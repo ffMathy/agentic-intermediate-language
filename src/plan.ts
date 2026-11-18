@@ -10,7 +10,7 @@ export function plan(p: Project): PlanEntry[] {
   const lock = readLock(p);
   const orphaned: PlanEntry[] = Object.entries(lock.nodes)
     .filter(([name]) => { const n = p.nodes.get(name); return !n || !isCompilable(p, n); })
-    .map(([name, e]) => ({ node: name, status: "orphaned" as const, hash: e.hash, path: Object.keys(e.files).join(", "), reason: "node no longer in the IL; `ail prune` removes its output" }));
+    .map(([name, e]) => ({ node: name, status: "orphaned" as const, hash: e.hash, path: Object.keys(e.files).join(", "), reason: "node no longer in the IL; `ail build` removes its output" }));
   return [...orphaned, ...topoByUses(p, p.ordered.filter((n) => isCompilable(p, n))).map((n) => {
     const hash = compileHash(p, n);
     const path = modulePath(p, n)!;

@@ -11,7 +11,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - uses: oven-sh/setup-bun@v2
-      - run: bun install --frozen-lockfile
+      - run: bun install --frozen-lockfile && bun link
       - run: bun install --frozen-lockfile
         working-directory: examples/tictactoe
       - run: bun run typecheck
@@ -26,4 +26,13 @@ jobs:
       - uses: ./
         with:
           project: examples/tictactoe
-          base: ${{ github.event.pull_request.base.sha || 'HEAD~1' }}
+
+  site:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: ./
+        with:
+          project: site

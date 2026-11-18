@@ -4,10 +4,9 @@
   "type": "module",
   "scripts": {
     "dev": "bun ./index.html",
-    "lint": "bun ../../src/cli.ts lint",
-    "plan": "bun ../../src/cli.ts plan",
-    "verify": "bun ../../src/cli.ts verify",
-    "compile": "bun ../../src/cli.ts compile"
+    "check": "ail check",
+    "build": "ail build",
+    "show": "ail show"
   },
   "dependencies": {
     "react": "^19.0.0",
@@ -20,6 +19,7 @@
     "@types/bun": "latest",
     "@types/react": "^19.0.0",
     "@types/react-dom": "^19.0.0",
-    "typescript": "^5.6.0"
+    "typescript": "^5.6.0",
+    "ail": "link:ail"
   }
 }

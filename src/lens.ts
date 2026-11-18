@@ -125,3 +125,30 @@ export function renderReview(p: Project, ref: string): string {
   if (removed.length) out.push(`\n## Removed\n${removed.map((r) => `- ${r}`).join("\n")}`);
   return out.join("\n") + "\n";
 }
+
+/** The whole tree with kind, level, folder, build status and sharing. */
+export function renderTree(p: Project, status: Map<string, string>): string {
+  return p.ordered.map((n) => {
+    const users = p.ordered.filter((u) => u.uses.includes(n.name)).length;
+    const st = status.get(n.name);
+    return `${"  ".repeat(ancestors(p, n.name).length)}${n.name} : ${n.kind} · ${n.level} · ${n.dir || "."}${st ? ` [${st}]` : ""}${users > 1 ? ` (used by ${users})` : ""}`;
+  }).join("\n") + "\n";
+}
+
+/** One node: where it lives, its status, who it serves, and its source. */
+export function renderNode(p: Project, n: AilNode, status?: string): string {
+  const users = p.ordered.filter((u) => u.uses.includes(n.name));
+  const reach = dependants(p, n.name);
+  const lines = [
+    `${n.name} : ${n.kind} · ${n.level} — ${n.file}:${n.line}${status ? ` [${status}]` : ""}`,
+    ...(ancestors(p, n.name).length ? [`path:     ${[...ancestors(p, n.name).map((a) => a.name), n.name].join(" › ")}`] : []),
+    ...(n.uses.length ? [`uses:     ${n.uses.join(", ")}`] : []),
+    ...(users.length ? [`used by:  ${users.map((u) => `${u.name} (${where(u)})`).join(", ")}`] : []),
+    ...(reach.length > users.length ? [`reaches:  ${reach.map((u) => u.name).join(", ")}`] : []),
+    "",
+    "```ail",
+    ...n.raw,
+    "```",
+  ];
+  return lines.join("\n") + "\n";
+}

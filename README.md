@@ -1,118 +1,129 @@
-# agentic-intermediate-language
+# AIL — Agentic Intermediate Language
 
-**AIL** is a recursive *why / what / how* specification language for software
-built by agents. People review the IL. An agent compiles it into code, and
-`ail verify` proves that the code does what the IL says, whichever model or
-vendor wrote it.
+**Write the spec. Let agents build the code. Prove that they agree.**
 
-```ail
-node TicTacToe : system   level: product
-  why   A quick, familiar game people can finish in under a minute.
-  what
-    4. The computer never loses.          refined-by: ComputerPlayer
-    ...
+AIL is a recursive *why / what / how* specification. People review the spec:
+plain language at the top, precise contracts further down. Any model compiles
+it, node by node, and every check the spec implies runs against the result.
+The same spec gives the same behaviour whichever model or vendor builds it.
+
+🌐 **Website:** <https://ffmathy.github.io/agentic-intermediate-language/>. The
+site is itself written in AIL ([`site/`](site)) and compiled by `ail build`.
+It includes a playable demo.
+
+![The Tic-Tac-Toe demo, built entirely from a spec](docs/tictactoe.png)
+
+## Use it in Claude Code
+
+No API key is needed; it runs on your Claude subscription.
+
+```
+/plugin marketplace add ffMathy/agentic-intermediate-language
 ```
 
-The top of the tree reads like a product brief. Each level down is more
-precise, ending at specialist nodes with algorithms, invariants and proofs.
-See [`docs/proposal.md`](docs/proposal.md) for the design, and
-[`examples/tictactoe`](examples/tictactoe) for a complete kata, compiled and
-verified.
+```
+/plugin install ail@agentic-intermediate-language
+```
 
-![The compiled Tic-Tac-Toe kata](docs/tictactoe.png)
+Then ask for features in plain words. Claude changes the spec, not the code.
+Two commands do the rest:
 
-## Install
+| | |
+|---|---|
+| `/ail:build` | compile whatever changed; each node is built by a subagent that can only see that node's slice of the spec |
+| `/ail:show [what]` | the tree, a node, a view for one audience (`stakeholder`, `design`, `engineer`, `specialist`), or `changes` |
 
-The toolchain needs [Bun](https://bun.sh) 1.2 or later.
+See **[docs/claude-code.md](docs/claude-code.md)** for the full guide.
+
+## Use it from a terminal
+
+The CLI needs [Bun](https://bun.sh) 1.2 or later.
+
+```bash
+bun add -g github:ffMathy/agentic-intermediate-language
+```
+
+Then, anywhere inside a project (any folder with an `ail.config.json`):
+
+| | |
+|---|---|
+| `ail check` | Is the spec sound, is the code built from it, and does it pass every check? |
+| `ail build` | Compile whatever changed. It uses Claude Code's login unless `ANTHROPIC_API_KEY` is set; `--model` picks another provider. |
+| `ail show [what]` | Same as `/ail:show` |
+
+That's the whole tool. Change detection, deriving tests from scenarios,
+regenerating glue and cleaning up after moved or deleted nodes all happen
+inside `ail build` and `ail check`.
+
+## Try the demo locally
+
+```bash
+cd examples/tictactoe
+```
 
 ```bash
 bun install
 ```
 
 ```bash
-bun src/cli.ts help
-```
-
-No API key is needed if you use Claude Code. Without `ANTHROPIC_API_KEY`,
-`ail` compiles through Claude Code's own login, including a Claude
-subscription. With the plugin installed, `/ail:ail-compile` lets Claude Code
-compile each node in a subagent whose only tools are `ail_context` and
-`ail_submit`.
-
-As a Claude Code plugin (skills, MCP tools, hooks, slash commands, and the
-leaf-compiler subagent):
-
-```
-/plugin marketplace add ffMathy/agentic-intermediate-language
-/plugin install ail@agentic-intermediate-language
-```
-
-## Try the kata
-
-```bash
-cd examples/tictactoe && bun install
+ail check
 ```
 
 ```bash
-bun ../../src/cli.ts lint
-```
-
-```bash
-bun ../../src/cli.ts verify
-```
-
-```bash
-bun ../../src/cli.ts lens stakeholder
+ail show stakeholder
 ```
 
 ```bash
 bun run dev
 ```
 
-## Commands
+## In CI
 
-| command | what it does |
-|---|---|
-| `ail lint` | structure, why-traceability, refinement links, per-level vocabulary, catalog references, cycles |
-| `ail plan [--check]` | which nodes are fresh, stale, missing or hand-edited |
-| `ail context <Node>` | the encapsulated slice of the spec one compile step sees |
-| `ail compile [Node…]` | compile stale nodes: model → verify → retry → lock |
-| `ail submit <Node> <file>` | hand in code written by an agent: verified and locked, or rolled back |
-| `ail verify [Node…]` | examples, derived checks, import boundaries, drift, typecheck |
-| `ail derive <Node>` | turn scenarios and verify items into pinned tests |
-| `ail diverge [Node…]` | sample N× per model; report where behaviour disagrees |
-| `ail lens <audience>` | stakeholder, design, engineer or specialist (`--tag`) view |
-| `ail review --base <ref>` | semantic IL diff, grouped by who should review it |
-| `ail lift <file>` | draft IL from existing code |
-| `ail prune` | delete the output of nodes removed from the IL (hand edits are kept) |
-| `ail mcp` | MCP server exposing all of the above |
+```yaml
+- uses: ffMathy/agentic-intermediate-language@main
+  with:
+    project: path/to/your/project
+```
 
-Models are given as `--model <spec>`. Repeat the flag for `diverge`.
+The action runs `ail check` and puts a review of the spec changes in the job
+summary.
 
-| spec | provider |
-|---|---|
-| `claude-code[:<model>]` | the Claude Code CLI and its login, subscription included (the default without an API key) |
-| `anthropic:claude-opus-5-5` | Anthropic API (the default when `ANTHROPIC_API_KEY` is set) |
-| `openai:<model>` | any OpenAI-compatible endpoint (`OPENAI_BASE_URL`, `OPENAI_API_KEY`) |
-| `command:<cli>` | any CLI that reads a prompt on stdin, e.g. `command:claude -p` |
-| `mock:<file.json>` | canned replies for tests |
+## How it works
+
+- **A node** states its `why`, its observable `what` (claims, scenarios,
+  executable examples), its `how` (decisions, plus the alternatives that were
+  rejected), and, for UI, its `look`, `copy` and `binds`.
+- **Levels** (`product` → `experience` → `system` → `specialist`) keep the top
+  readable by anyone and the bottom precise. Lint enforces the vocabulary at
+  each level.
+- **Folders mirror the tree.** Shared nodes have one owner (a `library` node)
+  and many users through `uses`.
+- **Only what changed is rebuilt.** Each node's compile hash covers exactly what
+  its compiler sees, and a dependency contributes only its contract. The lock
+  file records what produced each generated file, which also catches hand
+  edits.
+- **Gaps become questions.** A compiler that would have to guess replies
+  `STOP: <question>`, and you answer it in the spec.
+
+The full design is in [docs/proposal.md](docs/proposal.md).
 
 ## Repository layout
 
 ```
-src/                 the ail toolchain (Bun, TypeScript)
+src/                 the ail CLI and MCP server (Bun, TypeScript)
+prompts/             instructions given to the compiling model
 profiles/            target profiles: settings, catalog, glue templates, golden examples
-skills/              agent skills: author, compile-leaf, derive-checks, review, lift
-commands/            slash commands for the plugin
-agents/              the tool-restricted leaf-compiler subagent
-hooks/               plugin hooks (block generated-file edits, lint IL edits)
-examples/tictactoe/  the kata: IL, generated code, derived checks, lock file
-tests/               toolchain tests (bun test)
-docs/proposal.md     the design
-action.yml           GitHub Action: lint, plan --check, verify, review summary
+skills/ commands/ agents/ hooks/ .claude-plugin/    the Claude Code plugin
+examples/tictactoe/  the demo: spec, generated code, derived checks, lock file
+site/                the website, written in AIL
+tests/               toolchain tests
 ```
 
 ## Develop
+
+```bash
+bun install && bun link
+```
 
 ```bash
 bun test

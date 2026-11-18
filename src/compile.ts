@@ -1,4 +1,4 @@
-// `ail compile`, `ail submit`, `ail derive` and deterministic glue.
+// The build loop behind `ail build`, the `submit` door, and deterministic glue.
 //
 // The compile loop is code, not prompt: hash → cache check → encapsulated
 // context → model → verify → retry with failures → lock. A model can only
@@ -12,12 +12,8 @@ import type { AilNode } from "./parse.ts";
 import { plan } from "./plan.ts";
 import { AIL_HOME, isCompilable, kebab, modulePath, topoByUses, type Project } from "./project.ts";
 import type { Provider } from "./providers/index.ts";
-import { checksDir, derivedCheckFile, needsDerivedCheck, verifyNode, type VerifyResult } from "./verify.ts";
-
-export function loadSkill(name: string): string {
-  const f = join(AIL_HOME, "skills", name, "SKILL.md");
-  return readFileSync(f, "utf8").replace(/^---[\s\S]*?---\s*/, "").trim();
-}
+import { checkHeader, checkPath, derivedCheckFile, loadPrompt, needsDerivedCheck, stampCheck, verifyNode, type VerifyResult } from "./verify.ts";
+export { checkPath, loadPrompt } from "./verify.ts";
 
 export interface ParsedReply { stop: string | null; files: Record<string, string> }
 
@@ -94,22 +90,29 @@ export interface SubmitResult { ok: boolean; node: string; error?: string; verif
 /**
  * Write a node's files, verify them, and record them in the lock — or roll
  * back. This is the single door through which generated code enters the
- * tree, whether a model was called by `ail compile` or an agent wrote it.
+ * tree, whether `ail build` called a model or an agent wrote it.
+ *
+ * `files` holds the node's module and, optionally, its derived check
+ * (checks/<dir>/<kebab>.test.ts(x)); the check is pinned to the current spec.
+ * Deterministic glue is refreshed and orphaned output pruned on the way.
  */
 export function submit(p: Project, n: AilNode, files: Record<string, string>, by = "agent"): SubmitResult {
   const path = modulePath(p, n);
   if (!path || !isCompilable(p, n)) return { ok: false, node: n.name, error: `${n.name} is not a compilable node` };
-  const extra = Object.keys(files).filter((f) => f !== path);
-  if (extra.length) return { ok: false, node: n.name, error: `${n.name} may only write ${path}; refused ${extra.join(", ")}` };
+  const check = needsDerivedCheck(n) ? checkPath(p, n) : null;
+  const extra = Object.keys(files).filter((f) => f !== path && f !== check);
+  if (extra.length) return { ok: false, node: n.name, error: `${n.name} may only write ${path}${check ? ` and ${check}` : ""}; refused ${extra.join(", ")}` };
   if (!(path in files)) return { ok: false, node: n.name, error: `no content for ${path}` };
 
-  const abs = join(p.root, path);
-  const backup = existsSync(abs) ? readFileSync(abs, "utf8") : null;
-  mkdirSync(dirname(abs), { recursive: true });
-  writeFileSync(abs, files[path]!);
+  writeGlue(p);
+  prune(p);
+  const writes: [string, string][] = [[path, files[path]!]];
+  if (check && files[check] !== undefined) writes.unshift([check, stampCheck(p, n, files[check]!)]);
+  const backups = writes.map(([rel]) => [rel, existsSync(join(p.root, rel)) ? readFileSync(join(p.root, rel), "utf8") : null] as const);
+  for (const [rel, body] of writes) { mkdirSync(dirname(join(p.root, rel)), { recursive: true }); writeFileSync(join(p.root, rel), body); }
   const verify = verifyNode(p, n, { checkDrift: false });
   if (!verify.ok) {
-    if (backup === null) rmSync(abs); else writeFileSync(abs, backup);
+    for (const [rel, old] of backups) { if (old === null) rmSync(join(p.root, rel)); else writeFileSync(join(p.root, rel), old); }
     return { ok: false, node: n.name, verify, error: "verification failed; previous version restored" };
   }
   const lock = readLock(p);
@@ -152,7 +155,7 @@ export interface CompileOptions {
   log?: (msg: string) => void;
 }
 
-export interface CompileOutcome { node: string; status: "fresh" | "compiled" | "stopped" | "failed"; attempts: number; detail: string }
+export interface CompileOutcome { node: string; status: "fresh" | "compiled" | "stopped" | "failed" | "skipped"; attempts: number; detail: string }
 
 export function compileTask(p: Project, n: AilNode): string {
   return [
@@ -170,7 +173,7 @@ export function compileTask(p: Project, n: AilNode): string {
 
 export async function compileNode(p: Project, n: AilNode, opts: CompileOptions, sample?: number): Promise<{ reply: ParsedReply; raw: string }> {
   const raw = await opts.provider.complete({
-    system: loadSkill("ail-compile-leaf"),
+    system: loadPrompt("compile-leaf"),
     prompt: compileTask(p, n),
     temperature: opts.temperature,
     meta: { node: n.name, sample, purpose: "compile" },
@@ -188,14 +191,22 @@ export async function compile(p: Project, names: string[], opts: CompileOptions)
   const statuses = new Map(plan(p).map((e) => [e.node, e.status]));
   const targets = topoByUses(p, p.ordered.filter((n) => isCompilable(p, n) && (!names.length || names.includes(n.name))));
   const outcomes: CompileOutcome[] = [];
+  const unbuilt = (name: string) => {
+    const d = p.nodes.get(name);
+    if (!d || !isCompilable(p, d)) return false;
+    const o = outcomes.find((x) => x.node === name);
+    return o ? o.status !== "fresh" && o.status !== "compiled" : statuses.get(name) !== "fresh";
+  };
   for (const n of targets) {
+    const waiting = n.uses.filter(unbuilt);
+    if (waiting.length) { outcomes.push({ node: n.name, status: "skipped", attempts: 0, detail: `waiting for ${waiting.join(", ")}` }); continue; }
     if (!opts.force && statuses.get(n.name) === "fresh") { outcomes.push({ node: n.name, status: "fresh", attempts: 0, detail: "cache hit" }); continue; }
     let prompt = compileTask(p, n);
     let outcome: CompileOutcome | null = null;
     const max = opts.maxAttempts ?? 3;
     for (let attempt = 1; attempt <= max && !outcome; attempt++) {
       log(`${n.name}: attempt ${attempt} with ${opts.provider.id}`);
-      const raw = await opts.provider.complete({ system: loadSkill("ail-compile-leaf"), prompt, temperature: opts.temperature, meta: { node: n.name, sample: attempt - 1, purpose: "compile" } });
+      const raw = await opts.provider.complete({ system: loadPrompt("compile-leaf"), prompt, temperature: opts.temperature, meta: { node: n.name, sample: attempt - 1, purpose: "compile" } });
       const reply = parseReply(raw);
       if (reply.stop) { outcome = { node: n.name, status: "stopped", attempts: attempt, detail: reply.stop }; break; }
       const res = submit(p, n, reply.files, opts.provider.id);
@@ -219,11 +230,10 @@ export async function compile(p: Project, names: string[], opts: CompileOptions)
  */
 export async function derive(p: Project, n: AilNode, provider: Provider): Promise<{ file: string; stop?: string }> {
   if (!needsDerivedCheck(n)) throw new Error(`${n.name} has no scenarios or verify section to derive checks from`);
-  const ext = n.kind === "view" || n.kind === "flow" ? "tsx" : "ts";
-  const rel = relative(p.root, join(checksDir(p), n.dir, `${kebab(n.name)}.test.${ext}`));
-  const header = `// ail-derived-from: ${n.name}@${oracleHash(p, n).slice(0, 16)}`;
+  const rel = checkPath(p, n);
+  const header = checkHeader(p, n);
   const raw = await provider.complete({
-    system: loadSkill("ail-derive-checks"),
+    system: loadPrompt("derive-checks"),
     prompt: [
       buildContext(p, n),
       "## Task",
@@ -243,6 +253,15 @@ export async function derive(p: Project, n: AilNode, provider: Provider): Promis
   const old = derivedCheckFile(p, n).file;
   if (old && relative(p.root, old) !== rel) rmSync(old);
   mkdirSync(dirname(join(p.root, rel)), { recursive: true });
-  writeFileSync(join(p.root, rel), body.startsWith("// ail-derived-from:") ? body.replace(/^.*\n/, header + "\n") : `${header}\n${body}`);
+  writeFileSync(join(p.root, rel), stampCheck(p, n, body));
   return { file: rel };
+}
+
+/** Nodes whose derived check is missing or was derived from an older spec. */
+export function checksToDerive(p: Project, nodes: AilNode[]): AilNode[] {
+  return nodes.filter((n) => {
+    if (!needsDerivedCheck(n)) return false;
+    const { file, pinned } = derivedCheckFile(p, n);
+    return !file || pinned !== oracleHash(p, n).slice(0, 16);
+  });
 }

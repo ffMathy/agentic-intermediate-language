@@ -1,24 +1,25 @@
 # Agent instructions
 
-## In any AIL project (a directory with `ail.config.json`)
+## In any AIL project (a folder with `ail.config.json`)
 
 - The `*.ail.md` files are the source of truth. Generated code (the profile's
-  `generated` globs, e.g. `src/gen/**`) is never edited by hand. Hooks block
-  it, and `ail plan` reports it as drift.
-- To change behaviour, edit the IL (skill `ail-author`), then compile.
-- To implement a node, get its context (`ail context <Node>` or the
-  `ail_context` tool), write the module from that context only, and hand it in
-  with `ail submit` or `ail_submit`.
-- If the spec doesn't determine something and it isn't in `free`, stop and ask
-  for an IL change. Don't guess in code.
-- Before you finish: `ail lint`, `ail plan --check` and `ail verify` all pass.
+  `generated` globs, e.g. `src/gen/**`) is never edited by hand: hooks block
+  it, and `ail check` reports it.
+- To change behaviour, change the spec, then build: `/ail:build` in Claude
+  Code, or `ail build` in a terminal.
+- If the spec leaves something open and it isn't in `free`, stop and ask for a
+  spec change. Never guess in code.
+- Before finishing, `ail check` (or the `ail_check` tool) must pass.
 
 ## In this repository (the toolchain)
 
-- Use Bun for everything: `bun install`, `bun test`, `bun run typecheck`, and
-  `bun src/cli.ts <command>`.
-- `bun test` includes an end-to-end check of `examples/tictactoe`, which needs
-  `bun install` run inside that directory first.
-- If you change the profile, the skills or the context format, the kata's
-  compile hashes change. Recompile, or re-submit the affected nodes, so that
-  `ail plan --check` passes in `examples/tictactoe`.
+- Use Bun for everything. Run `bun install && bun link` once, then
+  `bun test` and `bun run typecheck`. Example projects depend on the linked
+  `ail`.
+- `bun test` includes end-to-end checks of `examples/tictactoe`, which needs
+  `bun install` in that folder first.
+- `site/` is the website, and it is an AIL project. Change its pages through
+  its spec and `ail build`, never by editing `site/src/gen`.
+- If you change the profile, the prompts or the context format, compile hashes
+  change. Rebuild `examples/tictactoe` and `site` so that `ail check` passes in
+  both.

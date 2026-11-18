@@ -7,6 +7,8 @@
 import { dirname, relative } from "node:path";
 import type { AilNode } from "./parse.ts";
 import { ancestors, modulePath, type Project } from "./project.ts";
+import { checkHeader, checkPath, derivedCheckFile, loadPrompt, needsDerivedCheck } from "./verify.ts";
+import { oracleHash } from "./hash.ts";
 
 function importSpecifier(fromPath: string, toPath: string): string {
   let rel = relative(dirname(fromPath), toPath).replace(/\.tsx?$/, "").replace(/(^|\/)index$/, "$1").replace(/\/$/, "");
@@ -16,10 +18,11 @@ function importSpecifier(fromPath: string, toPath: string): string {
 
 const fence = (body: string, lang = "ail") => "```" + lang + "\n" + body.trimEnd() + "\n```";
 
+/** A dependency as its dependants see it: `what` and `binds`, never `how`. */
 export function whatOnly(n: AilNode): string {
   const header = n.raw[0]!;
-  const what = n.sections.find((s) => s.key === "what");
-  return [header, ...(what?.raw ?? ["  ; (no public contract)"])].join("\n");
+  const visible = n.sections.filter((s) => s.key === "what" || s.key === "binds");
+  return [header, ...(visible.length ? visible.flatMap((s) => s.raw) : ["  ; (no public contract)"])].join("\n");
 }
 
 export function buildContext(p: Project, n: AilNode): string {
@@ -55,6 +58,7 @@ export function buildContext(p: Project, n: AilNode): string {
   const deps = n.uses.map((u) => p.nodes.get(u)).filter(Boolean) as AilNode[];
   if (deps.length) {
     out.push(`\n## Dependencies (contract only — their implementation is hidden on purpose)`);
+    out.push(`They are compiled before you, at exactly the import specifiers shown. Use their names and props as written; never re-create them.`);
     for (const d of deps) {
       const dp = modulePath(p, d);
       out.push(`\n### ${d.name}${dp && path ? ` — import from "${importSpecifier(path, dp)}"` : ""}`);
@@ -67,6 +71,15 @@ export function buildContext(p: Project, n: AilNode): string {
     out.push(`\n## Shared modules`);
     if (catalogDir) out.push(`- catalog components: import { ... } from "${importSpecifier(path, catalogDir)}"`);
     if (tokensCss) out.push(`- design tokens are CSS variables defined in ${tokensCss}: token a.b.c → var(--a-b-c)`);
+  }
+
+  if (needsDerivedCheck(n)) {
+    const { file, pinned } = derivedCheckFile(p, n);
+    if (!file || pinned !== oracleHash(p, n).slice(0, 16)) {
+      const rel = checkPath(p, n);
+      out.push(`\n## Derived check needed`);
+      out.push(`This node's scenarios / verify items have no current derived check. Write ${rel} as well, and submit it together with the module. It imports the module relative to itself and starts with the line:\n${checkHeader(p, n)}\n\n${loadPrompt("derive-checks")}`);
+    }
   }
 
   const goldens = (p.profile?.goldens ?? []).filter((g) => g.kind === n.kind);

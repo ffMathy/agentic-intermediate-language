@@ -93,3 +93,11 @@ test("without an API key, the default model is Claude Code's own login", async (
   expect(defaultModel({}, () => null)).toBe("anthropic:claude-opus-5-5");
   expect(getProvider("claude-code:opus").id).toBe("claude-code:opus");
 });
+
+test("a node whose dependency did not build is skipped, not attempted", async () => {
+  const dir = tempProject();
+  const provider = getProvider(`mock:${mockFile(dir, { Add: ["STOP: overflow?"], Pick: [reply(PICK, goodPick)] })}`);
+  const out = await compile(load(dir), [], { provider });
+  expect(out.map((o) => [o.node, o.status])).toEqual([["Add", "stopped"], ["Pick", "skipped"]]);
+  expect(out[1]!.detail).toBe("waiting for Add");
+});

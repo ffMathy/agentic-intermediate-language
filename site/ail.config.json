@@ -1,0 +1,4 @@
+{
+  "sources": ["**/*.ail.md"],
+  "profilePaths": ["../profiles"]
+}

@@ -155,7 +155,7 @@ export interface CompileOptions {
   log?: (msg: string) => void;
 }
 
-export interface CompileOutcome { node: string; status: "fresh" | "compiled" | "stopped" | "failed"; attempts: number; detail: string }
+export interface CompileOutcome { node: string; status: "fresh" | "compiled" | "stopped" | "failed" | "skipped"; attempts: number; detail: string }
 
 export function compileTask(p: Project, n: AilNode): string {
   return [
@@ -191,7 +191,15 @@ export async function compile(p: Project, names: string[], opts: CompileOptions)
   const statuses = new Map(plan(p).map((e) => [e.node, e.status]));
   const targets = topoByUses(p, p.ordered.filter((n) => isCompilable(p, n) && (!names.length || names.includes(n.name))));
   const outcomes: CompileOutcome[] = [];
+  const unbuilt = (name: string) => {
+    const d = p.nodes.get(name);
+    if (!d || !isCompilable(p, d)) return false;
+    const o = outcomes.find((x) => x.node === name);
+    return o ? o.status !== "fresh" && o.status !== "compiled" : statuses.get(name) !== "fresh";
+  };
   for (const n of targets) {
+    const waiting = n.uses.filter(unbuilt);
+    if (waiting.length) { outcomes.push({ node: n.name, status: "skipped", attempts: 0, detail: `waiting for ${waiting.join(", ")}` }); continue; }
     if (!opts.force && statuses.get(n.name) === "fresh") { outcomes.push({ node: n.name, status: "fresh", attempts: 0, detail: "cache hit" }); continue; }
     let prompt = compileTask(p, n);
     let outcome: CompileOutcome | null = null;

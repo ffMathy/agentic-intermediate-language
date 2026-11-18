@@ -1,4 +1,4 @@
-// ail-derived-from: App@4e915521d4721d6e
+// ail-derived-from: App@66c86574c5953fab
 import { afterEach, expect, test } from "bun:test";
 import { cleanup, fireEvent, render, screen } from "@testing-library/react";
 import { App } from "../../src/gen/app/app";

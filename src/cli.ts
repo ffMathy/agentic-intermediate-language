@@ -107,10 +107,10 @@ async function main(argv: string[]): Promise<number> {
         temperature: flag(a, "temperature") ? Number(flag(a, "temperature")) : undefined,
       });
       for (const [node, q] of stopped) out.push({ node, status: "stopped", attempts: 0, detail: q });
-      const icon = { fresh: "✓", compiled: "✓", stopped: "?", failed: "✗" };
-      print(out.map((o) => `${icon[o.status]} ${o.node.padEnd(18)} ${o.status === "fresh" ? "up to date" : o.status}${o.status === "stopped" ? `: ${o.detail}` : ""}`).join("\n"), out);
+      const icon = { fresh: "✓", compiled: "✓", stopped: "?", failed: "✗", skipped: "…" };
+      print(out.map((o) => `${icon[o.status]} ${o.node.padEnd(18)} ${o.status === "fresh" ? "up to date" : o.status}${o.status === "stopped" || o.status === "skipped" ? `: ${o.detail}` : ""}`).join("\n"), out);
       if (out.some((o) => o.status === "stopped")) console.error("\nThe spec doesn't decide the questions above. Answer them in the .ail.md files, then build again.");
-      return out.some((o) => o.status === "failed" || o.status === "stopped") ? 1 : 0;
+      return out.some((o) => o.status !== "fresh" && o.status !== "compiled") ? 1 : 0;
     }
 
     case "show": {

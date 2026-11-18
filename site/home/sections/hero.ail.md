@@ -13,7 +13,10 @@ node Hero : view   level: experience
     name     font.hero, weight 800, color.accent, no margin; it is the page's level 1 heading
     pitch    font.heading, weight 600, color.text
     explanation  Text.body, color.text.muted, at most 640px wide
-    links    stack(h, gap: space.4, align: center); the first link looks like Button.primary, the others like Button.secondary
+    links    stack(h, gap: space.4, align: center) [ start, demo, github ]
+    link     a native link: pad space.2 above and below and space.4 left and right, radius.md, font.body, weight 600, no underline
+    start    background color.action, text color.action.text, a 1px color.action border
+    others   background color.surface, text color.text, a 1px color.border border
   copy
     hero.name         "AIL"
     hero.pitch        "Write the spec. Let agents build the code. Prove that they agree."

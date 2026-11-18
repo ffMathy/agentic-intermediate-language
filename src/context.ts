@@ -18,10 +18,11 @@ function importSpecifier(fromPath: string, toPath: string): string {
 
 const fence = (body: string, lang = "ail") => "```" + lang + "\n" + body.trimEnd() + "\n```";
 
+/** A dependency as its dependants see it: `what` and `binds`, never `how`. */
 export function whatOnly(n: AilNode): string {
   const header = n.raw[0]!;
-  const what = n.sections.find((s) => s.key === "what");
-  return [header, ...(what?.raw ?? ["  ; (no public contract)"])].join("\n");
+  const visible = n.sections.filter((s) => s.key === "what" || s.key === "binds");
+  return [header, ...(visible.length ? visible.flatMap((s) => s.raw) : ["  ; (no public contract)"])].join("\n");
 }
 
 export function buildContext(p: Project, n: AilNode): string {
@@ -57,6 +58,7 @@ export function buildContext(p: Project, n: AilNode): string {
   const deps = n.uses.map((u) => p.nodes.get(u)).filter(Boolean) as AilNode[];
   if (deps.length) {
     out.push(`\n## Dependencies (contract only — their implementation is hidden on purpose)`);
+    out.push(`They are compiled before you, at exactly the import specifiers shown. Use their names and props as written; never re-create them.`);
     for (const d of deps) {
       const dp = modulePath(p, d);
       out.push(`\n### ${d.name}${dp && path ? ` — import from "${importSpecifier(path, dp)}"` : ""}`);

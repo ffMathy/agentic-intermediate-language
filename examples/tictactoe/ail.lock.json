@@ -2,7 +2,7 @@
   "version": 1,
   "nodes": {
     "App": {
-      "hash": "bd4f74f0bc74cd61b3893af90d6e9c34cc86cb66acbceadfac45d4ddbd642e2c",
+      "hash": "b4894e5fd980bd334897312a6197062c6feab9f2ccace252033c2988896462ec",
       "files": {
         "src/gen/app/app.tsx": "aea36c9fe1798bc49f0c598ef88d746a43feece6b0d48f8c6a059fedba273dc6"
       },
@@ -51,7 +51,7 @@
       "by": "claude-session"
     },
     "PlayAGame": {
-      "hash": "86610c73eea71d37ae01a1bd7cb5a98cd981773a6e9fbf38d15b3e48d9293850",
+      "hash": "22bae0fa9d7ef547bb6e5e15fabd2fd15067a2872493908f2d0c03469bc2131a",
       "files": {
         "src/gen/app/play/play-a-game.tsx": "b76b22a8398e7e67da8d574c718eb197bfe9b89f1f88bd983d521720b6433ddf"
       },
@@ -72,7 +72,7 @@
       "by": "claude-session"
     },
     "WatchADemo": {
-      "hash": "203023699d9f51a5d05dc9bf995529f398c4a06f77336f90ef63f01f35d7a7ea",
+      "hash": "cac5980417b885e5d7d1f9a5efcef18174c975dc4e7004c841fd3cff3c8d0d2c",
       "files": {
         "src/gen/app/demo/watch-a-demo.tsx": "1c4032e69bc2ba1899b95dbb99e1cca7aecaaf92f06842df83a453f5382ab41a"
       },

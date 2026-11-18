@@ -39,8 +39,9 @@ export function canonicalNode(n: AilNode, only?: string[]): string {
   return [`node ${n.name} : ${n.kind} level:${n.level ?? "-"} ${[...n.tags].sort().map((t) => "@" + t).join(" ")}`.trim(), ...sections].join("\n");
 }
 
-/** The public contract of a node: what dependants are allowed to see. */
-export const contractOf = (n: AilNode) => canonicalNode(n, ["what"]);
+/** The public contract of a node: what dependants are allowed to see — its
+ * observable behaviour, and (for views and flows) the props it binds. */
+export const contractOf = (n: AilNode) => canonicalNode(n, ["what", "binds"]);
 
 export function profileHash(p: Project): string {
   if (!p.profile) return sha256("no-profile");

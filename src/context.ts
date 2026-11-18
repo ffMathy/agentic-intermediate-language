@@ -7,6 +7,8 @@
 import { dirname, relative } from "node:path";
 import type { AilNode } from "./parse.ts";
 import { ancestors, modulePath, type Project } from "./project.ts";
+import { checkHeader, checkPath, derivedCheckFile, loadPrompt, needsDerivedCheck } from "./verify.ts";
+import { oracleHash } from "./hash.ts";
 
 function importSpecifier(fromPath: string, toPath: string): string {
   let rel = relative(dirname(fromPath), toPath).replace(/\.tsx?$/, "").replace(/(^|\/)index$/, "$1").replace(/\/$/, "");
@@ -67,6 +69,15 @@ export function buildContext(p: Project, n: AilNode): string {
     out.push(`\n## Shared modules`);
     if (catalogDir) out.push(`- catalog components: import { ... } from "${importSpecifier(path, catalogDir)}"`);
     if (tokensCss) out.push(`- design tokens are CSS variables defined in ${tokensCss}: token a.b.c → var(--a-b-c)`);
+  }
+
+  if (needsDerivedCheck(n)) {
+    const { file, pinned } = derivedCheckFile(p, n);
+    if (!file || pinned !== oracleHash(p, n).slice(0, 16)) {
+      const rel = checkPath(p, n);
+      out.push(`\n## Derived check needed`);
+      out.push(`This node's scenarios / verify items have no current derived check. Write ${rel} as well, and submit it together with the module. It imports the module relative to itself and starts with the line:\n${checkHeader(p, n)}\n\n${loadPrompt("derive-checks")}`);
+    }
   }
 
   const goldens = (p.profile?.goldens ?? []).filter((g) => g.kind === n.kind);

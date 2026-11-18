@@ -40,7 +40,7 @@ export function preHook(payload: unknown, cwd = process.cwd()): HookResult {
   if (!hit) return { code: 0, message: "" };
   return {
     code: 2,
-    message: `${rel} is generated from the IL (matches "${hit}"). Do not edit it directly: change the .ail.md source and run \`ail compile\`, or write the module through the ail_submit tool / \`ail submit\` so it is verified and locked.`,
+    message: `${rel} is generated from the IL (matches "${hit}"). Do not edit it directly: change the .ail.md source and run \`ail build\` (or \`/ail:build\` in Claude Code).`,
   };
 }
 
@@ -53,5 +53,5 @@ export function postHook(payload: unknown, cwd = process.cwd()): HookResult {
   const p = loadProject(project);
   const errors = lint(p).filter((d) => d.severity === "error");
   if (!errors.length) return { code: 0, message: "" };
-  return { code: 2, message: `ail lint found problems after editing ${file}:\n${formatDiagnostics(errors)}` };
+  return { code: 2, message: `the spec has problems after editing ${file}:\n${formatDiagnostics(errors)}` };
 }

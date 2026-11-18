@@ -1,37 +1,33 @@
 name: AIL check
-description: Lint an AIL spec, fail if generated code is stale or hand-edited, run every check the IL implies, and post the IL review to the job summary.
+description: Run `ail check` on an AIL project (spec sound, code built from it, every check passing) and put a review of the spec changes in the job summary.
 inputs:
   project:
     description: Directory containing ail.config.json
     default: "."
   base:
-    description: Git ref to diff the IL against for the review summary (empty to skip)
-    default: ""
+    description: Git ref to describe spec changes against in the job summary (default origin/main when it exists; empty string to skip)
+    default: "origin/main"
 runs:
   using: composite
   steps:
     - uses: oven-sh/setup-bun@v2
-    - name: Install toolchain
+    - name: Install ail
       shell: bash
-      run: bun install --cwd "${{ github.action_path }}" --frozen-lockfile
+      working-directory: ${{ github.action_path }}
+      run: bun install --frozen-lockfile && bun link
     - name: Install project
       shell: bash
       working-directory: ${{ inputs.project }}
       run: if [ -f package.json ]; then bun install --frozen-lockfile; fi
-    - name: ail lint
+    - name: ail check
       shell: bash
       working-directory: ${{ inputs.project }}
-      run: bun "${{ github.action_path }}/src/cli.ts" lint
-    - name: ail plan --check
+      run: bun "${{ github.action_path }}/src/cli.ts" check
+    - name: Spec changes
+      if: ${{ always() && inputs.base != '' }}
       shell: bash
       working-directory: ${{ inputs.project }}
-      run: bun "${{ github.action_path }}/src/cli.ts" plan --check
-    - name: ail verify
-      shell: bash
-      working-directory: ${{ inputs.project }}
-      run: bun "${{ github.action_path }}/src/cli.ts" verify
-    - name: IL review summary
-      if: ${{ inputs.base != '' }}
-      shell: bash
-      working-directory: ${{ inputs.project }}
-      run: bun "${{ github.action_path }}/src/cli.ts" review --base "${{ inputs.base }}" >> "$GITHUB_STEP_SUMMARY"
+      run: |
+        if git rev-parse --verify --quiet "${{ inputs.base }}" >/dev/null; then
+          bun "${{ github.action_path }}/src/cli.ts" show changes --since "${{ inputs.base }}" >> "$GITHUB_STEP_SUMMARY"
+        fi

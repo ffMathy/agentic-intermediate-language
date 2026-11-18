@@ -1,0 +1,57 @@
+name: pages
+
+# The website is an AIL project (site/). Nothing here calls a model: the page
+# was compiled by `ail build` and committed. This workflow proves it is still
+# built from its spec and passes its checks, then publishes it, together with
+# the Tic-Tac-Toe demo at /demo/.
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: true
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: oven-sh/setup-bun@v2
+      - name: Install ail
+        run: bun install --frozen-lockfile && bun link
+      - name: Install the site and the demo
+        run: |
+          (cd site && bun install --frozen-lockfile)
+          (cd examples/tictactoe && bun install --frozen-lockfile)
+      - name: The site is built from its spec and passes its checks
+        working-directory: site
+        run: bun run check
+      - name: The demo is built from its spec and passes its checks
+        working-directory: examples/tictactoe
+        run: bun run check
+      - name: Bundle
+        run: |
+          (cd site && bun build ./index.html --outdir ../_site --production)
+          (cd examples/tictactoe && bun build ./index.html --outdir ../../_site/demo --production)
+      - uses: actions/configure-pages@v5
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: _site
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - id: deployment
+        uses: actions/deploy-pages@v4

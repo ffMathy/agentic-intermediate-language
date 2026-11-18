@@ -1,7 +1,3 @@
----
-name: ail-derive-checks
-description: Turn an AIL node's scenarios and verify items into a pinned test file (the derived oracle). Use when `ail verify` reports a missing or stale derived check, or when asked to `ail derive` a node.
----
 # Derive checks from scenarios
 
 Scenarios (Given/When/Then) and `verify` items describe behaviour that

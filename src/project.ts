@@ -106,7 +106,7 @@ export function loadProject(rootArg?: string): Project {
   const cfgFile = join(root, "ail.config.json");
   const config: Config = existsSync(cfgFile) ? JSON.parse(readFileSync(cfgFile, "utf8")) : {};
   const sources = config.sources
-    ? [...new Set(config.sources.flatMap((pattern) => [...new Bun.Glob(pattern).scanSync({ cwd: root })].map((f) => resolve(root, f))))].sort()
+    ? [...new Set(config.sources.flatMap((pattern) => [...new Bun.Glob(pattern).scanSync({ cwd: root })].filter((f) => !/(^|\/)(node_modules|\.[^/]+)\//.test(f)).map((f) => resolve(root, f))))].sort()
     : walk(root).sort();
   const files = sources.map((f) => parseFile(relative(root, f), readFileSync(f, "utf8")));
   const errors = files.flatMap((f) => f.errors);

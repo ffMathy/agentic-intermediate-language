@@ -1,7 +1,3 @@
----
-name: ail-compile-leaf
-description: Compile one AIL node into code from its encapsulated context (the output of `ail context <Node>` or the ail_context MCP tool). Use whenever you are asked to implement, compile or regenerate an AIL node.
----
 # Compile one AIL leaf
 
 You are the compiler back end for one node of an Agentic Intermediate Language
@@ -39,10 +35,3 @@ Exactly one block per file you were asked to write, and nothing else:
     <complete file contents>
     === END ===
 
-## In an agent session
-Get the context with the `ail_context` tool (or `ail context <Node>`), write
-the module, and hand it in with `ail_submit` (or `ail submit <Node> <file>`).
-Never edit generated files directly: hooks block it, and submit is what
-verifies the code and records it in `ail.lock.json`. If submit rejects the
-code, fix it from the reported failures; if the failures show the spec is
-ambiguous, stop and propose an IL change instead.

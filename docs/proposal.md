@@ -78,11 +78,11 @@ engine/computer-player/computer-player.ail.md    grew big, so it got its own fol
   `refined-by` a shared node, as long as some descendant uses it.
 - **Changing a shared contract is visible.** Lenses mark shared nodes with
   their users (`Used by PlayAGame (app/play/), WatchADemo (app/demo/)`).
-  `ail review` lists every node a contract change reaches, so each affected
+  `ail show changes` lists every node a contract change reaches, so each affected
   area's reviewers see it.
 - **Moving is safe.** The output location is part of the compile hash. A node
   that moved shows as `stale (moved from …)`, recompiling removes its old file,
-  and `ail prune` cleans up the output of nodes that were deleted. Hand-edited
+  and `ail build` cleans up the output of nodes that were deleted. Hand-edited
   files are never deleted.
 
 ## 3. Levels: one tree, many readers
@@ -100,7 +100,7 @@ depths:
 - Plain claims are **proven by children**. *"The computer never loses"* is a
   product sentence; the specialist node `ComputerPlayer` makes it true, and a
   derived check enumerates every game to prove it.
-- `ail lint` enforces the vocabulary. Jargon from the profile's list, or code
+- Lint (part of `ail check`) enforces the vocabulary. Jargon from the profile's list, or code
   notation (calls, operators, camelCase, braces), in `product`/`experience`
   prose is an error. Notation belongs in `look`, `copy` or `binds`, or one
   level deeper.
@@ -120,26 +120,31 @@ depths:
 | Golden examples | A few node → code pairs per kind anchor structure and style more strongly than written rules can. |
 | Encapsulated context | Each leaf is compiled from a small, fixed slice of the spec. A smaller context means less variance. |
 | Content hashing | Canonical forms ignore comments, whitespace and section order. Cosmetic edits never recompile anything; changing a dependency's `how` doesn't recompile its dependants. |
-| Divergence sampling | `ail diverge` compares N samples × M models on verification, export surface and `probes`. |
-| Drift detection | Hand edits to generated code are caught by the lock file. A hook blocks them, CI fails on them, and `ail lift` turns them back into a spec change. |
+| Divergence sampling | `ail check --samples N` compares N samples × M models on verification, export surface and `probes`. |
+| Drift detection | Hand edits to generated code are caught by the lock file. A hook blocks them, and CI fails on them. The fix is a spec change and a rebuild. |
 
 ## 5. The toolchain: skills teach, tools decide, hooks enforce
 
+The surface is deliberately small:
+
 | Piece | Job |
 |---|---|
-| `ail` CLI (Bun) | lint, plan, context, verify, compile, submit, derive, diverge, lens, review, lift, glue |
-| MCP server | the same operations as tools, so any MCP-capable agent can drive them |
-| Skills | `ail-author`, `ail-compile-leaf`, `ail-derive-checks`, `ail-review`, `ail-lift`, plus one per profile |
-| Hooks | block edits to generated files; lint every `.ail.md` edit |
-| Commands | `/ail-new`, `/ail-compile`, `/ail-lens`, `/ail-review` |
-| GitHub Action | lint, `plan --check`, verify, and the IL review in the job summary |
+| `ail check` | Is the spec sound (lint), is everything built from it (plan), and does it pass (verify)? `--samples N` adds divergence sampling. |
+| `ail build` | Regenerate glue, prune what was removed, derive tests from scenarios, then compile every node that changed. |
+| `ail show` | The tree, a node, a view for one audience, or the changes (a semantic diff against a git ref). |
+| MCP server | four tools: `ail_show`, `ail_check`, `ail_context`, `ail_submit` |
+| Plugin | the `ail` skill, the `/ail:build` and `/ail:show` commands, the `ail-leaf-compiler` subagent, and hooks that block edits to generated files and lint every `.ail.md` edit |
+| GitHub Action | `ail check`, plus the spec changes in the job summary |
+
+Plumbing for agents and tooling (`ail context`, `ail submit`, `ail mcp`,
+`ail hook`) stays out of the main help.
 
 ### Running on a Claude subscription
 
 No API key is required. There are two paths, and both use whatever Claude Code
 is logged in with:
 
-- **Inside Claude Code** (plugin): `/ail:ail-compile` delegates each node to the
+- **Inside Claude Code** (plugin): `/ail:build` delegates each node to the
   `ail-leaf-compiler` subagent. That subagent's only tools are `ail_context` and
   `ail_submit`, so it cannot read anything outside its node's slice. Tool
   permissions enforce the encapsulation.
@@ -172,17 +177,17 @@ All of this is in this repository and can be re-run:
   compiled nodes across 6 folders plus glue. 24 example tests and 22 derived
   checks pass (46 in all), including an exhaustive "computer never loses" proof
   and a typecheck. The app runs with `bun run dev`.
-- **It runs on a subscription.** With no API key set, `ail compile` used Claude
+- **It runs on a subscription.** With no API key set, `ail build` used Claude
   Code's login and compiled `WatchADemo` and `ComputerPlayer` on the first try,
   with correct imports across folders. With the plugin installed,
-  `/ail:ail-compile` recompiled a deleted node. A trace showed the main agent
+  `/ail:build` recompiled a deleted node. A trace showed the main agent
   only planning and verifying, while the restricted subagent made exactly one
   `ail_context` call and one `ail_submit` call.
-- **A real model passes on the first try.** In a scratch copy, `ail compile
+- **A real model passes on the first try.** In a scratch copy, `ail build
   ComputerPlayer --force --model "command:claude -p"` produced a textually
   different implementation (negamax instead of a min/max split) that passed the
   same checks on attempt 1.
-- **Real samples converge.** `ail diverge ComputerPlayer Rules --samples 2`
+- **Real samples converge.** `ail check ComputerPlayer Rules --samples 2`
   converged: every sample verified and every probe agreed.
 - **Ambiguity becomes a question, not a coin flip.** With the tie-break rule
   removed from `ComputerPlayer`, all 3 samples refused to guess. Each replied

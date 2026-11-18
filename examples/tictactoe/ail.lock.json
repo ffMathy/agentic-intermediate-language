@@ -1,0 +1,74 @@
+{
+  "version": 1,
+  "nodes": {
+    "BoardView": {
+      "hash": "98e7e377c3bc495f5d056b7b9461299e5c1b411f4a3f68d132c65550e078ecb3",
+      "files": {
+        "src/gen/board-view.tsx": "b9958c8ccf16261c31351f7da44fa1f90795dc980414644c9a041f9d9c42c7af"
+      },
+      "by": "claude-session"
+    },
+    "ChooseOpponent": {
+      "hash": "f7560634e6f0ae9811747c03c2ae78e86580b7b4c23a3def0aa966d5524087dc",
+      "files": {
+        "src/gen/choose-opponent.tsx": "cea2ebde838c05729044187959f68b87aa947a729106ddee5664c69792a6adb3"
+      },
+      "by": "claude-session"
+    },
+    "ComputerPlayer": {
+      "hash": "1e0f7825d382e242177360bfd20ef1fff0d7136758b0a3f3021e4b6fdb32a762",
+      "files": {
+        "src/gen/computer-player.ts": "2b33c13f164ee13f08a0d4ada8596973fc3cbbf79a0aadfd91491d856b54f414"
+      },
+      "by": "claude-session"
+    },
+    "GameReducer": {
+      "hash": "d677b455a8e2c94fe7537b054bb9bd988b79c64c2bb946f1dc6e7bed1c9d84a7",
+      "files": {
+        "src/gen/game-reducer.ts": "0c99dcede863818cac41df710ce5dd92da525f012461aff40a6a166a9fac550c"
+      },
+      "by": "claude-session"
+    },
+    "GameState": {
+      "hash": "771317ffcf1c976e61f5b357c35a5b2b808660bb665aabb1e084a5d87929752c",
+      "files": {
+        "src/gen/game-state.ts": "3d6a9ea8e1979fa40c11074d9bbde7bcca733f829b8fb62ee8bf668974aef0d4"
+      },
+      "by": "claude-session"
+    },
+    "NewGameButton": {
+      "hash": "ea9136eb7e8d851a5488c1f6e3624bc7988f970fcf71d6560380672e5220f55b",
+      "files": {
+        "src/gen/new-game-button.tsx": "36ce92e3cfc4a9b1bafbd530d186d9cddfbea2a7e0a0503ff3d9c9d88397f061"
+      },
+      "by": "claude-session"
+    },
+    "PlayAGame": {
+      "hash": "cae732eb9285c230177ecc5d9cba48d9f957b75a0453f66b7d1cb123b50b3f46",
+      "files": {
+        "src/gen/play-a-game.tsx": "76ccccc67d325ed28f3277c374c9606ca4d408e961e3e5de5c59aa6a91661460"
+      },
+      "by": "claude-session"
+    },
+    "Rules": {
+      "hash": "ba809b7aaca3aed0891f64170a9e6787bb3bbb7a8c3f3ef46a6a84df9bae8753",
+      "files": {
+        "src/gen/rules.ts": "b702030499d24d3cd520ace95bd1a4f2c17d586fec9f076bdf3c955019f4616e"
+      },
+      "by": "claude-session"
+    },
+    "StatusLine": {
+      "hash": "525e683c6daac56292533d7c4ae41f54430951bc53093eb0ae59050fa381036d",
+      "files": {
+        "src/gen/status-line.tsx": "ae0834c0bdf82a9d36de4145726681e07879d1710fc1d5c99e1376dc66e8b783"
+      },
+      "by": "claude-session"
+    }
+  },
+  "glue": {
+    "index.html": "4f4ff97e922e731e5ef7c938853ab6609e6bb01c7df7d3b6b34c30fe2994f595",
+    "src/gen/catalog/index.tsx": "38c5f7efa1655da2ebaeb0f0066abaa7fbaf69183c881edb5b5f70c4338b37b4",
+    "src/gen/main.tsx": "a68721b6a048d3c3c41f7fd3add42eae381e645f3f71b8f1c2d4524ab2769c37",
+    "src/gen/tokens.css": "01e2204cecf637a80551c03ad62e0fd65eb56a56f5ab4c0653ca71213c21254d"
+  }
+}

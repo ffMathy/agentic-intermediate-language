@@ -1,0 +1,9 @@
+{
+  "sources": [
+    "**/*.ail.md"
+  ],
+  "profilePaths": [
+    "../../profiles"
+  ],
+  "checksDir": "checks"
+}

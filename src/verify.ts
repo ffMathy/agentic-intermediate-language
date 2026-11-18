@@ -79,7 +79,7 @@ export function examplesTestSource(p: Project, n: AilNode): string {
 export const checksDir = (p: Project) => join(p.root, p.config.checksDir ?? "checks");
 
 export function derivedCheckFile(p: Project, n: AilNode): { file: string | null; pinned: string | null } {
-  const dir = checksDir(p);
+  const dir = join(checksDir(p), n.dir);
   if (!existsSync(dir)) return { file: null, pinned: null };
   const name = readdirSync(dir).find((f) => f === `${kebab(n.name)}.test.ts` || f === `${kebab(n.name)}.test.tsx`);
   if (!name) return { file: null, pinned: null };

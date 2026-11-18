@@ -9,9 +9,13 @@ When this page and a golden example disagree, the golden example wins.
 
 ## Modules
 - One node, one module, at the path the context gives. Named exports only.
-- Import dependencies by the specifier the context prints (`./rules`), the
-  catalog from `./catalog`, and nothing else besides `react` / `react-dom`.
-- Types from `data` nodes: `import type { Game } from "./game-state";`.
+- Import dependencies and the catalog by exactly the specifier the context
+  prints (`../../engine/rules`, `../catalog`). Modules live in folders that
+  mirror the spec, so never shorten or guess a path. Import nothing else
+  besides `react` / `react-dom`.
+- Types from `data` nodes: `import type { Game } from "../engine/game-state";`.
+- The golden examples sit at the top level, so they import `./catalog`. Your
+  node may sit deeper; the context's specifiers win.
 
 ## Mapping IL notation to TypeScript
 | IL | TypeScript |
@@ -34,8 +38,11 @@ When this page and a golden example disagree, the golden example wins.
 - `copy` keys are not runtime lookups: inline the string, interpolating
   `{placeholders}`.
 - `binds` lists the props and state; name props exactly as written there.
-- A flow owns state with `useReducer(reduce, initial())`. Timers come from
-  `binds` and are cleared in the effect's cleanup.
+- A flow owns the state `binds.state` names: `useReducer(reduce, initial())`
+  or `useState(value)`. Timers come from `binds` and are cleared in the
+  effect's cleanup.
+- A flow that `binds` an area switch renders one child flow at a time.
+  Unmounting a child resets it, which is how "starts fresh" is implemented.
 
 ## Accessibility
 - Interactive elements are `<button type="button">` (via `Button`) or have an

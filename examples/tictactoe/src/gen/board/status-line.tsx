@@ -1,5 +1,5 @@
-import { Text } from "./catalog";
-import type { Mark, Status } from "./game-state";
+import { Text } from "../catalog";
+import type { Mark, Status } from "../engine/game-state";
 
 function Player(props: { mark: Mark }) {
   return <span style={{ color: props.mark === "X" ? "var(--color-player-x)" : "var(--color-player-o)" }}>{props.mark}</span>;

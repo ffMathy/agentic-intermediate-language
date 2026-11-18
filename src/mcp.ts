@@ -28,7 +28,10 @@ export const TOOLS: Tool[] = [
     inputSchema: obj({}),
     run: (p) => {
       const status = new Map(plan(p).map((e) => [e.node, e.status]));
-      const lines = p.ordered.map((n) => `${"  ".repeat(ancestors(p, n.name).length)}${n.name} : ${n.kind} · ${n.level}${status.has(n.name) ? ` [${status.get(n.name)}]` : ""}`);
+      const lines = p.ordered.map((n) => {
+        const users = p.ordered.filter((u) => u.uses.includes(n.name)).length;
+        return `${"  ".repeat(ancestors(p, n.name).length)}${n.name} : ${n.kind} · ${n.level} · ${n.dir || "."}${status.has(n.name) ? ` [${status.get(n.name)}]` : ""}${users > 1 ? ` (used by ${users})` : ""}`;
+      });
       return { text: lines.join("\n") };
     },
   },

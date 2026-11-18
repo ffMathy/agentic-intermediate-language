@@ -85,3 +85,11 @@ test("spec edits make exactly the affected nodes stale", async () => {
   writeFileSync(f, readFileSync(f, "utf8").replace("pick([1, 5, 2]) => 1", "pick([1, 5, 2]) => 1\n      pick([7]) => 0"));
   expect(plan(load(dir)).map((e) => [e.node, e.status])).toEqual([["Add", "fresh"], ["Pick", "stale"]]);
 });
+
+test("without an API key, the default model is Claude Code's own login", async () => {
+  const { defaultModel } = await import("../src/providers/index.ts");
+  expect(defaultModel({ ANTHROPIC_API_KEY: "x" }, () => "/bin/claude")).toBe("anthropic:claude-opus-5-5");
+  expect(defaultModel({}, () => "/bin/claude")).toBe("claude-code");
+  expect(defaultModel({}, () => null)).toBe("anthropic:claude-opus-5-5");
+  expect(getProvider("claude-code:opus").id).toBe("claude-code:opus");
+});

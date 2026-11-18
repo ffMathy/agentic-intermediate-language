@@ -7,7 +7,7 @@ import { existsSync, mkdirSync, readFileSync, readdirSync, statSync, writeFileSy
 import { dirname, join, relative } from "node:path";
 import { buildContext, importSpecifier } from "./context.ts";
 import { compileHash, oracleHash, sha256 } from "./hash.ts";
-import { readLock, writeLock } from "./lock.ts";
+import { fileHash, readLock, writeLock } from "./lock.ts";
 import type { AilNode } from "./parse.ts";
 import { plan } from "./plan.ts";
 import { AIL_HOME, isCompilable, kebab, modulePath, topoByUses, type Project } from "./project.ts";
@@ -113,9 +113,33 @@ export function submit(p: Project, n: AilNode, files: Record<string, string>, by
     return { ok: false, node: n.name, verify, error: "verification failed; previous version restored" };
   }
   const lock = readLock(p);
+  // The node moved (e.g. into a subfolder): remove its old, untouched output.
+  for (const [old, h] of Object.entries(lock.nodes[n.name]?.files ?? {}))
+    if (old !== path && fileHash(p, old) === h) rmSync(join(p.root, old));
   lock.nodes[n.name] = { hash: compileHash(p, n), files: { [path]: sha256(files[path]!) }, by };
   writeLock(p, lock);
   return { ok: true, node: n.name, verify };
+}
+
+/**
+ * Drop lock entries for nodes that no longer exist (or are no longer
+ * compilable) and delete their generated files, unless someone edited them.
+ */
+export function prune(p: Project): { removed: string[]; kept: string[] } {
+  const lock = readLock(p);
+  const removed: string[] = [], kept: string[] = [];
+  for (const [name, entry] of Object.entries(lock.nodes)) {
+    const n = p.nodes.get(name);
+    if (n && isCompilable(p, n)) continue;
+    for (const [file, h] of Object.entries(entry.files)) {
+      const actual = fileHash(p, file);
+      if (actual === h) { rmSync(join(p.root, file)); removed.push(file); }
+      else if (actual !== null) kept.push(file);
+    }
+    delete lock.nodes[name];
+  }
+  writeLock(p, lock);
+  return { removed, kept };
 }
 
 // --- compile -----------------------------------------------------------------
@@ -158,6 +182,9 @@ export async function compile(p: Project, names: string[], opts: CompileOptions)
   const log = opts.log ?? (() => {});
   const glue = writeGlue(p);
   if (glue.length) log(`glue: wrote ${glue.join(", ")}`);
+  const pruned = prune(p);
+  if (pruned.removed.length) log(`pruned: ${pruned.removed.join(", ")}`);
+  if (pruned.kept.length) log(`left hand-edited files of removed nodes in place: ${pruned.kept.join(", ")}`);
   const statuses = new Map(plan(p).map((e) => [e.node, e.status]));
   const targets = topoByUses(p, p.ordered.filter((n) => isCompilable(p, n) && (!names.length || names.includes(n.name))));
   const outcomes: CompileOutcome[] = [];
@@ -193,7 +220,7 @@ export async function compile(p: Project, names: string[], opts: CompileOptions)
 export async function derive(p: Project, n: AilNode, provider: Provider): Promise<{ file: string; stop?: string }> {
   if (!needsDerivedCheck(n)) throw new Error(`${n.name} has no scenarios or verify section to derive checks from`);
   const ext = n.kind === "view" || n.kind === "flow" ? "tsx" : "ts";
-  const rel = relative(p.root, join(checksDir(p), `${kebab(n.name)}.test.${ext}`));
+  const rel = relative(p.root, join(checksDir(p), n.dir, `${kebab(n.name)}.test.${ext}`));
   const header = `// ail-derived-from: ${n.name}@${oracleHash(p, n).slice(0, 16)}`;
   const raw = await provider.complete({
     system: loadSkill("ail-derive-checks"),

@@ -1,4 +1,4 @@
-import { Button } from "./catalog";
+import { Button } from "../../catalog";
 
 /** NewGameButton: pressing "New game" asks for a new game, once. */
 export function NewGameButton(props: { onPress: () => void }) {

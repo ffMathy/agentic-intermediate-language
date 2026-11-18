@@ -1,7 +1,7 @@
 #!/usr/bin/env bun
 // ail — the Agentic Intermediate Language toolchain.
 import { readFileSync, writeFileSync } from "node:fs";
-import { compile, derive, submit, writeGlue } from "./compile.ts";
+import { compile, derive, prune, submit, writeGlue } from "./compile.ts";
 import { buildContext } from "./context.ts";
 import { diverge, formatDiverge } from "./diverge.ts";
 import { postHook, preHook } from "./hooks.ts";
@@ -32,11 +32,13 @@ usage: ail <command> [args] [--root <dir>] [--json]
   review [--base REF]          semantic IL diff since REF, grouped by reviewer level
   lift <file>                  draft IL from existing code (--name, --kind, --level, --model)
   glue                         regenerate deterministic glue (tokens, entry, catalog)
+  prune                        delete output of nodes that left the IL (hand edits are kept)
   hook pre|post                Claude Code hook entry points (payload on stdin)
   mcp                          run the MCP server on stdio
 
-models: anthropic:<id> (default anthropic:claude-opus-5-5), openai:<id>,
-        command:<shell cmd>, mock:<file.json>; or set AIL_MODELS=a,b`;
+models: claude-code[:<model>] (uses Claude Code's login, e.g. a Claude subscription;
+        the default when no ANTHROPIC_API_KEY is set), anthropic:<id>,
+        openai:<id>, command:<shell cmd>, mock:<file.json>; or AIL_MODELS=a,b`;
 
 interface Args { _: string[]; flags: Record<string, string[]> }
 
@@ -104,6 +106,11 @@ async function main(argv: string[]): Promise<number> {
       const r = verifyProject(p, rest);
       print(formatVerify(r), r);
       return r.ok ? 0 : 1;
+    }
+    case "prune": {
+      const r = prune(p);
+      print([r.removed.length ? `removed ${r.removed.join(", ")}` : "nothing to prune", ...(r.kept.length ? [`kept hand-edited ${r.kept.join(", ")}`] : [])].join("\n"), r);
+      return 0;
     }
     case "glue": {
       const w = writeGlue(p);

@@ -51,6 +51,40 @@ Two graphs live in one file:
   nodes it uses, never their `how`. That is encapsulation, enforced by the
   compiler rather than by convention.
 
+### Folders, splitting and reuse
+
+A spec can be one file or many. Any `.ail.md` file in any subfolder takes
+part, and **the folders mirror the tree**:
+
+```
+tictactoe.ail.md                                 TicTacToe (product)
+app/app.ail.md                                   App: switches areas
+app/play/play.ail.md                             the play area
+app/demo/demo.ail.md                             the watch area
+board/board.ail.md                               BoardKit (library): BoardView, StatusLine
+engine/engine.ail.md                             Engine (library): GameState, Rules, GameReducer
+engine/computer-player/computer-player.ail.md    grew big, so it got its own folder
+```
+
+- **Generated code mirrors the folders.** Profile paths use `{dir}` (e.g.
+  `src/gen/{dir}/{kebab}.tsx`). Imports between folders are computed for each
+  context, so a model never guesses a relative path.
+- **Splitting.** When a node outgrows its size budget (`maxNodeLines`, default
+  80), lint asks for it to be split into children in a subfolder. Children
+  belong in their parent's folder or below (`misplaced-node`).
+- **Reuse: one owner, many users.** A shared node has exactly one place in the
+  review tree, usually under a `library` node (a grouping kind that is never
+  compiled). Any number of areas list it under `uses`. A product claim may be
+  `refined-by` a shared node, as long as some descendant uses it.
+- **Changing a shared contract is visible.** Lenses mark shared nodes with
+  their users (`Used by PlayAGame (app/play/), WatchADemo (app/demo/)`).
+  `ail review` lists every node a contract change reaches, so each affected
+  area's reviewers see it.
+- **Moving is safe.** The output location is part of the compile hash. A node
+  that moved shows as `stale (moved from …)`, recompiling removes its old file,
+  and `ail prune` cleans up the output of nodes that were deleted. Hand-edited
+  files are never deleted.
+
 ## 3. Levels: one tree, many readers
 
 | level | reader | allowed language |
@@ -100,6 +134,21 @@ depths:
 | Commands | `/ail-new`, `/ail-compile`, `/ail-lens`, `/ail-review` |
 | GitHub Action | lint, `plan --check`, verify, and the IL review in the job summary |
 
+### Running on a Claude subscription
+
+No API key is required. There are two paths, and both use whatever Claude Code
+is logged in with:
+
+- **Inside Claude Code** (plugin): `/ail:ail-compile` delegates each node to the
+  `ail-leaf-compiler` subagent. That subagent's only tools are `ail_context` and
+  `ail_submit`, so it cannot read anything outside its node's slice. Tool
+  permissions enforce the encapsulation.
+- **Headless** (scripts, CI): the `claude-code` provider runs `claude -p` as a
+  pure completion: built-in tools, MCP and slash commands are off, and it runs
+  in an empty directory, so no CLAUDE.md or project file leaks into the context.
+  It is the default model when `ANTHROPIC_API_KEY` is not set. In CI, give
+  Claude Code a token from `claude setup-token` as `CLAUDE_CODE_OAUTH_TOKEN`.
+
 The compile loop is ordinary code, so it behaves the same whichever vendor
 fills in the leaves:
 
@@ -118,10 +167,17 @@ components) is rendered from templates without any model call.
 
 All of this is in this repository and can be re-run:
 
-- **The kata compiles and verifies end to end.** `examples/tictactoe`: 9
-  compiled nodes plus glue. 24 example tests and 16 derived checks pass (40 in all),
-  including an exhaustive "computer never loses" proof and a typecheck. The app
-  runs with `bun run dev`.
+- **The kata compiles and verifies end to end.** `examples/tictactoe` has two
+  areas (play and watch) that share a board kit and an engine, with 11
+  compiled nodes across 6 folders plus glue. 24 example tests and 22 derived
+  checks pass (46 in all), including an exhaustive "computer never loses" proof
+  and a typecheck. The app runs with `bun run dev`.
+- **It runs on a subscription.** With no API key set, `ail compile` used Claude
+  Code's login and compiled `WatchADemo` and `ComputerPlayer` on the first try,
+  with correct imports across folders. With the plugin installed,
+  `/ail:ail-compile` recompiled a deleted node. A trace showed the main agent
+  only planning and verifying, while the restricted subagent made exactly one
+  `ail_context` call and one `ail_submit` call.
 - **A real model passes on the first try.** In a scratch copy, `ail compile
   ComputerPlayer --force --model "command:claude -p"` produced a textually
   different implementation (negamax instead of a min/max split) that passed the
@@ -141,6 +197,8 @@ All of this is in this repository and can be re-run:
   "correct" means.
 - **Multi-file nodes.** Today one node maps to one module. Some targets need a
   node to own a set of files.
+- **Namespaces.** Node names are unique across the whole project. Large
+  projects may want folder-qualified names (`board.BoardView`).
 - **More profiles.** A backend profile (HTTP + database) would test whether the
   approach holds outside the UI.
 - **Self-hosting.** Specifying the `ail` toolchain in AIL would be a real test

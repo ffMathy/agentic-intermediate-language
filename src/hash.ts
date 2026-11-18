@@ -5,7 +5,7 @@
 // meaning hash the same, so cosmetic edits never trigger recompilation.
 import { createHash } from "node:crypto";
 import type { AilNode, Section } from "./parse.ts";
-import { ancestors, type Project } from "./project.ts";
+import { ancestors, modulePath, type Project } from "./project.ts";
 
 export const sha256 = (s: string) => createHash("sha256").update(s).digest("hex");
 
@@ -68,7 +68,8 @@ export function compileHash(p: Project, n: AilNode): string {
     JSON.stringify(p.glossary.map((t) => [t.term, t.plain, t.formal])),
     ...ancestors(p, n.name).map((a) => canonicalNode(a, ["why"])),
     canonicalNode(n),
-    ...deps.map(contractOf).sort(),
+    `at ${modulePath(p, n) ?? "-"}`,
+    ...deps.map((d) => `${contractOf(d)}\nat ${modulePath(p, d) ?? "-"}`).sort(),
   ].join("\n---\n"));
 }
 

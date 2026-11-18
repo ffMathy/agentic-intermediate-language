@@ -1,5 +1,5 @@
-import { Segmented } from "./catalog";
-import type { Opponent } from "./game-state";
+import { Segmented } from "../../catalog";
+import type { Opponent } from "../../engine/game-state";
 
 /** ChooseOpponent: two options, "Friend" and "Computer", named together as "Opponent". */
 export function ChooseOpponent(props: { opponent: Opponent; onChange: (opponent: Opponent) => void }) {

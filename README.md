@@ -33,7 +33,14 @@ bun install
 bun src/cli.ts help
 ```
 
-As a Claude Code plugin (skills, MCP tools, hooks and slash commands):
+No API key is needed if you use Claude Code. Without `ANTHROPIC_API_KEY`,
+`ail` compiles through Claude Code's own login, including a Claude
+subscription. With the plugin installed, `/ail:ail-compile` lets Claude Code
+compile each node in a subagent whose only tools are `ail_context` and
+`ail_submit`.
+
+As a Claude Code plugin (skills, MCP tools, hooks, slash commands, and the
+leaf-compiler subagent):
 
 ```
 /plugin marketplace add ffMathy/agentic-intermediate-language
@@ -77,13 +84,15 @@ bun run dev
 | `ail lens <audience>` | stakeholder, design, engineer or specialist (`--tag`) view |
 | `ail review --base <ref>` | semantic IL diff, grouped by who should review it |
 | `ail lift <file>` | draft IL from existing code |
+| `ail prune` | delete the output of nodes removed from the IL (hand edits are kept) |
 | `ail mcp` | MCP server exposing all of the above |
 
 Models are given as `--model <spec>`. Repeat the flag for `diverge`.
 
 | spec | provider |
 |---|---|
-| `anthropic:claude-opus-5-5` | Anthropic API (the default; uses `ANTHROPIC_API_KEY`) |
+| `claude-code[:<model>]` | the Claude Code CLI and its login, subscription included (the default without an API key) |
+| `anthropic:claude-opus-5-5` | Anthropic API (the default when `ANTHROPIC_API_KEY` is set) |
 | `openai:<model>` | any OpenAI-compatible endpoint (`OPENAI_BASE_URL`, `OPENAI_API_KEY`) |
 | `command:<cli>` | any CLI that reads a prompt on stdin, e.g. `command:claude -p` |
 | `mock:<file.json>` | canned replies for tests |
@@ -95,6 +104,7 @@ src/                 the ail toolchain (Bun, TypeScript)
 profiles/            target profiles: settings, catalog, glue templates, golden examples
 skills/              agent skills: author, compile-leaf, derive-checks, review, lift
 commands/            slash commands for the plugin
+agents/              the tool-restricted leaf-compiler subagent
 hooks/               plugin hooks (block generated-file edits, lint IL edits)
 examples/tictactoe/  the kata: IL, generated code, derived checks, lock file
 tests/               toolchain tests (bun test)

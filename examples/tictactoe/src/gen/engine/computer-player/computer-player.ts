@@ -1,5 +1,5 @@
-import { other, type Board, type Mark } from "./game-state";
-import { evaluate } from "./rules";
+import { other, type Board, type Mark } from "../game-state";
+import { evaluate } from "../rules";
 
 const memo = new Map<string, { score: number; index: number }>();
 

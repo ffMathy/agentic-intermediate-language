@@ -1,8 +1,8 @@
 // ail-derived-from: BoardView@2e2306121a14c4c8
 import { afterEach, expect, mock, test } from "bun:test";
 import { cleanup, fireEvent, render, screen } from "@testing-library/react";
-import { BoardView } from "../src/gen/board-view";
-import { boardFrom } from "../src/gen/game-state";
+import { BoardView } from "../../src/gen/board/board-view";
+import { boardFrom } from "../../src/gen/engine/game-state";
 
 afterEach(cleanup);
 

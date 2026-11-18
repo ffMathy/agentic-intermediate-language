@@ -1,5 +1,5 @@
-import { Text } from "./catalog";
-import type { Board, Status } from "./game-state";
+import { Text } from "../catalog";
+import type { Board, Status } from "../engine/game-state";
 
 /** BoardView: 9 squares in 3 rows of 3; pressing a square that can be picked asks to place the current mark there. */
 export function BoardView(props: { board: Board; status: Status; locked: boolean; onPlace: (index: number) => void }) {

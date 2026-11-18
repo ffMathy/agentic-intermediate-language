@@ -35,6 +35,8 @@ export interface Decision { what: string; because: string; rejected: Rejected[];
 
 export interface AilNode {
   name: string;
+  /** Folder of the defining file, relative to the project root ("" at the root). */
+  dir: string;
   kind: string;
   level: Level | null;
   tags: string[];
@@ -165,8 +167,9 @@ function parseNode(header: string, sections: Section[], file: string, line: numb
   const tags = [...rest.matchAll(/@([\w.-]+)/g)].map((t) => t[1]!);
   const get = (k: string) => sections.find((s) => s.key === k);
 
+  const dir = file.includes("/") ? file.slice(0, file.lastIndexOf("/")) : "";
   const node: AilNode = {
-    name: m[1]!, kind: m[2] ?? "node", level: (level as Level) ?? null, tags, file, line, sections, raw,
+    name: m[1]!, dir, kind: m[2] ?? "node", level: (level as Level) ?? null, tags, file, line, sections, raw,
     why: null, claims: [], scenarios: [], examples: [], probes: [], decisions: [],
     children: [], uses: [], free: [], entry: null,
   };

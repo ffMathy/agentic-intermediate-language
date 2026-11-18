@@ -1,7 +1,7 @@
 // ail-derived-from: ChooseOpponent@25d2b7f3c1cb78e5
 import { afterEach, expect, mock, test } from "bun:test";
 import { cleanup, fireEvent, render, screen } from "@testing-library/react";
-import { ChooseOpponent } from "../src/gen/choose-opponent";
+import { ChooseOpponent } from "../../../src/gen/app/play/choose-opponent";
 
 afterEach(cleanup);
 

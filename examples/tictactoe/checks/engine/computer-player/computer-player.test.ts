@@ -1,8 +1,8 @@
 // ail-derived-from: ComputerPlayer@0c990bfbddc62e20
 import { expect, test } from "bun:test";
-import { choose } from "../src/gen/computer-player";
-import type { Board } from "../src/gen/game-state";
-import { evaluate } from "../src/gen/rules";
+import { choose } from "../../../src/gen/engine/computer-player/computer-player";
+import type { Board } from "../../../src/gen/engine/game-state";
+import { evaluate } from "../../../src/gen/engine/rules";
 
 test("never loses", () => {
   let games = 0;

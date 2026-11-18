@@ -1,12 +1,14 @@
 // Loads an AIL project: config, sources, the profile it uses, and the
 // derived tree (children) and dependency graph (uses).
 import { existsSync, readFileSync, readdirSync, statSync } from "node:fs";
-import { dirname, join, relative, resolve } from "node:path";
+import { dirname, join, posix, relative, resolve } from "node:path";
 import { parseFile, type AilNode, type ParsedFile, type Term } from "./parse.ts";
 
 export const AIL_HOME = resolve(import.meta.dir, "..");
 
 export interface Config {
+  /** Lint warns when a node spans more lines than this (default 80): split it into children. */
+  maxNodeLines?: number;
   sources?: string[];
   profilePaths?: string[];
   checksDir?: string;
@@ -103,7 +105,9 @@ export function loadProject(rootArg?: string): Project {
   const root = rootArg ? resolve(rootArg) : findRoot();
   const cfgFile = join(root, "ail.config.json");
   const config: Config = existsSync(cfgFile) ? JSON.parse(readFileSync(cfgFile, "utf8")) : {};
-  const sources = config.sources ? config.sources.map((s) => resolve(root, s)) : walk(root);
+  const sources = config.sources
+    ? [...new Set(config.sources.flatMap((pattern) => [...new Bun.Glob(pattern).scanSync({ cwd: root })].map((f) => resolve(root, f))))].sort()
+    : walk(root).sort();
   const files = sources.map((f) => parseFile(relative(root, f), readFileSync(f, "utf8")));
   const errors = files.flatMap((f) => f.errors);
 
@@ -152,7 +156,7 @@ export const kebab = (name: string) =>
 export function modulePath(p: Project, n: AilNode): string | null {
   const tpl = p.profile?.settings[`path.${n.kind}`];
   if (!tpl) return null;
-  return tpl.replace("{kebab}", kebab(n.name)).replace("{name}", n.name);
+  return posix.normalize(tpl.replace("{dir}", n.dir).replace("{kebab}", kebab(n.name)).replace("{name}", n.name));
 }
 
 /** Nodes the LLM compiles: those with a module path that aren't glue kinds. */
@@ -180,6 +184,30 @@ export function descendants(p: Project, name: string): Set<string> {
     if (out.has(c)) continue;
     out.add(c);
     stack.push(...(p.nodes.get(c)?.children ?? []));
+  }
+  return out;
+}
+
+/** Every node that depends on `name`, directly or through other nodes' `uses`. */
+export function dependants(p: Project, name: string): AilNode[] {
+  const out = new Set<string>();
+  const stack = [name];
+  while (stack.length) {
+    const cur = stack.pop()!;
+    for (const n of p.nodes.values()) if (n.uses.includes(cur) && !out.has(n.name)) { out.add(n.name); stack.push(n.name); }
+  }
+  return p.ordered.filter((n) => out.has(n.name));
+}
+
+/** Every node a node depends on, directly or transitively. */
+export function dependencies(p: Project, name: string): Set<string> {
+  const out = new Set<string>();
+  const stack = [...(p.nodes.get(name)?.uses ?? [])];
+  while (stack.length) {
+    const cur = stack.pop()!;
+    if (out.has(cur)) continue;
+    out.add(cur);
+    stack.push(...(p.nodes.get(cur)?.uses ?? []));
   }
   return out;
 }

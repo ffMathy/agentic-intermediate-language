@@ -1,7 +1,7 @@
-// ail-derived-from: PlayAGame@ae1205d1ccdfa5c9
+// ail-derived-from: PlayAGame@5900c044e6e3cdfa
 import { afterEach, expect, test } from "bun:test";
 import { act, cleanup, fireEvent, render, screen } from "@testing-library/react";
-import { PlayAGame } from "../src/gen/play-a-game";
+import { PlayAGame } from "../../../src/gen/app/play/play-a-game";
 
 afterEach(cleanup);
 

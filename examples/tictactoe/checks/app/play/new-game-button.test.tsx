@@ -1,7 +1,7 @@
 // ail-derived-from: NewGameButton@eba34a1df940702e
 import { afterEach, expect, mock, test } from "bun:test";
 import { cleanup, fireEvent, render, screen } from "@testing-library/react";
-import { NewGameButton } from "../src/gen/new-game-button";
+import { NewGameButton } from "../../../src/gen/app/play/new-game-button";
 
 afterEach(cleanup);
 

@@ -1,5 +1,9 @@
 {
-  "sources": ["tictactoe.ail.md"],
-  "profilePaths": ["../../profiles"],
+  "sources": [
+    "**/*.ail.md"
+  ],
+  "profilePaths": [
+    "../../profiles"
+  ],
   "checksDir": "checks"
 }

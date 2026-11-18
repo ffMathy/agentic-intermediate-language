@@ -2,7 +2,7 @@
 import { afterEach, expect, test } from "bun:test";
 import { cleanup, render } from "@testing-library/react";
 import type { ReactElement } from "react";
-import { StatusLine } from "../src/gen/status-line";
+import { StatusLine } from "../../src/gen/board/status-line";
 
 afterEach(cleanup);
 

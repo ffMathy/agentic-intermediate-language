@@ -1,10 +1,11 @@
 // `ail lint`: structural, traceability and readability rules.
 import { LEVELS, NODE_SECTIONS, type AilNode, type Level } from "./parse.ts";
-import { ancestors, descendants, isCompilable, modulePath, type Project } from "./project.ts";
+import { ancestors, dependencies, descendants, isCompilable, modulePath, type Project } from "./project.ts";
 
 export type Severity = "error" | "warning";
 export interface Diagnostic { severity: Severity; code: string; message: string; node?: string; file: string; line: number }
 
+const kebabName = (name: string) => name.replace(/([a-z0-9])([A-Z])/g, "$1-$2").replace(/([A-Z])([A-Z][a-z])/g, "$1-$2").toLowerCase();
 const levelIdx = (l: Level | null) => (l ? LEVELS.indexOf(l) : 2);
 
 /** Sections that may carry technical notation even at plain-language levels. */
@@ -52,12 +53,18 @@ export function lint(p: Project): Diagnostic[] {
     for (const c of n.children) if (!p.nodes.has(c)) push("error", "unknown-node", n, `child "${c}" is not defined`);
     for (const u of n.uses) if (!p.nodes.has(u)) push("error", "unknown-node", n, `uses "${u}", which is not defined`);
     const parents = multiParent.get(n.name) ?? [];
-    if (parents.length > 1) push("error", "multiple-parents", n, `${n.name} is a child of ${parents.join(" and ")}; a node has exactly one parent (use \`uses\` for dependencies)`);
+    if (parents.length > 1) push("error", "multiple-parents", n, `${n.name} is a child of ${parents.join(" and ")}; a node has exactly one owner. To share it, give it one owner (e.g. a \`library\` node) and let every area list it under \`uses\``);
     const par = p.parent.get(n.name);
     if (par) {
       const pn = p.nodes.get(par)!;
       if (lvl < levelIdx(pn.level)) push("error", "level-order", n, `${n.name} (${n.level}) is less detailed than its parent ${pn.name} (${pn.level}); levels may only deepen`);
+      if (pn.dir && n.dir !== pn.dir && !n.dir.startsWith(pn.dir + "/"))
+        push("warning", "misplaced-node", n, `${n.name} lives in "${n.dir || "."}" but its parent ${pn.name} lives in "${pn.dir}"; keep children in their parent's folder or below so the folders mirror the tree`);
     }
+    if (n.kind === "library" && n.children.length === 0) push("warning", "empty-library", n, `library ${n.name} owns no children`);
+    const maxLines = p.config.maxNodeLines ?? 80;
+    const size = n.raw.filter((l) => l.trim() !== "").length;
+    if (size > maxLines) push("warning", "node-too-large", n, `${n.name} spans ${size} lines (budget ${maxLines}); split it into children, e.g. in a ${n.dir ? n.dir + "/" : ""}${kebabName(n.name)}/ folder`);
 
     // --- why traceability -------------------------------------------------
     if (!n.why) push(lvl <= 1 ? "error" : "warning", "missing-why", n, `${n.name} has no \`why\``);
@@ -74,10 +81,13 @@ export function lint(p: Project): Diagnostic[] {
       if (claimCount > n.claims.length) push("error", "missing-refinement", n, `every product-level claim needs "refined-by: <Node>" (${claimCount - n.claims.length} without)`);
       for (const k of ["how", "look", "binds", "copy"]) if (n.sections.some((s) => s.key === k)) push("error", "plain-level-detail", n, `product-level nodes state outcomes only; move \`${k}\` into a child`);
     }
+    // A claim is refined by a descendant, or by a shared node one of them uses.
     const desc = descendants(p, n.name);
+    const reach = new Set(desc);
+    for (const d of [n.name, ...desc]) for (const dep of dependencies(p, d)) reach.add(dep);
     for (const c of n.claims) for (const r of c.refs) {
       if (!p.nodes.has(r)) push("error", "bad-refinement", n, `refined-by "${r}" is not defined`, c.line);
-      else if (!desc.has(r)) push("error", "bad-refinement", n, `refined-by ${r}, which is not a descendant of ${n.name}`, c.line);
+      else if (!reach.has(r)) push("error", "bad-refinement", n, `refined-by ${r}, which is neither a descendant of ${n.name} nor used by one`, c.line);
     }
 
     // --- vocabulary per level ----------------------------------------------

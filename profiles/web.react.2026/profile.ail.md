@@ -1,5 +1,9 @@
 # Profile `web.react.2026`
 
+Output paths use `{dir}`, the folder of the `.ail.md` file that defines a
+node, so generated code mirrors the spec's folders. `library` nodes only
+group shared children; they have no path and are never compiled.
+
 A profile fixes every default a model would otherwise pick on its own: language,
 framework, file layout, naming, styling, testing. Nodes inherit it, so none of
 these choices can vary between vendors or runs.
@@ -10,7 +14,7 @@ profile web.react.2026
   runtime         Bun 1.x for tests and the dev server
   ui              React 19 function components only; no class components; no state, routing or styling libraries
   libs            react react-dom
-  state           a flow owns its state with useReducer and passes values and callbacks down as props; logic lives in pure fn modules
+  state           a flow owns exactly the state its `binds.state` names (useReducer for a reducer, useState for a single value) and passes values and callbacks down as props; logic lives in pure fn modules
   effects         only flows may use useEffect, and only for what `binds` names
   styling         inline style objects whose values reference catalog tokens as CSS variables (token a.b.c → "var(--a-b-c)"); a px literal only where `look` gives one
   layout          stack(v|h, gap: t, align: a, pad: t) [ A, B ] → <Stack dir="v" gap="t" align="a" pad="t"><A/><B/></Stack> from the catalog
@@ -21,10 +25,10 @@ profile web.react.2026
   a11y            every interactive element is keyboard reachable and has an accessible name
   comments        one JSDoc line per export quoting the IL clause it implements; no other comments
   formatting      2-space indent, double quotes, semicolons, trailing commas in multi-line literals
-  path.data       src/gen/{kebab}.ts
-  path.fn         src/gen/{kebab}.ts
-  path.view       src/gen/{kebab}.tsx
-  path.flow       src/gen/{kebab}.tsx
+  path.data       src/gen/{dir}/{kebab}.ts
+  path.fn         src/gen/{dir}/{kebab}.ts
+  path.view       src/gen/{dir}/{kebab}.tsx
+  path.flow       src/gen/{dir}/{kebab}.tsx
   catalog-module  src/gen/catalog/index.tsx
   tokens-css      src/gen/tokens.css
   generated       src/gen/** index.html

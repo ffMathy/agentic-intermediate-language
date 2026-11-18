@@ -9,7 +9,7 @@ import type { AilNode } from "./parse.ts";
 import { ancestors, modulePath, type Project } from "./project.ts";
 
 function importSpecifier(fromPath: string, toPath: string): string {
-  let rel = relative(dirname(fromPath), toPath).replace(/\.tsx?$/, "");
+  let rel = relative(dirname(fromPath), toPath).replace(/\.tsx?$/, "").replace(/(^|\/)index$/, "$1").replace(/\/$/, "");
   if (!rel.startsWith(".")) rel = "./" + rel;
   return rel;
 }

@@ -24,7 +24,8 @@ node Name : kind   level: product|experience|system|specialist   @tag
   children  nodes that refine this one
   verify    properties that need a derived check (e.g. exhaustive search)
 ```
-Kinds: `system` (the root, has `entry`), `flow`, `view`, `data`, `fn`.
+Kinds: `system` (the root, has `entry`), `flow`, `view`, `data`, `fn`, and
+`library` (groups shared nodes; never compiled).
 
 ## Levels: who reads what
 | level | reader | language |
@@ -38,6 +39,19 @@ A child is never less detailed than its parent. `ail lint` rejects jargon and
 code notation in `product` and `experience` prose. Put notation in `look`,
 `copy` or `binds`, or move it down a level. Define domain words once in the
 `glossary` with a plain and a formal meaning.
+
+## Folders, splitting and reuse
+- Put a node in the folder of its parent, or in a subfolder. The folders should
+  read like the tree. Generated code mirrors them.
+- When a node grows past the size budget (lint `node-too-large`), split it:
+  move detail into child nodes in a subfolder named after the node.
+- To share a node between areas, give it one owner: a `library` node (e.g.
+  `board/board.ail.md` with `node BoardKit : library`). Then list it under
+  `uses` in every area that needs it. Never make it the child of two parents.
+- A shared node's `what` is a contract with every user. `ail review` lists
+  everything a change reaches, so keep it small and pinned by examples.
+- After moving or deleting nodes, run `ail plan`: moved nodes recompile in
+  their new place, and `ail prune` removes the output of deleted ones.
 
 ## Making the output deterministic
 - **Examples are the cheapest pin.** `evaluate(boardFrom("XXX/OO_/___")) => { kind: "won", mark: "X", line: [0, 1, 2] }`.

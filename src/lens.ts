@@ -1,7 +1,8 @@
 // `ail lens` and `ail review`: one source, projections per audience.
 import { canonicalNode } from "./hash.ts";
 import { parseFile, type AilNode, LEVELS } from "./parse.ts";
-import { ancestors, type Project } from "./project.ts";
+import { ancestors, dependants, type Project } from "./project.ts";
+import { contractOf } from "./hash.ts";
 
 export const LENSES = ["stakeholder", "design", "engineer", "specialist"] as const;
 export type Lens = (typeof LENSES)[number];
@@ -21,6 +22,15 @@ function block(n: AilNode, keys: string[] | "all"): string {
 }
 
 const heading = (p: Project, n: AilNode) => "#".repeat(Math.min(6, ancestors(p, n.name).length + 2));
+
+const where = (n: AilNode) => (n.dir ? `${n.dir}/` : "./");
+
+/** "Used by" line for nodes that more than one other node depends on. */
+export function usedBy(p: Project, n: AilNode): string | null {
+  const users = p.ordered.filter((u) => u.uses.includes(n.name));
+  if (users.length < 2) return null;
+  return `_Used by ${users.map((u) => `${u.name} (${where(u)})`).join(", ")}._`;
+}
 
 function plainSummary(n: AilNode): string[] {
   const out: string[] = [];
@@ -56,10 +66,14 @@ export function renderLens(p: Project, lens: Lens, opts: { tag?: string; only?: 
       out.push(plainSummary(n).join("\n"));
     } else if (lens === "design") {
       if (lvl > 1) { hidden++; continue; }
-      out.push(`\n${heading(p, n)} ${n.name} · ${n.level}`);
+      out.push(`\n${heading(p, n)} ${n.name} · ${n.level} · ${where(n)}`);
+      const shared = usedBy(p, n);
+      if (shared) out.push(shared);
       out.push(block(n, "all"));
     } else {
-      out.push(`\n${heading(p, n)} ${n.name} · ${n.level}`);
+      out.push(`\n${heading(p, n)} ${n.name} · ${n.level} · ${where(n)}`);
+      const shared = usedBy(p, n);
+      if (shared) out.push(shared);
       out.push(lvl === 3 ? block(n, ["why", "what"]) + "\n_(how collapsed — see the specialist lens)_" : block(n, "all"));
     }
   }
@@ -70,7 +84,7 @@ export function renderLens(p: Project, lens: Lens, opts: { tag?: string; only?: 
 }
 
 /** Nodes whose meaning changed relative to a git ref (cosmetic edits ignored). */
-export function changedNodes(p: Project, ref: string): { changed: string[]; added: string[]; removed: string[] } {
+export function changedNodes(p: Project, ref: string): { changed: string[]; added: string[]; removed: string[]; before: Map<string, AilNode> } {
   const before = new Map<string, AilNode>();
   for (const f of p.files) {
     const r = Bun.spawnSync(["git", "show", `${ref}:./${f.file}`], { cwd: p.root, stdout: "pipe", stderr: "pipe" });
@@ -84,11 +98,11 @@ export function changedNodes(p: Project, ref: string): { changed: string[]; adde
     else if (canonicalNode(b) !== canonicalNode(n)) changed.push(n.name);
   }
   const removed = [...before.keys()].filter((k) => !p.nodes.has(k));
-  return { changed, added, removed };
+  return { changed, added, removed, before };
 }
 
 export function renderReview(p: Project, ref: string): string {
-  const { changed, added, removed } = changedNodes(p, ref);
+  const { changed, added, removed, before } = changedNodes(p, ref);
   const touched = [...changed, ...added];
   if (!touched.length && !removed.length) return `No semantic IL changes since ${ref}.\n`;
   const out = [`# IL review since ${ref}`];
@@ -100,6 +114,11 @@ export function renderReview(p: Project, ref: string): string {
       out.push(`\n### ${added.includes(n.name) ? "＋" : "✎"} ${n.name}`);
       const chain = ancestors(p, n.name);
       if (chain.length) out.push(chain.map((a) => `> **${a.name}** — ${a.why?.text ?? ""}`).join("\n>\n"));
+      const old = before.get(n.name);
+      if (old && contractOf(old) !== contractOf(n)) {
+        const reach = dependants(p, n.name);
+        if (reach.length) out.push(`**Contract changed** — this reaches ${reach.map((d) => `${d.name} (${d.level}, ${where(d)})`).join(", ")}; their reviewers should look too.`);
+      }
       out.push(block(n, "all"));
     }
   }

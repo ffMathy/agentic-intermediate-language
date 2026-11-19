@@ -14,9 +14,9 @@ node StopIdea : view   level: experience
   copy
     idea.depth      "idea"
     idea.chip       "IDEA"
-    idea.reader     "a product owner, before any tools"
+    idea.reader     "a product owner, in their own words"
     idea.headline   "It starts as a sentence anyone could say."
-    idea.body       "Every AIL project starts at the top of a tree, with plain promises. This one is a game people can finish in under a minute, and one of its promises is that the built-in opponent can't be beaten. Nothing here is technical yet, and it shouldn't be."
+    idea.body       "Every AIL project starts with someone saying what they want, in plain words. Here it's a game people can finish in under a minute, and a promise that the built-in opponent can't be beaten. Those words go into the spec just as they were said, at the top of the tree. Nothing here is technical yet, and it shouldn't be."
     idea.label      "The idea, at the top of the spec"
     idea.file       "examples/tictactoe/tictactoe.ail.md"
     idea.line.1     "  why   A quick, familiar game people can finish in under a minute,"
@@ -24,7 +24,7 @@ node StopIdea : view   level: experience
     idea.line.3     "  …"
     idea.line.4     "    4. The computer never loses."
     idea.highlight  "The computer never loses."
-    idea.turns      "One promise at the top of the tree. The rest of this page follows it down."
+    idea.turns      "The owner's words, written down unchanged as the spec's first lines. Next, the sentence joins the product's other promises and gets a node that keeps it."
   binds
     stop     JourneyStop with depth idea.depth, chip idea.chip, reader idea.reader, headline idea.headline, explanation idea.body, lines idea.line.1 to idea.line.4, label idea.label, file idea.file, highlight [idea.highlight], turnsInto idea.turns
   uses      JourneyStop, IdeaFigure

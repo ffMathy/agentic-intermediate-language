@@ -8,7 +8,7 @@ node StopSystem : view   level: experience
     Scenario: the system level
       Given the page is open
       Then the article "stop-4" has the level 3 heading "System level: one exact shape, one exact rule, examples that run."
-      And the region named "System-level spec excerpt" shows its twelve lines, with "ComputerPlayer" highlighted
+      And the region named "System-level spec excerpt" shows its fifteen lines, with "ComputerPlayer" highlighted
   look
     stop     JourneyStop with number 4, color color.level.system, figure SystemFigure
   copy
@@ -22,19 +22,22 @@ node StopSystem : view   level: experience
     system.line.1    "node Engine : library   level: system"
     system.line.2    "  why   One set of rules for every part of the game, so playing and watching can never disagree.   <- TicTacToe"
     system.line.3    "  children  GameState, Rules, GameReducer, ComputerPlayer"
-    system.line.4    ""
+    system.line.4    "…"
     system.line.5    "node Rules : fn   level: system"
-    system.line.6    "    evaluate(board: Board) -> Status"
-    system.line.7    "      the first line in LINES order whose three cells hold the same mark → won(mark, line)"
-    system.line.8    "      otherwise, if every cell is filled → draw"
-    system.line.9    "      otherwise → playing"
-    system.line.10   "    examples"
-    system.line.11   "      evaluate(boardFrom("XXX/OO_/___")) => ({ kind: "won", mark: "X", line: [0, 1, 2] })"
-    system.line.12   "      evaluate(boardFrom("XOX/XOO/OXX")) => ({ kind: "draw" })"
+    system.line.6    "  …"
+    system.line.7    "    evaluate(board: Board) -> Status"
+    system.line.8    "      the first line in LINES order whose three cells hold the same mark → won(mark, line)"
+    system.line.9    "      otherwise, if every cell is filled → draw"
+    system.line.10   "      otherwise → playing"
+    system.line.11   "    …"
+    system.line.12   "    examples"
+    system.line.13   "      evaluate(boardFrom("XXX/OO_/___")) => ({ kind: "won", mark: "X", line: [0, 1, 2] })"
+    system.line.14   "      …"
+    system.line.15   "      evaluate(boardFrom("XOX/XOO/OXX")) => ({ kind: "draw" })"
     system.mark      "ComputerPlayer"
     system.turns     "rules.ts, plus one unit test per example line. ComputerPlayer looks ahead with these same rules."
   binds
-    stop     JourneyStop with depth system.depth, chip system.chip, reader system.reader, headline system.headline, explanation system.body, lines system.line.1 to system.line.12, label system.label, file system.file, highlight [system.mark], turnsInto system.turns
+    stop     JourneyStop with depth system.depth, chip system.chip, reader system.reader, headline system.headline, explanation system.body, lines system.line.1 to system.line.15, label system.label, file system.file, highlight [system.mark], turnsInto system.turns
   uses      JourneyStop, SystemFigure
   children  SystemFigure
 ```

@@ -12,7 +12,7 @@ node HomePage : view   level: experience
     Scenario: one story, in order
       Given the page is open
       Then the level 1 heading reads "Write one sentence. Watch it become working software."
-      And the level 2 headings read "Between a prompt and the code, there was nothing to review.", "Follow one sentence all the way down", "One spec, four readers", "How a spec becomes code you can trust" and "Start in two minutes", in that order
+      And the level 2 headings read "Between a prompt and the code, there is nothing to review.", "Follow one sentence all the way down", "One spec, four readers", "How a spec becomes code you can trust" and "Start in two minutes", in that order
     Scenario: every top bar link has a place to land
       Given the page is open
       Then the page has elements with the ids "journey", "readers", "loop" and "start"

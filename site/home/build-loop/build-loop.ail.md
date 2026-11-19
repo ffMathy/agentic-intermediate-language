@@ -7,11 +7,12 @@ node BuildLoop : view   level: experience
   why   Show that AIL is a way of working, not only a format: changes go into the spec, and the tools do the rest.   <- HomePage
   what
     a heading, a loop picture beside four numbered steps, and an example of a question the compiler asks instead of guessing
-    the example is labelled as an illustration, with the place in the real spec that answers it
+    the example is labelled as an example question, and a note in plain words says how the real Tic-Tac-Toe spec already answers it and which node holds the answer
     Scenario: four steps
       Given the page is open
       Then the section with the id "loop" lists the steps "Write", "Build", "Check" and "Ask", in that order
-      And it shows the text "Illustrative example."
+      And it shows the text "Example question."
+      And it shows the text "(see the GameReducer node)"
   look
     band      Section with id "loop", tone plain, holding stack(v, gap: space.8, align: stretch) [ head, grid, stop ]
     head      SectionHeading with text from loop.heading, lead from loop.lead
@@ -34,14 +35,14 @@ node BuildLoop : view   level: experience
     loop.1.title    "Write"
     loop.1.text     "Change the spec, in plain words or with Claude Code's help. Generated code is never edited by hand."
     loop.2.title    "Build"
-    loop.2.text     "ail build recompiles only the nodes whose spec changed. Each node is compiled by an agent that sees only its own slice of the tree."
+    loop.2.text     "ail build recompiles only the nodes whose slice changed: their own spec, the contracts of the nodes they use, or shared parts like the tokens. Each node is compiled by an agent that sees only that slice."
     loop.3.title    "Check"
     loop.3.text     "ail check lints the spec, confirms every file was built from it, and runs every example, scenario and verify line as a test."
     loop.4.title    "Ask"
     loop.4.text     "When the spec leaves a gap, the compiler doesn't guess. It replies STOP with a question, and the answer goes into the spec."
     loop.stop.word  "STOP:"
     loop.stop.text  " after switching to the computer, does “New game” keep the computer as the opponent?"
-    loop.stop.note  "Illustrative example. The real spec answers it in GameReducer: newGame → initial(game.opponent)."
+    loop.stop.note  "Example question. In the real Tic-Tac-Toe spec the answer is already written down: “New game” keeps the opponent you chose (see the GameReducer node)."
   uses      Section, SectionHeading, Stack, LoopFigure
   children  LoopFigure
 ```

@@ -7,6 +7,8 @@ node GetStarted : view   level: experience
     two cards, "In Claude Code" and "In a terminal", side by side when there is room
     every command has its own copy button
     the terminal card lists the three commands that make up the whole tool
+    the terminal card says the commands run inside a project, meaning a folder with an ail.config.json, and ends with copyable steps to try the tic-tac-toe demo from this page
+    under the cards, two links point to what to read or try next: the Tic-Tac-Toe spec and the repository
     Scenario: in Claude Code
       Given the page is open
       Then the card "In Claude Code" shows the commands "/plugin marketplace add ffMathy/agentic-intermediate-language" and "/plugin install ail@agentic-intermediate-language", in that order
@@ -14,9 +16,16 @@ node GetStarted : view   level: experience
       Given the page is open
       Then the card "In a terminal" shows the command "bun add -g github:ffMathy/agentic-intermediate-language"
       And a table lists "ail check", "ail build" and "ail show [what]", in that order, each with what it does
+      And after the table it says the commands run inside a folder with an ail.config.json
+      And it shows the commands "git clone https://github.com/ffMathy/agentic-intermediate-language && cd agentic-intermediate-language", "bun install && bun link", "cd examples/tictactoe && bun install && ail check" and "ail show stakeholder", in that order
+    Scenario: what to do next
+      Given the page is open
+      Then the heading "Start in two minutes" is followed by the lead "Install it, then describe a feature in plain words. You get a spec you can review, and code that is checked against it."
+      And under the cards, the link "Read the Tic-Tac-Toe spec" leads to the example's spec folder and the link "View on GitHub ↗" leads to the repository, in that order
   look
     band      Section with id "start", tone raised
-    head      SectionHeading with text from start.heading
+    layout    stack(v, gap: space.6, align: stretch) [ head, cards, next ]
+    head      SectionHeading with text from start.heading, lead from start.lead
     cards     a div: display grid, grid-template-columns repeat(auto-fit, minmax(min(320px, 100%), 1fr)), gap space.6, align-items start
     card      background color.surface, a 1px solid color.border border, radius.lg, pad space.6, min-width 0; stack(v, gap: space.3, align: stretch)
     title     an h3: font.lead, weight 700, color.text, margin 0
@@ -26,8 +35,12 @@ node GetStarted : view   level: experience
     table     width 100%, border-collapse collapse; every row has a 1px solid color.border bottom border; cells pad space.2 space.2 space.2 0, vertical-align top, font.small, text-align left
     command   the first cell in font.mono at font.code, weight 600, color.accent, white-space nowrap
     closing   a p: font.small, weight 600, color.text, margin 0
+    next      stack(h, gap: space.3, align: center, wrap: true) [ example, repo ]
+    example   a link: background color.accent, color color.on.accent, a 2px solid color.accent border, radius.md, pad space.3 space.6, weight 700, no underline
+    repo      a link: background color.surface, color color.accent, a 2px solid color.accent border, radius.md, pad space.3 space.6, weight 700, no underline
   copy
     start.heading          "Start in two minutes"
+    start.lead             "Install it, then describe a feature in plain words. You get a spec you can review, and code that is checked against it."
     start.claude.title     "In Claude Code"
     start.claude.subtitle  "No API key. It runs on your Claude subscription."
     start.claude.1         "/plugin marketplace add ffMathy/agentic-intermediate-language"
@@ -45,9 +58,18 @@ node GetStarted : view   level: experience
     start.cli.show         "ail show [what]"
     start.cli.show.does    "The tree, a node, one reader's view, or what changed."
     start.cli.closing      "That's the whole tool: three commands."
+    start.cli.where        "Run these inside a project, meaning any folder with an ail.config.json. To try the tic-tac-toe demo from this page:"
+    start.cli.2            "git clone https://github.com/ffMathy/agentic-intermediate-language && cd agentic-intermediate-language"
+    start.cli.3            "bun install && bun link"
+    start.cli.4            "cd examples/tictactoe && bun install && ail check"
+    start.cli.5            "ail show stakeholder"
+    start.example          "Read the Tic-Tac-Toe spec"
+    start.repo             "View on GitHub ↗"
   binds
     claude   a card with an h3 from start.claude.title, the subtitle, CopyCommand with start.claude.1, CopyCommand with start.claude.2, then the text
-    cli      a card with an h3 from start.cli.title, the subtitle, CopyCommand with start.cli.1, the table with a header row, then the closing line
+    cli      a card with an h3 from start.cli.title, the subtitle, CopyCommand with start.cli.1, the table with a header row, the closing line, then a p from start.cli.where styled as text, CopyCommand with start.cli.2, CopyCommand with start.cli.3, CopyCommand with start.cli.4, CopyCommand with start.cli.5
+    example  a link to "https://github.com/ffMathy/agentic-intermediate-language/tree/main/examples/tictactoe"
+    repo     a link to "https://github.com/ffMathy/agentic-intermediate-language"
     cards    each card is a region named by its h3
   uses  Section, SectionHeading, Stack, CopyCommand
 ```

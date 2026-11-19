@@ -13,6 +13,7 @@ node StopResult : view   level: experience
       Given the page is open
       Then the article "stop-8" has the level 3 heading "The result: try to beat it."
       And the region named "The promise, one last time" shows "    4. The computer never loses." with "The computer never loses." highlighted
+      And the stop reads "Apart from a short index.html, none of its code was written by hand."
   look
     stop     JourneyStop with number 8, color color.accent, last, figure ResultFrame
   copy
@@ -25,7 +26,7 @@ node StopResult : view   level: experience
     result.file      "examples/tictactoe/tictactoe.ail.md"
     result.line.1    "    4. The computer never loses."
     result.mark      "The computer never loses."
-    result.turns     "Every square, word and move in this game comes from the spec above. None of its code was written by hand."
+    result.turns     "Every square, word and move in this game comes from the spec above. Apart from a short index.html, none of its code was written by hand."
   binds
     stop     JourneyStop with depth result.depth, chip result.chip, reader result.reader, headline result.headline, explanation result.body, lines [result.line.1], label result.label, file result.file, highlight [result.mark], turnsInto result.turns, last true
   uses      JourneyStop, ResultFrame
@@ -42,11 +43,15 @@ node ResultFrame : view   level: experience
       Then a frame titled "Tic-Tac-Toe, built from its AIL spec" shows "./demo/"
       And the link "Open the game full screen ↗" leads to "./demo/"
       And the hint reads "Pick “Computer”, then play as X"
+    Scenario: the game fits a phone
+      Given the viewport is 375px wide
+      When the stop is shown
+      Then the frame titled "Tic-Tac-Toe, built from its AIL spec" is 520px tall
   look
     layout   stack(v, gap: space.3, align: center, style: width 100%) [ hint, device, open, trace ]
     hint     a p: background color.thread, color color.text, font.small, weight 600, radius.pill, pad space.1 space.3, margin 0
-    device   a div: background color.code, pad space.3, radius.xl, width 100%, max-width 400px, box-sizing border-box
-    frame    an iframe: width 100%, height 600px, border 0, radius.lg, background color.surface, display block
+    device   a div: background color.code, pad space.3 (pad space.1 below 600px viewport width), radius.xl, width 100%, max-width 400px, box-sizing border-box
+    frame    an iframe: width 100%, height 600px (height 520px below 600px viewport width), border 0, radius.lg, background color.surface, display block
     open     a link: font.small, weight 600, color.accent
     trace    a ul: list-style none, margin 0, pad 0, width 100%, max-width 400px; stack(v, gap: space.1, align: stretch); each li font.small, color.text: what is seen, then " ← ", then the source in font.mono, color.text.muted
   copy

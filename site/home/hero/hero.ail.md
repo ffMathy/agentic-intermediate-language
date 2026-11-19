@@ -12,7 +12,7 @@ node Hero : view   level: experience
     Scenario: the links go to the right places
       Given the page is open
       Then "Follow the sentence ↓" leads to "#journey"
-      And "Play the finished game" leads to "./demo/"
+      And "Try to beat the computer ↓" leads to "#stop-8"
       And "View on GitHub ↗" leads to the repository
   look
     band      Section, tone plain
@@ -24,20 +24,20 @@ node Hero : view   level: experience
     links     stack(h, gap: space.3, align: center, wrap: true) [ follow, play, github ]
     follow    a link: background color.accent, color color.on.accent, a 2px solid color.accent border, radius.md, pad space.3 space.6, weight 700, no underline
     play      a link: background color.surface, color color.accent, a 2px solid color.accent border, radius.md, pad space.3 space.6, weight 700, no underline
-    github    a link: color color.text, weight 600, pad space.3 space.2, no underline
+    github    a link: color color.text, weight 600, pad space.3 0, no underline
     note      a p: font.small, color.text.muted, margin 0
     picture   HeroFigure, centered in its column
   copy
     hero.eyebrow   "A SPEC LANGUAGE FOR AI-BUILT SOFTWARE"
     hero.headline  "Write one sentence. Watch it become working software."
-    hero.subhead   "AIL is a spec language for building software with AI agents. You write what you want in plain words, then refine it level by level until it is precise enough that any model builds the same behaviour, and checks prove the code does what the sentence says. Below, one real sentence goes all the way down."
+    hero.subhead   "Write what you want in plain words, then add detail level by level. AI agents build the code from it, checks prove it does what you wrote, and everyone on the team reviews the level written for them."
     hero.follow    "Follow the sentence ↓"
-    hero.play      "Play the finished game"
+    hero.play      "Try to beat the computer ↓"
     hero.github    "View on GitHub ↗"
     hero.note      "This website is itself written in AIL and compiled by the same tool."
   binds
     follow   a link to "#journey"
-    play     a link to "./demo/"
+    play     a link to "#stop-8"
     github   a link to "https://github.com/ffMathy/agentic-intermediate-language"
   uses      Section, Stack, HeroFigure
   children  HeroFigure

@@ -31,7 +31,7 @@ target
   state        a flow owns exactly the state `binds.state` names, with useState; never mutate inputs
   effects      only flows use useEffect, and only for the timers `binds` names, cleared in the effect's cleanup
   styling      inline style objects only, no class names and no style elements; design tokens as CSS variables (token a.b.c → "var(--a-b-c)"); literal px, %, fr, ch, em and rgba values only where `look` gives them
-  responsive   no media queries and no width measuring: wrapping comes from grid auto-fit with minmax, flex-wrap, clamp() and max-width, exactly as `look` gives them
+  responsive   no media queries and no width measuring in components: wrapping comes from grid auto-fit with minmax, flex-wrap, clamp() and max-width, exactly as `look` gives them. The only exception is two classes defined in index.html: an element with class "ail-wide" shows only at 600px viewport width or more, and one with class "ail-narrow" only below 600px
   svg          inline SVG elements with exactly the viewBox, shapes, coordinates and colors `look` gives; numbers in `look` are SVG user units; SVG text uses font-family var(--font-sans) unless `look` says mono, which is var(--font-mono)
   images       no image files, icon fonts or external scripts; every picture is inline SVG
   motion       animations only through the keyframes defined in index.html (ail-thread, ail-dash), referenced from inline styles; index.html turns them off under reduced motion

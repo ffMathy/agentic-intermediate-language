@@ -11,7 +11,7 @@ node Footer : view   level: experience
   look
     bar       a footer element: background color.code, color color.code.muted, font.small
     strip     a div at the top, height 4px, display flex; four equal children with flex 1, colored color.level.product, color.level.experience, color.level.system and color.level.specialist
-    inner     a div with max-width width.content, margin 0 auto, box-sizing border-box, pad space.8 space.4; stack(v, gap: space.4, align: start) [ text, links ]
+    inner     a div with max-width width.content, margin 0 auto, box-sizing content-box, pad space.8 space.4 (the space.4 side padding sits outside the width, so the content box is at most width.content wide); stack(v, gap: space.4, align: start) [ text, links ]
     text      a p: line-height 1.6, max-width width.prose, margin 0
     links     a nav element; stack(h, gap: space.4, align: center, wrap: true) [ github, proposal, guide, spec ]
     link      color color.code.text, weight 600, underline

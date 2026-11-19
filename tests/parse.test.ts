@@ -51,30 +51,33 @@ test("node header, sections and derived fields", () => {
   expect(n.children).toEqual(["C"]);
 });
 
-test("glossary, catalog, profile and jargon statements", () => {
+test("glossary, catalog and target statements", () => {
   const md = [
     "```ail",
-    "use profile p.1",
     "glossary",
     '  term "game over"  plain "it ended"  formal status ≠ playing',
     "catalog",
     "  tokens",
     "    space.1=4px  color.x=#fff",
-    "  components",
-    "    Button.primary",
-    "profile p.1",
-    "  language  TS",
-    "  path.fn   src/{kebab}.ts",
-    'jargon reducer "state machine"',
+    "target",
+    "  code     TS",
+    "  path.fn  src/{kebab}.ts",
     "```",
   ].join("\n");
   const f = parseFile("g.ail.md", md);
   expect(f.errors).toEqual([]);
-  expect(f.uses[0]!.profile).toBe("p.1");
   expect(f.glossary[0]).toMatchObject({ term: "game over", plain: "it ended", formal: "status ≠ playing" });
-  expect(f.catalogs[0]).toMatchObject({ tokens: { "space.1": "4px", "color.x": "#fff" }, components: ["Button.primary"] });
-  expect(f.profiles[0]!.settings["path.fn"]).toBe("src/{kebab}.ts");
-  expect(f.jargon).toEqual(["reducer", "state machine"]);
+  expect(f.catalogs[0]).toMatchObject({ tokens: { "space.1": "4px", "color.x": "#fff" } });
+  expect(f.targets[0]!.settings["path.fn"]).toBe("src/{kebab}.ts");
+});
+
+test("profiles, jargon and catalog components are gone", () => {
+  const f = parseFile("old.ail.md", "```ail\nuse profile web.react.2026\njargon reducer\ncatalog\n  components\n    Button.primary\n```");
+  expect(f.errors.map((e) => e.message)).toEqual([
+    'unknown statement "use"',
+    'unknown statement "jargon"',
+    "catalog components are ordinary nodes now: specify them as views (e.g. in a `library` node) and list them under `uses`",
+  ]);
 });
 
 test("malformed statements are reported, not thrown", () => {

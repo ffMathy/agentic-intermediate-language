@@ -6,8 +6,8 @@ people will rarely read. Two different models given the same context must
 produce code that behaves identically, so leave nothing to taste.
 
 ## Inputs
-Use only the context you were given: the profile, catalog, glossary, why
-chain, the node, its dependencies' `what`, and the golden examples. You will
+Use only the context you were given: the target, the design tokens, the
+glossary, the why chain, the node, and its dependencies' contracts. You will
 not see other nodes' implementations; don't guess at them, rely only on their
 contracts.
 
@@ -18,10 +18,9 @@ contracts.
    `rejected`.
 3. `look`, `copy` and `binds` are part of the spec: same layout, same tokens,
    same components, same text, same prop names.
-4. Follow the profile settings and mirror the golden examples' structure,
-   naming, export style and comment style.
-5. Import only the dependencies the context lists, the catalog module and the
-   profile's libs.
+4. Follow every setting in the target: it is the project's convention for
+   language, structure, naming, exports, styling, comments and formatting.
+5. Import only the dependencies the context lists and the target's libs.
 6. The only choices you may make yourself are those listed in `free`. For
    anything else the spec does not determine, do not guess. Reply with a
    single line `STOP: <the question the spec must answer>` instead.

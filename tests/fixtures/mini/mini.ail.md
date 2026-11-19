@@ -1,7 +1,13 @@
 # Mini fixture
 
 ```ail
-use profile web.react.2026
+target
+  code       TypeScript 5 strict, named exports only
+  path.data  src/gen/{dir}/{kebab}.ts
+  path.fn    src/gen/{dir}/{kebab}.ts
+  path.view  src/gen/{dir}/{kebab}.tsx
+  path.flow  src/gen/{dir}/{kebab}.tsx
+  generated  src/gen/**
 ```
 
 ```ail

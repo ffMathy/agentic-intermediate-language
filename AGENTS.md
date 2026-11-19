@@ -2,7 +2,7 @@
 
 ## In any AIL project (a folder with `ail.config.json`)
 
-- The `*.ail.md` files are the source of truth. Generated code (the profile's
+- The `*.ail.md` files are the source of truth. Generated code (the target's
   `generated` globs, e.g. `src/gen/**`) is never edited by hand: hooks block
   it, and `ail check` reports it.
 - To change behaviour, change the spec, then build: `/ail:build` in Claude
@@ -20,6 +20,6 @@
   `bun install` in that folder first.
 - `site/` is the website, and it is an AIL project. Change its pages through
   its spec and `ail build`, never by editing `site/src/gen`.
-- If you change the profile, the prompts or the context format, compile hashes
+- If you change the prompts or the context format, compile hashes
   change. Rebuild `examples/tictactoe` and `site` so that `ail check` passes in
   both.

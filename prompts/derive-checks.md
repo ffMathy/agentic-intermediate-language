@@ -14,9 +14,10 @@ run.
    aren't in `look`.
 3. Find elements the way a user would: by role and accessible name, using the
    `copy` text verbatim (`getByRole("button", { name: "New game" })`).
-4. For the web.react.2026 profile, use `bun:test` with `@testing-library/react`
-   (`render`, `screen`, `fireEvent`, `act`, `cleanup`) and import the module
-   under test relative to the check file. Call `cleanup()` in `afterEach`.
+4. Use the test tools the target names. For React targets that is `bun:test`
+   with `@testing-library/react` (`render`, `screen`, `fireEvent`, `act`,
+   `cleanup`); call `cleanup()` in `afterEach`. Import the module under test
+   relative to the check file.
 5. The first line is the `// ail-derived-from: Node@hash` header you were given.
 6. If a scenario can't be checked without guessing, reply with
    `STOP: <question>`.

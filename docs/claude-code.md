@@ -96,11 +96,27 @@ A project is any folder with an `ail.config.json`:
 { "sources": ["**/*.ail.md"] }
 ```
 
-…and a root spec file that names its profile and its entry point:
+…and a root spec file with a `target` (what to generate, and the conventions
+to follow), the design tokens, and the root node with its entry point:
 
 ````md
 ```ail
-use profile web.react.2026
+target
+  code        TypeScript 5 strict, React 19 function components, named exports only
+  styling     inline styles; design tokens as CSS variables (token a.b.c → "var(--a-b-c)")
+  path.system src/gen/main.tsx
+  path.view   src/gen/{dir}/{kebab}.tsx
+  path.flow   src/gen/{dir}/{kebab}.tsx
+  path.fn     src/gen/{dir}/{kebab}.ts
+  libs        react react-dom
+  tokens-css  src/gen/tokens.css
+  generated   src/gen/**
+```
+
+```ail
+catalog
+  tokens
+    space.2=8px  color.text=#111827
 ```
 
 ```ail

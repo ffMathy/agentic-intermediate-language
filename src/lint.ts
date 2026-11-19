@@ -31,11 +31,9 @@ export function lint(p: Project): Diagnostic[] {
 
   for (const e of p.errors) d.push({ severity: "error", code: "parse", message: e.message, file: e.file, line: e.line });
 
-  if (!p.profile && p.nodes.size) push("warning", "no-profile", null, "no `use profile <id>` statement; nothing can be compiled", 1, p.files[0]?.file);
+  if (!p.target && p.nodes.size) push("warning", "no-target", null, "no `target` block: nothing says what to generate, so nothing can be built", 1, p.files[0]?.file);
 
-  const glossaryWords = new Set(p.glossary.map((t) => t.term.toLowerCase()));
   const tokenFamilies = new Set(Object.keys(p.tokens).map((t) => t.split(".")[0]!));
-  const componentFamilies = new Set(p.components.map((c) => c.split(".")[0]!));
   const multiParent = new Map<string, string[]>();
   for (const n of p.nodes.values()) for (const c of n.children) multiParent.set(c, [...(multiParent.get(c) ?? []), n.name]);
 
@@ -97,11 +95,6 @@ export function lint(p: Project): Diagnostic[] {
         const lines = s.inline ? [s.inline, ...s.body] : s.body;
         lines.forEach((raw, i) => {
           const line = plainText(raw);
-          for (const j of p.jargon) {
-            if (glossaryWords.has(j)) continue;
-            if (new RegExp(`\\b${j.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")}\\b`, "i").test(line))
-              push("error", "jargon", n, `"${j}" is jargon at the ${n.level} level; use a glossary term or move it to a deeper node`, s.line + i);
-          }
           for (const [re, what] of CODE_PATTERNS) {
             const m = re.exec(line);
             if (m) { push("error", "code-in-plain-level", n, `${what} "${m[0]}" in ${s.key} at the ${n.level} level; keep notation in look/binds or a deeper node`, s.line + i); break; }
@@ -110,26 +103,32 @@ export function lint(p: Project): Diagnostic[] {
       }
     }
 
-    // --- catalog references -----------------------------------------------
-    for (const s of n.sections.filter((x) => x.key === "look")) {
+    // --- tokens and components ---------------------------------------------
+    // A design token must be in the catalog. A component is just a node: a
+    // look that shows `Button.primary` or `Stack` must use that node.
+    for (const s of n.sections.filter((x) => x.key === "look" || x.key === "binds")) {
       const text = [s.inline, ...s.body].join(" ").replace(/"[^"]*"/g, " ");
-      for (const m of text.matchAll(/\b([a-z][a-z0-9]*(?:\.[a-z0-9]+)+)\b/g)) {
+      if (s.key === "look") for (const m of text.matchAll(/\b([a-z][a-z0-9]*(?:\.[a-z0-9]+)+)\b/g)) {
         const t = m[1]!;
         if (tokenFamilies.has(t.split(".")[0]!) && !(t in p.tokens)) push("error", "unknown-token", n, `design token "${t}" is not in the catalog`, s.line);
       }
-      for (const m of text.matchAll(/\b([A-Z][A-Za-z]*(?:\.[a-z0-9]+)+)\b/g)) {
-        const c = m[1]!;
-        if (componentFamilies.has(c.split(".")[0]!) && !p.components.includes(c)) push("error", "unknown-component", n, `component "${c}" is not in the catalog`, s.line);
+      const named = new Set<string>();
+      for (const m of text.matchAll(/\b([A-Z][A-Za-z0-9]*)(\.[a-z0-9]+)*\b/g)) {
+        const [whole, name, variant] = [m[0], m[1]!, m[2]];
+        if (p.nodes.has(name)) named.add(name);
+        else if (variant && s.key === "look") push("error", "unknown-component", n, `"${whole}" names no node; components are nodes (e.g. a view in a \`library\`)`, s.line);
       }
+      for (const name of named) if (name !== n.name && !n.uses.includes(name))
+        push("error", "missing-uses", n, `${s.key} refers to ${name}, but ${n.name} does not list it under \`uses\``, s.line);
     }
 
     // --- executable checks ------------------------------------------------
     for (const e of n.examples) if (!e.expected) push("error", "example-syntax", n, `example "${e.expr}" needs "=> expected"`, e.line);
     for (const dec of n.decisions) if (!dec.because) push("warning", "decision-without-because", n, `decision "${dec.what}" has no \`because\``, dec.line);
 
-    if (p.profile && n.children.length === 0 && n.kind !== "system" && !modulePath(p, n))
-      push("warning", "no-path", n, `leaf ${n.name} (kind ${n.kind}) has no path.${n.kind} in profile ${p.profile.id}; it will not be compiled`);
-    if (p.profile && isCompilable(p, n) && n.examples.length === 0 && n.scenarios.length === 0 && !n.sections.some((s) => s.key === "verify") && n.kind !== "data")
+    if (p.target && n.children.length === 0 && n.kind !== "library" && !modulePath(p, n))
+      push("warning", "no-path", n, `leaf ${n.name} (kind ${n.kind}) has no path.${n.kind} in the target; it will not be built`);
+    if (p.target && isCompilable(p, n) && n.examples.length === 0 && n.scenarios.length === 0 && !n.sections.some((s) => s.key === "verify") && n.kind !== "data" && n.kind !== "system")
       push("warning", "unverifiable", n, `${n.name} has no examples, scenarios or verify section; nothing proves the generated code right`);
     if (n.kind === "system" && n.entry && !p.nodes.has(n.entry)) push("error", "unknown-node", n, `entry "${n.entry}" is not defined`);
   }

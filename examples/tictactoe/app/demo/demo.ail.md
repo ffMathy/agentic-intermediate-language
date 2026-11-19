@@ -44,5 +44,5 @@ node WatchADemo : flow   level: experience
     StatusLine  status = game.status, next = game.next
     BoardView   board = game.board, status = game.status, locked = true, onPlace(i) = nothing
     again       onPress() = dispatch newGame
-  uses  StatusLine, BoardView, GameState, GameReducer, ComputerPlayer
+  uses  StatusLine, BoardView, GameState, GameReducer, ComputerPlayer, Stack, Button
 ```

@@ -22,7 +22,7 @@ function projectFor(file: string): string | null {
 
 export function generatedGlobs(root?: string): { root: string; globs: string[] } {
   const p = loadProject(root);
-  const globs = (p.profile?.settings["generated"] ?? "").split(/[\s,]+/).filter(Boolean);
+  const globs = (p.target?.settings["generated"] ?? "").split(/[\s,]+/).filter(Boolean);
   return { root: p.root, globs };
 }
 

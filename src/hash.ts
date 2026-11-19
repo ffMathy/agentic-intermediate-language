@@ -43,16 +43,11 @@ export function canonicalNode(n: AilNode, only?: string[]): string {
  * observable behaviour, and (for views and flows) the props it binds. */
 export const contractOf = (n: AilNode) => canonicalNode(n, ["what", "binds"]);
 
-export function profileHash(p: Project): string {
-  if (!p.profile) return sha256("no-profile");
-  const pr = p.profile;
+export function targetHash(p: Project): string {
+  const t = p.target;
   return sha256(JSON.stringify({
-    id: pr.id,
-    settings: pr.order.map((k) => [k, pr.settings[k]]),
+    target: t ? t.order.map((k) => [k, t.settings[k]]) : null,
     tokens: Object.entries(p.tokens).sort(),
-    components: [...p.components].sort(),
-    goldens: pr.goldens.map((g) => [g.name, g.il, Object.entries(g.files)]),
-    skill: pr.skill,
   }));
 }
 
@@ -64,8 +59,8 @@ export function profileHash(p: Project): string {
 export function compileHash(p: Project, n: AilNode): string {
   const deps = n.uses.map((u) => p.nodes.get(u)).filter(Boolean) as AilNode[];
   return sha256([
-    "ail-compile-v1",
-    profileHash(p),
+    "ail-compile-v2",
+    targetHash(p),
     JSON.stringify(p.glossary.map((t) => [t.term, t.plain, t.formal])),
     ...ancestors(p, n.name).map((a) => canonicalNode(a, ["why"])),
     canonicalNode(n),

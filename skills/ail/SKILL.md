@@ -6,8 +6,8 @@ description: Work with AIL (*.ail.md), the why/what/how specification that agent
 
 An AIL spec is a tree of nodes. Each node says **why** it exists, **what** it
 does observably, and **how** its key decisions were made. Detail is delegated
-to children. People review the spec; generated code (`src/gen/**` in the web
-profile) is never edited by hand, and hooks block attempts to.
+to children. People review the spec; generated code (the target's `generated`
+paths) is never edited by hand, and hooks block attempts to.
 
 Tools: `ail_show` (look around), `ail_check` (is everything right?),
 `ail_context` and `ail_submit` (used by the `ail-leaf-compiler` agent). To
@@ -21,7 +21,7 @@ node Name : kind   level: product|experience|system|specialist   @tag
   how       decide X
               because Y
               rejected Z because W
-  look      layout and visuals, in catalog tokens and components
+  look      layout and visuals, in design tokens and component nodes
   copy      key "user-visible text"
   binds     props, state and events that connect a view to logic
   free      [ the only things the compiler may choose ]
@@ -31,6 +31,16 @@ node Name : kind   level: product|experience|system|specialist   @tag
 ```
 Kinds: `system` (the root, with `entry`), `flow`, `view`, `data`, `fn`, and
 `library` (groups shared nodes; it is never compiled).
+
+The project's root file also holds:
+- `target`: what to generate and the conventions every compiler follows,
+  including language, structure, naming, styling, and where each kind of node
+  is written (`path.view src/gen/{dir}/{kebab}.tsx`)
+- `catalog tokens`: the design tokens, the only values `look` may use
+- `glossary`: domain words with a plain and a formal meaning
+
+Components (buttons, layout boxes, text styles) are ordinary nodes, usually
+in a `library`. A `look` that mentions one must list it under `uses`.
 
 ## Levels: who reads what
 | level | reader | language |

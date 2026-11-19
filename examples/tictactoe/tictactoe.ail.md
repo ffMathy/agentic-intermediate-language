@@ -10,6 +10,7 @@ owner, and each area lists them under `uses`:
 ```
 tictactoe.ail.md                         🟢 TicTacToe (this file)
 app/app.ail.md                           🟡 App: switches between the two areas
+ui/ui.ail.md                             🟡 UiKit (library): Stack, Text, Button, Segmented
 app/play/play.ail.md                     🟡 PlayAGame, NewGameButton, ChooseOpponent
 app/demo/demo.ail.md                     🟡 WatchADemo
 board/board.ail.md                       🟡 BoardKit (library): BoardView, StatusLine
@@ -20,8 +21,34 @@ engine/computer-player/computer-player.ail.md   🔴 ComputerPlayer
 Both areas, play and watch, reuse the same board, status line, rules and
 computer player. Generated code mirrors these folders under `src/gen/`.
 
+## Target
+
+What to generate, and the conventions every compiler must follow. It is part
+of the spec, so it is reviewed like everything else.
+
 ```ail
-use profile web.react.2026
+target
+  code         TypeScript 5 in strict mode, ES modules, no `any`; React 19 function components only
+  libs         react react-dom
+  exports      named exports only; a view or flow exports a component named exactly like its node; export every name `what` mentions and nothing else except types
+  props        named exactly as `binds` lists them
+  state        a flow owns exactly the state `binds.state` names (useReducer for a reducer, useState for a single value); logic lives in fn modules; never mutate inputs
+  effects      only flows use useEffect, and only for the timers `binds` names, cleared in the effect's cleanup
+  styling      inline style objects; design tokens as CSS variables (token a.b.c → "var(--a-b-c)"); px only where `look` gives px
+  layout       stack(v|h, gap: t, align: a, pad: t) [ A, B ] means the Stack node with those props and those children, in that order
+  copy         user-visible text is the `copy` text verbatim, with {placeholders} filled in
+  a11y         interactive elements are native buttons, or have a role and keyboard handling; accessible names come from `copy`
+  comments     one JSDoc line per export quoting the clause it implements; no other comments
+  formatting   2-space indent, double quotes, semicolons, trailing commas in multi-line literals
+  entry        the system node compiles to an entry module that renders its `entry` node into the element with id "root"
+  path.system  src/gen/main.tsx
+  path.data    src/gen/{dir}/{kebab}.ts
+  path.fn      src/gen/{dir}/{kebab}.ts
+  path.view    src/gen/{dir}/{kebab}.tsx
+  path.flow    src/gen/{dir}/{kebab}.tsx
+  tokens-css   src/gen/tokens.css
+  generated    src/gen/**
+  tests        bun test with @testing-library/react and happy-dom
 ```
 
 ## Glossary
@@ -38,12 +65,16 @@ glossary
   term computer     plain "the built-in opponent, which always plays O"  formal ComputerPlayer
 ```
 
-Game-specific design tokens, added to the profile's catalog:
+## Design tokens
 
 ```ail
 catalog
   tokens
-    color.player.x=#2563eb  color.player.o=#dc2626  color.highlight=#fde68a
+    space.1=4px  space.2=8px  space.4=16px  space.6=24px  radius.md=8px
+    font.body=16px  font.status=18px  font.mark=40px
+    color.surface=#ffffff  color.surface.raised=#f3f4f6  color.border=#d1d5db
+    color.text=#111827  color.text.muted=#6b7280  color.action=#111827  color.action.text=#ffffff
+    color.player.x=#2563eb  color.player.o=#dc2626  color.highlight=#fde68a  color.focus=#2563eb
 ```
 
 ---
@@ -62,5 +93,5 @@ node TicTacToe : system   level: product
     5. You can start a new game at any time.                                refined-by: NewGameButton
     6. You can watch the computer play itself, move by move.                refined-by: WatchADemo
   entry     App
-  children  App, BoardKit, Engine
+  children  App, BoardKit, Engine, UiKit
 ```

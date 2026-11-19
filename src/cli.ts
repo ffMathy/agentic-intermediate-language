@@ -2,7 +2,7 @@
 // ail — the Agentic Intermediate Language toolchain.
 import { readFileSync } from "node:fs";
 import { formatCheck, runCheck } from "./check.ts";
-import { checkPath, checksToDerive, compile, derive, submit } from "./compile.ts";
+import { checkPath, checksToDerive, compile, derive, mapLimit, submit } from "./compile.ts";
 import { buildContext } from "./context.ts";
 import { diverge, formatDiverge } from "./diverge.ts";
 import { postHook, preHook } from "./hooks.ts";
@@ -20,6 +20,7 @@ const HELP = `ail — write the spec, let agents build the code.
                         subscription works) unless ANTHROPIC_API_KEY is set.
                         --model M     claude-code[:model], anthropic:<id>, openai:<id>, command:<cli>
                         --force       rebuild even if nothing changed
+                        --jobs N      nodes compiled at once (default 4)
   ail show [what]       The tree (default), a <Node>, an audience
                         (stakeholder | design | engineer | specialist [tag]),
                         or changes [--since <ref>]
@@ -95,15 +96,16 @@ async function main(argv: string[]): Promise<number> {
       const provider = models()[0]!;
       const names = nodesOrDie(p, rest);
       const targets = p.ordered.filter((n) => isCompilable(p, n) && (!names.length || names.includes(n.name)));
+      const jobs = Number(flag(a, "jobs") ?? 4);
       const stopped = new Map<string, string>();
-      for (const n of checksToDerive(p, targets)) {
+      await mapLimit(checksToDerive(p, targets), jobs, async (n) => {
         log(`${n.name}: deriving checks from its scenarios`);
         const r = await derive(p, n, provider);
         if (r.stop) stopped.set(n.name, r.stop);
         else log(`${n.name}: wrote ${r.file}; review it, since it now defines "correct"`);
-      }
+      });
       const out = await compile(p, targets.filter((n) => !stopped.has(n.name)).map((n) => n.name), {
-        provider, force: flag(a, "force") === "true", log,
+        provider, jobs, force: flag(a, "force") === "true", log,
         temperature: flag(a, "temperature") ? Number(flag(a, "temperature")) : undefined,
       });
       for (const [node, q] of stopped) out.push({ node, status: "stopped", attempts: 0, detail: q });

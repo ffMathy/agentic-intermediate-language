@@ -27,10 +27,11 @@ test("unrelated nodes are not in the context", () => {
   expect(c).not.toContain("node BoardView");
 });
 
-test("golden examples are filtered by kind", () => {
-  expect(ctx("BoardView")).toContain("### quantity-stepper");
-  expect(ctx("BoardView")).not.toContain("### clamp-quantity");
-  expect(ctx("Rules")).toContain("### clamp-quantity");
+test("the target and the tokens come from the project's own spec", () => {
+  const c = ctx("Rules");
+  expect(c).toContain("## Target (the project's conventions — normative)");
+  expect(c).toContain("color.player.x=#2563eb");
+  expect(c).not.toContain("golden");
 });
 
 test("context is deterministic", () => {

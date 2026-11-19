@@ -1,4 +1,4 @@
-// ail-derived-from: StopProduct@00abdb56a1bfbcd4
+// ail-derived-from: StopProduct@e08a6a3ea86f90de
 import { afterEach, expect, test } from "bun:test";
 import { cleanup, render, screen, within } from "@testing-library/react";
 import { StopProduct } from "../../../../src/gen/home/journey/stops/stop-product";
@@ -21,6 +21,8 @@ const lines = [
   "  children  App, BoardKit, Engine, UiKit",
 ];
 
+const marks = ["4. The computer never loses.", "refined-by: ComputerPlayer"];
+
 test("the product level", () => {
   render(<StopProduct />);
 
@@ -30,19 +32,26 @@ test("the product level", () => {
   expect(article).toBeDefined();
   const stop = article as HTMLElement;
 
-  const heading = within(stop).getByRole("heading", {
-    level: 3,
-    name: "Product level: the sentence becomes a promise with an owner.",
-  });
-  expect(heading).toBeTruthy();
+  const heading = within(stop).getByRole("heading", { level: 3 });
+  expect(heading.textContent).toBe(
+    "Product level: the sentence becomes a promise with an owner.",
+  );
 
   const region = within(stop).getByRole("region", {
     name: "Product-level spec excerpt",
   });
   const text = region.textContent ?? "";
+
+  let from = 0;
   for (const line of lines) {
-    expect(text).toContain(line);
+    const at = text.indexOf(line, from);
+    expect(at).toBeGreaterThanOrEqual(0);
+    from = at + line.length;
   }
-  expect(text).toContain("4. The computer never loses.");
-  expect(text).toContain("refined-by: ComputerPlayer");
+
+  const all = Array.from(region.querySelectorAll("*"));
+  for (const mark of marks) {
+    const highlighted = all.filter((el) => el.textContent === mark);
+    expect(highlighted.length).toBeGreaterThan(0);
+  }
 });

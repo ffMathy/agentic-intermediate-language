@@ -1,4 +1,5 @@
-import { useState } from "react";
+import { useRef, useState } from "react";
+import type { KeyboardEvent } from "react";
 import { Section } from "../../parts/section";
 import { SectionHeading } from "../../parts/section-heading";
 import { Stack } from "../../parts/stack";
@@ -47,15 +48,22 @@ const colors: Record<Reader, string> = {
   specialist: "var(--color-level-specialist)",
 };
 
-/** "four tabs, "Stakeholder", "Design", "Engineer" and "Specialist", named together as "Readers"; "Stakeholder" is picked first" */
+/** four tabs, "Stakeholder", "Design", "Engineer" and "Specialist", named together as "Readers"; "Stakeholder" is picked first */
 export function Readers() {
   const [reader, setReader] = useState<Reader>("stakeholder");
+  const tabRefs = useRef<(HTMLButtonElement | null)[]>([]);
 
-  const move = (from: Reader, step: number) => {
-    const index = order.indexOf(from);
-    const next = order[(index + step + order.length) % order.length];
-    setReader(next);
-    document.getElementById(`reader-tab-${next}`)?.focus();
+  const onKeyDown = (event: KeyboardEvent<HTMLButtonElement>, index: number) => {
+    let next: number;
+    if (event.key === "ArrowRight") {
+      next = (index + 1) % order.length;
+    } else if (event.key === "ArrowLeft") {
+      next = (index - 1 + order.length) % order.length;
+    } else {
+      return;
+    }
+    setReader(order[next]);
+    tabRefs.current[next]?.focus();
   };
 
   return (
@@ -66,11 +74,14 @@ export function Readers() {
       />
       <div role="tablist" aria-label="Readers">
         <Stack dir="h" gap="space.2" align="center" wrap={true}>
-          {order.map((key) => {
+          {order.map((key, index) => {
             const picked = key === reader;
             return (
               <button
                 key={key}
+                ref={(element) => {
+                  tabRefs.current[index] = element;
+                }}
                 type="button"
                 role="tab"
                 id={`reader-tab-${key}`}
@@ -78,13 +89,7 @@ export function Readers() {
                 aria-controls="reader-panel"
                 tabIndex={picked ? 0 : -1}
                 onClick={() => setReader(key)}
-                onKeyDown={(event) => {
-                  if (event.key === "ArrowRight") {
-                    move(key, 1);
-                  } else if (event.key === "ArrowLeft") {
-                    move(key, -1);
-                  }
-                }}
+                onKeyDown={(event) => onKeyDown(event, index)}
                 style={{
                   height: "40px",
                   padding: "0 var(--space-4)",
@@ -97,9 +102,7 @@ export function Readers() {
                   border: picked
                     ? `1px solid ${colors[key]}`
                     : "1px solid var(--color-border)",
-                  color: picked
-                    ? "var(--color-on-accent)"
-                    : "var(--color-text)",
+                  color: picked ? "var(--color-on-accent)" : "var(--color-text)",
                 }}
               >
                 {names[key]}

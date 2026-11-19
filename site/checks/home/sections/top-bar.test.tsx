@@ -1,4 +1,4 @@
-// ail-derived-from: TopBar@23c48a92be907d8e
+// ail-derived-from: TopBar@414844f2db23df4c
 import { afterEach, expect, test } from "bun:test";
 import { cleanup, render, screen, within } from "@testing-library/react";
 import { TopBar } from "../../../src/gen/home/sections/top-bar";
@@ -9,24 +9,20 @@ afterEach(() => {
 
 test("the links lead to the right places", () => {
   render(<TopBar />);
-
   const nav = screen.getByRole("navigation", { name: "Sections" });
   const links = within(nav).getAllByRole("link");
-
   const expected: Array<[string, string]> = [
     ["The journey", "#journey"],
     ["Four readers", "#readers"],
     ["How it builds", "#loop"],
-    ["This page in AIL", "#this-page"],
+    ["Browse the specs", "#specs"],
     ["Get started", "#start"],
     ["GitHub ↗", "https://github.com/ffMathy/agentic-intermediate-language"],
   ];
-
   expect(links.length).toBe(expected.length);
-
-  expected.forEach(([name, href], index) => {
-    const byName = within(nav).getByRole("link", { name });
-    expect(links[index]).toBe(byName);
-    expect(byName.getAttribute("href")).toBe(href);
+  expected.forEach(([name, href], i) => {
+    const link = links[i];
+    expect(link).toBe(within(nav).getByRole("link", { name }));
+    expect(link.getAttribute("href")).toBe(href);
   });
 });

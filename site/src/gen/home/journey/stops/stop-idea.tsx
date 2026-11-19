@@ -23,6 +23,7 @@ export function StopIdea() {
       highlight={["The computer never loses."]}
       turnsInto="The owner's words, written down unchanged as the spec's first lines. Next, the sentence joins the product's other promises and gets a node that keeps it."
       figure={<IdeaFigure />}
+      browse="#spec/tictactoe/tictactoe.ail.md"
     />
   );
 }

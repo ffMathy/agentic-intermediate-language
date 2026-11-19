@@ -30,6 +30,7 @@ export function StopProduct() {
       highlight={["4. The computer never loses.", "refined-by: ComputerPlayer"]}
       turnsInto="Nothing is built from this level directly. Each refined-by names the node that will be: for claim 4, ComputerPlayer."
       figure={<ProductFigure />}
+      browse="#spec/tictactoe/tictactoe.ail.md"
     />
   );
 }

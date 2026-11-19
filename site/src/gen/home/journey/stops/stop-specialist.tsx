@@ -37,6 +37,7 @@ export function StopSpecialist() {
       ]}
       turnsInto="A minimax search in TypeScript, and a check that plays every possible game against it."
       figure={<SpecialistFigure />}
+      browse="#spec/tictactoe/engine/computer-player/computer-player.ail.md"
     />
   );
 }

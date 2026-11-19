@@ -1,4 +1,4 @@
-// ail-derived-from: StopSpecialist@7ccf3bcdc3904540
+// ail-derived-from: StopSpecialist@8f459f55f084ced6
 import { afterEach, expect, test } from "bun:test";
 import { cleanup, render, screen, within } from "@testing-library/react";
 import { StopSpecialist } from "../../../../src/gen/home/journey/stops/stop-specialist";
@@ -25,6 +25,11 @@ const lines: string[] = [
   "                 and assert that no game ends in a win for X",
 ];
 
+const marks: string[] = [
+  "never loses",
+  "no game against choose ends in a win for the other player",
+];
+
 test("the specialist level", () => {
   render(<StopSpecialist />);
 
@@ -34,29 +39,28 @@ test("the specialist level", () => {
   expect(article).toBeDefined();
   if (!article) return;
 
-  const scope = within(article);
-  scope.getByRole("heading", {
-    level: 3,
-    name: "Specialist level: the promise becomes an algorithm and a proof.",
-  });
+  expect(
+    within(article).getByRole("heading", {
+      level: 3,
+      name: "Specialist level: the promise becomes an algorithm and a proof.",
+    }),
+  ).toBeTruthy();
 
-  const region = scope.getByRole("region", {
+  const region = within(article).getByRole("region", {
     name: "Specialist-level spec excerpt",
   });
   const text = region.textContent ?? "";
 
-  let from = 0;
+  let last = -1;
   for (const line of lines) {
-    const at = text.indexOf(line, from);
-    expect(at).toBeGreaterThanOrEqual(0);
-    from = at + line.length;
+    const at = text.indexOf(line, last + 1);
+    expect(at).toBeGreaterThan(last);
+    last = at;
   }
 
-  const marks = Array.from(region.querySelectorAll("mark")).map(
-    (m) => m.textContent ?? "",
-  );
-  expect(marks).toContain("never loses");
-  expect(marks).toContain(
-    "no game against choose ends in a win for the other player",
-  );
+  const elements = Array.from(region.querySelectorAll("*"));
+  for (const mark of marks) {
+    const highlighted = elements.filter((el) => el.textContent === mark);
+    expect(highlighted.length).toBeGreaterThan(0);
+  }
 });

@@ -1,16 +1,10 @@
 const chips = [
-  { y: 10, color: "var(--color-level-product)", label: "promise · product" },
-  { y: 66, color: "var(--color-level-experience)", label: "scenario · experience" },
-  { y: 122, color: "var(--color-level-system)", label: "rules · system" },
-  { y: 178, color: "var(--color-level-specialist)", label: "invariant · specialist" },
-  { y: 234, color: "var(--color-level-build)", label: "test · never loses" },
+  { y: 10, color: "var(--color-level-product)", text: "promise · product" },
+  { y: 66, color: "var(--color-level-experience)", text: "scenario · experience" },
+  { y: 122, color: "var(--color-level-system)", text: "rules · system" },
+  { y: 178, color: "var(--color-level-specialist)", text: "invariant · specialist" },
+  { y: 234, color: "var(--color-level-build)", text: "test · never loses" },
 ];
-
-const threadStroke = {
-  stroke: "var(--color-thread-strong)",
-  strokeWidth: 4,
-  strokeLinecap: "round" as const,
-};
 
 /** five stacked chips, one per level the promise passed through, joined by the yellow thread, ending in a green check */
 export function ProofFigure() {
@@ -26,15 +20,29 @@ export function ProofFigure() {
         display: "block",
       }}
     >
-      <line x1={30} y1={27} x2={30} y2={251} style={threadStroke} />
+      <line
+        x1={30}
+        y1={27}
+        x2={30}
+        y2={251}
+        style={{
+          stroke: "var(--color-thread-strong)",
+          strokeWidth: 4,
+          strokeLinecap: "round",
+        }}
+      />
       {chips.map((chip) => (
         <line
-          key={`branch-${chip.y}`}
+          key={`thread-${chip.y}`}
           x1={30}
           y1={chip.y + 17}
           x2={50}
           y2={chip.y + 17}
-          style={threadStroke}
+          style={{
+            stroke: "var(--color-thread-strong)",
+            strokeWidth: 4,
+            strokeLinecap: "round",
+          }}
         />
       ))}
       {chips.map((chip) => (
@@ -61,7 +69,7 @@ export function ProofFigure() {
             fill: "var(--color-on-accent)",
           }}
         >
-          {chip.label}
+          {chip.text}
         </text>
       ))}
       <line

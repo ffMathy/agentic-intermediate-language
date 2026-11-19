@@ -45,7 +45,11 @@ function Pill({ n }: { n: number }) {
   );
 }
 
-function Group({ label, ns }: { label: string; ns: number[] }) {
+function Group({ label, from, to }: { label: string; from: number; to: number }) {
+  const ns: number[] = [];
+  for (let n = from; n <= to; n++) {
+    ns.push(n);
+  }
   return (
     <Stack dir="v" gap="space.1" align="start">
       <span style={groupLabelStyle}>{label}</span>
@@ -64,8 +68,8 @@ export function JumpGauge() {
     <nav aria-label="Journey stops">
       <Stack dir="h" gap="space.4" align="end" wrap={true}>
         <Pill n={1} />
-        <Group label="The spec: four levels" ns={[2, 3, 4, 5]} />
-        <Group label="What it becomes" ns={[6, 7, 8]} />
+        <Group label="The spec: four levels" from={2} to={5} />
+        <Group label="What it becomes" from={6} to={8} />
       </Stack>
     </nav>
   );

@@ -1,4 +1,4 @@
-// ail-derived-from: StopExperience@01c9b0f351dcdd4a
+// ail-derived-from: StopExperience@94bc6fb32d4a27ab
 import { afterEach, expect, test } from "bun:test";
 import { cleanup, render, screen, within } from "@testing-library/react";
 import { StopExperience } from "../../../../src/gen/home/journey/stops/stop-experience";
@@ -24,26 +24,31 @@ const lines = [
 test("the experience level", () => {
   render(<StopExperience />);
 
-  const article = document.getElementById("stop-3");
-  expect(article).not.toBeNull();
-  const articleEl = article as HTMLElement;
-  expect(articleEl.tagName.toLowerCase() === "article" || articleEl.getAttribute("role") === "article").toBe(true);
-  expect(
-    within(articleEl).getByRole("heading", {
-      level: 3,
-      name: "Experience level: what the player sees, as scenarios anyone can test.",
-    }),
-  ).toBeTruthy();
+  const article = screen
+    .getAllByRole("article")
+    .find((element) => element.id === "stop-3");
+  expect(article).toBeDefined();
+  if (!article) return;
 
-  const region = screen.getByRole("region", { name: "Experience-level spec excerpt" });
+  const heading = within(article).getByRole("heading", {
+    level: 3,
+    name: "Experience level: what the player sees, as scenarios anyone can test.",
+  });
+  expect(heading).toBeTruthy();
+
+  const region = within(article).getByRole("region", {
+    name: "Experience-level spec excerpt",
+  });
   const text = region.textContent ?? "";
   let from = 0;
   for (const line of lines) {
-    const at = text.indexOf(line, from);
-    expect(at).toBeGreaterThanOrEqual(0);
-    from = at + line.length;
+    const index = text.indexOf(line, from);
+    expect(index).toBeGreaterThanOrEqual(0);
+    from = index + line.length;
   }
 
-  const marks = Array.from(region.querySelectorAll("mark")).map((m) => m.textContent ?? "");
-  expect(marks).toContain("the computer places an O");
+  const highlighted = Array.from(region.querySelectorAll("*")).filter(
+    (element) => element.textContent === "the computer places an O",
+  );
+  expect(highlighted.length).toBeGreaterThan(0);
 });

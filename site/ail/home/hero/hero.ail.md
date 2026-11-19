@@ -18,7 +18,7 @@ node Hero : view   level: experience
     band      Section, tone plain
     grid      a div: display grid, grid-template-columns repeat(auto-fit, minmax(min(320px, 100%), 1fr)), gap space.8, align-items center
     text      stack(v, gap: space.4, align: start) [ eyebrow, headline, subhead, links, note ]
-    eyebrow   font.tiny, weight 700, letter-spacing 0.12em, color.accent, margin 0
+    eyebrow   a p: font.tiny, weight 700, letter-spacing 0.12em, color.accent, margin 0
     headline  an h1: font.hero, weight 800, line-height 1.1, letter-spacing -0.02em, color.text, margin 0, max-width 16ch
     subhead   a p: font.lead, line-height 1.6, color.text.muted, max-width 52ch, margin 0
     links     stack(h, gap: space.3, align: center, wrap: true) [ follow, play, github ]

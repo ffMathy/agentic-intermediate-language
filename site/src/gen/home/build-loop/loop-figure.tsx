@@ -12,7 +12,7 @@ const heads = [
   "translate(88 88) rotate(315)",
 ];
 
-/** four colored circles on a ring, Write, Build, Check and Ask, with arrows going clockwise, and a padlock with "ail.lock.json" in the middle */
+/** "four colored circles on a ring, Write, Build, Check and Ask, with arrows going clockwise, and a padlock with "ail.lock.json" in the middle" */
 export function LoopFigure() {
   return (
     <svg

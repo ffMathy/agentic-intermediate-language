@@ -19,6 +19,7 @@ export function StopResult() {
       turnsInto="Every square, word and move in this game comes from the spec above. Apart from a short index.html, none of its code was written by hand."
       figure={<ResultFrame />}
       last={true}
+      browse="#spec/tictactoe/tictactoe.ail.md"
     />
   );
 }

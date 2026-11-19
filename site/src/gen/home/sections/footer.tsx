@@ -1,13 +1,12 @@
 import { Stack } from "../../parts/stack";
 
-const linkStyle = {
-  color: "var(--color-code-text)",
-  fontWeight: 600,
-  textDecoration: "underline",
-};
-
 /** "a strip of the four level colors, one sentence on where this page and the game came from, and four links" */
 export function Footer() {
+  const linkStyle = {
+    color: "var(--color-code-text)",
+    fontWeight: 600,
+    textDecoration: "underline",
+  };
   return (
     <footer
       style={{
@@ -40,7 +39,7 @@ export function Footer() {
             margin: 0,
           }}
         >
-          This page was compiled from site/*.ail.md, and the game from examples/tictactoe/*.ail.md. Apart from the spec and a short index.html, nothing in either was written by hand.
+          This page was compiled from the spec in site/ail/, and the game from the spec in examples/tictactoe/ail/. Apart from the spec and a short index.html, nothing in either was written by hand.
         </p>
         <nav aria-label="More about AIL">
           <Stack dir="h" gap="space.4" align="center" wrap={true}>

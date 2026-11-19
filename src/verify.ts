@@ -21,6 +21,13 @@ export interface VerifyResult { node: string; ok: boolean; checks: Check[] }
 const pass = (kind: string, detail = ""): Check => ({ kind, ok: true, severity: "error", detail });
 const fail = (kind: string, detail: string, severity: "error" | "warning" = "error"): Check => ({ kind, ok: false, severity, detail });
 
+/** The assertion and error messages of a failed run, without passing tests or file noise: what a retry needs. */
+export function errorExcerpt(output: string, maxLines = 40): string {
+  const lines = output.split("\n").filter((l) => /^\s*(error: (?!react-stack-top-frame)|Expected|Received|TypeError:|ReferenceError:|Unable to find|Found multiple)|^\s+at /.test(l));
+  const kept = lines.filter((l) => !/^\s+at /.test(l) || /src\/gen|checks\//.test(l));
+  return kept.slice(0, maxLines).map((l) => l.trimEnd()).join("\n");
+}
+
 export function runBunTest(cwd: string, files: string[]): { ok: boolean; failures: string[]; passes: number; output: string } {
   const r = Bun.spawnSync(["bun", "test", ...files.map((f) => (f.startsWith("/") ? f : "./" + f))], {
     cwd, env: { ...process.env, NO_COLOR: "1", FORCE_COLOR: "0" }, stdout: "pipe", stderr: "pipe",
@@ -130,7 +137,7 @@ export function verifyNode(p: Project, n: AilNode, opts: { checkDrift?: boolean 
   if (testFiles.length) {
     const r = runBunTest(p.root, testFiles);
     if (r.ok) checks.push(pass("tests", `${r.passes} passed`));
-    else checks.push(fail("tests", r.failures.length ? r.failures.map((f) => "✗ " + f).join("\n") : r.output.trim().split("\n").slice(-25).join("\n")));
+    else checks.push(fail("tests", r.failures.length ? `${r.failures.map((f) => "✗ " + f).join("\n")}\n${errorExcerpt(r.output)}` : r.output.trim().split("\n").slice(-25).join("\n")));
   }
   return { node: n.name, ok: checks.every((c) => c.ok || c.severity === "warning"), checks };
 }

@@ -1,3 +1,4 @@
+import type { ReactNode } from "react";
 import { Stack } from "./stack";
 
 /** shows the eyebrow when given, the text as a level 2 heading, and the lead when given, in that order */
@@ -9,7 +10,7 @@ export function SectionHeading({
   text: string;
   eyebrow?: string;
   lead?: string;
-}) {
+}): ReactNode {
   return (
     <Stack dir="v" gap="space.3" align="start">
       {eyebrow !== undefined ? (

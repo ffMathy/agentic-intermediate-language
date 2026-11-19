@@ -14,9 +14,11 @@ export function IdeaFigure() {
     >
       <path
         d="M48 92 L40 118 L74 92"
-        fill="var(--color-surface)"
-        stroke="var(--color-border)"
         strokeWidth={2}
+        style={{
+          fill: "var(--color-surface)",
+          stroke: "var(--color-border)",
+        }}
       />
       <rect
         x={10}
@@ -24,9 +26,11 @@ export function IdeaFigure() {
         width={300}
         height={84}
         rx={16}
-        fill="var(--color-surface)"
-        stroke="var(--color-border)"
         strokeWidth={2}
+        style={{
+          fill: "var(--color-surface)",
+          stroke: "var(--color-border)",
+        }}
       />
       <rect
         x={78}
@@ -34,7 +38,7 @@ export function IdeaFigure() {
         width={164}
         height={30}
         rx={4}
-        fill="var(--color-thread)"
+        style={{ fill: "var(--color-thread)" }}
       />
       <text
         x={160}
@@ -42,8 +46,10 @@ export function IdeaFigure() {
         textAnchor="middle"
         fontSize={24}
         fontWeight={700}
-        fontFamily="var(--font-sans)"
-        fill="var(--color-text)"
+        style={{
+          fill: "var(--color-text)",
+          fontFamily: "var(--font-sans)",
+        }}
       >
         The computer
       </text>
@@ -53,26 +59,35 @@ export function IdeaFigure() {
         textAnchor="middle"
         fontSize={24}
         fontWeight={700}
-        fontFamily="var(--font-sans)"
-        fill="var(--color-text)"
+        style={{
+          fill: "var(--color-text)",
+          fontFamily: "var(--font-sans)",
+        }}
       >
         never loses.
       </text>
-      <circle cx={40} cy={136} r={10} fill="var(--color-text-muted)" />
+      <circle
+        cx={40}
+        cy={136}
+        r={10}
+        style={{ fill: "var(--color-text-muted)" }}
+      />
       <rect
         x={22}
         y={150}
         width={36}
         height={24}
         rx={12}
-        fill="var(--color-text-muted)"
+        style={{ fill: "var(--color-text-muted)" }}
       />
       <text
         x={70}
         y={160}
         fontSize={12}
-        fontFamily="var(--font-sans)"
-        fill="var(--color-text-muted)"
+        style={{
+          fill: "var(--color-text-muted)",
+          fontFamily: "var(--font-sans)",
+        }}
       >
         product owner
       </text>

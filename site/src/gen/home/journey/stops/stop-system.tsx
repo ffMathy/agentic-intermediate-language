@@ -34,6 +34,7 @@ export function StopSystem() {
       highlight={["ComputerPlayer"]}
       turnsInto="rules.ts, plus one unit test per example line. ComputerPlayer looks ahead with these same rules."
       figure={<SystemFigure />}
+      browse="#spec/tictactoe/engine/engine.ail.md"
     />
   );
 }

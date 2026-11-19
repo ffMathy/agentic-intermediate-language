@@ -1,5 +1,7 @@
 # AIL — Agentic Intermediate Language
 
+![AIL: write the spec, let agents build the code, prove that they agree](docs/cover.png)
+
 **Write the spec. Let agents build the code. Prove that they agree.**
 
 AIL is a recursive *why / what / how* specification. People review the spec:
@@ -31,6 +33,7 @@ and one command does the rest:
 | | |
 |---|---|
 | `/ail:build` | compile whatever changed (each node sees only its own slice of the spec), then check everything |
+| `/ail:adopt` | bring an existing app under AIL: see below |
 
 To look at the spec, just ask: "show me the tree", "the stakeholder view",
 "what changed?".
@@ -50,11 +53,40 @@ Then, anywhere inside a project (any folder with an `ail.config.json`):
 | | |
 |---|---|
 | `ail build` | Compile whatever changed, then check everything: the spec is sound, the code is built from it, every check passes, and each screen matches its `look`. With nothing to compile it only checks, without a model, so CI runs it too. It uses Claude Code's login unless `ANTHROPIC_API_KEY` is set; `--model` picks another provider. |
+| `ail adopt` | Does the existing app behave as its spec says? Starts it as `ail.config.json`'s `run` says, runs each flow's end-to-end check, and stops it. |
 | `ail show [what]` | The tree, a node, an audience's view (`stakeholder`, `design`, `engineer`, `specialist`), or `changes`. Add `--shots <dir>` for screenshots of the proofs |
 
 That's the whole tool. Change detection, deriving tests from scenarios,
 writing the token CSS and cleaning up after moved or deleted nodes all happen
 inside `ail build`.
+
+## Adopt an existing app
+
+AIL also works in reverse. To bring an existing app under AIL, or to move it to
+another technology, write its spec from what already exists, one slice at a
+time:
+
+1. **Why**, from its tickets (Asana, Jira, Linear, through Claude's connectors)
+   and from interviewing the people who own it. A reason nobody can confirm
+   is written down as unknown, and every build lists it until someone answers.
+2. **What**, from driving the running app in a browser: every screen, text and
+   error path, quirks included.
+3. **How**, from its code: data shapes, rules, edge cases and real values as
+   examples.
+4. **Proof.** Each flow gets an end-to-end check that plays its scenarios with
+   whatever drives the app: a browser, a simulator, a process. The agent finds
+   out how to start the app and records it under `run` in `ail.config.json`.
+   `ail adopt` starts the old app, runs the checks and stops it, which proves
+   the spec describes the old app.
+
+Then change the `target` to the new technology and run `ail build`. Once
+`run.app` says how the new app starts, every build runs the same checks
+against it, which proves it behaves like the old one. Each node's `sources` section records where its
+claims came from, for review.
+
+In Claude Code, `/ail:adopt` does all of this, one slice at a time. The
+demo has an example check at
+[`examples/tictactoe/checks/e2e/`](examples/tictactoe/checks/e2e).
 
 ## Try the demo locally
 

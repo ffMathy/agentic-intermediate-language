@@ -1,6 +1,7 @@
 // MCP server (JSON-RPC 2.0 over newline-delimited stdio) for the Claude Code
-// plugin. Two tools: look at the spec (ail_show) and build it (ail_build, the
-// same build as the CLI). No SDK dependency on purpose.
+// plugin. Three tools: look at the spec (ail_show), build it (ail_build, the
+// same build as the CLI), and check a running app against it (ail_adopt). No SDK dependency on purpose.
+import { adopt, formatAdopt } from "./adopt.ts";
 import { build } from "./build.ts";
 import { loadProject, type Project } from "./project.ts";
 import { show } from "./show.ts";
@@ -27,6 +28,12 @@ export const TOOLS: Tool[] = [
       const r = await build(p, { names: (a.nodes as string[]) ?? [], force: a.force === true, log: progress });
       return { text: r.text, isError: !r.ok };
     },
+  },
+  {
+    name: "ail_adopt",
+    description: "Does the app behave as the spec says? Starts the app as ail.config.json's `run` says (`app`: which entry; default run.legacy while adopting an existing app, else run.app), runs each flow's end-to-end check (checks/e2e/<folder>/<node>.e2e.ts, which drives the app however suits it: a browser, a simulator, a process) and stops it. Use it while bringing an existing app under AIL, to prove the spec describes it, and after building, to prove the new app behaves the same. Lists the flows that have no end-to-end check yet.",
+    inputSchema: obj({ app: str, nodes: { type: "array", items: str } }),
+    run: async (p, a, progress) => { const r = await adopt(p, { app: a.app as string | undefined, names: (a.nodes as string[]) ?? [], log: progress }); return { text: formatAdopt(r), isError: !r.ok }; },
   },
 ];
 

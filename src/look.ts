@@ -6,7 +6,7 @@
 import { mkdirSync, readFileSync, rmSync } from "node:fs";
 import { join } from "node:path";
 import { readLock, writeLock } from "./lock.ts";
-import type { AilNode } from "./parse.ts";
+import { specText, type AilNode } from "./parse.ts";
 import { ancestors, type Project } from "./project.ts";
 import type { Provider } from "./providers/index.ts";
 import { takeShots, visualNodes, type Shot } from "./shots.ts";
@@ -26,7 +26,7 @@ export function lookTask(p: Project, n: AilNode, shots: Shot[]): string {
   return [
     `## Node ${n.name}`,
     ...(chain ? ["Why it exists, from the top:", chain, ""] : []),
-    "```ail", ...n.raw, "```",
+    "```ail", specText(n), "```",
     ...(tokens ? ["", "## Design tokens", tokens, `In the page they are CSS variables: token a.b.c → var(--a-b-c).`] : []),
     "",
     "## Screenshots",

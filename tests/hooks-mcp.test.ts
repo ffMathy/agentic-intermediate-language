@@ -36,7 +36,7 @@ test("hooks find the project from the edited file, and ignore files outside AIL 
   expect(preHook({ tool_input: { file_path: join(root, "src/cli.ts") } }, root).code).toBe(0);
 });
 
-test("the MCP surface is two tools", async () => {
+test("the MCP surface is three tools", async () => {
   const list = await handle({ jsonrpc: "2.0", id: 1, method: "tools/list" }, KATA) as any;
-  expect(list.result.tools.map((t: { name: string }) => t.name)).toEqual(["ail_show", "ail_build"]);
+  expect(list.result.tools.map((t: { name: string }) => t.name)).toEqual(["ail_show", "ail_build", "ail_adopt"]);
 });

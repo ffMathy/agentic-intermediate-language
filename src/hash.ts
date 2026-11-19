@@ -4,7 +4,7 @@
 // runs of whitespace outside string literals. Two IL texts with the same
 // meaning hash the same, so cosmetic edits never trigger recompilation.
 import { createHash } from "node:crypto";
-import type { AilNode, Section } from "./parse.ts";
+import { PROVENANCE, type AilNode, type Section } from "./parse.ts";
 import { ancestors, modulePath, specModulePath, type Project } from "./project.ts";
 
 export const sha256 = (s: string) => createHash("sha256").update(s).digest("hex");
@@ -33,7 +33,7 @@ export function canonicalSection(s: Section): string {
 
 export function canonicalNode(n: AilNode, only?: string[]): string {
   const sections = n.sections
-    .filter((s) => !only || only.includes(s.key))
+    .filter((s) => !PROVENANCE.has(s.key) && (!only || only.includes(s.key)))
     .map(canonicalSection)
     .sort();
   return [`node ${n.name} : ${n.kind} level:${n.level ?? "-"} ${[...n.tags].sort().map((t) => "@" + t).join(" ")}`.trim(), ...sections].join("\n");

@@ -28,15 +28,20 @@ runs:
       shell: bash
       working-directory: ${{ inputs.project }}
       run: if [ -f package.json ]; then bun install --frozen-lockfile; fi
+    - name: Install Chromium (end-to-end checks, screenshots)
+      shell: bash
+      working-directory: ${{ github.action_path }}
+      env:
+        AIL_PROJECT_DIR: ${{ github.workspace }}/${{ inputs.project }}
+        AIL_SHOTS: ${{ inputs.base != '' && inputs.screenshots == 'true' && github.event_name == 'pull_request' }}
+      run: |
+        if [ -d "$AIL_PROJECT_DIR/checks/e2e" ] || [ "$AIL_SHOTS" = "true" ]; then
+          bunx playwright install --with-deps chromium
+        fi
     - name: ail build
       shell: bash
       working-directory: ${{ inputs.project }}
       run: bun "${{ github.action_path }}/src/cli.ts" build
-    - name: Install Chromium for screenshots
-      if: ${{ always() && inputs.base != '' && inputs.screenshots == 'true' && github.event_name == 'pull_request' }}
-      shell: bash
-      working-directory: ${{ github.action_path }}
-      run: bunx playwright install --with-deps chromium
     - name: Spec changes
       if: ${{ always() && inputs.base != '' }}
       shell: bash

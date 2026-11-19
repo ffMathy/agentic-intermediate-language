@@ -1,0 +1,74 @@
+---
+description: Bring an existing app under AIL - write its spec from its people, its tickets, the running app and its code, then prove the spec describes it
+argument-hint: "[where the app's code is] [what to start with]"
+---
+Bring an existing app under AIL, in reverse: the app exists, and you write
+the spec that describes it. Work on one slice at a time (a screen, a flow or a
+rule), never the whole app at once. Arguments: "$ARGUMENTS". Ask where the
+app's code is if that's missing.
+
+Follow the `ail` skill for how nodes are written. On top of it:
+
+0. **Find out how to run it.** Work out for yourself what kind of app it is
+   (web, mobile, desktop, CLI or API) and how it starts. Look in its README,
+   package scripts, Makefile, Dockerfile and compose files, CI config, and
+   Xcode or Gradle projects. Start it and see it run. Then record that in
+   `ail.config.json` under `run.legacy`:
+   - `start`: the shell command
+   - `cwd`: where to run it, relative to the AIL project
+   - `ready`: a URL that answers, or a shell command that exits 0 once the app
+     is up, such as a simulator's boot status
+   - `timeout`: how long to wait, in seconds
+   - `env`: what the checks need to reach the app, such as `AIL_APP_URL`, a
+     device id or a binary's path
+
+   If it needs something this machine lacks, such as a simulator, a device, a
+   database or a secret, say exactly what, and ask.
+1. **Why: from people and tickets.** Search the task tracker your connectors
+   reach (Asana, Jira, Linear, GitHub issues), plus PR descriptions, commit
+   messages and docs, for the reasons behind the slice. Then ask the user
+   about what is still unclear, a few questions at a time, the way you would
+   interview its owner. Write each reason into a `why`. A reason nobody can
+   confirm is written as `because "unknown, confirm with the owner"`: never
+   invent one. Every build lists these until someone answers them.
+2. **What: from the running app.** Drive the app through the slice with
+   whatever suits its platform:
+   - Playwright for the web
+   - Appium, Maestro or XCUITest/Espresso on a simulator or emulator for
+     mobile
+   - a spawned process for a CLI
+   - HTTP for an API
+
+   Go through every screen, control, message and error path. Write what you
+   see as scenarios, with the exact text in `copy` and the layout in `look`.
+   Record behaviour as it is, quirks included. If something looks like a bug,
+   keep it, and add a `because "unknown, confirm with the owner"` asking
+   whether to keep it.
+3. **How: from the code.** Read the code behind the slice for what the app
+   doesn't show: data shapes, rules, edge cases, tie-breaks, timing. Turn real
+   inputs and outputs into `expr => expected` examples, and the decisions worth
+   keeping into `how`.
+4. **Sources.** Give each node a `sources` section listing where its claims
+   came from: ticket links, interview answers (who, and when), screens, and
+   code paths. It is kept for review and never compiled.
+5. **Prove it on the old app.** For each flow, write an end-to-end check at
+   `checks/e2e/<the node's folder>/<node in kebab-case>.e2e.ts`:
+   - a `bun:test` file, with one test per scenario, named exactly as the
+     scenario
+   - it drives the app with the same tool as step 2, and reaches it through
+     the `env` in `run`
+   - it uses only what a user can see and do, never the old app's code or
+     markup, so that it also works against the rebuilt app
+
+   Add any driver it needs to the project's dev dependencies. Call `ail_adopt`:
+   it starts the app as `run.legacy` says, runs the checks, and stops the app.
+   A failing check means the spec, or the check, is wrong about the app: fix
+   that, never the app. When the checks pass, the spec describes the app.
+6. **Report.** Report the nodes written, what `ail_adopt` says, and every
+   open question, each with who could answer it.
+
+To move to another technology afterwards:
+1. Change the root's `target` and run `/ail:build`.
+2. Find out how the new app starts, and record it as `run.app`.
+3. From then on, every build runs the same checks against the new app, which
+   proves it behaves like the old one.

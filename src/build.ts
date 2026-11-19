@@ -9,6 +9,10 @@ import { plan } from "./plan.ts";
 import { isCompilable, type Project } from "./project.ts";
 import { getProvider, modelUnavailable, resolveModels } from "./providers/index.ts";
 import { takeShots } from "./shots.ts";
+import { existsSync } from "node:fs";
+import { join } from "node:path";
+import { adopt, formatAdopt } from "./adopt.ts";
+import { checksDir } from "./verify.ts";
 
 export interface BuildOptions {
   /** Only these nodes (default: all). */
@@ -79,6 +83,14 @@ export async function build(p: Project, o: BuildOptions = {}): Promise<BuildResu
     for (const n of targets) reports.push(await diverge(p, n, specs.map(getProvider), o.samples, 1, log));
     ok &&= reports.every((r) => r.verdict === "converged");
     sections.push(formatDiverge(reports));
+  }
+  // The end-to-end checks, against the app this build made, started as run.app says.
+  if (existsSync(join(checksDir(p), "e2e"))) {
+    if (p.config.run?.app) {
+      const r = await adopt(p, { app: "app", names, log });
+      ok &&= r.ok;
+      sections.push(formatAdopt(r));
+    } else sections.push("! app      end-to-end checks not run: ail.config.json has no run.app saying how to start the app this project builds");
   }
   if (o.shots) sections.push(`📷 ${(await takeShots(p, o.shots, names.length ? names : undefined, log)).length} screenshot(s) in ${o.shots}`);
   const stopped = out.some((x) => x.status === "stopped");

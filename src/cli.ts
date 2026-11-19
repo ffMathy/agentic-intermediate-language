@@ -1,5 +1,6 @@
 #!/usr/bin/env bun
 // ail — the Agentic Intermediate Language toolchain.
+import { adopt, formatAdopt } from "./adopt.ts";
 import { build } from "./build.ts";
 import { postHook, preHook } from "./hooks.ts";
 import { changedNodes } from "./lens.ts";
@@ -10,8 +11,9 @@ import { defaultBase, show } from "./show.ts";
 const HELP = `ail — write the spec, let agents build the code.
 
   ail build [Node…]     Compile whatever changed, then check everything: the spec is
-                        sound, the code is built from it, every check passes, and a model
-                        has compared each screen with its look. With nothing to compile it
+                        sound, the code is built from it, every check passes, a model
+                        has compared each screen with its look, and, with run.app set,
+                        the app behaves as the spec says end to end. With nothing to compile it
                         only checks, so CI runs it too. Uses Claude Code's login (a Claude
                         subscription works) unless ANTHROPIC_API_KEY is set.
                         --model M     claude-code[:model], anthropic:<id>, openai:<id>, command:<cli>
@@ -21,6 +23,10 @@ const HELP = `ail — write the spec, let agents build the code.
                         --shots DIR   also screenshot the final screen of every scenario of
                                       nodes with a look (needs Playwright)
                         --samples N   also compile N times per model and compare behaviour
+  ail adopt [Node…]     Does the app behave as the spec says? Starts it as ail.config.json's
+                        run says (run.legacy while you write the spec of an existing app,
+                        else run.app), runs each flow's end-to-end check, and stops it.
+                        --app NAME    another entry of run
   ail show [what]       The tree (default), a <Node>, an audience
                         (stakeholder | design | engineer | specialist [tag]),
                         or changes [--since <ref>]
@@ -82,6 +88,12 @@ async function main(argv: string[]): Promise<number> {
         samples: Number(flag(a, "samples") ?? 0), shots: flag(a, "shots"), log,
       });
       print(r.text, { outcomes: r.outcomes, check: r.check });
+      return r.ok ? 0 : 1;
+    }
+
+    case "adopt": {
+      const r = await adopt(p, { app: flag(a, "app"), names: nodesOrDie(p, rest), log });
+      print(formatAdopt(r), r);
       return r.ok ? 0 : 1;
     }
 

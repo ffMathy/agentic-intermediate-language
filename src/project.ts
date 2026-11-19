@@ -6,6 +6,20 @@ import { parseFile, type AilNode, type ParsedFile, type Term } from "./parse.ts"
 
 export const AIL_HOME = resolve(import.meta.dir, "..");
 
+/** How to start an app and tell that it is ready. Any platform: a web server, a simulator, a CLI. */
+export interface RunSpec {
+  /** Shell command that starts the app, from `cwd`. Omit when the app is already running. */
+  start?: string;
+  /** Folder to start it from, relative to the project (default: the project). */
+  cwd?: string;
+  /** Ready when this URL answers, or when this shell command exits 0. Polled until `timeout`. */
+  ready?: string;
+  /** Seconds to wait for ready (default 120). */
+  timeout?: number;
+  /** Passed to the end-to-end checks: how to reach the app (e.g. AIL_APP_URL, a device id). */
+  env?: Record<string, string>;
+}
+
 export interface Config {
   /** Lint warns when a node spans more lines than this (default 80): split it into children. */
   maxNodeLines?: number;
@@ -19,6 +33,9 @@ export interface Config {
    * with a key, a display name and its spec folder (relative to this project). */
   specModule?: string | { path: string; projects: { key: string; name: string; dir: string }[] };
   checksDir?: string;
+  /** How to run apps for the end-to-end checks, found out by the agent that adopts or builds the project:
+   * "legacy" is the existing app a spec is written from, "app" the one `ail build` makes. */
+  run?: Record<string, RunSpec>;
   lockFile?: string;
   models?: string[];
 }

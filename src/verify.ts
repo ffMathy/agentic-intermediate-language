@@ -21,11 +21,31 @@ export interface VerifyResult { node: string; ok: boolean; checks: Check[] }
 const pass = (kind: string, detail = ""): Check => ({ kind, ok: true, severity: "error", detail });
 const fail = (kind: string, detail: string, severity: "error" | "warning" = "error"): Check => ({ kind, ok: false, severity, detail });
 
-/** The assertion and error messages of a failed run, without passing tests or file noise: what a retry needs. */
-export function errorExcerpt(output: string, maxLines = 40): string {
-  const lines = output.split("\n").filter((l) => /^\s*(error: (?!react-stack-top-frame)|Expected|Received|TypeError:|ReferenceError:|Unable to find|Found multiple)|^\s+at /.test(l));
-  const kept = lines.filter((l) => !/^\s+at /.test(l) || /src\/gen|checks\//.test(l));
-  return kept.slice(0, maxLines).map((l) => l.trimEnd()).join("\n");
+/**
+ * The failures of a run, without passing tests or file noise: what a retry needs.
+ * Each failed test keeps its name, its error and the expected/received diff;
+ * source frames and stack lines outside the generated code are dropped.
+ */
+export function errorExcerpt(output: string, maxLines = 60): string {
+  const lines = output.split("\n");
+  const out: string[] = [];
+  let block: string[] = [];
+  let inError = false;
+  const flush = (name?: string) => { if (name) out.push(name); out.push(...block); block = []; inError = false; };
+  for (const raw of lines) {
+    const l = raw.trimEnd();
+    if (/^\(fail\)/.test(l)) { flush(l); continue; }
+    if (/^\(pass\)|^\(skip\)|^\(todo\)/.test(l)) { block = []; inError = false; continue; }
+    if (/^\s*error: react-stack-top-frame/.test(l)) continue;
+    if (/^\s*(error:|TypeError:|ReferenceError:|SyntaxError:)/.test(l)) { inError = true; block.push(l); continue; }
+    if (!inError) continue;
+    if (/^\s+at /.test(l)) { if (/src\/gen|checks\//.test(l)) block.push(l); continue; }
+    if (/^\s*\d+\s*\|/.test(l) || /^\s*\^\s*$/.test(l) || l.trim() === "") continue; // source frame
+    block.push(l.length > 200 ? l.slice(0, 200) + "…" : l);
+  }
+  // Errors with no test around them (e.g. a module that fails to load).
+  out.push(...block);
+  return out.slice(0, maxLines).join("\n");
 }
 
 export function runBunTest(cwd: string, files: string[]): { ok: boolean; failures: string[]; passes: number; output: string } {

@@ -1,4 +1,5 @@
 // `ail lint`: structural, traceability and readability rules.
+import { specFilesIn, specModuleProjects } from "./compile.ts";
 import { LEVELS, NODE_SECTIONS, type AilNode, type Level } from "./parse.ts";
 import { ancestors, dependencies, descendants, isCompilable, modulePath, type Project } from "./project.ts";
 
@@ -33,6 +34,9 @@ export function lint(p: Project): Diagnostic[] {
     d.push({ severity, code, message, node: n?.name, file: file ?? n?.file ?? "", line: line ?? n?.line ?? 0 });
 
   for (const e of p.errors) d.push({ severity: "error", code: "parse", message: e.message, file: e.file, line: e.line });
+
+  if (p.config.specModule) for (const q of specModuleProjects(p))
+    if (!specFilesIn(q.dir).length) push("error", "spec-module-empty", null, `specModule project "${q.key}": no *.ail.md files in ${q.configDir}, so the page would show an empty project`, 1, "ail.config.json");
 
   if (!p.target && p.nodes.size) push("error", "no-target", null, "no `target` block: nothing says what to generate, so nothing can be built", 1, p.files[0]?.file);
 

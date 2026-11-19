@@ -90,7 +90,14 @@ export function changedNodes(p: Project, ref: string): { changed: string[]; adde
   const before = new Map<string, AilNode>();
   const ls = Bun.spawnSync(["git", "ls-tree", "-r", "--name-only", "--full-name", ref, "--", "."], { cwd: p.root, stdout: "pipe", stderr: "pipe" });
   const top = Bun.spawnSync(["git", "rev-parse", "--show-prefix"], { cwd: p.root, stdout: "pipe" }).stdout.toString().trim();
-  for (const full of ls.stdout.toString().split("\n").filter((f) => f.endsWith(".ail.md") && !/(^|\/)node_modules\//.test(f))) {
+  // The files the project reads now come first, so a same-named node elsewhere
+  // (a fixture, a nested project) never shadows the real one; other files only
+  // fill in nodes that have since moved.
+  const current = new Set(p.files.map((f) => top + f.file.split("\\").join("/")));
+  const paths = ls.stdout.toString().split("\n")
+    .filter((f) => f.endsWith(".ail.md") && !/(^|\/)(node_modules|\.[^/]+)\//.test(f.slice(top.length)))
+    .sort((a, b) => Number(current.has(b)) - Number(current.has(a)));
+  for (const full of paths) {
     const r = Bun.spawnSync(["git", "show", `${ref}:${full}`], { cwd: p.root, stdout: "pipe", stderr: "pipe" });
     if (r.exitCode !== 0) continue;
     const rel = full.startsWith(top) ? full.slice(top.length) : full;

@@ -84,3 +84,64 @@ test("spec files are listed in explorer order: a folder's own files before its s
     "site.ail.md", "home/home.ail.md", "home/hero/hero.ail.md", "home/journey/journey.ail.md", "home/journey/stops/1.ail.md", "parts/a.ail.md",
   ]);
 });
+
+test("a spec module project folder with no spec files is a spec error", async () => {
+  const { lint } = await import("../src/lint.ts");
+  const dir = tempProject("areas");
+  writeFileSync(join(dir, "ail.config.json"), JSON.stringify({
+    specModule: { path: "src/gen/spec.ts", projects: [{ key: "shop", name: "Shop", dir: "." }, { key: "typo", name: "Typo", dir: "../no-such-folder" }] },
+  }));
+  const d = lint(load(dir)).filter((x) => x.code === "spec-module-empty");
+  expect(d.map((x) => x.message)).toEqual([expect.stringContaining('"typo"')]);
+  expect(runCheck(load(dir)).ok).toBe(false);
+});
+
+test("CRLF checkouts of the spec do not make the spec module stale", () => {
+  const dir = tempProject("areas");
+  writeFileSync(join(dir, "ail.config.json"), JSON.stringify({ specModule: "src/gen/spec.ts" }));
+  writeGlue(load(dir));
+  const crlf = (f: string) => writeFileSync(f, readFileSync(f, "utf8").replace(/\r?\n/g, "\r\n"));
+  crlf(join(dir, "lib/lib.ail.md"));
+  crlf(join(dir, "src/gen/spec.ts"));
+  expect(runCheck(load(dir)).glue).toEqual([]);
+});
+
+test("a review prefers the project's own files over a same-named node elsewhere", async () => {
+  const { renderReview } = await import("../src/lens.ts");
+  const dir = tempProject("areas");
+  moveSpecInto(dir, "spec");
+  mkdirSync(join(dir, "fixtures"));
+  const lib = readFileSync(join(dir, "spec/lib/lib.ail.md"), "utf8");
+  writeFileSync(join(dir, "fixtures/lib.ail.md"), lib.replace("price(1999) => 19", "price(1999) => 20"));
+  const git = (...a: string[]) => Bun.spawnSync(["git", "-c", "user.email=t@t", "-c", "user.name=t", ...a], { cwd: dir });
+  git("init", "-q"); git("add", "-A"); git("commit", "-qm", "base");
+  expect(renderReview(load(dir), "HEAD")).toContain("No semantic IL changes");
+});
+
+test("errorExcerpt keeps each failed test's name, error and diff", async () => {
+  const { errorExcerpt } = await import("../src/verify.ts");
+  const out = [
+    "checks/x.test.ts:",
+    "(pass) fine [0.1ms]",
+    "1 | test('a', () => {",
+    "error: expect(received).toEqual(expected)",
+    "",
+    "@@ -1,3 +1,3 @@",
+    "-   3,",
+    "+   4,",
+    "",
+    "- Expected  - 1",
+    "+ Received  + 1",
+    "",
+    "      at <anonymous> (/p/checks/x.test.ts:2:3)",
+    "      at node_modules/bun/x.js:1:1",
+    "(fail) state after a move [0.4ms]",
+  ].join("\n");
+  const e = errorExcerpt(out);
+  expect(e.split("\n")).toEqual([
+    "(fail) state after a move [0.4ms]",
+    "error: expect(received).toEqual(expected)",
+    "@@ -1,3 +1,3 @@", "-   3,", "+   4,", "- Expected  - 1", "+ Received  + 1",
+    "      at <anonymous> (/p/checks/x.test.ts:2:3)",
+  ]);
+});

@@ -21,7 +21,6 @@
     "src",
     "prompts",
     "skills",
-    "agents",
     "commands",
     "hooks",
     ".claude-plugin",

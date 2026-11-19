@@ -1,4 +1,4 @@
-// The check that ends every `ail build` (and the `ail_check` tool): is the spec
+// The check that ends every `ail build`: is the spec
 // sound, is the code built from it, and does the code do what it says?
 // Read-only, and never calls a model.
 import { staleGlue } from "./compile.ts";

@@ -25,13 +25,15 @@ No API key is needed; it runs on your Claude subscription.
 /plugin install ail@agentic-intermediate-language
 ```
 
-Then ask for features in plain words. Claude changes the spec, not the code.
-Two commands do the rest:
+Then ask for features in plain words. Claude changes the spec, not the code,
+and one command does the rest:
 
 | | |
 |---|---|
-| `/ail:build` | compile whatever changed; each node is built by a subagent that can only see that node's slice of the spec |
-| `/ail:show [what]` | the tree, a node, a view for one audience (`stakeholder`, `design`, `engineer`, `specialist`), or `changes` |
+| `/ail:build` | compile whatever changed (each node sees only its own slice of the spec), then check everything |
+
+To look at the spec, just ask: "show me the tree", "the stakeholder view",
+"what changed?".
 
 See **[docs/claude-code.md](docs/claude-code.md)** for the full guide.
 
@@ -48,7 +50,7 @@ Then, anywhere inside a project (any folder with an `ail.config.json`):
 | | |
 |---|---|
 | `ail build` | Compile whatever changed, then check everything: the spec is sound, the code is built from it, every check passes, and each screen matches its `look`. With nothing to compile it only checks, without a model, so CI runs it too. It uses Claude Code's login unless `ANTHROPIC_API_KEY` is set; `--model` picks another provider. |
-| `ail show [what]` | Same as `/ail:show`. Add `--shots <dir>` for screenshots of the proofs |
+| `ail show [what]` | The tree, a node, an audience's view (`stakeholder`, `design`, `engineer`, `specialist`), or `changes`. Add `--shots <dir>` for screenshots of the proofs |
 
 That's the whole tool. Change detection, deriving tests from scenarios,
 writing the token CSS and cleaning up after moved or deleted nodes all happen
@@ -122,7 +124,7 @@ The full design is in [docs/proposal.md](docs/proposal.md).
 ```
 src/                 the ail CLI and MCP server (Bun, TypeScript)
 prompts/             instructions given to the compiling model
-skills/ commands/ agents/ hooks/ .claude-plugin/    the Claude Code plugin
+skills/ commands/ hooks/ .claude-plugin/    the Claude Code plugin
 examples/tictactoe/  the demo: spec in ail/, generated code, derived checks, lock file
 site/                the website, written in AIL (spec in site/ail/); its spec browser shows both example specs in a read-only Monaco editor
 tests/               toolchain tests

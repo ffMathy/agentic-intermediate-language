@@ -9,9 +9,9 @@ does observably, and **how** its key decisions were made. Detail is delegated
 to children. People review the spec; generated code (the target's `generated`
 paths) is never edited by hand, and hooks block attempts to.
 
-Tools: `ail_show` (look around), `ail_check` (is everything right? `/ail:build` ends with it),
-`ail_context` and `ail_submit` (used by the `ail-leaf-compiler` agent). To
-compile, run `/ail:build`.
+Tools: `ail_show` looks at the spec (the tree, a node, an audience's view, or
+what changed); `ail_build` builds it, then checks everything. `/ail:build`
+calls it.
 
 ## Node shape
 ```ail
@@ -89,11 +89,12 @@ change reaches. For each node, ask:
 - Did `free` grow?
 - Is every product claim still refined?
 
-For nodes with a `look`, run `ail show changes --shots .ail/shots` in a
-terminal and look at the screenshots: the final screen of each scenario. A
-screen that is wrong while its check passes means the `look` is missing
-something. On pull requests, the GitHub Action posts the same review and
-screenshots as a comment, so there is nothing to attach by hand.
+Screens are compared too: every build has a model check the final screen of
+each scenario against the node's `look` and `copy`, and the screenshots it
+judged are in `.ail/look/`. A screen that is wrong while every check passes
+means the `look` is missing something. On pull requests, the GitHub Action
+posts the review with screenshots as a comment, so there is nothing to attach
+by hand.
 
 Don't review generated code. If it's wrong, the spec is missing something.
 

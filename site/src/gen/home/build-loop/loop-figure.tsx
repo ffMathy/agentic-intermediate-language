@@ -1,8 +1,8 @@
 const steps = [
-  { cx: 180, cy: 50, n: "1", name: "Write", color: "var(--color-level-product)" },
-  { cx: 310, cy: 180, n: "2", name: "Build", color: "var(--color-level-build)" },
-  { cx: 180, cy: 310, n: "3", name: "Check", color: "var(--color-step-check)" },
-  { cx: 50, cy: 180, n: "4", name: "Ask", color: "var(--color-level-experience)" },
+  { cx: 180, cy: 50, number: "1", name: "Write", color: "var(--color-level-product)" },
+  { cx: 310, cy: 180, number: "2", name: "Build", color: "var(--color-level-build)" },
+  { cx: 180, cy: 310, number: "3", name: "Check", color: "var(--color-step-check)" },
+  { cx: 50, cy: 180, number: "4", name: "Ask", color: "var(--color-level-experience)" },
 ];
 
 const heads = [
@@ -12,7 +12,7 @@ const heads = [
   "translate(88 88) rotate(315)",
 ];
 
-/** "four colored circles on a ring, Write, Build, Check and Ask, with arrows going clockwise, and a padlock with "ail.lock.json" in the middle" */
+/** four colored circles on a ring, Write, Build, Check and Ask, with arrows going clockwise, and a padlock with "ail.lock.json" in the middle */
 export function LoopFigure() {
   return (
     <svg
@@ -56,7 +56,7 @@ export function LoopFigure() {
             opacity={0.85}
             fontFamily="var(--font-sans)"
           >
-            {step.n}
+            {step.number}
           </text>
           <text
             x={step.cx}

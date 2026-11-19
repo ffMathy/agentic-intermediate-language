@@ -1,4 +1,3 @@
-import type { ReactNode } from "react";
 import { Stack } from "./stack";
 
 /** shows the eyebrow when given, the text as a level 2 heading, and the lead when given, in that order */
@@ -10,10 +9,10 @@ export function SectionHeading({
   text: string;
   eyebrow?: string;
   lead?: string;
-}): ReactNode {
+}) {
   return (
     <Stack dir="v" gap="space.3" align="start">
-      {eyebrow !== undefined ? (
+      {eyebrow !== undefined && (
         <p
           style={{
             fontSize: "var(--font-tiny)",
@@ -25,7 +24,7 @@ export function SectionHeading({
         >
           {eyebrow}
         </p>
-      ) : null}
+      )}
       <h2
         style={{
           fontSize: "var(--font-heading)",
@@ -38,7 +37,7 @@ export function SectionHeading({
       >
         {text}
       </h2>
-      {lead !== undefined ? (
+      {lead !== undefined && (
         <p
           style={{
             fontSize: "var(--font-lead)",
@@ -50,7 +49,7 @@ export function SectionHeading({
         >
           {lead}
         </p>
-      ) : null}
+      )}
     </Stack>
   );
 }

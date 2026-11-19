@@ -1,7 +1,7 @@
 # The journey
 
 The centre of the page. One promise from the real Tic-Tac-Toe spec, "The
-computer never loses.", followed from the product owner's sentence down to the
+computer never loses.", followed from the product owner's requirements down to the
 code, the check and the running game. Each stop has its own file in
 [`stops/`](stops/).
 
@@ -14,7 +14,7 @@ node Journey : view   level: experience
     the excerpts are copied from the Tic-Tac-Toe spec, its generated code and its derived check, and each names its file
     Scenario: eight stops in order
       Given the page is open
-      Then the section with the id "journey" holds eight level 3 headings, from "It starts as a sentence anyone could say." to "The result: try to beat it."
+      Then the section with the id "journey" holds eight level 3 headings, from "It starts with what the product owner wants." to "The result: try to beat it."
       And the stops have the ids "stop-1" to "stop-8", in order
     Scenario: the thread is explained
       Given the page is open
@@ -29,7 +29,7 @@ node Journey : view   level: experience
   copy
     journey.eyebrow  "THE JOURNEY"
     journey.heading  "Follow one sentence all the way down"
-    journey.intro    "This is the real spec of the Tic-Tac-Toe demo, not a mock-up. We follow one promise, “the computer never loses”, from the product owner's sentence to the code that keeps it. Stops 2 to 5 are the four levels of the spec, from plain promise to algorithm. Stops 6 to 8 are what the tools make from it: the code, the proof and the game. The yellow highlight marks the thread at every level."
+    journey.intro    "This is the real spec of the Tic-Tac-Toe demo, not a mock-up. We follow one of the product owner's requirements for Tic-Tac-Toe, “the computer never loses”, down to the code that keeps it. Stops 2 to 5 are the four levels of the spec, from plain promise to algorithm. Stops 6 to 8 are what the tools make from it: the code, the proof and the game. The yellow highlight marks the thread at every level."
     journey.legend   "the thread we are following"
   uses      Section, SectionHeading, Stack, JumpGauge, StopIdea, StopProduct, StopExperience, StopSystem, StopSpecialist, StopBuild, StopProof, StopResult
   children  JumpGauge, JourneyStop, StopIdea, StopProduct, StopExperience, StopSystem, StopSpecialist, StopBuild, StopProof, StopResult

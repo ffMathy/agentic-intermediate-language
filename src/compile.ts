@@ -8,6 +8,7 @@ import { dirname, join, relative, resolve } from "node:path";
 import { buildContext, checkImports } from "./context.ts";
 import { compileHash, oracleHash, sha256 } from "./hash.ts";
 import { fileHash, readLock, writeLock } from "./lock.ts";
+import { hasLook, lookCheck, recordLook, type LookResult } from "./look.ts";
 import { parseFile, type AilNode } from "./parse.ts";
 import { plan } from "./plan.ts";
 import { AIL_HOME, isCompilable, kebab, modulePath, specModulePath, topoByUses, type Project } from "./project.ts";
@@ -214,6 +215,8 @@ export interface CompileOptions {
   force?: boolean;
   maxAttempts?: number;
   temperature?: number;
+  /** Compare each built node's screens with its look (default true; skipped without Playwright). */
+  look?: boolean;
   log?: (msg: string) => void;
 }
 
@@ -290,10 +293,28 @@ export async function compile(p: Project, names: string[], opts: CompileOptions)
     const depOutcomes = await Promise.all(deps.map((d) => results.get(d.name) ?? Promise.resolve({ status: statuses.get(d.name) ?? "missing" })));
     const waiting = deps.filter((_, i) => !built(depOutcomes[i]!)).map((d) => d.name);
     if (waiting.length) return { node: n.name, status: "skipped", attempts: 0, detail: `waiting for ${waiting.join(", ")}` };
-    if (!opts.force && statuses.get(n.name) === "fresh") return { node: n.name, status: "fresh", attempts: 0, detail: "cache hit" };
+    const judgeLook = opts.look !== false && hasLook(n);
+    /** null when the screens match (or can't be compared); otherwise what is wrong, as retry feedback. */
+    const looks = async (): Promise<string | null> => {
+      if (!judgeLook) return null;
+      let r: LookResult;
+      try { r = await lookCheck(p, n, opts.provider, log); }
+      catch (e) { log(`${n.name}: screens not compared: ${(e as Error).message}`); return null; }
+      if (r.skipped) { log(`${n.name}: screens not compared: ${r.skipped}`); return null; }
+      if (r.ok) { recordLook(p, n.name); log(`${n.name}: ${r.shots.length} screen(s) match its look`); return null; }
+      return r.problems.map((x) => `- look: ${x}`).join("\n");
+    };
+    let feedback: string | null = null;
+    if (!opts.force && statuses.get(n.name) === "fresh") {
+      if (!judgeLook || readLock(p).nodes[n.name]?.look === readLock(p).nodes[n.name]?.hash) return { node: n.name, status: "fresh", attempts: 0, detail: "cache hit" };
+      feedback = await limit(looks);
+      if (!feedback) return { node: n.name, status: "fresh", attempts: 0, detail: "cache hit" };
+      log(`${n.name}: its screens don't match its look; rebuilding\n${feedback}`);
+    }
     return limit(async () => {
-      let prompt = compileTask(p, n);
+      let prompt = feedback ? `${compileTask(p, n)}\n\n## The current build was rejected\n${feedback}\n\nScreenshots of its tests were compared with the look and copy above.` : compileTask(p, n);
       const max = opts.maxAttempts ?? 3;
+      let lastLook: string | null = null;
       for (let attempt = 1; attempt <= max; attempt++) {
         log(`${n.name}: attempt ${attempt} with ${opts.provider.id}`);
         let raw: string;
@@ -305,11 +326,14 @@ export async function compile(p: Project, names: string[], opts: CompileOptions)
         const reply = parseReply(raw);
         if (reply.stop) return { node: n.name, status: "stopped" as const, attempts: attempt, detail: reply.stop };
         const res = submit(p, n, reply.files, opts.provider.id);
-        if (res.ok) return { node: n.name, status: "compiled" as const, attempts: attempt, detail: res.verify?.checks.map((c) => c.kind).join(", ") ?? "" };
-        const failures = res.verify ? res.verify.checks.filter((c) => !c.ok).map((c) => `- ${c.kind}: ${c.detail}`).join("\n") : `- ${res.error}`;
+        const mismatch = res.ok ? await looks() : null;
+        if (res.ok && !mismatch) return { node: n.name, status: "compiled" as const, attempts: attempt, detail: res.verify?.checks.map((c) => c.kind).join(", ") ?? "" };
+        lastLook = mismatch;
+        const failures = mismatch ?? (res.verify ? res.verify.checks.filter((c) => !c.ok).map((c) => `- ${c.kind}: ${c.detail}`).join("\n") : `- ${res.error}`);
         log(`${n.name}: attempt ${attempt} rejected\n${failures}`);
         prompt = `${compileTask(p, n)}\n\n## Your previous attempt was rejected\n${failures}\n\nPrevious attempt:\n${raw}`;
       }
+      if (lastLook) return { node: n.name, status: "failed" as const, attempts: max, detail: `it passes its checks, but its screens still don't match its look (the last attempt is kept; see .ail/look/). Either the look is ambiguous, or the judge is wrong:\n${lastLook}` };
       const check = needsDerivedCheck(n) ? derivedCheckFile(p, n).file : null;
       return { node: n.name, status: "failed" as const, attempts: max, detail: `no attempt passed verification: the node may be under-specified or infeasible${check ? `, or its derived check ${relative(p.root, check)} may itself be wrong (it was generated, so review it)` : ""}` };
     });

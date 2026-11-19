@@ -1,7 +1,7 @@
 import { JourneyStop } from "../journey-stop";
 import { ExperienceFigure } from "./experience-figure";
 
-/** "the third stop, in the experience color" */
+/** the third stop, in the experience color */
 export function StopExperience() {
   return (
     <JourneyStop

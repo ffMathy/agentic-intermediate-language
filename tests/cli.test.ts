@@ -10,12 +10,12 @@ import { KATA, load, tempProject } from "./helpers.ts";
 
 const installed = existsSync(join(KATA, "node_modules", "react"));
 
-test("ail check passes on the kata", async () => {
+test("ail build only checks when nothing changed, and passes on the kata", async () => {
   if (!installed) return;
   const log = console.log;
   let out = "";
   console.log = (s: string) => { out += s; };
-  try { expect(await main(["check", "--root", KATA])).toBe(0); } finally { console.log = log; }
+  try { expect(await main(["build", "--root", KATA, "--no-look"])).toBe(0); } finally { console.log = log; }
   expect(out).toContain("✓ spec");
   expect(out).toContain("✓ build    16 node(s) up to date");
   expect(out).toMatch(/✓ behavior \d+ test\(s\) passed, typecheck ok/);

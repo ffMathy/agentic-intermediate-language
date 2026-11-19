@@ -20,6 +20,8 @@ type JourneyStopProps = {
   browse?: string;
 };
 
+const tokenVar = (name: string): string => `var(--${name.replace(/\./g, "-")})`;
+
 /** "Every stop has the same anatomy, so the visitor compares levels instead of learning a new layout each time." */
 export function JourneyStop({
   number,
@@ -38,7 +40,7 @@ export function JourneyStop({
   last,
   browse,
 }: JourneyStopProps) {
-  const stopColor = `var(--${color.replace(/\./g, "-")})`;
+  const stopColor = tokenVar(color);
   return (
     <article
       id={`stop-${number}`}
@@ -53,25 +55,14 @@ export function JourneyStop({
       <div style={{ gridColumn: 1, position: "relative" }}>
         <div
           aria-hidden="true"
-          style={
-            last
-              ? {
-                  position: "absolute",
-                  left: "calc(clamp(32px, 9vw, 56px) / 2 - 2px)",
-                  top: 0,
-                  width: "4px",
-                  background: stopColor,
-                  height: "36px",
-                }
-              : {
-                  position: "absolute",
-                  left: "calc(clamp(32px, 9vw, 56px) / 2 - 2px)",
-                  top: 0,
-                  width: "4px",
-                  background: stopColor,
-                  bottom: 0,
-                }
-          }
+          style={{
+            position: "absolute",
+            left: "calc(clamp(32px, 9vw, 56px) / 2 - 2px)",
+            top: 0,
+            width: "4px",
+            background: stopColor,
+            ...(last ? { height: "36px" } : { bottom: 0 }),
+          }}
         />
         <div
           aria-hidden="true"
@@ -217,7 +208,8 @@ export function JourneyStop({
             margin: 0,
           }}
         >
-          <span style={{ fontWeight: 700, color: "var(--color-accent)" }}>Turns into:</span>{" "}
+          <span style={{ fontWeight: 700, color: "var(--color-accent)" }}>Turns into:</span>
+          {" "}
           {turnsInto}
         </p>
       </Stack>

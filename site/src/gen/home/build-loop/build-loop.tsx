@@ -5,32 +5,32 @@ import { LoopFigure } from "./loop-figure";
 
 const steps = [
   {
-    number: "1",
+    n: "1",
     title: "Write",
     text: "Change the spec, in plain words or with Claude Code's help. Generated code is never edited by hand.",
     color: "var(--color-level-product)",
   },
   {
-    number: "2",
+    n: "2",
     title: "Build",
     text: "ail build recompiles only the nodes whose slice changed: their own spec, the contracts of the nodes they use, or shared parts like the tokens. Each node is compiled by an agent that sees only that slice.",
     color: "var(--color-level-build)",
   },
   {
-    number: "3",
+    n: "3",
     title: "Check",
-    text: "ail check lints the spec, confirms every file was built from it, and runs every example, scenario and verify line as a test.",
+    text: "Every build ends by checking: it lints the spec, confirms every file was built from it, runs every example, scenario and verify line as a test, and has a model compare each screen with its look.",
     color: "var(--color-step-check)",
   },
   {
-    number: "4",
+    n: "4",
     title: "Ask",
     text: "When the spec leaves a gap, the compiler doesn't guess. It replies STOP with a question, and the answer goes into the spec.",
     color: "var(--color-level-experience)",
   },
 ];
 
-/** "a heading, a loop picture beside four numbered steps, and an example of a question the compiler asks instead of guessing" */
+/** a heading, a loop picture beside four numbered steps, and an example of a question the compiler asks instead of guessing */
 export function BuildLoop() {
   return (
     <Section id="loop" tone="plain">
@@ -83,7 +83,7 @@ export function BuildLoop() {
                     background: step.color,
                   }}
                 >
-                  {step.number}
+                  {step.n}
                 </span>
                 <div
                   style={{
@@ -133,9 +133,7 @@ export function BuildLoop() {
               margin: 0,
             }}
           >
-            <span style={{ fontWeight: 700, color: "var(--color-stop-text)" }}>
-              STOP:
-            </span>
+            <span style={{ fontWeight: 700, color: "var(--color-stop-text)" }}>STOP:</span>
             {" after switching to the computer, does “New game” keep the computer as the opponent?"}
           </p>
           <p

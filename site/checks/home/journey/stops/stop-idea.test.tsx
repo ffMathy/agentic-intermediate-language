@@ -1,4 +1,4 @@
-// ail-derived-from: StopIdea@11e907f9a9104e5e
+// ail-derived-from: StopIdea@a4a6bb874b09b37a
 import { afterEach, expect, test } from "bun:test";
 import { cleanup, render, screen, within } from "@testing-library/react";
 import { StopIdea } from "../../../../src/gen/home/journey/stops/stop-idea";
@@ -7,46 +7,45 @@ afterEach(() => {
   cleanup();
 });
 
+const lines = [
+  "Tic-Tac-Toe: a quick, familiar game people can finish in under a minute,",
+  "alone or with a friend on the same device.",
+  "1. Two players take turns placing their mark on a 3 × 3 board.",
+  "2. Three marks in a line wins; a full board with no winner is a draw.",
+  "3. You can play against a friend or against the computer.",
+  "4. The computer never loses.",
+  "5. You can start a new game at any time.",
+  "6. You can watch the computer play itself, move by move.",
+];
+
 test("the idea", () => {
   render(<StopIdea />);
 
   const article = document.getElementById("stop-1");
   expect(article).not.toBeNull();
-  if (article === null) {
-    return;
-  }
-  const isArticle =
-    article.tagName.toLowerCase() === "article" ||
-    article.getAttribute("role") === "article";
-  expect(isArticle).toBe(true);
+  expect(article?.tagName).toBe("ARTICLE");
+  const scoped = within(article as HTMLElement);
+  expect(
+    scoped.getByRole("heading", {
+      level: 3,
+      name: "It starts with what the product owner wants.",
+    }),
+  ).toBeTruthy();
 
-  const heading = within(article).getByRole("heading", {
-    level: 3,
-    name: "It starts as a sentence anyone could say.",
+  const region = screen.getByRole("region", {
+    name: "What the product owner asked for",
   });
-  expect(heading).toBeTruthy();
-
-  const region = within(article).getByRole("region", {
-    name: "The idea, at the top of the spec",
-  });
-  expect(screen.getByRole("region", { name: "The idea, at the top of the spec" })).toBe(region);
-
   const text = region.textContent ?? "";
-  const lines = [
-    "  why   A quick, familiar game people can finish in under a minute,",
-    "        alone or with a friend on the same device.",
-    "  …",
-    "    4. The computer never loses.",
-  ];
-  let from = 0;
+  let position = -1;
   for (const line of lines) {
-    const at = text.indexOf(line, from);
-    expect(at).toBeGreaterThanOrEqual(0);
-    from = at + line.length;
+    const found = text.indexOf(line, position + 1);
+    expect(found).toBeGreaterThan(position);
+    position = found;
   }
 
-  const highlighted = Array.from(region.querySelectorAll("*")).filter(
-    (el) => (el.textContent ?? "").trim() === "The computer never loses.",
+  const highlight = "4. The computer never loses.";
+  const holders = Array.from(region.querySelectorAll("*")).filter(
+    (el) => (el.textContent ?? "").trim() === highlight,
   );
-  expect(highlighted.length).toBeGreaterThan(0);
+  expect(holders.length).toBeGreaterThan(0);
 });

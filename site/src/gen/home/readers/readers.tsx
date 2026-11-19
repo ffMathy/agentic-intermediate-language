@@ -1,4 +1,4 @@
-import { useRef, useState } from "react";
+import { useState } from "react";
 import type { KeyboardEvent } from "react";
 import { Section } from "../../parts/section";
 import { SectionHeading } from "../../parts/section-heading";
@@ -9,7 +9,7 @@ type Reader = "stakeholder" | "design" | "engineer" | "specialist";
 
 const order: Reader[] = ["stakeholder", "design", "engineer", "specialist"];
 
-const content: Record<
+const readerInfo: Record<
   Reader,
   { name: string; level: string; text: string; cmd: string; color: string }
 > = {
@@ -43,32 +43,25 @@ const content: Record<
   },
 };
 
-/** Explain why levels exist: each level of the tree is written for one kind of reader, and each reader's view goes only as deep as they need. */
+/** "four tabs, "Stakeholder", "Design", "Engineer" and "Specialist", named together as "Readers"; "Stakeholder" is picked first" */
 export function Readers() {
   const [reader, setReader] = useState<Reader>("stakeholder");
-  const tabRefs = useRef<Record<Reader, HTMLButtonElement | null>>({
-    stakeholder: null,
-    design: null,
-    engineer: null,
-    specialist: null,
-  });
+  const info = readerInfo[reader];
 
   const onKeyDown = (event: KeyboardEvent<HTMLButtonElement>, key: Reader) => {
     const index = order.indexOf(key);
-    let next: Reader | null = null;
+    let next: Reader | undefined;
     if (event.key === "ArrowRight") {
       next = order[(index + 1) % order.length];
     } else if (event.key === "ArrowLeft") {
       next = order[(index - 1 + order.length) % order.length];
     }
-    if (next !== null) {
-      event.preventDefault();
-      setReader(next);
-      tabRefs.current[next]?.focus();
+    if (next === undefined) {
+      return;
     }
+    setReader(next);
+    document.getElementById(`reader-tab-${next}`)?.focus();
   };
-
-  const picked = content[reader];
 
   return (
     <Section id="readers" tone="raised">
@@ -79,20 +72,17 @@ export function Readers() {
       <div role="tablist" aria-label="Readers">
         <Stack dir="h" gap="space.2" align="center" wrap={true}>
           {order.map((key) => {
-            const isPicked = key === reader;
-            const c = content[key];
+            const picked = key === reader;
+            const color = readerInfo[key].color;
             return (
               <button
                 key={key}
                 type="button"
-                ref={(el) => {
-                  tabRefs.current[key] = el;
-                }}
                 role="tab"
                 id={`reader-tab-${key}`}
-                aria-selected={isPicked}
+                aria-selected={picked}
                 aria-controls="reader-panel"
-                tabIndex={isPicked ? 0 : -1}
+                tabIndex={picked ? 0 : -1}
                 onClick={() => setReader(key)}
                 onKeyDown={(event) => onKeyDown(event, key)}
                 style={{
@@ -103,16 +93,14 @@ export function Readers() {
                   fontSize: "var(--font-small)",
                   fontWeight: 600,
                   cursor: "pointer",
-                  background: isPicked ? c.color : "var(--color-surface)",
-                  border: isPicked
-                    ? `1px solid ${c.color}`
+                  background: picked ? color : "var(--color-surface)",
+                  border: picked
+                    ? `1px solid ${color}`
                     : "1px solid var(--color-border)",
-                  color: isPicked
-                    ? "var(--color-on-accent)"
-                    : "var(--color-text)",
+                  color: picked ? "var(--color-on-accent)" : "var(--color-text)",
                 }}
               >
-                {c.name}
+                {readerInfo[key].name}
               </button>
             );
           })}
@@ -135,10 +123,10 @@ export function Readers() {
               fontSize: "var(--font-micro)",
               fontWeight: 700,
               letterSpacing: "0.08em",
-              color: picked.color,
+              color: info.color,
             }}
           >
-            {picked.level}
+            {info.level}
           </div>
           <p
             style={{
@@ -149,7 +137,7 @@ export function Readers() {
               margin: 0,
             }}
           >
-            {picked.text}
+            {info.text}
           </p>
           <code
             style={{
@@ -162,7 +150,7 @@ export function Readers() {
               padding: "var(--space-1) var(--space-2)",
             }}
           >
-            {picked.cmd}
+            {info.cmd}
           </code>
           <ReadersTree reader={reader} />
         </Stack>

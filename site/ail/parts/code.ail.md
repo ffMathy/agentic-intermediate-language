@@ -36,6 +36,7 @@ node CodeBlock : view   level: experience
   binds
     props    lines: string[], label: string, edge?: token name, highlight?: string[], caption?: string
     element  the pre has role region and aria-label set to label; each line is its own block span inside it (see look.line), with no line-break characters between the spans
+    marked   each marked occurrence is a mark element whose text is exactly the highlight phrase, so a reader, a screen reader or a check can find it
   uses  Stack
 ```
 
@@ -49,9 +50,9 @@ node CopyCommand : flow   level: experience
     pressing "Copy" puts exactly the command on the clipboard; once that succeeds the button reads "Copied" for 1.5 seconds, then "Copy" again
     when the clipboard can't be written, the button keeps reading "Copy"
     Scenario: copying
-      Given the command "ail check" and a working clipboard
-      When the visitor presses the button named "Copy ail check"
-      Then the clipboard holds "ail check"
+      Given the command "ail build" and a working clipboard
+      When the visitor presses the button named "Copy ail build"
+      Then the clipboard holds "ail build"
       And the button reads "Copied"
       When 1500 ms pass
       Then the button reads "Copy" again

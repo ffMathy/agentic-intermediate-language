@@ -1,6 +1,6 @@
 import { Stack } from "../../../parts/stack";
 
-const trace: { seen: string; source: string }[] = [
+const trace = [
   { seen: "“X's turn”", source: "StatusLine copy" },
   { seen: "the O after 300 ms", source: "PlayAGame decision" },
   { seen: "the square the O picks", source: "ComputerPlayer" },

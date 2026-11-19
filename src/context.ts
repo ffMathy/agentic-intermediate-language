@@ -1,4 +1,4 @@
-// `ail context <Node>`: the encapsulated slice of the spec one compile step sees.
+// The encapsulated slice of the spec one compile step sees.
 //
 // Included: the target, the design tokens, the glossary, the `why` chain of
 // ancestors, the node itself, and the contract (`what` + `binds`) of every

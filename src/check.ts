@@ -1,7 +1,9 @@
-// `ail check`: is the spec sound, is the code built from it, and does the code
-// do what it says? One read-only answer for people, agents and CI.
+// The check that ends every `ail build`: is the spec
+// sound, is the code built from it, and does the code do what it says?
+// Read-only, and never calls a model.
 import { staleGlue } from "./compile.ts";
 import { lint, type Diagnostic } from "./lint.ts";
+import { unjudged } from "./look.ts";
 import { plan, type PlanEntry } from "./plan.ts";
 import type { Project } from "./project.ts";
 import { formatVerify, verifyProject, type VerifyResult, type Check } from "./verify.ts";
@@ -10,6 +12,8 @@ export interface CheckReport {
   ok: boolean;
   /** Model-free outputs (token CSS, spec module) that are out of date. */
   glue: string[];
+  /** Built nodes with a look whose screens no model has compared with it yet. */
+  unjudged: string[];
   lint: Diagnostic[];
   plan: PlanEntry[];
   verify: { results: VerifyResult[]; typecheck: Check | null; ok: boolean };
@@ -21,7 +25,8 @@ export function runCheck(p: Project, nodes: string[] = []): CheckReport {
   const v = verifyProject(p, nodes);
   const glue = staleGlue(p);
   const ok = !l.some((d) => d.severity === "error") && pl.every((e) => e.status === "fresh") && !glue.length && v.ok;
-  return { ok, glue, lint: l, plan: pl, verify: v };
+  const looks = unjudged(p).filter((n) => !nodes.length || nodes.includes(n));
+  return { ok, glue, unjudged: looks, lint: l, plan: pl, verify: v };
 }
 
 export function formatCheck(r: CheckReport): string {
@@ -45,5 +50,6 @@ export function formatCheck(r: CheckReport): string {
   } else out.push(`✓ behavior ${tests} test(s) passed${tc ? ", typecheck ok" : ""}`);
   const warn = r.verify.results.flatMap((x) => x.checks.filter((c) => !c.ok && c.severity === "warning").map((c) => `    ! ${x.node} ${c.kind}: ${c.detail}`));
   out.push(...warn);
+  if (r.unjudged.length) out.push(`! look     ${r.unjudged.length} node(s) whose screens were never compared with their look — \`ail build\` compares them: ${r.unjudged.join(", ")}`);
   return out.join("\n");
 }

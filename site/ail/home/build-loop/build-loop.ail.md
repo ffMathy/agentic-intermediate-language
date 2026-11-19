@@ -37,7 +37,7 @@ node BuildLoop : view   level: experience
     loop.2.title    "Build"
     loop.2.text     "ail build recompiles only the nodes whose slice changed: their own spec, the contracts of the nodes they use, or shared parts like the tokens. Each node is compiled by an agent that sees only that slice."
     loop.3.title    "Check"
-    loop.3.text     "ail check lints the spec, confirms every file was built from it, and runs every example, scenario and verify line as a test."
+    loop.3.text     "Every build ends by checking: it lints the spec, confirms every file was built from it, runs every example, scenario and verify line as a test, and has a model compare each screen with its look."
     loop.4.title    "Ask"
     loop.4.text     "When the spec leaves a gap, the compiler doesn't guess. It replies STOP with a question, and the answer goes into the spec."
     loop.stop.word  "STOP:"

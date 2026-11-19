@@ -1,13 +1,13 @@
-// ail-derived-from: CopyCommand@1aa626b90d340d1c
+// ail-derived-from: CopyCommand@e6a08e317cc6ab20
 import { afterEach, beforeEach, expect, test } from "bun:test";
 import { act, cleanup, fireEvent, render, screen, waitFor } from "@testing-library/react";
 import { CopyCommand } from "../../src/gen/parts/copy-command";
 
-let clipboardText: string | undefined;
+let clipboardText: string | null = null;
 let originalClipboard: PropertyDescriptor | undefined;
 
 beforeEach(() => {
-  clipboardText = undefined;
+  clipboardText = null;
   originalClipboard = Object.getOwnPropertyDescriptor(navigator, "clipboard");
   Object.defineProperty(navigator, "clipboard", {
     configurable: true,
@@ -25,28 +25,26 @@ afterEach(() => {
   if (originalClipboard) {
     Object.defineProperty(navigator, "clipboard", originalClipboard);
   } else {
-    Reflect.deleteProperty(navigator, "clipboard");
+    delete (navigator as unknown as Record<string, unknown>).clipboard;
   }
 });
 
 test("copying", async () => {
-  render(<CopyCommand command="ail check" />);
-
-  const button = screen.getByRole("button", { name: "Copy ail check" });
+  render(<CopyCommand command="ail build" />);
+  const button = screen.getByRole("button", { name: "Copy ail build" });
 
   await act(async () => {
     fireEvent.click(button);
   });
 
-  expect(clipboardText).toBe("ail check");
-
+  expect(clipboardText).toBe("ail build");
   await waitFor(() => {
-    expect(screen.getByRole("button", { name: "Copy ail check" }).textContent).toBe("Copied");
+    expect(screen.getByRole("button", { name: "Copy ail build" }).textContent).toBe("Copied");
   });
 
   await act(async () => {
-    await new Promise<void>((resolve) => setTimeout(resolve, 1600));
+    await new Promise((resolve) => setTimeout(resolve, 1600));
   });
 
-  expect(screen.getByRole("button", { name: "Copy ail check" }).textContent).toBe("Copy");
-}, 10000);
+  expect(screen.getByRole("button", { name: "Copy ail build" }).textContent).toBe("Copy");
+});

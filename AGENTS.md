@@ -4,12 +4,13 @@
 
 - The `*.ail.md` files are the source of truth. Generated code (the target's
   `generated` globs, e.g. `src/gen/**`) is never edited by hand: hooks block
-  it, and `ail check` reports it.
+  it, and `ail build` reports it.
 - To change behaviour, change the spec, then build: `/ail:build` in Claude
   Code, or `ail build` in a terminal.
 - If the spec leaves something open and it isn't in `free`, stop and ask for a
   spec change. Never guess in code.
-- Before finishing, `ail check` (or the `ail_check` tool) must pass.
+- Before finishing, `ail build` (or `/ail:build`) must pass: it compiles what
+  changed and then checks everything.
 
 ## In this repository (the toolchain)
 
@@ -24,7 +25,7 @@
   which `ail build` writes without a model from both `site/ail/` and
   `examples/tictactoe/ail/`. So after editing the kata's spec, also run
   `ail build` in `site/` (no model calls are needed for that), or the site's
-  `ail check` fails.
+  build fails its check.
 - If you change the prompts or the context format, compile hashes
-  change. Rebuild `examples/tictactoe` and `site` so that `ail check` passes in
+  change. Rebuild `examples/tictactoe` and `site` so that `ail build` passes in
   both.

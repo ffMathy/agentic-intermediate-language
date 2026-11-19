@@ -1,12 +1,20 @@
 import { Stack } from "../../parts/stack";
 
+const linkStyle = {
+  color: "var(--color-code-text)",
+  fontWeight: 600,
+  textDecoration: "underline",
+};
+
+const stripColors = [
+  "var(--color-level-product)",
+  "var(--color-level-experience)",
+  "var(--color-level-system)",
+  "var(--color-level-specialist)",
+];
+
 /** "a strip of the four level colors, one sentence on where this page and the game came from, and four links" */
 export function Footer() {
-  const linkStyle = {
-    color: "var(--color-code-text)",
-    fontWeight: 600,
-    textDecoration: "underline",
-  };
   return (
     <footer
       style={{
@@ -16,10 +24,9 @@ export function Footer() {
       }}
     >
       <div style={{ height: "4px", display: "flex" }}>
-        <div style={{ flex: 1, background: "var(--color-level-product)" }} />
-        <div style={{ flex: 1, background: "var(--color-level-experience)" }} />
-        <div style={{ flex: 1, background: "var(--color-level-system)" }} />
-        <div style={{ flex: 1, background: "var(--color-level-specialist)" }} />
+        {stripColors.map((color) => (
+          <div key={color} style={{ flex: 1, background: color }} />
+        ))}
       </div>
       <Stack
         dir="v"

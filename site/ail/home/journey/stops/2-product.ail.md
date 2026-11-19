@@ -2,12 +2,12 @@
 
 ```ail
 node StopProduct : view   level: experience
-  why   Show the product level: the sentence becomes one of the promises at the root, and each promise names who keeps it.   <- Journey
+  why   Show the product level: the owner's requirements become the promises at the root, and each promise names who keeps it.   <- Journey
   what
     the second stop, in the product color
     Scenario: the product level
       Given the page is open
-      Then the article "stop-2" has the level 3 heading "Product level: the sentence becomes a promise with an owner."
+      Then the article "stop-2" has the level 3 heading "Product level: each requirement becomes a promise with an owner."
       And the region named "Product-level spec excerpt" shows its eleven lines, with claim 4 and "refined-by: ComputerPlayer" highlighted
   look
     stop     JourneyStop with number 2, color color.level.product, figure ProductFigure, browse "#spec/tictactoe/tictactoe.ail.md"
@@ -15,8 +15,8 @@ node StopProduct : view   level: experience
     product.depth     "depth 1"
     product.chip      "PRODUCT"
     product.reader    "anyone: stakeholders, customers, the whole team"
-    product.headline  "Product level: the sentence becomes a promise with an owner."
-    product.body      "In the root node, the sentence sits beside five other promises. Each one must name a deeper node that makes it true, and a check rejects code notation at this level, so anyone can review it."
+    product.headline  "Product level: each requirement becomes a promise with an owner."
+    product.body      "In the root node, the owner's six requirements become the product's promises, word for word. Each one must name a deeper node that makes it true, and a check rejects code notation at this level, so anyone can review it."
     product.label     "Product-level spec excerpt"
     product.file      "examples/tictactoe/ail/tictactoe.ail.md"
     product.line.1    "node TicTacToe : system   level: product"

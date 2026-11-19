@@ -105,7 +105,7 @@ depths:
 - Plain claims are **proven by children**. *"The computer never loses"* is a
   product sentence; the specialist node `ComputerPlayer` makes it true, and a
   derived check enumerates every game to prove it.
-- Lint (part of `ail check`) enforces the vocabulary. Code notation (calls,
+- Lint (part of the check that ends every `ail build`) enforces the vocabulary. Code notation (calls,
   operators, camelCase, braces) in `product`/`experience` prose is an error. Notation belongs in `look`, `copy` or `binds`, or one
   level deeper.
 - A **glossary** gives each domain word a plain meaning and a formal one, so
@@ -123,7 +123,7 @@ depths:
 | Explicit freedom | Anything not in `free` must follow from the spec. Otherwise the compiler replies `STOP: <question>` instead of guessing. |
 | Encapsulated context | Each leaf is compiled from a small, fixed slice of the spec. A smaller context means less variance. |
 | Content hashing | Canonical forms ignore comments, whitespace and section order. Cosmetic edits never recompile anything; changing a dependency's `how` doesn't recompile its dependants. |
-| Divergence sampling | `ail check --samples N` compares N samples × M models on verification, export surface and `probes`. |
+| Divergence sampling | `ail build --samples N` compares N samples × M models on verification, export surface and `probes`. |
 | Drift detection | Hand edits to generated code are caught by the lock file. A hook blocks them, and CI fails on them. The fix is a spec change and a rebuild. |
 
 ## 5. The toolchain: skills teach, tools decide, hooks enforce
@@ -132,28 +132,22 @@ The surface is deliberately small:
 
 | Piece | Job |
 |---|---|
-| `ail check` | Is the spec sound (lint), is everything built from it (plan), and does it pass (verify)? `--samples N` adds divergence sampling. |
+| `ail build` | Compile what changed, then check: is the spec sound (lint), is everything built from it (plan), does it pass (verify), and does each screen match its look? With nothing to compile it needs no model. `--samples N` adds divergence sampling. |
 | `ail build` | Write the token CSS, prune what was removed, derive tests from scenarios, then compile every node that changed (independent nodes in parallel). |
 | `ail show` | The tree, a node, a view for one audience, or the changes (a semantic diff against a git ref). |
-| MCP server | four tools: `ail_show`, `ail_check`, `ail_context`, `ail_submit` |
-| Plugin | the `ail` skill, the `/ail:build` and `/ail:show` commands, the `ail-leaf-compiler` subagent, and hooks that block edits to generated files and lint every `.ail.md` edit |
-| GitHub Action | `ail check`, plus the spec changes in the job summary |
+| MCP server | two tools: `ail_show`, and `ail_build` (the same build as the CLI) |
+| Plugin | the `ail` skill, the `/ail:build` command, the MCP server, and hooks that block edits to generated files and lint every `.ail.md` edit |
+| GitHub Action | `ail build`, plus the spec changes in the job summary |
 
-Plumbing for agents and tooling (`ail context`, `ail submit`, `ail mcp`,
-`ail hook`) stays out of the main help.
+Plumbing for the plugin (`ail mcp`, `ail hook`) stays out of the main help.
 
 ### Running on a Claude subscription
 
-No API key is required. There are two paths, and both use whatever Claude Code
-is logged in with:
-
-- **Inside Claude Code** (plugin): `/ail:build` delegates each node to the
-  `ail-leaf-compiler` subagent. That subagent's only tools are `ail_context` and
-  `ail_submit`, so it cannot read anything outside its node's slice. Tool
-  permissions enforce the encapsulation.
-- **Headless** (scripts, CI): the `claude-code` provider runs `claude -p` as a
-  pure completion: built-in tools, MCP and slash commands are off, and it runs
-  in an empty directory, so no CLAUDE.md or project file leaks into the context.
+No API key is required. `ail build` (and `/ail:build`, which runs the same
+build through the plugin's MCP server) uses whatever Claude Code is logged in
+with: the `claude-code` provider runs `claude -p` as a pure completion.
+Built-in tools, MCP and slash commands are off, and it runs in an empty
+directory, so no CLAUDE.md or project file leaks into a node's context.
   It is the default model when `ANTHROPIC_API_KEY` is not set. In CI, give
   Claude Code a token from `claude setup-token` as `CLAUDE_CODE_OAUTH_TOKEN`.
 
@@ -172,7 +166,7 @@ The only outputs that need no model are the design-token CSS, written straight
 from the catalog, and, when a project sets `specModule`, a data module holding
 spec files (of this project, or of several listed projects). The website uses
 it for its spec browser, which opens the site's own spec and the Tic-Tac-Toe
-spec in a read-only Monaco editor, so it can never go stale; `ail check` fails if either output is
+spec in a read-only Monaco editor, so it can never go stale; `ail build` fails its check if either output is
 out of date. Everything else, the entry point and the components
 included, is a node compiled like any other.
 
@@ -186,7 +180,7 @@ the same one, so it was a reuse mechanism with a single user. Now:
 - the components are ordinary nodes in a `library`
 - the design tokens are the project's own `catalog`
 - `index.html` is a normal hand-written file
-- the golden examples are gone; `ail check --samples` shows whether that costs
+- the golden examples are gone; `ail build --samples` shows whether that costs
   determinism
 
 Sharing conventions across projects means copying a `target` block, which is
@@ -203,15 +197,13 @@ All of this is in this repository and can be re-run:
   and a typecheck. The app runs with `bun run dev`.
 - **It runs on a subscription.** With no API key set, `ail build` used Claude
   Code's login and compiled `WatchADemo` and `ComputerPlayer` on the first try,
-  with correct imports across folders. With the plugin installed,
-  `/ail:build` recompiled a deleted node. A trace showed the main agent
-  only planning and verifying, while the restricted subagent made exactly one
-  `ail_context` call and one `ail_submit` call.
+  with correct imports across folders. (An earlier version of the plugin
+  compiled through a restricted subagent; it now runs this same build.)
 - **A real model passes on the first try.** In a scratch copy, `ail build
   ComputerPlayer --force --model "command:claude -p"` produced a textually
   different implementation (negamax instead of a min/max split) that passed the
   same checks on attempt 1.
-- **Real samples converge.** `ail check ComputerPlayer Rules --samples 2`
+- **Real samples converge.** `ail build ComputerPlayer Rules --samples 2`
   converged: every sample verified and every probe agreed.
 - **Ambiguity becomes a question, not a coin flip.** With the tie-break rule
   removed from `ComputerPlayer`, all 3 samples refused to guess. Each replied

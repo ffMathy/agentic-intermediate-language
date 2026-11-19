@@ -23,6 +23,8 @@ export interface CompletionRequest {
   /** Sampling temperature, for providers that still accept one. */
   temperature?: number;
   maxTokens?: number;
+  /** Images shown before the prompt (e.g. screenshots to judge), each with a label. */
+  images?: { label: string; mediaType: "image/png"; data: string }[];
   /** Which node and sample this is; used by the mock provider and for logs. */
   meta?: { node?: string; sample?: number; purpose?: string };
 }
@@ -42,6 +44,15 @@ export function defaultModel(env: Record<string, string | undefined> = process.e
   if (env.ANTHROPIC_API_KEY || env.ANTHROPIC_AUTH_TOKEN) return DEFAULT_MODEL;
   if (which("claude")) return "claude-code";
   return DEFAULT_MODEL;
+}
+
+/** Why a model spec can't be used here (e.g. CI without a login), or null when it can. */
+export function modelUnavailable(spec: string, env: Record<string, string | undefined> = process.env, which: (cmd: string) => string | null = Bun.which): string | null {
+  const kind = spec.split(":")[0];
+  if (kind === "claude-code") return which("claude") ? null : "Claude Code is not installed";
+  if (kind === "anthropic") return env.ANTHROPIC_API_KEY || env.ANTHROPIC_AUTH_TOKEN ? null : "ANTHROPIC_API_KEY is not set, and Claude Code is not installed";
+  if (kind === "openai") return env.OPENAI_API_KEY || env.OPENAI_BASE_URL ? null : "OPENAI_API_KEY is not set";
+  return null;
 }
 
 export function getProvider(spec: string): Provider {

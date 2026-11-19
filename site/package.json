@@ -4,7 +4,6 @@
   "type": "module",
   "scripts": {
     "dev": "bun ./index.html",
-    "check": "ail check",
     "build": "ail build",
     "show": "ail show"
   },

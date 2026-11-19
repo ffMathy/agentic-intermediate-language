@@ -8,6 +8,7 @@ export function commandProvider(cmd: string): Provider {
   return {
     id: `command:${cmd}`,
     async complete(req: CompletionRequest) {
+      if (req.images?.length) throw new Error(`"${cmd}" takes text on stdin, so it can't be shown images; use claude-code, anthropic: or openai: for this`);
       const proc = Bun.spawn(["sh", "-c", cmd], {
         stdin: new TextEncoder().encode(`${req.system}\n\n---\n\n${req.prompt}`),
         stdout: "pipe",

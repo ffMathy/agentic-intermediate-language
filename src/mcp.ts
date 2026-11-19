@@ -1,24 +1,16 @@
-// MCP server (JSON-RPC 2.0 over newline-delimited stdio). Four tools:
-// look (ail_show), judge (ail_check), and the two the leaf compiler needs
-// (ail_context, ail_submit). No SDK dependency on purpose.
-import { formatCheck, runCheck } from "./check.ts";
-import { checkPath, submit } from "./compile.ts";
-import { buildContext } from "./context.ts";
-import { loadProject, modulePath, type Project } from "./project.ts";
+// MCP server (JSON-RPC 2.0 over newline-delimited stdio) for the Claude Code
+// plugin. Two tools: look at the spec (ail_show) and build it (ail_build, the
+// same build as the CLI). No SDK dependency on purpose.
+import { build } from "./build.ts";
+import { loadProject, type Project } from "./project.ts";
 import { show } from "./show.ts";
-import { formatVerify } from "./verify.ts";
 
 type Json = Record<string, unknown>;
-interface Tool { name: string; description: string; inputSchema: Json; run: (p: Project, args: Json) => { text: string; isError?: boolean } }
+type ToolResult = { text: string; isError?: boolean };
+interface Tool { name: string; description: string; inputSchema: Json; run: (p: Project, args: Json, progress: (message: string) => void) => ToolResult | Promise<ToolResult> }
 
 const str = { type: "string" };
 const obj = (properties: Json, required: string[] = []) => ({ type: "object", properties, required, additionalProperties: false });
-
-function needNode(p: Project, name: unknown) {
-  const n = typeof name === "string" ? p.nodes.get(name) : undefined;
-  if (!n) throw new Error(`unknown node "${String(name)}". Known: ${[...p.nodes.keys()].join(", ")}`);
-  return n;
-}
 
 export const TOOLS: Tool[] = [
   {
@@ -28,35 +20,17 @@ export const TOOLS: Tool[] = [
     run: (p, a) => ({ text: show(p, (a.target as string) ?? "", { tag: a.tag as string | undefined, since: a.since as string | undefined }) }),
   },
   {
-    name: "ail_check",
-    description: "Is the spec sound, is every node built from the current spec, and does the code pass every check the spec implies? Read-only.",
-    inputSchema: obj({ nodes: { type: "array", items: str } }),
-    run: (p, a) => { const r = runCheck(p, (a.nodes as string[]) ?? []); return { text: formatCheck(r), isError: !r.ok }; },
-  },
-  {
-    name: "ail_context",
-    description: "The encapsulated compile context for one node: the target, design tokens, glossary, why chain, the node, its dependencies' contracts, and (when needed) instructions for its derived check. Implement the node from this context only, then call ail_submit.",
-    inputSchema: obj({ node: str }, ["node"]),
-    run: (p, a) => ({ text: buildContext(p, needNode(p, a.node)) }),
-  },
-  {
-    name: "ail_submit",
-    description: "Hand in a node's module (content) and, when its context asked for one, its derived check (checks). They are written, verified against the spec and recorded — or rolled back with the failures returned. The only way to write generated code.",
-    inputSchema: obj({ node: str, content: str, checks: str }, ["node", "content"]),
-    run: (p, a) => {
-      const n = needNode(p, a.node);
-      const path = modulePath(p, n);
-      if (!path) throw new Error(`${n.name} has no output path`);
-      const files: Record<string, string> = { [path]: String(a.content) };
-      if (typeof a.checks === "string") files[checkPath(p, n)] = a.checks;
-      const r = submit(p, n, files, "mcp");
-      const detail = r.verify ? formatVerify({ results: [r.verify], typecheck: null, ok: r.ok }) : "";
-      return { text: r.ok ? `accepted: ${path}\n${detail}` : `rejected: ${r.error}\n${detail}`, isError: !r.ok };
+    name: "ail_build",
+    description: "Build the project, exactly like `ail build`: compile every node that changed (each with only its own slice of the spec, through Claude Code's login unless the project names other models), have a model compare each screen with its look, then check everything: the spec is sound, the code is built from it, and every check passes. With nothing to compile it only checks. Can take minutes. Reports STOP questions the spec must answer.",
+    inputSchema: obj({ nodes: { type: "array", items: str }, force: { type: "boolean" } }),
+    run: async (p, a, progress) => {
+      const r = await build(p, { names: (a.nodes as string[]) ?? [], force: a.force === true, log: progress });
+      return { text: r.text, isError: !r.ok };
     },
   },
 ];
 
-export function handle(msg: Json, root?: string): Json | null {
+export async function handle(msg: Json, root?: string, notify: (msg: Json) => void = () => {}): Promise<Json | null> {
   const id = msg.id as number | string | undefined;
   const method = msg.method as string;
   const reply = (result: Json) => ({ jsonrpc: "2.0", id, result });
@@ -67,16 +41,19 @@ export function handle(msg: Json, root?: string): Json | null {
         protocolVersion: (msg.params as Json)?.protocolVersion ?? "2025-06-18",
         capabilities: { tools: {} },
         serverInfo: { name: "ail", version: "0.2.0" },
-        instructions: "Tools for the Agentic Intermediate Language. The *.ail.md files are the source of truth; generated code is written only through ail_submit.",
+        instructions: "Tools for the Agentic Intermediate Language. The *.ail.md files are the source of truth; generated code is written only by ail_build.",
       });
     case "ping": return reply({});
     case "tools/list": return reply({ tools: TOOLS.map(({ run: _r, ...t }) => t) });
     case "tools/call": {
-      const params = msg.params as { name: string; arguments?: Json };
+      const params = msg.params as { name: string; arguments?: Json; _meta?: { progressToken?: string | number } };
+      const token = params._meta?.progressToken;
+      let step = 0;
+      const progress = (message: string) => { if (token !== undefined) notify({ jsonrpc: "2.0", method: "notifications/progress", params: { progressToken: token, progress: ++step, message } }); };
       const tool = TOOLS.find((t) => t.name === params.name);
       if (!tool) return { jsonrpc: "2.0", id, error: { code: -32602, message: `unknown tool ${params.name}` } };
       try {
-        const r = tool.run(loadProject(root), params.arguments ?? {});
+        const r = await tool.run(loadProject(root), params.arguments ?? {}, progress);
         return reply({ content: [{ type: "text", text: r.text }], isError: r.isError ?? false });
       } catch (e) {
         return reply({ content: [{ type: "text", text: (e as Error).message }], isError: true });
@@ -99,7 +76,7 @@ export async function serve(root?: string) {
       if (!line) continue;
       let msg: Json;
       try { msg = JSON.parse(line); } catch { process.stdout.write(JSON.stringify({ jsonrpc: "2.0", id: null, error: { code: -32700, message: "parse error" } }) + "\n"); continue; }
-      const out = handle(msg, root);
+      const out = await handle(msg, root, (n) => process.stdout.write(JSON.stringify(n) + "\n"));
       if (out) process.stdout.write(JSON.stringify(out) + "\n");
     }
   }

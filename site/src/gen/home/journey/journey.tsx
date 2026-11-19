@@ -11,14 +11,14 @@ import { StopBuild } from "./stops/stop-build";
 import { StopProof } from "./stops/stop-proof";
 import { StopResult } from "./stops/stop-result";
 
-/** a heading, an introduction, a legend for the yellow thread, a map of the stops, then eight stops in order */
+/** "a heading, an introduction, a legend for the yellow thread, a map of the stops, then eight stops in order" */
 export function Journey() {
   return (
     <Section id="journey" tone="plain">
       <SectionHeading
         eyebrow="THE JOURNEY"
         text="Follow one sentence all the way down"
-        lead="This is the real spec of the Tic-Tac-Toe demo, not a mock-up. We follow one promise, “the computer never loses”, from the product owner's sentence to the code that keeps it. Stops 2 to 5 are the four levels of the spec, from plain promise to algorithm. Stops 6 to 8 are what the tools make from it: the code, the proof and the game. The yellow highlight marks the thread at every level."
+        lead="This is the real spec of the Tic-Tac-Toe demo, not a mock-up. We follow one of the product owner's requirements for Tic-Tac-Toe, “the computer never loses”, down to the code that keeps it. Stops 2 to 5 are the four levels of the spec, from plain promise to algorithm. Stops 6 to 8 are what the tools make from it: the code, the proof and the game. The yellow highlight marks the thread at every level."
       />
       <Stack dir="h" gap="space.2" align="center">
         <span

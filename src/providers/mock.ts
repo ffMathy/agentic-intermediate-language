@@ -13,6 +13,7 @@ export function mockProvider(file: string): Provider {
       const node = req.meta?.node ?? "";
       const key = req.meta?.purpose && data[`${node}#${req.meta.purpose}`] ? `${node}#${req.meta.purpose}` : node;
       const list = data[key];
+      if (!list?.length && req.meta?.purpose === "look") return "MATCHES"; // screens agree unless a test says otherwise
       if (!list?.length) throw new Error(`mock: no response for "${key}"`);
       const n = req.meta?.sample ?? calls.get(key) ?? 0;
       calls.set(key, n + 1);

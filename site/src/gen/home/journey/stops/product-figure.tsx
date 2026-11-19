@@ -16,7 +16,7 @@ const owners = [
   "WatchADemo",
 ];
 
-/** six promises on the left, each joined to the node that keeps it on the right; promise 4 and its owner stand out, and their joining line moves */
+/** "six promises on the left, each joined to the node that keeps it on the right; promise 4 and its owner stand out, and their joining line moves" */
 export function ProductFigure() {
   return (
     <svg
@@ -37,46 +37,54 @@ export function ProductFigure() {
         const isKeeper = owner === "ComputerPlayer";
         return (
           <g key={promise}>
-            {isFour ? (
-              <line
-                x1={158}
-                y1={y + 14}
-                x2={222}
-                y2={y + 14}
-                stroke="var(--color-thread-strong)"
-                strokeWidth={4}
-                strokeDasharray="6 4"
-                style={{ animation: "ail-dash 1s linear infinite" }}
-              />
-            ) : (
-              <line
-                x1={158}
-                y1={y + 14}
-                x2={222}
-                y2={y + 14}
-                stroke="var(--color-border)"
-                strokeWidth={1}
-              />
-            )}
+            <line
+              x1={158}
+              y1={y + 14}
+              x2={222}
+              y2={y + 14}
+              style={
+                isFour
+                  ? {
+                      stroke: "var(--color-thread-strong)",
+                      strokeWidth: 4,
+                      strokeDasharray: "6 4",
+                      animation: "ail-dash 1s linear infinite",
+                    }
+                  : {
+                      stroke: "var(--color-border)",
+                      strokeWidth: 1,
+                    }
+              }
+            />
             <rect
               x={8}
               y={y}
               width={150}
               height={28}
               rx={14}
-              fill={isFour ? "var(--color-thread)" : "var(--color-surface)"}
-              stroke={
-                isFour ? "var(--color-thread-strong)" : "var(--color-border)"
+              style={
+                isFour
+                  ? {
+                      fill: "var(--color-thread)",
+                      stroke: "var(--color-thread-strong)",
+                      strokeWidth: 2,
+                    }
+                  : {
+                      fill: "var(--color-surface)",
+                      stroke: "var(--color-border)",
+                      strokeWidth: 1,
+                    }
               }
-              strokeWidth={isFour ? 2 : 1}
             />
             <text
               x={22}
               y={y + 18}
               fontSize={12}
-              fill="var(--color-text)"
-              fontFamily="var(--font-sans)"
-              fontWeight={isFour ? 700 : undefined}
+              style={{
+                fontFamily: "var(--font-sans)",
+                fill: "var(--color-text)",
+                fontWeight: isFour ? 700 : undefined,
+              }}
             >
               {promise}
             </text>
@@ -86,21 +94,28 @@ export function ProductFigure() {
               width={130}
               height={28}
               rx={6}
-              fill={
+              style={
                 isKeeper
-                  ? "var(--color-level-specialist)"
-                  : "var(--color-surface)"
+                  ? {
+                      fill: "var(--color-level-specialist)",
+                      stroke: "none",
+                    }
+                  : {
+                      fill: "var(--color-surface)",
+                      stroke: "var(--color-border)",
+                      strokeWidth: 1,
+                    }
               }
-              stroke={isKeeper ? "none" : "var(--color-border)"}
-              strokeWidth={isKeeper ? undefined : 1}
             />
             <text
               x={232}
               y={y + 18}
               fontSize={11}
-              fill={isKeeper ? "var(--color-on-accent)" : "var(--color-text)"}
-              fontFamily="var(--font-mono)"
-              fontWeight={isKeeper ? 700 : undefined}
+              style={{
+                fontFamily: "var(--font-mono)",
+                fill: isKeeper ? "var(--color-on-accent)" : "var(--color-text)",
+                fontWeight: isKeeper ? 700 : undefined,
+              }}
             >
               {owner}
             </text>
@@ -112,8 +127,10 @@ export function ProductFigure() {
         y={250}
         textAnchor="middle"
         fontSize={12}
-        fill="var(--color-text-muted)"
-        fontFamily="var(--font-sans)"
+        style={{
+          fontFamily: "var(--font-sans)",
+          fill: "var(--color-text-muted)",
+        }}
       >
         every promise is refined-by the node that keeps it
       </text>

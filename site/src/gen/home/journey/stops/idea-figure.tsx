@@ -1,10 +1,10 @@
-/** a speech bubble saying "The computer never loses." over a simple person labelled "product owner", with "never loses." highlighted */
+/** a speech bubble saying "Tic-Tac-Toe." and then "The computer never loses." over a simple person labelled "product owner", with "never loses." highlighted */
 export function IdeaFigure() {
   return (
     <svg
-      viewBox="0 0 320 180"
+      viewBox="0 0 320 210"
       role="img"
-      aria-label="A product owner says: The computer never loses."
+      aria-label="A product owner says: Tic-Tac-Toe. The computer never loses."
       style={{
         width: "100%",
         maxWidth: "320px",
@@ -13,28 +13,41 @@ export function IdeaFigure() {
       }}
     >
       <path
-        d="M48 92 L40 118 L74 92"
-        strokeWidth={2}
+        d="M48 122 L40 148 L74 122"
         style={{
           fill: "var(--color-surface)",
           stroke: "var(--color-border)",
+          strokeWidth: 2,
         }}
       />
       <rect
         x={10}
         y={10}
         width={300}
-        height={84}
+        height={114}
         rx={16}
-        strokeWidth={2}
         style={{
           fill: "var(--color-surface)",
           stroke: "var(--color-border)",
+          strokeWidth: 2,
         }}
       />
+      <text
+        x={160}
+        y={40}
+        textAnchor="middle"
+        style={{
+          fontFamily: "var(--font-sans)",
+          fontSize: 16,
+          fontWeight: 600,
+          fill: "var(--color-text-muted)",
+        }}
+      >
+        Tic-Tac-Toe.
+      </text>
       <rect
         x={78}
-        y={58}
+        y={88}
         width={164}
         height={30}
         rx={4}
@@ -42,39 +55,39 @@ export function IdeaFigure() {
       />
       <text
         x={160}
-        y={44}
+        y={74}
         textAnchor="middle"
-        fontSize={24}
-        fontWeight={700}
         style={{
-          fill: "var(--color-text)",
           fontFamily: "var(--font-sans)",
+          fontSize: 24,
+          fontWeight: 700,
+          fill: "var(--color-text)",
         }}
       >
         The computer
       </text>
       <text
         x={160}
-        y={81}
+        y={111}
         textAnchor="middle"
-        fontSize={24}
-        fontWeight={700}
         style={{
-          fill: "var(--color-text)",
           fontFamily: "var(--font-sans)",
+          fontSize: 24,
+          fontWeight: 700,
+          fill: "var(--color-text)",
         }}
       >
         never loses.
       </text>
       <circle
         cx={40}
-        cy={136}
+        cy={166}
         r={10}
         style={{ fill: "var(--color-text-muted)" }}
       />
       <rect
         x={22}
-        y={150}
+        y={180}
         width={36}
         height={24}
         rx={12}
@@ -82,11 +95,11 @@ export function IdeaFigure() {
       />
       <text
         x={70}
-        y={160}
-        fontSize={12}
+        y={190}
         style={{
-          fill: "var(--color-text-muted)",
           fontFamily: "var(--font-sans)",
+          fontSize: 12,
+          fill: "var(--color-text-muted)",
         }}
       >
         product owner

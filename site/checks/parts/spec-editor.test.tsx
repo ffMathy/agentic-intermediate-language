@@ -1,4 +1,4 @@
-// ail-derived-from: SpecEditor@b09bcdab28433ea3
+// ail-derived-from: SpecEditor@08a61a463791af11
 import { afterEach, expect, test } from "bun:test";
 import { cleanup, render, screen } from "@testing-library/react";
 import { SpecEditor } from "../../src/gen/parts/spec-editor";

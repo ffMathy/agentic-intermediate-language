@@ -36,6 +36,7 @@ node CodeBlock : view   level: experience
   binds
     props    lines: string[], label: string, edge?: token name, highlight?: string[], caption?: string
     element  the pre has role region and aria-label set to label; each line is its own block span inside it (see look.line), with no line-break characters between the spans
+    marked   each marked occurrence is a mark element whose text is exactly the highlight phrase, so a reader, a screen reader or a check can find it
   uses  Stack
 ```
 

@@ -1,4 +1,4 @@
-// ail-derived-from: Journey@ea5f50d26cd4b7f6
+// ail-derived-from: Journey@cc0ec7e2136e2e46
 import { afterEach, expect, test } from "bun:test";
 import { cleanup, render, screen, within } from "@testing-library/react";
 import { Journey } from "../../../src/gen/home/journey/journey";
@@ -8,29 +8,30 @@ afterEach(() => {
 });
 
 test("eight stops in order", () => {
-  const { container } = render(<Journey />);
-  const section = container.querySelector("#journey");
+  render(<Journey />);
+  const section = document.getElementById("journey");
   expect(section).not.toBeNull();
-  const band = section as HTMLElement;
-
-  const headings = within(band).getAllByRole("heading", { level: 3 });
+  if (section === null) return;
+  const headings = within(section).getAllByRole("heading", { level: 3 });
   expect(headings.length).toBe(8);
-  expect(headings[0].textContent).toBe("It starts as a sentence anyone could say.");
-  expect(headings[7].textContent).toBe("The result: try to beat it.");
-
-  const stopIds = Array.from(band.querySelectorAll("[id]"))
-    .map((el) => el.id)
-    .filter((id) => /^stop-\d+$/.test(id));
-  expect(stopIds).toEqual([
-    "stop-1",
-    "stop-2",
-    "stop-3",
-    "stop-4",
-    "stop-5",
-    "stop-6",
-    "stop-7",
-    "stop-8",
-  ]);
+  expect((headings[0].textContent ?? "").trim()).toBe(
+    "It starts with what the product owner wants.",
+  );
+  expect((headings[7].textContent ?? "").trim()).toBe(
+    "The result: try to beat it.",
+  );
+  const stops: HTMLElement[] = [];
+  for (let n = 1; n <= 8; n += 1) {
+    const stop = document.getElementById(`stop-${n}`);
+    expect(stop).not.toBeNull();
+    if (stop === null) return;
+    expect(section.contains(stop)).toBe(true);
+    stops.push(stop);
+  }
+  for (let i = 0; i < stops.length - 1; i += 1) {
+    const position = stops[i].compareDocumentPosition(stops[i + 1]);
+    expect(position & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
+  }
 });
 
 test("the thread is explained", () => {

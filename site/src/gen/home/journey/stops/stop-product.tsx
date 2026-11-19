@@ -10,8 +10,8 @@ export function StopProduct() {
       depth="depth 1"
       chip="PRODUCT"
       reader="anyone: stakeholders, customers, the whole team"
-      headline="Product level: the sentence becomes a promise with an owner."
-      explanation="In the root node, the sentence sits beside five other promises. Each one must name a deeper node that makes it true, and a check rejects code notation at this level, so anyone can review it."
+      headline="Product level: each requirement becomes a promise with an owner."
+      explanation="In the root node, the owner's six requirements become the product's promises, word for word. Each one must name a deeper node that makes it true, and a check rejects code notation at this level, so anyone can review it."
       lines={[
         "node TicTacToe : system   level: product",
         "  …",

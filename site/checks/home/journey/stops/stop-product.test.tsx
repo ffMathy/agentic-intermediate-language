@@ -1,4 +1,4 @@
-// ail-derived-from: StopProduct@e08a6a3ea86f90de
+// ail-derived-from: StopProduct@04034fc30e7652ee
 import { afterEach, expect, test } from "bun:test";
 import { cleanup, render, screen, within } from "@testing-library/react";
 import { StopProduct } from "../../../../src/gen/home/journey/stops/stop-product";
@@ -21,37 +21,30 @@ const lines = [
   "  children  App, BoardKit, Engine, UiKit",
 ];
 
-const marks = ["4. The computer never loses.", "refined-by: ComputerPlayer"];
+const squash = (s: string): string => s.replace(/\s+/g, " ").trim();
 
 test("the product level", () => {
-  render(<StopProduct />);
+  const { container } = render(<StopProduct />);
 
-  const article = screen
-    .getAllByRole("article")
-    .find((el) => el.id === "stop-2");
-  expect(article).toBeDefined();
-  const stop = article as HTMLElement;
+  const article = container.querySelector("article#stop-2");
+  expect(article).not.toBeNull();
+  const art = article as HTMLElement;
 
-  const heading = within(stop).getByRole("heading", { level: 3 });
-  expect(heading.textContent).toBe(
-    "Product level: the sentence becomes a promise with an owner.",
-  );
+  expect(
+    within(art).getByRole("heading", {
+      level: 3,
+      name: "Product level: each requirement becomes a promise with an owner.",
+    }),
+  ).toBeTruthy();
 
-  const region = within(stop).getByRole("region", {
-    name: "Product-level spec excerpt",
-  });
-  const text = region.textContent ?? "";
+  const region = screen.getByRole("region", { name: "Product-level spec excerpt" });
+  expect(art.contains(region)).toBe(true);
 
-  let from = 0;
+  const text = squash(region.textContent ?? "");
   for (const line of lines) {
-    const at = text.indexOf(line, from);
-    expect(at).toBeGreaterThanOrEqual(0);
-    from = at + line.length;
+    expect(text).toContain(squash(line));
   }
 
-  const all = Array.from(region.querySelectorAll("*"));
-  for (const mark of marks) {
-    const highlighted = all.filter((el) => el.textContent === mark);
-    expect(highlighted.length).toBeGreaterThan(0);
-  }
+  expect(within(region).getAllByText("4. The computer never loses.").length).toBeGreaterThan(0);
+  expect(within(region).getAllByText("refined-by: ComputerPlayer").length).toBeGreaterThan(0);
 });

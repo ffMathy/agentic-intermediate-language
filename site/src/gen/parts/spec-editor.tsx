@@ -51,7 +51,7 @@ const beforeMount: BeforeMount = (monaco) => {
   });
 };
 
-/** shows the given text in a read-only code editor with AIL colours, line numbers and wrapped lines */
+/** "shows the given text in a read-only code editor with AIL colours, line numbers and wrapped lines" */
 export function SpecEditor({
   text,
   path,
@@ -62,7 +62,7 @@ export function SpecEditor({
   label: string;
 }) {
   const lines = text.split(/\r?\n/);
-  if (lines.length > 1 && lines[lines.length - 1] === "") {
+  if (lines.length > 0 && lines[lines.length - 1] === "") {
     lines.pop();
   }
   const fallback = (

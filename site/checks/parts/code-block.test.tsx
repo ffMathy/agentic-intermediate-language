@@ -1,4 +1,4 @@
-// ail-derived-from: CodeBlock@11939f6ee6fab25e
+// ail-derived-from: CodeBlock@2fc882c12eb5f63c
 import { afterEach, expect, test } from "bun:test";
 import { cleanup, render, screen } from "@testing-library/react";
 import { CodeBlock } from "../../src/gen/parts/code-block";
@@ -7,19 +7,21 @@ afterEach(() => {
   cleanup();
 });
 
-function lineElements(region: HTMLElement): HTMLElement[] {
-  return Array.from(region.children) as HTMLElement[];
+function lineSpans(region: HTMLElement): HTMLElement[] {
+  return Array.from(region.children).filter(
+    (el): el is HTMLElement => el.tagName.toLowerCase() === "span",
+  );
 }
 
 test("shown exactly", () => {
   render(<CodeBlock lines={["a  b", "  c"]} label="Sample" />);
   const region = screen.getByRole("region", { name: "Sample" });
-  const lines = lineElements(region);
-  expect(lines.length).toBe(2);
-  expect(lines[0].textContent).toBe("a  b");
-  expect(lines[1].textContent).toBe("  c");
-  for (const line of lines) {
-    expect(line.style.display).toBe("block");
+  const spans = lineSpans(region);
+  expect(spans.length).toBe(2);
+  expect(spans[0].textContent).toBe("a  b");
+  expect(spans[1].textContent).toBe("  c");
+  for (const span of spans) {
+    expect(span.style.display).toBe("block");
   }
   expect(region.textContent).toBe("a  b  c");
   expect(region.style.whiteSpace).toBe("pre-wrap");
@@ -29,28 +31,26 @@ test("the thread is marked", () => {
   render(
     <CodeBlock
       lines={["4. The computer never loses.", "5. New game"]}
-      label="Sample"
+      label="Thread"
       highlight={["never loses"]}
     />,
   );
-  const region = screen.getByRole("region", { name: "Sample" });
-  const marks = Array.from(region.querySelectorAll("mark"));
+  const region = screen.getByRole("region", { name: "Thread" });
+  const marks = Array.from(document.querySelectorAll("mark"));
   expect(marks.length).toBe(1);
   expect(marks[0].textContent).toBe("never loses");
-  const lines = lineElements(region);
-  expect(lines[0].textContent).toBe("4. The computer never loses.");
-  expect(lines[1].textContent).toBe("5. New game");
+  expect(region.contains(marks[0])).toBe(true);
 });
 
 test("a caption", () => {
   render(
     <CodeBlock
-      lines={["a"]}
-      label="Sample"
+      lines={["node Game : flow"]}
+      label="Spec"
       caption="examples/tictactoe/tictactoe.ail.md"
     />,
   );
-  const region = screen.getByRole("region", { name: "Sample" });
+  const region = screen.getByRole("region", { name: "Spec" });
   const caption = screen.getByText("examples/tictactoe/tictactoe.ail.md");
   expect(region.contains(caption)).toBe(false);
   expect(
@@ -59,28 +59,24 @@ test("a caption", () => {
 });
 
 test("a long line wraps under itself", () => {
-  const text =
+  const line =
     "    because an instant answer feels like the player's own move did nothing";
-  const { container } = render(
+  render(
     <div style={{ width: "30ch" }}>
-      <CodeBlock lines={[text]} label="Sample" />
+      <CodeBlock lines={[line]} label="Long" />
     </div>,
   );
-  expect(container).toBeTruthy();
-  const region = screen.getByRole("region", { name: "Sample" });
-  expect(region.textContent).toBe(text);
+  const region = screen.getByRole("region", { name: "Long" });
   expect(region.style.whiteSpace).toBe("pre-wrap");
   expect(region.style.overflowWrap).toBe("anywhere");
-  expect(["scroll", "auto", "hidden", "clip"]).not.toContain(
-    region.style.overflowX,
-  );
-  expect(["scroll", "auto", "hidden", "clip"]).not.toContain(
-    region.style.overflow,
-  );
-  const lines = lineElements(region);
-  expect(lines.length).toBe(1);
-  const line = lines[0];
-  expect(line.style.display).toBe("block");
-  expect(line.style.paddingLeft.replace(/\s+/g, "")).toBe("8ch");
-  expect(line.style.textIndent.replace(/\s+/g, "")).toBe("-8ch");
+  for (const value of [region.style.overflow, region.style.overflowX]) {
+    expect(["scroll", "auto", "hidden", "clip"]).not.toContain(value);
+  }
+  expect(region.textContent).toBe(line);
+  const spans = lineSpans(region);
+  expect(spans.length).toBe(1);
+  expect(spans[0].textContent).toBe(line);
+  expect(spans[0].style.display).toBe("block");
+  expect(spans[0].style.paddingLeft).toBe("8ch");
+  expect(spans[0].style.textIndent).toBe("-8ch");
 });

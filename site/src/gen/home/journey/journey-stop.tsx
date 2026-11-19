@@ -2,8 +2,7 @@ import type { ReactNode } from "react";
 import { Stack } from "../../parts/stack";
 import { CodeBlock } from "../../parts/code-block";
 
-/** "number: number, color: token name, depth: string, chip: string, reader: string, headline: string, explanation: string, lines: string[], label: string, file: string, highlight: string[], turnsInto: string, figure: React node, last?: boolean, browse?: string" */
-export type JourneyStopProps = {
+type JourneyStopProps = {
   number: number;
   color: string;
   depth: string;
@@ -21,14 +20,7 @@ export type JourneyStopProps = {
   browse?: string;
 };
 
-function tokenColor(color: string): string {
-  const value = color.trim();
-  if (value.startsWith("#") || value.startsWith("var(") || value.startsWith("rgb")) {
-    return value;
-  }
-  const name = value.replace(/^--/, "").split(".").join("-");
-  return `var(--${name.startsWith("color-") ? name : `color-${name}`})`;
-}
+const tokenVar = (name: string): string => `var(--${name.replace(/\./g, "-")})`;
 
 /** "Every stop has the same anatomy, so the visitor compares levels instead of learning a new layout each time." */
 export function JourneyStop({
@@ -48,7 +40,7 @@ export function JourneyStop({
   last,
   browse,
 }: JourneyStopProps) {
-  const stopColor = tokenColor(color);
+  const stopColor = tokenVar(color);
   return (
     <article
       id={`stop-${number}`}
@@ -68,7 +60,7 @@ export function JourneyStop({
             left: "calc(clamp(32px, 9vw, 56px) / 2 - 2px)",
             top: 0,
             width: "4px",
-            backgroundColor: stopColor,
+            background: stopColor,
             ...(last ? { height: "36px" } : { bottom: 0 }),
           }}
         />
@@ -81,10 +73,8 @@ export function JourneyStop({
             height: "clamp(28px, 7vw, 36px)",
             boxSizing: "border-box",
             borderRadius: "var(--radius-pill)",
-            backgroundColor: stopColor,
-            borderWidth: "3px",
-            borderStyle: "solid",
-            borderColor: "var(--color-surface)",
+            background: stopColor,
+            border: "3px solid var(--color-surface)",
             boxShadow: `0 0 0 1px ${stopColor}`,
             color: "var(--color-on-accent)",
             fontSize: "clamp(var(--font-micro), 3vw, var(--font-small))",
@@ -108,7 +98,7 @@ export function JourneyStop({
             textTransform: "uppercase",
             letterSpacing: "0.08em",
             color: "var(--color-text-muted)",
-            backgroundColor: "var(--color-page)",
+            background: "var(--color-page)",
             padding: "var(--space-1) 0",
           }}
         >
@@ -119,7 +109,7 @@ export function JourneyStop({
         <Stack dir="h" gap="space.3" align="center" wrap={true}>
           <span
             style={{
-              backgroundColor: stopColor,
+              background: stopColor,
               color: "var(--color-on-accent)",
               fontSize: "var(--font-micro)",
               fontWeight: 700,
@@ -172,7 +162,7 @@ export function JourneyStop({
           </p>
           <div
             style={{
-              backgroundColor: "var(--color-surface-raised)",
+              background: "var(--color-surface-raised)",
               borderRadius: "var(--radius-lg)",
               padding: "clamp(12px, 2vw, 16px) clamp(4px, 2vw, 16px)",
               minHeight: "200px",
@@ -209,7 +199,7 @@ export function JourneyStop({
         <p
           style={{
             maxWidth: "var(--width-prose)",
-            backgroundColor: "var(--color-accent-soft)",
+            background: "var(--color-accent-soft)",
             borderRadius: "var(--radius-md)",
             padding: "var(--space-2) var(--space-4)",
             fontSize: "var(--font-small)",

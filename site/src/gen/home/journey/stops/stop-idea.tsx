@@ -10,18 +10,22 @@ export function StopIdea() {
       depth="idea"
       chip="IDEA"
       reader="a product owner, in their own words"
-      headline="It starts as a sentence anyone could say."
-      explanation="Every AIL project starts with someone saying what they want, in plain words. Here it's a game people can finish in under a minute, and a promise that the built-in opponent can't be beaten. Those words go into the spec just as they were said, at the top of the tree. Nothing here is technical yet, and it shouldn't be."
+      headline="It starts with what the product owner wants."
+      explanation="Every AIL project starts with someone saying what they want, in plain words. Here a product owner asks for Tic-Tac-Toe, with six requirements. We follow one of them, “The computer never loses.”, all the way down to the code and the game. Nothing here is technical yet, and it shouldn't be."
       lines={[
-        "  why   A quick, familiar game people can finish in under a minute,",
-        "        alone or with a friend on the same device.",
-        "  …",
-        "    4. The computer never loses.",
+        "Tic-Tac-Toe: a quick, familiar game people can finish in under a minute,",
+        "alone or with a friend on the same device.",
+        "1. Two players take turns placing their mark on a 3 × 3 board.",
+        "2. Three marks in a line wins; a full board with no winner is a draw.",
+        "3. You can play against a friend or against the computer.",
+        "4. The computer never loses.",
+        "5. You can start a new game at any time.",
+        "6. You can watch the computer play itself, move by move.",
       ]}
-      label="The idea, at the top of the spec"
+      label="What the product owner asked for"
       file="examples/tictactoe/ail/tictactoe.ail.md"
-      highlight={["The computer never loses."]}
-      turnsInto="The owner's words, written down unchanged as the spec's first lines. Next, the sentence joins the product's other promises and gets a node that keeps it."
+      highlight={["4. The computer never loses."]}
+      turnsInto="These words go into the spec unchanged, at the top of the tree. Next, each requirement gets a node that will make it true."
       figure={<IdeaFigure />}
       browse="#spec/tictactoe/tictactoe.ail.md"
     />

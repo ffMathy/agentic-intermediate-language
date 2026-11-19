@@ -1,6 +1,6 @@
-// ail-derived-from: StopSpecialist@5a8dac0ba3dbeeca
+// ail-derived-from: StopSpecialist@8f459f55f084ced6
 import { afterEach, expect, test } from "bun:test";
-import { cleanup, render, within } from "@testing-library/react";
+import { cleanup, render, screen, within } from "@testing-library/react";
 import { StopSpecialist } from "../../../../src/gen/home/journey/stops/stop-specialist";
 
 afterEach(() => {
@@ -33,35 +33,34 @@ const marks: string[] = [
 test("the specialist level", () => {
   render(<StopSpecialist />);
 
-  const article = document.getElementById("stop-5");
-  expect(article).not.toBeNull();
-  if (article === null) {
-    return;
-  }
-  const isArticle =
-    article.tagName.toLowerCase() === "article" ||
-    article.getAttribute("role") === "article";
-  expect(isArticle).toBe(true);
+  const article = screen
+    .getAllByRole("article")
+    .find((el) => el.id === "stop-5");
+  expect(article).toBeDefined();
+  if (!article) return;
 
-  const scope = within(article);
-  scope.getByRole("heading", {
-    level: 3,
-    name: "Specialist level: the promise becomes an algorithm and a proof.",
-  });
+  expect(
+    within(article).getByRole("heading", {
+      level: 3,
+      name: "Specialist level: the promise becomes an algorithm and a proof.",
+    }),
+  ).toBeTruthy();
 
-  const region = scope.getByRole("region", {
+  const region = within(article).getByRole("region", {
     name: "Specialist-level spec excerpt",
   });
   const text = region.textContent ?? "";
+
+  let last = -1;
   for (const line of lines) {
-    expect(text).toContain(line);
+    const at = text.indexOf(line, last + 1);
+    expect(at).toBeGreaterThan(last);
+    last = at;
   }
 
   const elements = Array.from(region.querySelectorAll("*"));
   for (const mark of marks) {
-    const highlighted = elements.some(
-      (el) => (el.textContent ?? "") === mark,
-    );
-    expect(highlighted).toBe(true);
+    const highlighted = elements.filter((el) => el.textContent === mark);
+    expect(highlighted.length).toBeGreaterThan(0);
   }
 });

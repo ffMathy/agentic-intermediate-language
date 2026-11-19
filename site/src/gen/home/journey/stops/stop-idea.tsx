@@ -19,10 +19,11 @@ export function StopIdea() {
         "    4. The computer never loses.",
       ]}
       label="The idea, at the top of the spec"
-      file="examples/tictactoe/tictactoe.ail.md"
+      file="examples/tictactoe/ail/tictactoe.ail.md"
       highlight={["The computer never loses."]}
       turnsInto="The owner's words, written down unchanged as the spec's first lines. Next, the sentence joins the product's other promises and gets a node that keeps it."
       figure={<IdeaFigure />}
+      browse="#spec/tictactoe/tictactoe.ail.md"
     />
   );
 }

@@ -10,7 +10,7 @@ node StopIdea : view   level: experience
       Then the article "stop-1" has the level 3 heading "It starts as a sentence anyone could say."
       And the region named "The idea, at the top of the spec" shows its four lines, with "The computer never loses." highlighted
   look
-    stop     JourneyStop with number 1, color color.accent, figure IdeaFigure
+    stop     JourneyStop with number 1, color color.accent, figure IdeaFigure, browse "#spec/tictactoe/tictactoe.ail.md"
   copy
     idea.depth      "idea"
     idea.chip       "IDEA"
@@ -18,7 +18,7 @@ node StopIdea : view   level: experience
     idea.headline   "It starts as a sentence anyone could say."
     idea.body       "Every AIL project starts with someone saying what they want, in plain words. Here it's a game people can finish in under a minute, and a promise that the built-in opponent can't be beaten. Those words go into the spec just as they were said, at the top of the tree. Nothing here is technical yet, and it shouldn't be."
     idea.label      "The idea, at the top of the spec"
-    idea.file       "examples/tictactoe/tictactoe.ail.md"
+    idea.file       "examples/tictactoe/ail/tictactoe.ail.md"
     idea.line.1     "  why   A quick, familiar game people can finish in under a minute,"
     idea.line.2     "        alone or with a friend on the same device."
     idea.line.3     "  …"

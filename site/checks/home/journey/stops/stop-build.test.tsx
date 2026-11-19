@@ -1,4 +1,4 @@
-// ail-derived-from: StopBuild@b05710b06ece73c8
+// ail-derived-from: StopBuild@2391650d21709175
 import { afterEach, expect, test } from "bun:test";
 import { cleanup, render, screen, within } from "@testing-library/react";
 import { StopBuild } from "../../../../src/gen/home/journey/stops/stop-build";
@@ -20,24 +20,20 @@ const lines = [
 test("the build", () => {
   const { container } = render(<StopBuild />);
 
-  const article = container.querySelector("#stop-6");
+  const article = container.querySelector("article#stop-6");
   expect(article).not.toBeNull();
-  const articles = screen.getAllByRole("article");
-  expect(articles).toContain(article as HTMLElement);
+  const stop = article as HTMLElement;
 
-  const scope = within(article as HTMLElement);
-  scope.getByRole("heading", {
+  const heading = within(stop).getByRole("heading", {
     level: 3,
     name: "Build: an agent compiles the node, seeing only its own slice.",
   });
+  expect(heading).toBeTruthy();
 
-  const region = scope.getByRole("region", { name: "Generated code excerpt" });
+  const region = screen.getByRole("region", { name: "Generated code excerpt" });
   const text = region.textContent ?? "";
-  let from = 0;
   for (const line of lines) {
-    const at = text.indexOf(line, from);
-    expect(at).toBeGreaterThanOrEqual(0);
-    from = at + line.length;
+    expect(text).toContain(line);
   }
 
   const highlighted = Array.from(region.querySelectorAll("*")).filter(

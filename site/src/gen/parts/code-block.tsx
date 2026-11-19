@@ -1,14 +1,15 @@
 import type { CSSProperties, ReactNode } from "react";
 import { Stack } from "./stack";
 
-type Segment = {
-  text: string;
-  marked: boolean;
+type CodeBlockProps = {
+  lines: string[];
+  label: string;
+  edge?: string;
+  highlight?: string[];
+  caption?: string;
 };
 
-const tokenVar = (token: string): string => `var(--${token.split(".").join("-")})`;
-
-const preStyle: CSSProperties = {
+const blockStyle: CSSProperties = {
   background: "var(--color-code)",
   color: "var(--color-code-text)",
   fontFamily: "var(--font-mono)",
@@ -36,95 +37,63 @@ const captionStyle: CSSProperties = {
   overflowWrap: "anywhere",
 };
 
-const splitLine = (line: string, phrases: string[]): Segment[] => {
-  const segments: Segment[] = [];
-  let pos = 0;
-  let plainStart = 0;
-  while (pos < line.length) {
-    let bestIndex = -1;
-    let bestLength = 0;
-    for (const phrase of phrases) {
-      if (phrase.length === 0) {
-        continue;
-      }
-      const index = line.indexOf(phrase, pos);
-      if (index === -1) {
-        continue;
-      }
-      if (bestIndex === -1 || index < bestIndex || (index === bestIndex && phrase.length > bestLength)) {
-        bestIndex = index;
-        bestLength = phrase.length;
-      }
-    }
-    if (bestIndex === -1) {
-      break;
-    }
-    if (bestIndex > plainStart) {
-      segments.push({ text: line.slice(plainStart, bestIndex), marked: false });
-    }
-    segments.push({ text: line.slice(bestIndex, bestIndex + bestLength), marked: true });
-    pos = bestIndex + bestLength;
-    plainStart = pos;
-  }
-  if (plainStart < line.length) {
-    segments.push({ text: line.slice(plainStart), marked: false });
-  }
-  return segments;
-};
+function tokenVar(name: string): string {
+  return `var(--${name.replace(/\./g, "-")})`;
+}
 
-const renderLine = (line: string, phrases: string[], index: number): ReactNode => {
-  const leading = line.length - line.trimStart().length;
-  const offset = `${leading + 4}ch`;
-  const style: CSSProperties = {
-    display: "block",
-    paddingLeft: offset,
-    textIndent: `-${offset}`,
-  };
-  if (line.length === 0) {
-    return (
-      <span key={index} style={style}>
-        {" "}
-      </span>
-    );
+function markLine(line: string, phrases: string[]): ReactNode[] {
+  const parts: ReactNode[] = [];
+  let plain = "";
+  let i = 0;
+  while (i < line.length) {
+    const found = phrases.find((p) => line.startsWith(p, i));
+    if (found !== undefined) {
+      if (plain !== "") {
+        parts.push(plain);
+        plain = "";
+      }
+      parts.push(
+        <mark key={i} style={markStyle}>
+          {found}
+        </mark>,
+      );
+      i += found.length;
+    } else {
+      plain += line[i];
+      i += 1;
+    }
   }
-  return (
-    <span key={index} style={style}>
-      {splitLine(line, phrases).map((segment, i) =>
-        segment.marked ? (
-          <mark key={i} style={markStyle}>
-            {segment.text}
-          </mark>
-        ) : (
-          segment.text
-        ),
-      )}
-    </span>
-  );
-};
+  if (plain !== "") {
+    parts.push(plain);
+  }
+  return parts;
+}
 
-/** Shows the given lines exactly, one per line, keeping every space; every occurrence of each highlight phrase is marked, in every line. */
-export function CodeBlock({
-  lines,
-  label,
-  edge,
-  highlight,
-  caption,
-}: {
-  lines: string[];
-  label: string;
-  edge?: string;
-  highlight?: string[];
-  caption?: string;
-}) {
-  const phrases = highlight ?? [];
-  const blockStyle: CSSProperties =
-    edge === undefined ? preStyle : { ...preStyle, borderLeft: `4px solid ${tokenVar(edge)}` };
+/** "shows the given lines exactly, one per line, keeping every space; an empty line stays an empty line" */
+export function CodeBlock({ lines, label, edge, highlight, caption }: CodeBlockProps) {
+  const phrases = (highlight ?? []).filter((p) => p !== "");
+  const preStyle: CSSProperties =
+    edge === undefined
+      ? blockStyle
+      : { ...blockStyle, borderLeft: `4px solid ${tokenVar(edge)}` };
   return (
     <Stack dir="v" gap="space.2" align="stretch">
-      <pre role="region" aria-label={label} style={blockStyle}>
-        {lines.map((line, index) => renderLine(line, phrases, index))}
+      <pre role="region" aria-label={label} style={preStyle}>
+        {lines.map((line, index) => {
+          const n = line.length - line.trimStart().length;
+          const lineStyle: CSSProperties = {
+            display: "block",
+            paddingLeft: `${n + 4}ch`,
+            textIndent: `-${n + 4}ch`,
+          };
+          return (
+            <span key={index} style={lineStyle}>
+              {line === "" ? " " : markLine(line, phrases)}
+            </span>
+          );
+        })}
       </pre>
-      {caption !== undefined ? <div style={captionStyle}>{caption}</div> : null}
+      {caption !== undefined && <div style={captionStyle}>{caption}</div>}
     </Stack>
   );
 }

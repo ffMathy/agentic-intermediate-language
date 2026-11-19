@@ -4,9 +4,15 @@
   --color-accent-soft: #f5f3ff;
   --color-border: #d1d5db;
   --color-code: #0f172a;
+  --color-code-bar: #0b1120;
   --color-code-border: #334155;
   --color-code-muted: #94a3b8;
+  --color-code-pick: #1e293b;
+  --color-code-side: #111a2e;
   --color-code-text: #e2e8f0;
+  --color-dot-amber: #f59e0b;
+  --color-dot-green: #22c55e;
+  --color-dot-red: #ef4444;
   --color-focus: #2563eb;
   --color-level-build: #475569;
   --color-level-experience: #ca8a04;

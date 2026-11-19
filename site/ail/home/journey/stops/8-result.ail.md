@@ -15,7 +15,7 @@ node StopResult : view   level: experience
       And the region named "The promise, one last time" shows "    4. The computer never loses." with "The computer never loses." highlighted
       And the stop reads "Apart from a short index.html, none of its code was written by hand."
   look
-    stop     JourneyStop with number 8, color color.accent, last, figure ResultFrame
+    stop     JourneyStop with number 8, color color.accent, last, figure ResultFrame, browse "#spec/tictactoe/tictactoe.ail.md"
   copy
     result.depth     "result"
     result.chip      "RESULT"
@@ -23,7 +23,7 @@ node StopResult : view   level: experience
     result.headline  "The result: try to beat it."
     result.body      "This is the game built from that spec, running right here. Pick Computer, then play as X. You can draw, but you can't win: a check proved it before this page was published."
     result.label     "The promise, one last time"
-    result.file      "examples/tictactoe/tictactoe.ail.md"
+    result.file      "examples/tictactoe/ail/tictactoe.ail.md"
     result.line.1    "    4. The computer never loses."
     result.mark      "The computer never loses."
     result.turns     "Every square, word and move in this game comes from the spec above. Apart from a short index.html, none of its code was written by hand."
@@ -50,8 +50,8 @@ node ResultFrame : view   level: experience
   look
     layout   stack(v, gap: space.3, align: center, style: width 100%) [ hint, device, open, trace ]
     hint     a p: background color.thread, color color.text, font.small, weight 600, radius.pill, pad space.1 space.3, margin 0
-    device   a div: background color.code, pad space.3 (pad space.1 below 600px viewport width), radius.xl, width 100%, max-width 400px, box-sizing border-box
-    frame    an iframe: width 100%, height 600px (height 520px below 600px viewport width), border 0, radius.lg, background color.surface, display block
+    device   a div: background color.code, pad clamp(4px, 2vw, 12px), radius.xl, width 100%, max-width 400px, box-sizing border-box
+    frame    an iframe: width 100%, height 60vw, min-height 520px, max-height 600px, border 0, radius.lg, background color.surface, display block
     open     a link: font.small, weight 600, color.accent
     trace    a ul: list-style none, margin 0, pad 0, width 100%, max-width 400px; stack(v, gap: space.1, align: stretch); each li font.small, color.text: what is seen, then " ← ", then the source in font.mono, color.text.muted
   copy

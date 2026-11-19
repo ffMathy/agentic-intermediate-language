@@ -4,6 +4,7 @@ import { GapStrip } from "./sections/gap-strip";
 import { Journey } from "./journey/journey";
 import { Readers } from "./readers/readers";
 import { BuildLoop } from "./build-loop/build-loop";
+import { SpecBrowser } from "./sections/spec-browser";
 import { GetStarted } from "./sections/get-started";
 import { Footer } from "./sections/footer";
 
@@ -27,6 +28,7 @@ export function HomePage() {
         <Journey />
         <Readers />
         <BuildLoop />
+        <SpecBrowser />
         <GetStarted />
       </main>
       <Footer />

@@ -1,4 +1,4 @@
-// ail-derived-from: GetStarted@c958a1720161d460
+// ail-derived-from: GetStarted@cde2a95b0ba44415
 import { afterEach, expect, test } from "bun:test";
 import { cleanup, render, screen, within } from "@testing-library/react";
 import { GetStarted } from "../../../src/gen/home/sections/get-started";
@@ -7,25 +7,19 @@ afterEach(() => {
   cleanup();
 });
 
-function precedes(a: Node, b: Node): boolean {
-  return (a.compareDocumentPosition(b) & Node.DOCUMENT_POSITION_FOLLOWING) !== 0;
-}
+const precedes = (a: Node, b: Node): boolean =>
+  (a.compareDocumentPosition(b) & Node.DOCUMENT_POSITION_FOLLOWING) !== 0;
 
-function expectCommandsInOrder(card: HTMLElement, commands: string[]): void {
-  const text = card.textContent ?? "";
-  let last = -1;
-  for (const command of commands) {
-    const at = text.indexOf(command, last + 1);
-    expect(at).toBeGreaterThan(last);
-    last = at;
-  }
-  const buttons = commands.map((command) =>
-    within(card).getByRole("button", { name: `Copy ${command}` }),
-  );
+const expectCommandsInOrder = (container: HTMLElement, commands: string[]): void => {
+  const scope = within(container);
+  const buttons = commands.map((command) => {
+    expect(container.textContent ?? "").toContain(command);
+    return scope.getByRole("button", { name: `Copy ${command}` });
+  });
   for (let i = 1; i < buttons.length; i++) {
     expect(precedes(buttons[i - 1], buttons[i])).toBe(true);
   }
-}
+};
 
 test("in Claude Code", () => {
   render(<GetStarted />);
@@ -39,28 +33,32 @@ test("in Claude Code", () => {
 test("in a terminal", () => {
   render(<GetStarted />);
   const card = screen.getByRole("region", { name: "In a terminal" });
+  const scope = within(card);
 
-  const install = "bun add -g github:ffMathy/agentic-intermediate-language";
-  expect(card.textContent ?? "").toContain(install);
-  within(card).getByRole("button", { name: `Copy ${install}` });
+  const install = scope.getByRole("button", {
+    name: "Copy bun add -g github:ffMathy/agentic-intermediate-language",
+  });
+  expect(card.textContent ?? "").toContain(
+    "bun add -g github:ffMathy/agentic-intermediate-language",
+  );
 
-  const table = within(card).getByRole("table");
-  const dataRows = within(table)
-    .getAllByRole("row")
-    .filter((row) => within(row).queryAllByRole("columnheader").length === 0);
-  const expected = ["ail check", "ail build", "ail show [what]"];
-  expect(dataRows.length).toBe(expected.length);
-  dataRows.forEach((row, i) => {
+  const table = scope.getByRole("table");
+  const rows = within(table).getAllByRole("row");
+  const expected: Array<[string, string]> = [
+    ["ail check", "Is the spec sound, is the code built from it, and does it pass every check?"],
+    ["ail build", "Compile whatever changed."],
+    ["ail show [what]", "The tree, a node, one reader's view, or what changed."],
+  ];
+  const bodyRows = rows.filter((row) => within(row).queryAllByRole("cell").length > 0);
+  expect(bodyRows.length).toBe(expected.length);
+  bodyRows.forEach((row, i) => {
     const cells = within(row).getAllByRole("cell");
-    expect(cells.length).toBeGreaterThanOrEqual(2);
-    expect((cells[0].textContent ?? "").trim()).toBe(expected[i]);
-    expect((cells[1].textContent ?? "").trim().length).toBeGreaterThan(0);
+    expect((cells[0].textContent ?? "").trim()).toBe(expected[i][0]);
+    expect((cells[1].textContent ?? "").trim()).toBe(expected[i][1]);
   });
 
-  const where = within(card).getByText((_, element) =>
-    element !== null &&
-    element.tagName.toLowerCase() === "p" &&
-    (element.textContent ?? "").includes("ail.config.json"),
+  const where = scope.getByText(
+    "Run these inside a project, meaning any folder with an ail.config.json. To try the tic-tac-toe demo from this page:",
   );
   expect(precedes(table, where)).toBe(true);
 
@@ -71,8 +69,9 @@ test("in a terminal", () => {
     "ail show stakeholder",
   ];
   expectCommandsInOrder(card, steps);
-  const first = within(card).getByRole("button", { name: `Copy ${steps[0]}` });
-  expect(precedes(where, first)).toBe(true);
+  const firstStep = scope.getByRole("button", { name: `Copy ${steps[0]}` });
+  expect(precedes(where, firstStep)).toBe(true);
+  expect(precedes(install, table)).toBe(true);
 });
 
 test("what to do next", () => {
@@ -93,10 +92,10 @@ test("what to do next", () => {
   );
   expect(precedes(example, repo)).toBe(true);
 
-  const claude = screen.getByRole("region", { name: "In Claude Code" });
-  const cli = screen.getByRole("region", { name: "In a terminal" });
-  for (const card of [claude, cli]) {
-    expect(card.contains(example)).toBe(false);
-    expect(precedes(card, example)).toBe(true);
-  }
+  const claudeCard = screen.getByRole("region", { name: "In Claude Code" });
+  const cliCard = screen.getByRole("region", { name: "In a terminal" });
+  expect(precedes(claudeCard, example)).toBe(true);
+  expect(precedes(cliCard, example)).toBe(true);
+  expect(claudeCard.contains(example)).toBe(false);
+  expect(cliCard.contains(example)).toBe(false);
 });

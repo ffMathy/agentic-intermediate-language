@@ -1,7 +1,7 @@
 import { JourneyStop } from "../journey-stop";
 import { ExperienceFigure } from "./experience-figure";
 
-/** the third stop, in the experience color */
+/** "the third stop, in the experience color" */
 export function StopExperience() {
   return (
     <JourneyStop
@@ -26,10 +26,11 @@ export function StopExperience() {
         "      rejected a random pause because it makes behaviour unpredictable and tests slow",
       ]}
       label="Experience-level spec excerpt"
-      file="examples/tictactoe/app/play/play.ail.md"
+      file="examples/tictactoe/ail/app/play/play.ail.md"
       highlight={["the computer places an O"]}
       turnsInto="A test that plays X and waits for the computer's O, and a 300 ms timer in the play screen."
       figure={<ExperienceFigure />}
+      browse="#spec/tictactoe/app/play/play.ail.md"
     />
   );
 }

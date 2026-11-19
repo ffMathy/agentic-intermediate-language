@@ -1,4 +1,10 @@
 {
-  "sources": ["**/*.ail.md"],
-  "profilePaths": ["../profiles"]
+  "specRoot": "ail",
+  "specModule": {
+    "path": "src/gen/spec.ts",
+    "projects": [
+      { "key": "site", "name": "This website", "dir": "ail" },
+      { "key": "tictactoe", "name": "Tic-Tac-Toe demo", "dir": "../examples/tictactoe/ail" }
+    ]
+  }
 }

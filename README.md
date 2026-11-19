@@ -113,8 +113,8 @@ The full design is in [docs/proposal.md](docs/proposal.md).
 src/                 the ail CLI and MCP server (Bun, TypeScript)
 prompts/             instructions given to the compiling model
 skills/ commands/ agents/ hooks/ .claude-plugin/    the Claude Code plugin
-examples/tictactoe/  the demo: spec, generated code, derived checks, lock file
-site/                the website, written in AIL
+examples/tictactoe/  the demo: spec in ail/, generated code, derived checks, lock file
+site/                the website, written in AIL (spec in site/ail/); its spec browser shows both example specs in a read-only Monaco editor
 tests/               toolchain tests
 ```
 

@@ -1,4 +1,4 @@
-// ail-derived-from: StopResult@59233776b3ce7e51
+// ail-derived-from: StopResult@d5b0eea494c67825
 import { afterEach, expect, test } from "bun:test";
 import { cleanup, render, screen, within } from "@testing-library/react";
 import { StopResult } from "../../../../src/gen/home/journey/stops/stop-result";
@@ -7,19 +7,13 @@ afterEach(() => {
   cleanup();
 });
 
-function getStop(): HTMLElement {
-  const articles = screen.getAllByRole("article");
-  const stop = articles.find((a) => a.id === "stop-8");
-  if (!stop) {
-    throw new Error('No article with id "stop-8"');
-  }
-  return stop;
-}
-
 test("the result", () => {
-  render(<StopResult />);
+  const { container } = render(<StopResult />);
 
-  const stop = getStop();
+  const article = container.querySelector("article#stop-8");
+  expect(article).not.toBeNull();
+  const stop = article as HTMLElement;
+
   expect(
     within(stop).getByRole("heading", {
       level: 3,
@@ -27,16 +21,21 @@ test("the result", () => {
     }),
   ).toBeTruthy();
 
+  const line = "    4. The computer never loses.";
+  const mark = "The computer never loses.";
   const region = screen.getByRole("region", {
     name: "The promise, one last time",
   });
-  expect(region.textContent ?? "").toContain("    4. The computer never loses.");
+  expect(region.textContent ?? "").toContain(line);
 
-  const mark = "The computer never loses.";
   const highlighted = Array.from(region.querySelectorAll("*")).filter(
-    (el) => (el.textContent ?? "") === mark,
+    (el) => el.textContent === mark,
   );
   expect(highlighted.length).toBeGreaterThan(0);
+  const parentOfHighlight = highlighted[0].parentElement;
+  expect(parentOfHighlight).not.toBeNull();
+  expect((parentOfHighlight as HTMLElement).textContent ?? "").toContain(line);
+  expect((parentOfHighlight as HTMLElement).textContent).not.toBe(mark);
 
   expect(stop.textContent ?? "").toContain(
     "Apart from a short index.html, none of its code was written by hand.",

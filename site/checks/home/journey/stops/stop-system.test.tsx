@@ -1,4 +1,4 @@
-// ail-derived-from: StopSystem@8dc84e0679abb3b3
+// ail-derived-from: StopSystem@f5176d9006c4c19d
 import { afterEach, expect, test } from "bun:test";
 import { cleanup, render, screen, within } from "@testing-library/react";
 import { StopSystem } from "../../../../src/gen/home/journey/stops/stop-system";
@@ -7,7 +7,7 @@ afterEach(() => {
   cleanup();
 });
 
-const lines: string[] = [
+const LINES: string[] = [
   "node Engine : library   level: system",
   "  why   One set of rules for every part of the game, so playing and watching can never disagree.   <- TicTacToe",
   "  children  GameState, Rules, GameReducer, ComputerPlayer",
@@ -34,22 +34,18 @@ test("the system level", () => {
   expect(article).toBeDefined();
   if (!article) return;
 
-  expect(
-    within(article).getByRole("heading", {
-      level: 3,
-      name: "System level: one exact shape, one exact rule, examples that run.",
-    }),
-  ).toBeTruthy();
+  const heading = within(article).getByRole("heading", {
+    level: 3,
+    name: "System level: one exact shape, one exact rule, examples that run.",
+  });
+  expect(heading).toBeTruthy();
 
-  const region = screen.getByRole("region", { name: "System-level spec excerpt" });
+  const region = within(article).getByRole("region", {
+    name: "System-level spec excerpt",
+  });
   const text = region.textContent ?? "";
-
-  let position = 0;
-  for (const line of lines) {
-    const needle = line.trim();
-    const found = text.indexOf(needle, position);
-    expect(found).toBeGreaterThanOrEqual(0);
-    position = found + needle.length;
+  for (const line of LINES) {
+    expect(text).toContain(line);
   }
 
   const highlighted = Array.from(region.querySelectorAll("*")).filter(

@@ -90,13 +90,23 @@ bundled GitHub Action:
 
 ## Starting a new project
 
-A project is any folder with an `ail.config.json`:
+A project is any folder with an `ail.config.json`. Keep the spec in its own
+folder:
 
 ```json
-{ "sources": ["**/*.ail.md"] }
+{ "specRoot": "ail" }
 ```
 
-…and a root spec file with a `target` (what to generate, and the conventions
+```
+my-app/
+  ail.config.json
+  ail/            the spec: every .ail.md file, nothing else
+  src/gen/        generated code, mirroring ail/'s folders
+  checks/         derived checks, mirroring ail/'s folders
+  index.html      hand-written
+```
+
+The root spec file (e.g. `ail/my-app.ail.md`) holds a `target` (what to generate, and the conventions
 to follow), the design tokens, and the root node with its entry point:
 
 ````md

@@ -1,4 +1,4 @@
-// ail-derived-from: StopIdea@2dde26ee4cdb1910
+// ail-derived-from: StopIdea@11e907f9a9104e5e
 import { afterEach, expect, test } from "bun:test";
 import { cleanup, render, screen, within } from "@testing-library/react";
 import { StopIdea } from "../../../../src/gen/home/journey/stops/stop-idea";
@@ -10,11 +10,15 @@ afterEach(() => {
 test("the idea", () => {
   render(<StopIdea />);
 
-  const article = screen
-    .getAllByRole("article")
-    .find((el) => el.id === "stop-1");
-  expect(article).toBeDefined();
-  if (!article) return;
+  const article = document.getElementById("stop-1");
+  expect(article).not.toBeNull();
+  if (article === null) {
+    return;
+  }
+  const isArticle =
+    article.tagName.toLowerCase() === "article" ||
+    article.getAttribute("role") === "article";
+  expect(isArticle).toBe(true);
 
   const heading = within(article).getByRole("heading", {
     level: 3,
@@ -22,9 +26,11 @@ test("the idea", () => {
   });
   expect(heading).toBeTruthy();
 
-  const region = screen.getByRole("region", {
+  const region = within(article).getByRole("region", {
     name: "The idea, at the top of the spec",
   });
+  expect(screen.getByRole("region", { name: "The idea, at the top of the spec" })).toBe(region);
+
   const text = region.textContent ?? "";
   const lines = [
     "  why   A quick, familiar game people can finish in under a minute,",
@@ -32,8 +38,11 @@ test("the idea", () => {
     "  …",
     "    4. The computer never loses.",
   ];
+  let from = 0;
   for (const line of lines) {
-    expect(text).toContain(line.trim());
+    const at = text.indexOf(line, from);
+    expect(at).toBeGreaterThanOrEqual(0);
+    from = at + line.length;
   }
 
   const highlighted = Array.from(region.querySelectorAll("*")).filter(

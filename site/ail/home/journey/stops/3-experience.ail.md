@@ -10,7 +10,7 @@ node StopExperience : view   level: experience
       Then the article "stop-3" has the level 3 heading "Experience level: what the player sees, as scenarios anyone can test."
       And the region named "Experience-level spec excerpt" shows its eleven lines, with "the computer places an O" highlighted
   look
-    stop     JourneyStop with number 3, color color.level.experience, figure ExperienceFigure
+    stop     JourneyStop with number 3, color color.level.experience, figure ExperienceFigure, browse "#spec/tictactoe/app/play/play.ail.md"
   copy
     experience.depth     "depth 2"
     experience.chip      "EXPERIENCE"
@@ -18,7 +18,7 @@ node StopExperience : view   level: experience
     experience.headline  "Experience level: what the player sees, as scenarios anyone can test."
     experience.body      "One level down, the play screen describes the computer's answer as a Given / When / Then scenario. Decisions record why, and what was rejected: the computer waits 300 ms, so the player's own move feels like it counted."
     experience.label     "Experience-level spec excerpt"
-    experience.file      "examples/tictactoe/app/play/play.ail.md"
+    experience.file      "examples/tictactoe/ail/app/play/play.ail.md"
     experience.line.1    "node PlayAGame : flow   level: experience"
     experience.line.2    "  …"
     experience.line.3    "    Scenario: the computer answers"

@@ -13,13 +13,40 @@ import { oracleHash } from "./hash.ts";
 
 import { fileHash, readLock } from "./lock.ts";
 import type { AilNode } from "./parse.ts";
-import { AIL_HOME, isCompilable, kebab, modulePath, topoByUses, type Project } from "./project.ts";
+import { AIL_HOME, isCompilable, kebab, modulePath, specModulePath, topoByUses, type Project } from "./project.ts";
 
 export interface Check { kind: string; ok: boolean; severity: "error" | "warning"; detail: string }
 export interface VerifyResult { node: string; ok: boolean; checks: Check[] }
 
 const pass = (kind: string, detail = ""): Check => ({ kind, ok: true, severity: "error", detail });
 const fail = (kind: string, detail: string, severity: "error" | "warning" = "error"): Check => ({ kind, ok: false, severity, detail });
+
+/**
+ * The failures of a run, without passing tests or file noise: what a retry needs.
+ * Each failed test keeps its name, its error and the expected/received diff;
+ * source frames and stack lines outside the generated code are dropped.
+ */
+export function errorExcerpt(output: string, maxLines = 60): string {
+  const lines = output.split("\n");
+  const out: string[] = [];
+  let block: string[] = [];
+  let inError = false;
+  const flush = (name?: string) => { if (name) out.push(name); out.push(...block); block = []; inError = false; };
+  for (const raw of lines) {
+    const l = raw.trimEnd();
+    if (/^\(fail\)/.test(l)) { flush(l); continue; }
+    if (/^\(pass\)|^\(skip\)|^\(todo\)/.test(l)) { block = []; inError = false; continue; }
+    if (/^\s*error: react-stack-top-frame/.test(l)) continue;
+    if (/^\s*(error:|TypeError:|ReferenceError:|SyntaxError:)/.test(l)) { inError = true; block.push(l); continue; }
+    if (!inError) continue;
+    if (/^\s+at /.test(l)) { if (/src\/gen|checks\//.test(l)) block.push(l); continue; }
+    if (/^\s*\d+\s*\|/.test(l) || /^\s*\^\s*$/.test(l) || l.trim() === "") continue; // source frame
+    block.push(l.length > 200 ? l.slice(0, 200) + "…" : l);
+  }
+  // Errors with no test around them (e.g. a module that fails to load).
+  out.push(...block);
+  return out.slice(0, maxLines).join("\n");
+}
 
 export function runBunTest(cwd: string, files: string[]): { ok: boolean; failures: string[]; passes: number; output: string } {
   const r = Bun.spawnSync(["bun", "test", ...files.map((f) => (f.startsWith("/") ? f : "./" + f))], {
@@ -38,6 +65,8 @@ function allowedImports(p: Project, n: AilNode): { relative: Set<string>; packag
   for (const u of n.uses) { const d = p.nodes.get(u); const mp = d && modulePath(p, d); if (mp) rel.add(strip(mp)); }
   const s = p.target?.settings ?? {};
   if (s["tokens-css"]) rel.add(strip(s["tokens-css"]));
+  const sm = specModulePath(p);
+  if (sm) rel.add(strip(sm));
   return { relative: rel, packages: (s["libs"] ?? "").split(/[\s,]+/).filter(Boolean) };
 }
 
@@ -128,7 +157,7 @@ export function verifyNode(p: Project, n: AilNode, opts: { checkDrift?: boolean 
   if (testFiles.length) {
     const r = runBunTest(p.root, testFiles);
     if (r.ok) checks.push(pass("tests", `${r.passes} passed`));
-    else checks.push(fail("tests", r.failures.length ? r.failures.map((f) => "✗ " + f).join("\n") : r.output.trim().split("\n").slice(-25).join("\n")));
+    else checks.push(fail("tests", r.failures.length ? `${r.failures.map((f) => "✗ " + f).join("\n")}\n${errorExcerpt(r.output)}` : r.output.trim().split("\n").slice(-25).join("\n")));
   }
   return { node: n.name, ok: checks.every((c) => c.ok || c.severity === "warning"), checks };
 }

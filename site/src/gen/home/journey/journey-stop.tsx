@@ -2,8 +2,7 @@ import type { ReactNode } from "react";
 import { Stack } from "../../parts/stack";
 import { CodeBlock } from "../../parts/code-block";
 
-/** "number: number, color: token name, depth: string, chip: string, reader: string, headline: string, explanation: string, lines: string[], label: string, file: string, highlight: string[], turnsInto: string, figure: React node, last?: boolean" */
-export type JourneyStopProps = {
+type JourneyStopProps = {
   number: number;
   color: string;
   depth: string;
@@ -18,6 +17,7 @@ export type JourneyStopProps = {
   turnsInto: string;
   figure: ReactNode;
   last?: boolean;
+  browse?: string;
 };
 
 /** "Every stop has the same anatomy, so the visitor compares levels instead of learning a new layout each time." */
@@ -36,9 +36,9 @@ export function JourneyStop({
   turnsInto,
   figure,
   last,
+  browse,
 }: JourneyStopProps) {
-  const stopColor = `var(--${color.split(".").join("-")})`;
-  const segmentEnd = last ? { height: "36px" } : { bottom: 0 };
+  const stopColor = `var(--${color.replace(/\./g, "-")})`;
   return (
     <article
       id={`stop-${number}`}
@@ -53,14 +53,25 @@ export function JourneyStop({
       <div style={{ gridColumn: 1, position: "relative" }}>
         <div
           aria-hidden="true"
-          style={{
-            position: "absolute",
-            left: "calc(clamp(32px, 9vw, 56px) / 2 - 2px)",
-            top: 0,
-            width: "4px",
-            background: stopColor,
-            ...segmentEnd,
-          }}
+          style={
+            last
+              ? {
+                  position: "absolute",
+                  left: "calc(clamp(32px, 9vw, 56px) / 2 - 2px)",
+                  top: 0,
+                  width: "4px",
+                  background: stopColor,
+                  height: "36px",
+                }
+              : {
+                  position: "absolute",
+                  left: "calc(clamp(32px, 9vw, 56px) / 2 - 2px)",
+                  top: 0,
+                  width: "4px",
+                  background: stopColor,
+                  bottom: 0,
+                }
+          }
         />
         <div
           aria-hidden="true"
@@ -82,7 +93,7 @@ export function JourneyStop({
             justifyContent: "center",
           }}
         >
-          {String(number)}
+          {number}
         </div>
         <div
           className="ail-wide"
@@ -180,6 +191,20 @@ export function JourneyStop({
           highlight={highlight}
           edge={color}
         />
+        {browse !== undefined ? (
+          <a
+            href={browse}
+            style={{
+              alignSelf: "flex-start",
+              fontSize: "var(--font-small)",
+              fontWeight: 600,
+              color: "var(--color-accent)",
+              textDecoration: "none",
+            }}
+          >
+            Open the whole file in the spec browser ↓
+          </a>
+        ) : null}
         <p
           style={{
             maxWidth: "var(--width-prose)",
@@ -192,10 +217,7 @@ export function JourneyStop({
             margin: 0,
           }}
         >
-          <span style={{ fontWeight: 700, color: "var(--color-accent)" }}>
-            Turns into:
-          </span>
-          {" "}
+          <span style={{ fontWeight: 700, color: "var(--color-accent)" }}>Turns into:</span>{" "}
           {turnsInto}
         </p>
       </Stack>

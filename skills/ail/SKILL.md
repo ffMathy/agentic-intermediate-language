@@ -56,6 +56,8 @@ or `binds`, or move it one level down. Define domain words once in the
 `glossary`.
 
 ## Folders, splitting and reuse
+- The spec lives in its own folder (the config's `specRoot`, usually `ail/`),
+  with nothing else in it. Generated code and checks sit outside it.
 - A node lives in its parent's folder or below it, so the folders read like the
   tree. Generated code mirrors the folders.
 - A node over the size budget gets split into children in a subfolder named

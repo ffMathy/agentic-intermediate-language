@@ -16,7 +16,7 @@ node Footer : view   level: experience
     links     a nav element; stack(h, gap: space.4, align: center, wrap: true) [ github, proposal, guide, spec ]
     link      color color.code.text, weight 600, underline
   copy
-    footer.text      "This page was compiled from site/*.ail.md, and the game from examples/tictactoe/*.ail.md. Apart from the spec and a short index.html, nothing in either was written by hand."
+    footer.text      "This page was compiled from the spec in site/ail/, and the game from the spec in examples/tictactoe/ail/. Apart from the spec and a short index.html, nothing in either was written by hand."
     footer.nav       "More about AIL"
     footer.github    "GitHub"
     footer.proposal  "Design proposal"

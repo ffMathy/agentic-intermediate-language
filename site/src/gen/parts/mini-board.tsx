@@ -1,4 +1,4 @@
-export type MiniBoardProps = {
+type MiniBoardProps = {
   x: number;
   y: number;
   cell: number;
@@ -7,8 +7,8 @@ export type MiniBoardProps = {
   numbers?: boolean;
 };
 
-/** "draws a 3 by 3 board inside a larger picture, at the position and size it is given" */
-export function MiniBoard({ x, y, cell, marks, highlight = [], numbers = false }: MiniBoardProps) {
+/** draws a 3 by 3 board inside a larger picture, at the position and size it is given */
+export function MiniBoard({ x, y, cell, marks, highlight, numbers }: MiniBoardProps) {
   const squares = [0, 1, 2, 3, 4, 5, 6, 7, 8];
   return (
     <g>
@@ -20,7 +20,7 @@ export function MiniBoard({ x, y, cell, marks, highlight = [], numbers = false }
         const cx = left + cell / 2;
         const cy = top + cell / 2;
         const mark = marks.charAt(i);
-        const lit = highlight.includes(i);
+        const lit = highlight !== undefined && highlight.includes(i);
         return (
           <g key={i}>
             <rect
@@ -28,10 +28,10 @@ export function MiniBoard({ x, y, cell, marks, highlight = [], numbers = false }
               y={top}
               width={cell}
               height={cell}
-              strokeWidth={1.5}
               style={{
                 fill: lit ? "var(--color-thread)" : "var(--color-surface)",
                 stroke: "var(--color-border)",
+                strokeWidth: 1.5,
               }}
             />
             {mark === "X" || mark === "O" ? (
@@ -40,10 +40,10 @@ export function MiniBoard({ x, y, cell, marks, highlight = [], numbers = false }
                 y={cy}
                 textAnchor="middle"
                 dominantBaseline="central"
-                fontSize={cell * 0.62}
                 style={{
                   fontFamily: "var(--font-sans)",
                   fontWeight: 800,
+                  fontSize: cell * 0.62,
                   fill: mark === "X" ? "var(--color-player-x)" : "var(--color-player-o)",
                 }}
               >
@@ -55,9 +55,9 @@ export function MiniBoard({ x, y, cell, marks, highlight = [], numbers = false }
                 y={cy}
                 textAnchor="middle"
                 dominantBaseline="central"
-                fontSize={cell * 0.36}
                 style={{
                   fontFamily: "var(--font-mono)",
+                  fontSize: cell * 0.36,
                   fill: "var(--color-text-muted)",
                 }}
               >

@@ -6,7 +6,7 @@
 // `how` or code. Encapsulation is enforced by construction.
 import { dirname, relative } from "node:path";
 import type { AilNode } from "./parse.ts";
-import { ancestors, modulePath, type Project } from "./project.ts";
+import { ancestors, modulePath, specModulePath, type Project } from "./project.ts";
 import { checkHeader, checkPath, derivedCheckFile, loadPrompt, needsDerivedCheck } from "./verify.ts";
 import { oracleHash } from "./hash.ts";
 
@@ -23,6 +23,15 @@ export function whatOnly(n: AilNode): string {
   const header = n.raw[0]!;
   const visible = n.sections.filter((s) => s.key === "what" || s.key === "binds");
   return [header, ...(visible.length ? visible.flatMap((s) => s.raw) : ["  ; (no public contract)"])].join("\n");
+}
+
+/** Where a derived check imports from: its paths differ from the module's, since it lives elsewhere. */
+export function checkImports(p: Project, n: AilNode, check: string): string {
+  const mp = modulePath(p, n), sm = specModulePath(p);
+  return [
+    mp ? `From ${check}, import the module under test from "${importSpecifier(check, mp)}".` : "",
+    sm ? `Import spec files, if needed, from "${importSpecifier(check, sm)}" (not the module's own path to it).` : "",
+  ].filter(Boolean).join(" ");
 }
 
 export function buildContext(p: Project, n: AilNode): string {
@@ -42,6 +51,11 @@ export function buildContext(p: Project, n: AilNode): string {
     out.push(Object.entries(p.tokens).map(([k, v]) => (v ? `${k}=${v}` : k)).join("  "));
     const css = p.target?.settings["tokens-css"];
     if (css) out.push(`They are CSS variables defined in ${css}: token a.b.c → var(--a-b-c).`);
+  }
+  const sm = specModulePath(p);
+  if (sm && path) {
+    out.push(`\n## Spec files, as data`);
+    out.push(`"${importSpecifier(path, sm)}" exports specProjects: one entry per project ({ key, name, nodeCount, files }), where files is every spec file ({ path, text }), paths relative to that project's spec folder, in explorer order (within each folder, its own files first, then its subfolders, each by name). Import it only if this node's spec shows spec files.`);
   }
   if (p.glossary.length) {
     out.push(`\n## Glossary`);
@@ -72,7 +86,7 @@ export function buildContext(p: Project, n: AilNode): string {
     if (!file || pinned !== oracleHash(p, n).slice(0, 16)) {
       const rel = checkPath(p, n);
       out.push(`\n## Derived check needed`);
-      out.push(`This node's scenarios / verify items have no current derived check. Write ${rel} as well, and submit it together with the module. It imports the module relative to itself and starts with the line:\n${checkHeader(p, n)}\n\n${loadPrompt("derive-checks")}`);
+      out.push(`This node's scenarios / verify items have no current derived check. Write ${rel} as well, and submit it together with the module. ${checkImports(p, n, rel)} It starts with the line:\n${checkHeader(p, n)}\n\n${loadPrompt("derive-checks")}`);
     }
   }
 

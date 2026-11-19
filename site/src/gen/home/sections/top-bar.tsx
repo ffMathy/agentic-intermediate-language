@@ -8,15 +8,7 @@ const linkStyle = {
   padding: "var(--space-1) 0",
 };
 
-const links = [
-  { href: "#journey", text: "The journey" },
-  { href: "#readers", text: "Four readers" },
-  { href: "#loop", text: "How it builds" },
-  { href: "#start", text: "Get started" },
-  { href: "https://github.com/ffMathy/agentic-intermediate-language", text: "GitHub ↗" },
-];
-
-/** the name of the project on the left, and five links on the right */
+/** TopBar: "the name of the project on the left, and six links on the right" */
 export function TopBar() {
   return (
     <header
@@ -34,7 +26,10 @@ export function TopBar() {
         align="center"
         justify="between"
         wrap={true}
-        style={{ maxWidth: "var(--width-content)", margin: "0 auto" }}
+        style={{
+          maxWidth: "var(--width-content)",
+          margin: "0 auto",
+        }}
       >
         <Stack dir="h" gap="space.2" align="center" wrap={true}>
           <span
@@ -48,17 +43,38 @@ export function TopBar() {
           >
             AIL
           </span>
-          <span style={{ fontSize: "var(--font-small)", color: "var(--color-text-muted)" }}>
+          <span
+            style={{
+              fontSize: "var(--font-small)",
+              color: "var(--color-text-muted)",
+            }}
+          >
             Agentic Intermediate Language
           </span>
         </Stack>
         <nav aria-label="Sections">
           <Stack dir="h" gap="space.4" align="center" wrap={true}>
-            {links.map((link) => (
-              <a key={link.href} href={link.href} style={linkStyle}>
-                {link.text}
-              </a>
-            ))}
+            <a href="#journey" style={linkStyle}>
+              The journey
+            </a>
+            <a href="#readers" style={linkStyle}>
+              Four readers
+            </a>
+            <a href="#loop" style={linkStyle}>
+              How it builds
+            </a>
+            <a href="#specs" style={linkStyle}>
+              Browse the specs
+            </a>
+            <a href="#start" style={linkStyle}>
+              Get started
+            </a>
+            <a
+              href="https://github.com/ffMathy/agentic-intermediate-language"
+              style={linkStyle}
+            >
+              GitHub ↗
+            </a>
           </Stack>
         </nav>
       </Stack>

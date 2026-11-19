@@ -12,14 +12,14 @@ node HomePage : view   level: experience
     Scenario: one story, in order
       Given the page is open
       Then the level 1 heading reads "Write one sentence. Watch it become working software."
-      And the level 2 headings read "Between a prompt and the code, there is nothing to review.", "Follow one sentence all the way down", "One spec, four readers", "How a spec becomes code you can trust" and "Start in two minutes", in that order
+      And the level 2 headings read "Between a prompt and the code, there is nothing to review.", "Follow one sentence all the way down", "One spec, four readers", "How a spec becomes code you can trust", "Browse the specs" and "Start in two minutes", in that order
     Scenario: every top bar link has a place to land
       Given the page is open
-      Then the page has elements with the ids "journey", "readers", "loop" and "start"
+      Then the page has elements with the ids "journey", "readers", "loop", "specs" and "start"
   look
     page     a div: background color.page, color color.text, font.sans at font.body, line-height 1.6, min-height 100vh
     layout   [ TopBar, main, Footer ]
-    main     a main element holding [ Hero, GapStrip, Journey, Readers, BuildLoop, GetStarted ], with no gaps between them; each section brings its own padding
-  uses      TopBar, Hero, GapStrip, Journey, Readers, BuildLoop, GetStarted, Footer
-  children  TopBar, Hero, GapStrip, Journey, Readers, BuildLoop, GetStarted, Footer
+    main     a main element holding [ Hero, GapStrip, Journey, Readers, BuildLoop, SpecBrowser, GetStarted ], with no gaps between them; each section brings its own padding
+  uses      TopBar, Hero, GapStrip, Journey, Readers, BuildLoop, SpecBrowser, GetStarted, Footer
+  children  TopBar, Hero, GapStrip, Journey, Readers, BuildLoop, SpecBrowser, GetStarted, Footer
 ```

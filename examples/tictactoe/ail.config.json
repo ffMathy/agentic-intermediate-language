@@ -1,9 +1,4 @@
 {
-  "sources": [
-    "**/*.ail.md"
-  ],
-  "profilePaths": [
-    "../../profiles"
-  ],
+  "specRoot": "ail",
   "checksDir": "checks"
 }

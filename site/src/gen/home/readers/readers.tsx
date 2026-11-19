@@ -1,4 +1,5 @@
-import { useState } from "react";
+import { useRef, useState } from "react";
+import type { KeyboardEvent } from "react";
 import { Section } from "../../parts/section";
 import { SectionHeading } from "../../parts/section-heading";
 import { Stack } from "../../parts/stack";
@@ -8,55 +9,66 @@ type Reader = "stakeholder" | "design" | "engineer" | "specialist";
 
 const order: Reader[] = ["stakeholder", "design", "engineer", "specialist"];
 
-const names: Record<Reader, string> = {
-  stakeholder: "Stakeholder",
-  design: "Design",
-  engineer: "Engineer",
-  specialist: "Specialist",
+const content: Record<
+  Reader,
+  { name: string; level: string; text: string; cmd: string; color: string }
+> = {
+  stakeholder: {
+    name: "Stakeholder",
+    level: "PRODUCT LEVEL",
+    text: "Reads the six promises at the top and the scenarios under them in plain words, and can sign off on “The computer never loses.” without reading any code.",
+    cmd: "ail show stakeholder",
+    color: "var(--color-level-product)",
+  },
+  design: {
+    name: "Design",
+    level: "EXPERIENCE LEVEL",
+    text: "Reads the scenarios, the layout in design tokens, and every word on screen, such as “X's turn”, “X wins!” and “New game”.",
+    cmd: "ail show design",
+    color: "var(--color-level-experience)",
+  },
+  engineer: {
+    name: "Engineer",
+    level: "SYSTEM LEVEL",
+    text: "Reads everything down to the contracts, with the specialists' how folded away: the types, and the examples that run as tests, such as evaluate(boardFrom(\"XOX/XOO/OXX\")) => ({ kind: \"draw\" }).",
+    cmd: "ail show engineer",
+    color: "var(--color-level-system)",
+  },
+  specialist: {
+    name: "Specialist",
+    level: "SPECIALIST LEVEL",
+    text: "Reads the algorithm, its invariant and how it is proved: full minimax, memoized by board, checked against every possible game.",
+    cmd: "ail show specialist ai",
+    color: "var(--color-level-specialist)",
+  },
 };
 
-const levels: Record<Reader, string> = {
-  stakeholder: "PRODUCT LEVEL",
-  design: "EXPERIENCE LEVEL",
-  engineer: "SYSTEM LEVEL",
-  specialist: "SPECIALIST LEVEL",
-};
-
-const texts: Record<Reader, string> = {
-  stakeholder:
-    "Reads the six promises at the top and the scenarios under them in plain words, and can sign off on “The computer never loses.” without reading any code.",
-  design:
-    "Reads the scenarios, the layout in design tokens, and every word on screen, such as “X's turn”, “X wins!” and “New game”.",
-  engineer:
-    "Reads everything down to the contracts, with the specialists' how folded away: the types, and the examples that run as tests, such as evaluate(boardFrom(\"XOX/XOO/OXX\")) => ({ kind: \"draw\" }).",
-  specialist:
-    "Reads the algorithm, its invariant and how it is proved: full minimax, memoized by board, checked against every possible game.",
-};
-
-const commands: Record<Reader, string> = {
-  stakeholder: "ail show stakeholder",
-  design: "ail show design",
-  engineer: "ail show engineer",
-  specialist: "ail show specialist ai",
-};
-
-const colors: Record<Reader, string> = {
-  stakeholder: "var(--color-level-product)",
-  design: "var(--color-level-experience)",
-  engineer: "var(--color-level-system)",
-  specialist: "var(--color-level-specialist)",
-};
-
-/** "four tabs, "Stakeholder", "Design", "Engineer" and "Specialist", named together as "Readers"; "Stakeholder" is picked first" */
+/** Explain why levels exist: each level of the tree is written for one kind of reader, and each reader's view goes only as deep as they need. */
 export function Readers() {
   const [reader, setReader] = useState<Reader>("stakeholder");
+  const tabRefs = useRef<Record<Reader, HTMLButtonElement | null>>({
+    stakeholder: null,
+    design: null,
+    engineer: null,
+    specialist: null,
+  });
 
-  const move = (from: Reader, step: number) => {
-    const index = order.indexOf(from);
-    const next = order[(index + step + order.length) % order.length];
-    setReader(next);
-    document.getElementById(`reader-tab-${next}`)?.focus();
+  const onKeyDown = (event: KeyboardEvent<HTMLButtonElement>, key: Reader) => {
+    const index = order.indexOf(key);
+    let next: Reader | null = null;
+    if (event.key === "ArrowRight") {
+      next = order[(index + 1) % order.length];
+    } else if (event.key === "ArrowLeft") {
+      next = order[(index - 1 + order.length) % order.length];
+    }
+    if (next !== null) {
+      event.preventDefault();
+      setReader(next);
+      tabRefs.current[next]?.focus();
+    }
   };
+
+  const picked = content[reader];
 
   return (
     <Section id="readers" tone="raised">
@@ -67,24 +79,22 @@ export function Readers() {
       <div role="tablist" aria-label="Readers">
         <Stack dir="h" gap="space.2" align="center" wrap={true}>
           {order.map((key) => {
-            const picked = key === reader;
+            const isPicked = key === reader;
+            const c = content[key];
             return (
               <button
                 key={key}
                 type="button"
+                ref={(el) => {
+                  tabRefs.current[key] = el;
+                }}
                 role="tab"
                 id={`reader-tab-${key}`}
-                aria-selected={picked}
+                aria-selected={isPicked}
                 aria-controls="reader-panel"
-                tabIndex={picked ? 0 : -1}
+                tabIndex={isPicked ? 0 : -1}
                 onClick={() => setReader(key)}
-                onKeyDown={(event) => {
-                  if (event.key === "ArrowRight") {
-                    move(key, 1);
-                  } else if (event.key === "ArrowLeft") {
-                    move(key, -1);
-                  }
-                }}
+                onKeyDown={(event) => onKeyDown(event, key)}
                 style={{
                   height: "40px",
                   padding: "0 var(--space-4)",
@@ -93,16 +103,16 @@ export function Readers() {
                   fontSize: "var(--font-small)",
                   fontWeight: 600,
                   cursor: "pointer",
-                  background: picked ? colors[key] : "var(--color-surface)",
-                  border: picked
-                    ? `1px solid ${colors[key]}`
+                  background: isPicked ? c.color : "var(--color-surface)",
+                  border: isPicked
+                    ? `1px solid ${c.color}`
                     : "1px solid var(--color-border)",
-                  color: picked
+                  color: isPicked
                     ? "var(--color-on-accent)"
                     : "var(--color-text)",
                 }}
               >
-                {names[key]}
+                {c.name}
               </button>
             );
           })}
@@ -125,10 +135,10 @@ export function Readers() {
               fontSize: "var(--font-micro)",
               fontWeight: 700,
               letterSpacing: "0.08em",
-              color: colors[reader],
+              color: picked.color,
             }}
           >
-            {levels[reader]}
+            {picked.level}
           </div>
           <p
             style={{
@@ -139,7 +149,7 @@ export function Readers() {
               margin: 0,
             }}
           >
-            {texts[reader]}
+            {picked.text}
           </p>
           <code
             style={{
@@ -152,7 +162,7 @@ export function Readers() {
               padding: "var(--space-1) var(--space-2)",
             }}
           >
-            {commands[reader]}
+            {picked.cmd}
           </code>
           <ReadersTree reader={reader} />
         </Stack>

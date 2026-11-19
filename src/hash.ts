@@ -5,7 +5,7 @@
 // meaning hash the same, so cosmetic edits never trigger recompilation.
 import { createHash } from "node:crypto";
 import type { AilNode, Section } from "./parse.ts";
-import { ancestors, modulePath, type Project } from "./project.ts";
+import { ancestors, modulePath, specModulePath, type Project } from "./project.ts";
 
 export const sha256 = (s: string) => createHash("sha256").update(s).digest("hex");
 
@@ -65,6 +65,8 @@ export function compileHash(p: Project, n: AilNode): string {
     ...ancestors(p, n.name).map((a) => canonicalNode(a, ["why"])),
     canonicalNode(n),
     `at ${modulePath(p, n) ?? "-"}`,
+    // The spec module's location is in every context when configured.
+    ...(specModulePath(p) ? [`spec module at ${specModulePath(p)}`] : []),
     ...deps.map((d) => `${contractOf(d)}\nat ${modulePath(p, d) ?? "-"}`).sort(),
   ].join("\n---\n"));
 }

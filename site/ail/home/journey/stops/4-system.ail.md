@@ -10,7 +10,7 @@ node StopSystem : view   level: experience
       Then the article "stop-4" has the level 3 heading "System level: one exact shape, one exact rule, examples that run."
       And the region named "System-level spec excerpt" shows its fifteen lines, with "ComputerPlayer" highlighted
   look
-    stop     JourneyStop with number 4, color color.level.system, figure SystemFigure
+    stop     JourneyStop with number 4, color color.level.system, figure SystemFigure, browse "#spec/tictactoe/engine/engine.ail.md"
   copy
     system.depth     "depth 3"
     system.chip      "SYSTEM"
@@ -18,7 +18,7 @@ node StopSystem : view   level: experience
     system.headline  "System level: one exact shape, one exact rule, examples that run."
     system.body      "To prove anything about every game, the engine needs one exact board and one definition of a win. Prose gives way to types and examples, and every example line becomes a unit test, word for word. Playing and watching share this engine, so they can never disagree."
     system.label     "System-level spec excerpt"
-    system.file      "examples/tictactoe/engine/engine.ail.md"
+    system.file      "examples/tictactoe/ail/engine/engine.ail.md"
     system.line.1    "node Engine : library   level: system"
     system.line.2    "  why   One set of rules for every part of the game, so playing and watching can never disagree.   <- TicTacToe"
     system.line.3    "  children  GameState, Rules, GameReducer, ComputerPlayer"

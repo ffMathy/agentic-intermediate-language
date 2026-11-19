@@ -25,8 +25,11 @@ run.
    example the one with `aria-live`. Likewise, count things (marks on a
    board, items in a list) by role and accessible name, never by short text
    such as "X" that can appear elsewhere on the page.
-6. The first line is the `// ail-derived-from: Node@hash` header you were given.
-7. If a scenario can't be checked without guessing, reply with
+6. The test DOM (happy-dom) drops CSS functions such as clamp(), min() and
+   calc() from inline styles, so never assert on a style value that uses one.
+   Assert on plain values (px, vw, %) or on structure and text instead.
+7. The first line is the `// ail-derived-from: Node@hash` header you were given.
+8. If a scenario can't be checked without guessing, reply with
    `STOP: <question>`.
 
 ## Output

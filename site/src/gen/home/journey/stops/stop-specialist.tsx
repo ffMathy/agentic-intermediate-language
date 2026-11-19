@@ -30,13 +30,14 @@ export function StopSpecialist() {
         "                 and assert that no game ends in a win for X",
       ]}
       label="Specialist-level spec excerpt"
-      file="examples/tictactoe/engine/computer-player/computer-player.ail.md"
+      file="examples/tictactoe/ail/engine/computer-player/computer-player.ail.md"
       highlight={[
         "never loses",
         "no game against choose ends in a win for the other player",
       ]}
       turnsInto="A minimax search in TypeScript, and a check that plays every possible game against it."
       figure={<SpecialistFigure />}
+      browse="#spec/tictactoe/engine/computer-player/computer-player.ail.md"
     />
   );
 }

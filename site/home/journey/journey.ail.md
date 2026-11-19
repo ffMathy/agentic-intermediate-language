@@ -100,7 +100,7 @@ node JourneyStop : view   level: experience
     chip      a span: background the stop's color, color color.on.accent, font.micro, weight 700, letter-spacing 0.08em, radius.pill, pad space.1 space.3
     reader    font.small, color.text.muted
     headline  an h3: font.stop, weight 800, line-height 1.2, letter-spacing -0.01em, color.text, margin 0
-    body      a div: display grid, grid-template-columns repeat(auto-fit, minmax(min(300px, 100%), 1fr)), gap space.6, align-items center; holds explain, then figure
+    body      a div: display grid, grid-template-columns repeat(auto-fit, minmax(min(300px, 100%), 1fr)), gap space.6, align-items start; holds explain, then figure
     explain   a p: font.body, line-height 1.6, color.text.muted, max-width width.prose, margin 0
     excerpt   CodeBlock with lines, label, caption from file, highlight, and edge the stop's color
     turns     a p: max-width width.prose, background color.accent.soft, radius.md, pad space.2 space.4, font.small, line-height 1.5, color.text, margin 0; the label in weight 700 color.accent, then one space, then the text

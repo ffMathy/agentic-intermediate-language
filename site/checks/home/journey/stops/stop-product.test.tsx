@@ -1,4 +1,4 @@
-// ail-derived-from: StopProduct@1ed605e02afeef34
+// ail-derived-from: StopProduct@edc169f631bcc107
 import { afterEach, expect, test } from "bun:test";
 import { cleanup, render, screen, within } from "@testing-library/react";
 import { StopProduct } from "../../../../src/gen/home/journey/stops/stop-product";
@@ -24,27 +24,38 @@ const lines = [
 const marks = ["4. The computer never loses.", "refined-by: ComputerPlayer"];
 
 test("the product level", () => {
-  const { container } = render(<StopProduct />);
+  render(<StopProduct />);
 
-  const article = container.querySelector("article#stop-2");
-  expect(article).not.toBeNull();
-  const stop = article as HTMLElement;
+  const article = screen
+    .getAllByRole("article")
+    .find((el) => el.id === "stop-2");
+  expect(article).toBeDefined();
+  if (!article) return;
 
-  const heading = within(stop).getByRole("heading", {
+  const heading = within(article).getByRole("heading", {
     level: 3,
     name: "Product level: the sentence becomes a promise with an owner.",
   });
   expect(heading).toBeTruthy();
 
-  const region = screen.getByRole("region", { name: "Product-level spec excerpt" });
-  const regionText = region.textContent ?? "";
+  const region = within(article).getByRole("region", {
+    name: "Product-level spec excerpt",
+  });
+  const text = region.textContent ?? "";
+
+  let from = 0;
   for (const line of lines) {
-    expect(regionText).toContain(line.trim());
+    const at = text.indexOf(line, from);
+    expect(at).toBeGreaterThanOrEqual(0);
+    from = at + line.length;
   }
 
-  const elements = Array.from(region.querySelectorAll("*"));
+  const line7 = lines[6];
   for (const mark of marks) {
-    const highlighted = elements.filter((el) => (el.textContent ?? "").trim() === mark);
+    const highlighted = Array.from(region.querySelectorAll("*")).filter(
+      (el) => (el.textContent ?? "").trim() === mark,
+    );
     expect(highlighted.length).toBeGreaterThan(0);
+    expect(mark).not.toBe(line7);
   }
 });

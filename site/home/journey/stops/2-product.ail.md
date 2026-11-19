@@ -16,7 +16,7 @@ node StopProduct : view   level: experience
     product.chip      "PRODUCT"
     product.reader    "anyone: stakeholders, customers, the whole team"
     product.headline  "Product level: the sentence becomes a promise with an owner."
-    product.body      "In the root node, the sentence sits beside five other promises. Each one must name a deeper node that makes it true, and a check rejects jargon and code at this level, so anyone can review it."
+    product.body      "In the root node, the sentence sits beside five other promises. Each one must name a deeper node that makes it true, and a check rejects code notation at this level, so anyone can review it."
     product.label     "Product-level spec excerpt"
     product.file      "examples/tictactoe/tictactoe.ail.md"
     product.line.1    "node TicTacToe : system   level: product"

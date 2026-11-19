@@ -1,20 +1,20 @@
 name: AIL
-description: Run `ail build` on an AIL project (with nothing to compile it only checks that the spec is sound, the code is built from it, and every check passes), and review the spec changes in the job summary and, on pull requests, in a comment with screenshots.
+description: 'Run `ail build` on an AIL project (with nothing to compile it only checks that the spec is sound, the code is built from it, and every check passes), and review the spec changes in the job summary and, on pull requests, in a comment with screenshots.'
 inputs:
   project:
-    description: Directory containing ail.config.json
+    description: 'Directory containing ail.config.json'
     default: "."
   base:
-    description: Git ref to describe spec changes against (default origin/main when it exists; empty string to skip)
+    description: 'Git ref to describe spec changes against (default origin/main when it exists; empty string to skip)'
     default: "origin/main"
   screenshots:
-    description: On pull requests, screenshot the final screen of every scenario of changed nodes with a look, and of the nodes that use them
+    description: 'On pull requests, screenshot the final screen of every scenario of changed nodes with a look, and of the nodes that use them'
     default: "true"
   comment:
-    description: On pull requests, keep one comment per project up to date with the spec review and its screenshots. Needs `pull-requests: write`, and `contents: write` for screenshots (they are pushed to the `ail-shots` branch).
+    description: 'On pull requests, keep one comment per project up to date with the spec review and its screenshots. Needs `pull-requests: write`, and `contents: write` for screenshots (they are pushed to the `ail-shots` branch).'
     default: "true"
   token:
-    description: Token used to push screenshots and comment
+    description: 'Token used to push screenshots and comment'
     default: ${{ github.token }}
 runs:
   using: composite

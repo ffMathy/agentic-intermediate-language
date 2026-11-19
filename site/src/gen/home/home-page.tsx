@@ -5,11 +5,12 @@ import { TreeSection } from "./tree/tree-section";
 import { Journey } from "./journey/journey";
 import { Readers } from "./readers/readers";
 import { BuildLoop } from "./build-loop/build-loop";
+import { AdoptSection } from "./adopt/adopt-section";
 import { SpecBrowser } from "./sections/spec-browser";
 import { GetStarted } from "./sections/get-started";
 import { Footer } from "./sections/footer";
 
-/** One page that says what AIL is, shows it working on a real spec from the first sentence to the running game, and shows how to start. */
+/** "the parts appear in this order: TopBar, Hero, GapStrip, TreeSection, Journey, Readers, BuildLoop, AdoptSection, SpecBrowser, GetStarted, Footer" */
 export function HomePage() {
   return (
     <div
@@ -30,6 +31,7 @@ export function HomePage() {
         <Journey />
         <Readers />
         <BuildLoop />
+        <AdoptSection />
         <SpecBrowser />
         <GetStarted />
       </main>

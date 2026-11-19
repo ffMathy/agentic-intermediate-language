@@ -1,10 +1,26 @@
 {
   "version": 1,
   "nodes": {
-    "AIL": {
-      "hash": "de53c38e89291f94b6c70efc151d0576a2cf0d8732168aa460e888b66e3e4670",
+    "AdoptFigure": {
+      "hash": "edf1fc768bd80e2b677d707f6b84f4d14689e8a09c70190fdca2342d5df4fa99",
       "files": {
-        "src/gen/main.tsx": "047a881f79118dd33387b765e3a7d153903a2cbcfff5d8aecb0bf15574a5a09c"
+        "src/gen/home/adopt/adopt-figure.tsx": "66948a4c870c6860b51335ab1c319a3fbd3a0c69b850f42c1b466bb047c4bec5"
+      },
+      "by": "claude-code",
+      "look": "edf1fc768bd80e2b677d707f6b84f4d14689e8a09c70190fdca2342d5df4fa99"
+    },
+    "AdoptSection": {
+      "hash": "2a6392649789f6774a4395568229321c3f567298316b1ceafeb2c6a4a8e43083",
+      "files": {
+        "src/gen/home/adopt/adopt-section.tsx": "e466b191b85ff1aded21d99f4fd20c351cefc1660af05d1cfaef9ea8a46bf935"
+      },
+      "by": "claude-code",
+      "look": "2a6392649789f6774a4395568229321c3f567298316b1ceafeb2c6a4a8e43083"
+    },
+    "AIL": {
+      "hash": "c080a71cc648508a7975e79f8f6e2d9f1ef6eb942e5616e240e032f85ecd9ca2",
+      "files": {
+        "src/gen/main.tsx": "727c1ca781abe11f2d4f86df83f4d589405e624e3e84692216fdf74eabf96217"
       },
       "by": "claude-code"
     },
@@ -89,12 +105,12 @@
       "look": "3bd0c4b2a4492125d044fe3eb7a0ab954a611398be36f2ebeeeab94200114a0b"
     },
     "HomePage": {
-      "hash": "7a9de1a1e0cbdc0bded42010a9d1a1126269cc775161c663310aabd95fea9a31",
+      "hash": "f1f3f85053bc8f7464dc2cb98bf6d725c61e28730e8c68457e60cc83e50da567",
       "files": {
-        "src/gen/home/home-page.tsx": "a8471581275a28c466a61271c470c9f16d3498b14a320df94a02ea33868b3115"
+        "src/gen/home/home-page.tsx": "e0a2f3f03489c6e2aa4ec9b2102ef04cca7ba095fcff90b6f2b4370f8a5aea81"
       },
       "by": "claude-code",
-      "look": "7a9de1a1e0cbdc0bded42010a9d1a1126269cc775161c663310aabd95fea9a31"
+      "look": "f1f3f85053bc8f7464dc2cb98bf6d725c61e28730e8c68457e60cc83e50da567"
     },
     "IdeaFigure": {
       "hash": "709c4696627f578c033cc7b48cfef758c70614c20739641dedde9021cf03b146",
@@ -297,12 +313,12 @@
       "look": "acf15d8696ffa86503eb29c1df7ad493bce3ee3ddc60c5fd554ad4ef5a0cce9b"
     },
     "TopBar": {
-      "hash": "ab5ac214374d3875c8b8d23d78657a1d57ec571dea060af7185bdab0060c911d",
+      "hash": "6e6dcb8c0ae85447dff6c6c168aa7892fd1844443d1d4f1ab2096d9bb67ef1df",
       "files": {
-        "src/gen/home/sections/top-bar.tsx": "ad09d36364c12cc8b5e98f71d83026bf2d1d3038003d204fb799a8e3ffbf02f6"
+        "src/gen/home/sections/top-bar.tsx": "206b157e78dda00137786e15e8a30fa799594f20127a5af4ea791c6c87a92b6a"
       },
       "by": "claude-code",
-      "look": "ab5ac214374d3875c8b8d23d78657a1d57ec571dea060af7185bdab0060c911d"
+      "look": "6e6dcb8c0ae85447dff6c6c168aa7892fd1844443d1d4f1ab2096d9bb67ef1df"
     },
     "TreeFigure": {
       "hash": "fe7b29cf7160eb025ff239eb847ffaa1214852e37ec9be5d48fa2b075a58fd58",
@@ -322,7 +338,7 @@
     }
   },
   "glue": {
-    "src/gen/spec.ts": "60e8553e793ab32acc0a40fb9cac49517da655076274df5f8d05704898302bdd",
+    "src/gen/spec.ts": "ba951357ad0dc4914367b77089297710c42964bb87db1791acaab1c4f71a0bc2",
     "src/gen/tokens.css": "7bbb97ebb74409b3ed971ac9b054588620ec3b1652e3b22ce61e0ae8ddbcff31"
   }
 }

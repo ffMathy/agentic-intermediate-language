@@ -1,9 +1,11 @@
-// ail-derived-from: NewGameButton@eba34a1df940702e
+// ail-derived-from: NewGameButton@896079f16be83c2d
 import { afterEach, expect, mock, test } from "bun:test";
 import { cleanup, fireEvent, render, screen } from "@testing-library/react";
 import { NewGameButton } from "../../../src/gen/app/play/new-game-button";
 
-afterEach(cleanup);
+afterEach(() => {
+  cleanup();
+});
 
 test("pressing it", () => {
   const onPress = mock(() => {});

@@ -18,8 +18,15 @@ run.
    with `@testing-library/react` (`render`, `screen`, `fireEvent`, `act`,
    `cleanup`); call `cleanup()` in `afterEach`. Import the module under test
    relative to the check file.
-5. The first line is the `// ail-derived-from: Node@hash` header you were given.
-6. If a scenario can't be checked without guessing, reply with
+5. Text the spec composes from parts (a colored player mark followed by
+   "'s turn", a number next to a label) is split across elements. Never match
+   it with `getByText`, which only sees one element's own text. Read the
+   `textContent` of the element that contains the whole message instead, for
+   example the one with `aria-live`. Likewise, count things (marks on a
+   board, items in a list) by role and accessible name, never by short text
+   such as "X" that can appear elsewhere on the page.
+6. The first line is the `// ail-derived-from: Node@hash` header you were given.
+7. If a scenario can't be checked without guessing, reply with
    `STOP: <question>`.
 
 ## Output

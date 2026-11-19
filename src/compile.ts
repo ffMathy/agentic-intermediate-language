@@ -223,7 +223,8 @@ export async function compile(p: Project, names: string[], opts: CompileOptions)
         log(`${n.name}: attempt ${attempt} rejected\n${failures}`);
         prompt = `${compileTask(p, n)}\n\n## Your previous attempt was rejected\n${failures}\n\nPrevious attempt:\n${raw}`;
       }
-      return { node: n.name, status: "failed" as const, attempts: max, detail: "no attempt passed verification: the node may be under-specified or infeasible" };
+      const check = needsDerivedCheck(n) ? derivedCheckFile(p, n).file : null;
+      return { node: n.name, status: "failed" as const, attempts: max, detail: `no attempt passed verification: the node may be under-specified or infeasible${check ? `, or its derived check ${relative(p.root, check)} may itself be wrong (it was generated, so review it)` : ""}` };
     });
   };
   // Targets are in dependency order, so every dependency's promise exists before its dependants start.

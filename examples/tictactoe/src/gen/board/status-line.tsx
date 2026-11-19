@@ -1,26 +1,29 @@
-import { Text } from "../catalog";
 import type { Mark, Status } from "../engine/game-state";
+import { Text } from "../ui/text";
 
-function Player(props: { mark: Mark }) {
-  return <span style={{ color: props.mark === "X" ? "var(--color-player-x)" : "var(--color-player-o)" }}>{props.mark}</span>;
-}
-
-/** StatusLine: exactly one message — whose turn it is, who won, or that it's a draw. */
-export function StatusLine(props: { status: Status; next: Mark }) {
+/** shows exactly one message: whose turn it is, who won, or that it's a draw */
+export function StatusLine({ status, next }: { status: Status; next: Mark }) {
+  if (status.kind === "draw") {
+    return (
+      <Text variant="status" align="center" live="polite">
+        It's a draw
+      </Text>
+    );
+  }
+  const player = status.kind === "won" ? status.mark : next;
+  const playerPart = (
+    <span
+      style={{
+        color: player === "X" ? "var(--color-player-x)" : "var(--color-player-o)",
+      }}
+    >
+      {player}
+    </span>
+  );
   return (
     <Text variant="status" align="center" live="polite">
-      {props.status.kind === "draw" ? (
-        "It's a draw"
-      ) : props.status.kind === "won" ? (
-        <>
-          <Player mark={props.status.mark} /> wins!
-        </>
-      ) : (
-        <>
-          <Player mark={props.next} />
-          's turn
-        </>
-      )}
+      {playerPart}
+      {status.kind === "won" ? " wins!" : "'s turn"}
     </Text>
   );
 }

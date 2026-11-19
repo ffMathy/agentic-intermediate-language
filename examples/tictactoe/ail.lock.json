@@ -2,87 +2,119 @@
   "version": 1,
   "nodes": {
     "App": {
-      "hash": "b4894e5fd980bd334897312a6197062c6feab9f2ccace252033c2988896462ec",
+      "hash": "ae2e0b576c7b34d4f497d7be5146cac0466abfe43251fa15bdc4a96b7940b8b1",
       "files": {
-        "src/gen/app/app.tsx": "aea36c9fe1798bc49f0c598ef88d746a43feece6b0d48f8c6a059fedba273dc6"
+        "src/gen/app/app.tsx": "093cefc87478ff94896c51f4f6cbad1dcb7dc8436c34a3a58dc71d8df34f58b3"
       },
-      "by": "claude-session"
+      "by": "claude-code"
     },
     "BoardView": {
-      "hash": "896a4cc9cce0329fdb08d8ec2479e0ae9a300ab9b30eadc7bc119fa0d501a88c",
+      "hash": "0d84583856f59572c6ac4843ea4c19a322b4e636b922da4fc076fe7905ab9294",
       "files": {
-        "src/gen/board/board-view.tsx": "74629e5f7afa21ca4c4b0ec620327dec0b117383cba87ff8468e7da8066e38cf"
+        "src/gen/board/board-view.tsx": "9cbf48c2f007bf851823addd7daebc7fc1fba15b3be877475741f475762c98a9"
       },
-      "by": "claude-session"
+      "by": "claude-code"
+    },
+    "Button": {
+      "hash": "7a2b6ff9b8b6d52c0e3b009a832246c78821d99e4011e9f6e729169b42a2d312",
+      "files": {
+        "src/gen/ui/button.tsx": "e0cbe1a997c0791c17395da4605fa439c9c55c1b8bea741f3af5d426ef91a8f6"
+      },
+      "by": "claude-code"
     },
     "ChooseOpponent": {
-      "hash": "df76b4a4d8c068c8badc1a39ddfecf8d5f13e951269fb736c164cfe3b151770b",
+      "hash": "084b66aeb94c076a671b9301a2bdcdfcc9e61251f4600c29075b1396e58b39dc",
       "files": {
-        "src/gen/app/play/choose-opponent.tsx": "6c43105fa7aa04da58ecc28503ba8ef646e3ecdba7407da8bf3b50ee8390c718"
+        "src/gen/app/play/choose-opponent.tsx": "d3db3f984a677c52cecc9f872b75089756fab270053f1e39ceb5d45d23346bb5"
       },
-      "by": "claude-session"
+      "by": "claude-code"
     },
     "ComputerPlayer": {
-      "hash": "c5ea3fff6c135e370ebb57cc3e28abd40995d10d8c867f069297101881776fe4",
+      "hash": "6f03bffcf8146fb40fa4f60ab96f00473d56dd2cca3ea1f469dbfae631107c32",
       "files": {
-        "src/gen/engine/computer-player/computer-player.ts": "ae7fe4b6542255914fcf4f2af3b456b7115ddfa7409b439974ea09f93c0cb55e"
+        "src/gen/engine/computer-player/computer-player.ts": "310cc67f08fa87e9380e4a700e9f35f29cf5a5fcbc8f0dc392858a0f4a2fd868"
       },
-      "by": "claude-session"
+      "by": "claude-code"
     },
     "GameReducer": {
-      "hash": "405f569ce2d394a2cc1cbdecb3f7b15a79611ec9ba3da07d7a03e6084f41beee",
+      "hash": "4d46939eda98c5d6b17a980a7d30fbbfee69c51eb350351c10afdaa26061d7fc",
       "files": {
-        "src/gen/engine/game-reducer.ts": "0c99dcede863818cac41df710ce5dd92da525f012461aff40a6a166a9fac550c"
+        "src/gen/engine/game-reducer.ts": "4d3e0a54852c2c7da293576fc586ddcaaa5bda9747d819bc12710e2e745f8ea9"
       },
-      "by": "claude-session"
+      "by": "claude-code"
     },
     "GameState": {
-      "hash": "4d65842cc34d281c8c138026f5864f9890388195fec136c329779e4b17e8ed89",
+      "hash": "24dfc3b6e5904ed9d43cc44c6302944c7d287d19cd60941c4646e04a890ed0e8",
       "files": {
-        "src/gen/engine/game-state.ts": "3d6a9ea8e1979fa40c11074d9bbde7bcca733f829b8fb62ee8bf668974aef0d4"
+        "src/gen/engine/game-state.ts": "3464b42ff6a7b29a798e050b5ba3888f1cc7e1146ee8ecc77b48157781cdf562"
       },
-      "by": "claude-session"
+      "by": "claude-code"
     },
     "NewGameButton": {
-      "hash": "028ff717ba0a32f21520bb778af61ef9517d0f1b988ea18843650bb2c16a6008",
+      "hash": "f1c7b8d04096ed992837b113bcc1f0ea379be1cf380e9097a7c7262c90ab9ed9",
       "files": {
-        "src/gen/app/play/new-game-button.tsx": "d788ac9165a39f55f22e2e9683dc17e44678e5d763e287c3877178ae7ce24deb"
+        "src/gen/app/play/new-game-button.tsx": "379f08ccb9e1ca1841b5f81bd3294dd2d4aa3f0895de66ee5ae7c47e3b06f4b3"
       },
-      "by": "claude-session"
+      "by": "claude-code"
     },
     "PlayAGame": {
-      "hash": "22bae0fa9d7ef547bb6e5e15fabd2fd15067a2872493908f2d0c03469bc2131a",
+      "hash": "efc837a85236a6e12a47bc9dfe27b1febf9524a84ce0b9f5ec12263cdcc28275",
       "files": {
-        "src/gen/app/play/play-a-game.tsx": "b76b22a8398e7e67da8d574c718eb197bfe9b89f1f88bd983d521720b6433ddf"
+        "src/gen/app/play/play-a-game.tsx": "dca8d79d490dbe014559e756ef0c8304266f6df5b337c29d991ec2a5f5ae4c48"
       },
-      "by": "claude-session"
+      "by": "claude-code"
     },
     "Rules": {
-      "hash": "a493b2b3558b0fced8b1db1841d12c33e99333f3de09770d7d8026c4aa4a649a",
+      "hash": "fdb93eebabad97df44c742d80ba2394ae14a34e9a624ee29fd68e8f47fbeb18c",
       "files": {
-        "src/gen/engine/rules.ts": "b702030499d24d3cd520ace95bd1a4f2c17d586fec9f076bdf3c955019f4616e"
+        "src/gen/engine/rules.ts": "61bfbabb9920373175340d3283bde911ea021346c79527dcadf65520993c35ad"
       },
-      "by": "claude-session"
+      "by": "claude-code"
+    },
+    "Segmented": {
+      "hash": "26ceae5a48003ff5eaebe7a62a3b8ff6b10a63a6a9c67e8695fbce0b7d4a69f2",
+      "files": {
+        "src/gen/ui/segmented.tsx": "640470c72ae234edda405e5a3cc90fea6cc739f7864ac52a82a37ec3dd924326"
+      },
+      "by": "claude-code"
+    },
+    "Stack": {
+      "hash": "36de478b51fe41845f6e97a8c5de75542ebc563fc76a68d316a6e1a79730106c",
+      "files": {
+        "src/gen/ui/stack.tsx": "601a9007e7d8ebc3e938b85277d6922dded65dd25c82acfc87fc4eae9c81e424"
+      },
+      "by": "claude-code"
     },
     "StatusLine": {
-      "hash": "47ad6aabdcfaf75c1f3b9ff6c3f9b43f90ba3fd1905a0fcd959addca4b651ba2",
+      "hash": "18883794c610d9625b5ee66f20e66b187bc07d3f048b3d34fd626de5ea8a440a",
       "files": {
-        "src/gen/board/status-line.tsx": "db094bcac3cceef7f2882e92e492092401e9602878264c6f87ab083ce940324d"
+        "src/gen/board/status-line.tsx": "b3401907a972fd8deb4996f0450dbade0b9a6a8ddd7d61eaef5bd285700a567d"
       },
-      "by": "claude-session"
+      "by": "claude-code"
+    },
+    "Text": {
+      "hash": "c7ca119733dbecf346334c83c433f07a20665568f9d040c24d4ce746c99b4143",
+      "files": {
+        "src/gen/ui/text.tsx": "0f7a8df82a5ce1394ce76d7638c2373e2fe0da277087ddbfe4abc1867881c688"
+      },
+      "by": "claude-code"
+    },
+    "TicTacToe": {
+      "hash": "dfe7cee246d1fef1816e628fa185f0c142a32a867d4b9e583356a9ad428fd6d4",
+      "files": {
+        "src/gen/main.tsx": "de43575894a52f2c50e3cd4063a23bdf0267a632d9d3a6305efdc92c942f3742"
+      },
+      "by": "claude-code"
     },
     "WatchADemo": {
-      "hash": "cac5980417b885e5d7d1f9a5efcef18174c975dc4e7004c841fd3cff3c8d0d2c",
+      "hash": "f8f6552d315bef42e0eb71366f050f07eafd6927ce72afdca79d3a01fa0a61b3",
       "files": {
-        "src/gen/app/demo/watch-a-demo.tsx": "1c4032e69bc2ba1899b95dbb99e1cca7aecaaf92f06842df83a453f5382ab41a"
+        "src/gen/app/demo/watch-a-demo.tsx": "ca9a5e82676164a82686d32329f72719a626568eb5b71424d49b2beb106b268c"
       },
-      "by": "claude-session"
+      "by": "claude-code"
     }
   },
   "glue": {
-    "index.html": "4f4ff97e922e731e5ef7c938853ab6609e6bb01c7df7d3b6b34c30fe2994f595",
-    "src/gen/catalog/index.tsx": "38c5f7efa1655da2ebaeb0f0066abaa7fbaf69183c881edb5b5f70c4338b37b4",
-    "src/gen/main.tsx": "c02e7a9ce4eff5a56a48ba6e244a26167befbc66138ec32b03c702bbd1dc68c0",
-    "src/gen/tokens.css": "01e2204cecf637a80551c03ad62e0fd65eb56a56f5ab4c0653ca71213c21254d"
+    "src/gen/tokens.css": "ca57985cd6d059bd8ab5d6267ce75a7e34ed9a7154668400ed8e5ef7d26e3196"
   }
 }

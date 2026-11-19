@@ -10,7 +10,7 @@ test("context contains the node, its why chain and its dependencies' contracts",
   const c = ctx("GameReducer");
   expect(c).toContain("node GameReducer : fn");
   expect(c).toContain("- TicTacToe: A quick, familiar game");
-  expect(c).toContain("### Rules — import from \"./rules\"");
+  expect(c).toContain("### Rules — built at src/gen/engine/rules.ts, so import from \"./rules\"");
   expect(c).toContain("evaluate(board: Board) -> Status");
 });
 

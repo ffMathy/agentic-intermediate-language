@@ -1,18 +1,23 @@
-import { Segmented } from "../../catalog";
 import type { Opponent } from "../../engine/game-state";
+import { Segmented } from "../../ui/segmented";
 
-/** ChooseOpponent: two options, "Friend" and "Computer", named together as "Opponent". */
-export function ChooseOpponent(props: { opponent: Opponent; onChange: (opponent: Opponent) => void }) {
+/** two options, "Friend" and "Computer", named together as "Opponent" */
+export function ChooseOpponent({
+  opponent,
+  onChange,
+}: {
+  opponent: Opponent;
+  onChange: (opponent: Opponent) => void;
+}) {
   return (
     <Segmented
       label="Opponent"
-      width="fill"
       options={[
         { value: "friend", label: "Friend" },
         { value: "computer", label: "Computer" },
       ]}
-      value={props.opponent}
-      onChange={props.onChange}
+      value={opponent}
+      onChange={(value: Opponent) => onChange(value)}
     />
   );
 }

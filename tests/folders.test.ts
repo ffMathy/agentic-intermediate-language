@@ -28,7 +28,7 @@ test("generated paths and imports mirror the spec's folders", () => {
   const p = load(tempProject("areas"));
   expect(modulePath(p, p.nodes.get("Price")!)).toBe("src/gen/lib/price.ts");
   expect(modulePath(p, p.nodes.get("AreaA")!)).toBe("src/gen/a/area-a.ts");
-  expect(buildContext(p, p.nodes.get("AreaB")!)).toContain('### Price — import from "../lib/price"');
+  expect(buildContext(p, p.nodes.get("AreaB")!)).toContain('### Price — built at src/gen/lib/price.ts, so import from "../lib/price"');
 });
 
 test("a shared node has one owner and many users, and lints clean", () => {

@@ -63,7 +63,7 @@ export function buildContext(p: Project, n: AilNode): string {
     out.push(`They are compiled before you, at exactly the import specifiers shown. Use their names and props as written; never re-create them.`);
     for (const d of deps) {
       const dp = modulePath(p, d);
-      out.push(`\n### ${d.name}${dp && path ? ` — import from "${importSpecifier(path, dp)}"` : ""}`);
+      out.push(`\n### ${d.name}${dp && path ? ` — built at ${dp}, so import from "${importSpecifier(path, dp)}"` : ""}`);
       out.push(fence(whatOnly(d)));
     }
   }

@@ -1,5 +1,6 @@
 #!/usr/bin/env bun
 // ail — the Agentic Intermediate Language toolchain.
+import { adopt, formatAdopt } from "./adopt.ts";
 import { build } from "./build.ts";
 import { postHook, preHook } from "./hooks.ts";
 import { changedNodes } from "./lens.ts";
@@ -21,6 +22,10 @@ const HELP = `ail — write the spec, let agents build the code.
                         --shots DIR   also screenshot the final screen of every scenario of
                                       nodes with a look (needs Playwright)
                         --samples N   also compile N times per model and compare behaviour
+                        --app URL     also run the end-to-end checks against the app running there
+  ail adopt --app URL   Does the app running at URL behave as the spec says? Runs each
+            [Node…]     flow's end-to-end check (checks/e2e/) in a browser: against a legacy
+                        app while you write its spec, then against the one ail build made.
   ail show [what]       The tree (default), a <Node>, an audience
                         (stakeholder | design | engineer | specialist [tag]),
                         or changes [--since <ref>]
@@ -79,9 +84,17 @@ async function main(argv: string[]): Promise<number> {
         names: nodesOrDie(p, rest), models: a.flags.model, force: flag(a, "force") === "true",
         jobs: Number(flag(a, "jobs") ?? 4), look: flag(a, "no-look") !== "true",
         temperature: flag(a, "temperature") ? Number(flag(a, "temperature")) : undefined,
-        samples: Number(flag(a, "samples") ?? 0), shots: flag(a, "shots"), log,
+        samples: Number(flag(a, "samples") ?? 0), shots: flag(a, "shots"), app: flag(a, "app"), log,
       });
       print(r.text, { outcomes: r.outcomes, check: r.check });
+      return r.ok ? 0 : 1;
+    }
+
+    case "adopt": {
+      const app = flag(a, "app");
+      if (!app) throw new Error("usage: ail adopt --app <url of the running app> [Node…]");
+      const r = adopt(p, app, nodesOrDie(p, rest));
+      print(formatAdopt(app, r), r);
       return r.ok ? 0 : 1;
     }
 

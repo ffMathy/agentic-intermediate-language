@@ -13,12 +13,13 @@
   },
   "devDependencies": {
     "@happy-dom/global-registrator": "^17.0.0",
-    "@testing-library/react": "^16.0.0",
     "@testing-library/dom": "^10.0.0",
+    "@testing-library/react": "^16.0.0",
     "@types/bun": "latest",
     "@types/react": "^19.0.0",
     "@types/react-dom": "^19.0.0",
-    "typescript": "^5.6.0",
-    "ail": "link:ail"
+    "ail": "link:ail",
+    "playwright": "1.63.0",
+    "typescript": "^5.6.0"
   }
 }

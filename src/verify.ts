@@ -48,9 +48,9 @@ export function errorExcerpt(output: string, maxLines = 60): string {
   return out.slice(0, maxLines).join("\n");
 }
 
-export function runBunTest(cwd: string, files: string[]): { ok: boolean; failures: string[]; passes: number; output: string } {
+export function runBunTest(cwd: string, files: string[], env: Record<string, string> = {}): { ok: boolean; failures: string[]; passes: number; output: string } {
   const r = Bun.spawnSync(["bun", "test", ...files.map((f) => (f.startsWith("/") ? f : "./" + f))], {
-    cwd, env: { ...process.env, NO_COLOR: "1", FORCE_COLOR: "0" }, stdout: "pipe", stderr: "pipe",
+    cwd, env: { ...process.env, NO_COLOR: "1", FORCE_COLOR: "0", ...env }, stdout: "pipe", stderr: "pipe",
   });
   const output = r.stdout.toString() + r.stderr.toString();
   const failures = [...output.matchAll(/^\(fail\)\s+(.*)$/gm)].map((m) => m[1]!.trim());

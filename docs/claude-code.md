@@ -23,11 +23,12 @@ Restart Claude Code so the plugin's tools load.
 | | Name | What it's for |
 |---|---|---|
 | Command | `/ail:build [Node…]` | Compile everything that changed, then check everything |
+| Command | `/ail:adopt <url>` | Bring an existing app under AIL: its spec from its tickets, its people, the running app and its code, then proof that the spec describes it |
 | Skill | `ail` | Loaded automatically when you work on `*.ail.md` files: how to write, split, share and review nodes |
-| MCP tools | `ail_show`, `ail_build` | Look at the spec (the tree, a node, an audience's view, or what changed), and build it |
+| MCP tools | `ail_show`, `ail_build`, `ail_adopt` | Look at the spec (the tree, a node, an audience's view, or what changed), build it, and check a running app against it |
 | Hooks | — | Block edits to generated files, and lint the spec after every `.ail.md` edit |
 
-That's the whole surface: one command for you, the rest for Claude. To look
+That's the whole surface: two commands for you, the rest for Claude. To look
 at the spec, ask in plain words ("show me the stakeholder view", "what
 changed?"), and Claude calls `ail_show`.
 

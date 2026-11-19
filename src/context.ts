@@ -5,7 +5,7 @@
 // node it `uses`. Excluded: everything else, in particular any other node's
 // `how` or code. Encapsulation is enforced by construction.
 import { dirname, relative } from "node:path";
-import type { AilNode } from "./parse.ts";
+import { specText, type AilNode } from "./parse.ts";
 import { ancestors, modulePath, specModulePath, type Project } from "./project.ts";
 import { checkHeader, checkPath, derivedCheckFile, loadPrompt, needsDerivedCheck } from "./verify.ts";
 import { oracleHash } from "./hash.ts";
@@ -69,7 +69,7 @@ export function buildContext(p: Project, n: AilNode): string {
   }
 
   out.push(`\n## The node to implement`);
-  out.push(fence(n.raw.join("\n")));
+  out.push(fence(specText(n)));
 
   const deps = n.uses.map((u) => p.nodes.get(u)).filter(Boolean) as AilNode[];
   if (deps.length) {

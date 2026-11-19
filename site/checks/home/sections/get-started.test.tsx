@@ -1,4 +1,4 @@
-// ail-derived-from: GetStarted@10143132ad777be3
+// ail-derived-from: GetStarted@c3d61cb262a55efe
 import { afterEach, expect, test } from "bun:test";
 import { cleanup, render, screen, within } from "@testing-library/react";
 import { GetStarted } from "../../../src/gen/home/sections/get-started";
@@ -7,15 +7,13 @@ afterEach(() => {
   cleanup();
 });
 
-const FOLLOWING = 4;
-
-function follows(a: Node, b: Node): boolean {
-  return (a.compareDocumentPosition(b) & FOLLOWING) !== 0;
+function follows(first: Node, second: Node): boolean {
+  return (first.compareDocumentPosition(second) & Node.DOCUMENT_POSITION_FOLLOWING) !== 0;
 }
 
 function expectInOrder(nodes: Node[]): void {
-  for (let i = 0; i + 1 < nodes.length; i++) {
-    expect(follows(nodes[i], nodes[i + 1])).toBe(true);
+  for (let i = 1; i < nodes.length; i++) {
+    expect(follows(nodes[i - 1], nodes[i])).toBe(true);
   }
 }
 
@@ -27,12 +25,10 @@ test("in Claude Code", () => {
     "/plugin install ail@agentic-intermediate-language",
   ];
   const text = card.textContent ?? "";
-  for (const command of commands) {
+  const buttons = commands.map((command) => {
     expect(text).toContain(command);
-  }
-  const buttons = commands.map((command) =>
-    within(card).getByRole("button", { name: `Copy ${command}` }),
-  );
+    return within(card).getByRole("button", { name: `Copy ${command}` });
+  });
   expectInOrder(buttons);
   expect(text.indexOf(commands[0])).toBeLessThan(text.indexOf(commands[1]));
 });
@@ -47,22 +43,21 @@ test("in a terminal", () => {
   const installButton = within(card).getByRole("button", { name: `Copy ${install}` });
 
   const table = within(card).getByRole("table");
+  expect(follows(installButton, table)).toBe(true);
   const rows = within(table).getAllByRole("row");
-  const bodyRows = rows.filter((row) => {
-    const first = row.querySelector("td, th");
-    const label = first?.textContent?.trim() ?? "";
-    return label === "ail build" || label === "ail show [what]";
-  });
-  expect(bodyRows.map((row) => row.querySelector("td, th")?.textContent?.trim())).toEqual([
+  const bodyRows = rows
+    .map((row) => Array.from(row.querySelectorAll("td, th")).map((c) => (c.textContent ?? "").trim()))
+    .filter((cells) => cells[0] !== "Command");
+  expect(bodyRows.map((cells) => cells[0])).toEqual([
     "ail build",
     "ail show [what]",
+    "ail adopt --app <url>",
   ]);
-  expect(bodyRows[0].textContent).toContain(
+  expect(bodyRows.map((cells) => cells[1])).toEqual([
     "Compile whatever changed, then check everything: the spec, the code, every test, and each screen against its look.",
-  );
-  expect(bodyRows[1].textContent).toContain(
     "The tree, a node, one reader's view, or what changed.",
-  );
+    "Does the app running there behave as the spec says? For bringing an existing app under AIL, and proving a rebuilt one behaves the same.",
+  ]);
 
   const where = within(card).getByText(
     "Run these inside a project, meaning any folder with an ail.config.json. To try the tic-tac-toe demo from this page:",
@@ -75,15 +70,11 @@ test("in a terminal", () => {
     "cd examples/tictactoe && bun install && ail build",
     "ail show stakeholder",
   ];
-  for (const step of steps) {
-    expect(text).toContain(step);
-  }
-  const stepButtons = steps.map((step) =>
-    within(card).getByRole("button", { name: `Copy ${step}` }),
-  );
-  expectInOrder(stepButtons);
-  expect(follows(installButton, table)).toBe(true);
-  expect(follows(where, stepButtons[0])).toBe(true);
+  const stepButtons = steps.map((command) => {
+    expect(text).toContain(command);
+    return within(card).getByRole("button", { name: `Copy ${command}` });
+  });
+  expectInOrder([where, ...stepButtons]);
 });
 
 test("what to do next", () => {
@@ -96,15 +87,13 @@ test("what to do next", () => {
 
   const claude = screen.getByRole("region", { name: "In Claude Code" });
   const cli = screen.getByRole("region", { name: "In a terminal" });
+
   const example = screen.getByRole("link", { name: "Read the Tic-Tac-Toe spec" });
   const repo = screen.getByRole("link", { name: "View on GitHub ↗" });
-
   expect(example.getAttribute("href")).toBe(
     "https://github.com/ffMathy/agentic-intermediate-language/tree/main/examples/tictactoe",
   );
-  expect(repo.getAttribute("href")).toBe(
-    "https://github.com/ffMathy/agentic-intermediate-language",
-  );
+  expect(repo.getAttribute("href")).toBe("https://github.com/ffMathy/agentic-intermediate-language");
 
   expect(follows(claude, example)).toBe(true);
   expect(follows(cli, example)).toBe(true);

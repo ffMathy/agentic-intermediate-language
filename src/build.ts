@@ -9,6 +9,7 @@ import { plan } from "./plan.ts";
 import { isCompilable, type Project } from "./project.ts";
 import { getProvider, modelUnavailable, resolveModels } from "./providers/index.ts";
 import { takeShots } from "./shots.ts";
+import { adopt, formatAdopt } from "./adopt.ts";
 
 export interface BuildOptions {
   /** Only these nodes (default: all). */
@@ -24,6 +25,8 @@ export interface BuildOptions {
   samples?: number;
   /** Also write screenshots of the proofs here. */
   shots?: string;
+  /** Also run the end-to-end checks against the app running at this URL. */
+  app?: string;
   log?: (msg: string) => void;
 }
 
@@ -79,6 +82,11 @@ export async function build(p: Project, o: BuildOptions = {}): Promise<BuildResu
     for (const n of targets) reports.push(await diverge(p, n, specs.map(getProvider), o.samples, 1, log));
     ok &&= reports.every((r) => r.verdict === "converged");
     sections.push(formatDiverge(reports));
+  }
+  if (o.app) {
+    const r = adopt(p, o.app, names);
+    ok &&= r.ok;
+    sections.push(formatAdopt(o.app, r));
   }
   if (o.shots) sections.push(`📷 ${(await takeShots(p, o.shots, names.length ? names : undefined, log)).length} screenshot(s) in ${o.shots}`);
   const stopped = out.some((x) => x.status === "stopped");

@@ -67,6 +67,9 @@ export function lint(p: Project): Diagnostic[] {
         push("warning", "misplaced-node", n, `${n.name} lives in "${n.dir || "."}" but its parent ${pn.name} lives in "${pn.dir}"; keep children in their parent's folder or below so the folders mirror the tree`);
     }
     if (n.kind === "library" && n.children.length === 0) push("warning", "empty-library", n, `library ${n.name} owns no children`);
+    // Adopting an app leaves reasons nobody could confirm marked as such: keep them visible until an owner answers.
+    for (const sec of n.sections) for (const [i, l] of sec.raw.entries())
+      if (/confirm with the owner/i.test(l)) push("warning", "open-question", n, `${n.name} has a reason nobody has confirmed yet: ${l.trim()}`, sec.line + i);
     const maxLines = p.config.maxNodeLines ?? 80;
     const size = n.raw.filter((l) => l.trim() !== "").length;
     if (size > maxLines) push("warning", "node-too-large", n, `${n.name} spans ${size} lines (budget ${maxLines}); split it into children, e.g. in a ${n.dir ? n.dir + "/" : ""}${kebabName(n.name)}/ folder`);

@@ -10,8 +10,8 @@ to children. People review the spec; generated code (the target's `generated`
 paths) is never edited by hand, and hooks block attempts to.
 
 Tools: `ail_show` looks at the spec (the tree, a node, an audience's view, or
-what changed); `ail_build` builds it, then checks everything. `/ail:build`
-calls it.
+what changed); `ail_build` builds it, then checks everything (`/ail:build`
+calls it); `ail_adopt` checks a running app against the spec.
 
 ## Node shape
 ```ail
@@ -28,6 +28,7 @@ node Name : kind   level: product|experience|system|specialist   @tag
   uses      nodes whose contract this one depends on
   children  nodes that refine this one
   verify    properties that need a derived check
+  sources   where the claims came from (tickets, interviews, screens, code); for review, never compiled
 ```
 Kinds: `system` (the root, with `entry`), `flow`, `view`, `data`, `fn`, and
 `library` (groups shared nodes; it is never compiled).
@@ -98,7 +99,11 @@ by hand.
 
 Don't review generated code. If it's wrong, the spec is missing something.
 
-**Bring existing code under AIL.** Read the code and write the node that would
-compile back to the same behaviour. Trace real values into examples. When the
-code doesn't show the reason for something, write
-`because "unknown, confirm with the owner"`. Never invent a rationale.
+**Bring an existing app under AIL** (`/ail:adopt`). Write the spec in reverse,
+one slice at a time: the why from tickets and the people who own it, the what
+from driving the running app, the how from its code, each node with
+`sources`. Trace real values into examples. When nobody can confirm a reason,
+write `because "unknown, confirm with the owner"`; never invent one. Each flow
+gets an end-to-end check in `checks/e2e/`, and `ail_adopt` with the app's URL
+proves the spec describes the app. Later, the same checks prove the rebuilt app
+behaves the same.

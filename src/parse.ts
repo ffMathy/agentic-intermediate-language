@@ -68,8 +68,14 @@ export interface ParsedFile {
 }
 
 export const NODE_SECTIONS = new Set([
-  "why", "what", "how", "look", "copy", "binds", "free", "children", "uses", "verify", "entry",
+  "why", "what", "how", "look", "copy", "binds", "free", "children", "uses", "verify", "entry", "sources",
 ]);
+
+/** Sections that record where the spec came from: kept for review, never part of a hash or a compile. */
+export const PROVENANCE = new Set(["sources"]);
+
+/** The node's text without its provenance: what a compiler or a judge reads. */
+export const specText = (n: AilNode) => [n.raw[0]!, ...n.sections.filter((s) => !PROVENANCE.has(s.key)).flatMap((s) => s.raw)].join("\n");
 
 /** Strip a `;` comment that is outside double quotes and starts a word. */
 export function stripComment(line: string): string {

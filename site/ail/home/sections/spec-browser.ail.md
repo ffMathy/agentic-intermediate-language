@@ -1,0 +1,72 @@
+# Spec browser
+
+Both example specs, browsable like code. The files are not copied into the
+spec by hand: `ail build` writes them into a data module (the `specModule`
+in ail.config.json), so the browser always shows the current specs, including
+the one that describes this browser.
+
+```ail
+node SpecBrowser : flow   level: experience
+  why   Reading real specs is the fastest way to learn AIL, so both example specs can be browsed the way developers read code.   <- HomePage
+  what
+    two projects can be browsed: this website and the Tic-Tac-Toe demo; this website is shown first
+    for the shown project: how big its spec is, its spec files grouped by folder, and the picked file in a read-only editor
+    the size is counted from the spec itself: how many nodes, in how many files
+    at first the file that describes this very section is picked
+    showing another project picks its first file
+    a link anywhere on the page can open a file here: when the page address ends with "#spec/", a project's key, "/" and one of its file paths, that project and file are shown and this section scrolls into view
+    Scenario: this section shows its own spec first
+      Given the page is open
+      Then the project "This website" is shown as picked
+      And the file "home/sections/spec-browser.ail.md" is shown as picked
+      And the region named "Source of home/sections/spec-browser.ail.md" contains "node SpecBrowser : flow"
+    Scenario: picking another file
+      Given the page is open
+      When the visitor picks the file "site.ail.md"
+      Then "site.ail.md" is shown as picked and "home/sections/spec-browser.ail.md" is not
+      And the region named "Source of site.ail.md" contains "node AIL : system"
+    Scenario: showing the demo
+      Given the page is open
+      When the visitor picks the project "Tic-Tac-Toe demo"
+      Then that project is shown as picked and its first file is picked
+      And the size line reads the demo's number of nodes and of files
+    Scenario: opened from a link
+      Given the page address ends with "#spec/tictactoe/app/play/play.ail.md"
+      When the page opens
+      Then the project "Tic-Tac-Toe demo" and the file "app/play/play.ail.md" are shown as picked
+  look
+    band      Section with id "specs", tone raised
+    layout    stack(v, gap: space.6, align: stretch) [ head, window ]
+    head      SectionHeading with eyebrow from browse.eyebrow, text from browse.heading, lead from browse.lead
+    window    a div: radius.lg, overflow hidden, a 1px solid color.code.border border, background color.code, box-shadow 0 12px 32px rgba(15, 23, 42, 0.18)
+    titlebar  a div: display flex, flex-wrap wrap, align-items center, gap space.3, pad space.2 space.3, background color.code.bar, a 1px solid color.code.border bottom border; holding [ dots, projects, size ]
+    dots      an aria-hidden div with three 10px circles 6px apart: color.dot.red, color.dot.amber, color.dot.green
+    projects  a div with role group named by browse.projects: display flex, gap space.1; one project button per project
+    project   a button with type "button": font.small, weight 600, pad space.1 space.3, radius.md, border none, background transparent, color color.code.muted, cursor pointer
+    shown     the picked project button instead has background color.code.pick and color color.code.text
+    size      a p: margin 0 0 0 auto, font.mono at font.tiny, color color.code.muted
+    body      a div: display flex, flex-wrap wrap
+    explorer  a nav named by browse.files: flex 1 1 220px, max-height clamp(200px, 40vw, 560px), overflow-y auto, background color.code.side, pad space.2 0, box-sizing border-box
+    folder    a div: font.mono at font.tiny, color color.code.muted, pad space.1 space.3, padding-left calc(space.3 + 12px × (depth − 1)), where depth counts the "/" in the folder path plus one
+    file      a button with type "button": display block, width 100%, text-align left, font.mono at font.tiny, color color.code.text, background transparent, border none, a 2px solid transparent left border, pad space.1 space.3, padding-left calc(space.3 + 12px × depth), where depth counts the "/" in the path, cursor pointer
+    picked    the picked file button instead has background color.code.pick and a 2px solid color.accent left border
+    editor    a div: flex 999 1 420px, min-width 0, height 560px; holding SpecEditor
+  copy
+    browse.eyebrow    "Dogfooding"
+    browse.heading    "Browse the specs"
+    browse.lead       "Read both example specs the way you read code: this website, written in AIL and compiled by ail build, and the Tic-Tac-Toe demo. The files come straight from the specs at build time, so they are always current."
+    browse.size       "{nodes} nodes in {files} files"
+    browse.projects   "Projects"
+    browse.files      "Spec files"
+    browse.source     "Source of {path}"
+  binds
+    data      specProjects from the spec module; the projects' keys are "site" (this website) and "tictactoe" (the demo)
+    state     useState for the shown project's key, starting at "site", and useState for the picked file's path, starting at "home/sections/spec-browser.ail.md"
+    hash      on mount, and on every hashchange event of window (removed on unmount): when location.hash starts with "#spec/", the rest up to its first "/" is a project key and the remainder a file path; if that project has that file, show both and scroll the section element into view
+    project   one button per entry of specProjects, in order, showing its name; aria-pressed true on the shown one; pressing another one shows it and picks its first file
+    size      nodes is the shown project's nodeCount, files the number of its files
+    list      the shown project's files in their order; before a file whose folder (its path up to the last "/") differs from the previous file's folder, a folder row showing that folder followed by "/"; files at the top level have no folder row
+    file      shows the file name (the path after its last "/"); its accessible name and title are the full path; aria-pressed true on the picked one; pressing it picks that path
+    editor    SpecEditor with text = the picked file's text, path = the shown project's key + "/" + the picked path, label = browse.source with {path} filled in with the picked path
+  uses  Section, SectionHeading, SpecEditor, Stack
+```

@@ -33,18 +33,46 @@ test("files outside the spec root are not part of the spec", () => {
   expect(load(dir).nodes.has("Stray")).toBe(false);
 });
 
-test("the spec module carries every spec file and node, and check notices when it is stale", () => {
+test("the spec module carries every spec file of each listed project, and check notices when it is stale", () => {
   const dir = tempProject("areas");
   moveSpecInto(dir, "ail");
-  writeFileSync(join(dir, "ail.config.json"), JSON.stringify({ specRoot: "ail", specModule: "src/gen/spec.ts" }));
+  mkdirSync(join(dir, "other"));
+  writeFileSync(join(dir, "other/x.ail.md"), "```ail\nnode X : fn   level: system\n```\n");
+  writeFileSync(join(dir, "ail.config.json"), JSON.stringify({
+    specRoot: "ail",
+    specModule: { path: "src/gen/spec.ts", projects: [{ key: "shop", name: "Shop", dir: "ail" }, { key: "other", name: "Other", dir: "other" }] },
+  }));
   expect(runCheck(load(dir)).glue).toEqual(["src/gen/spec.ts"]);
   writeGlue(load(dir));
   const mod = readFileSync(join(dir, "src/gen/spec.ts"), "utf8");
+  expect(mod).toContain('"key": "shop"');
   expect(mod).toContain('"path": "a/a.ail.md"');
-  expect(mod).toContain('"name": "Price"');
+  expect(mod).toContain('"nodeCount": 5');
+  expect(mod).toContain('"key": "other"');
   expect(runCheck(load(dir)).glue).toEqual([]);
-  // editing the spec makes the module stale until the next build
-  const f = join(dir, "ail/a/a.ail.md");
-  writeFileSync(f, readFileSync(f, "utf8").replace("The basket.", "The shopping basket."));
+  // editing any listed project's spec makes the module stale until the next build
+  writeFileSync(join(dir, "other/x.ail.md"), "```ail\nnode X : fn   level: system\nnode Y : fn   level: system\n```\n");
   expect(runCheck(load(dir)).glue).toEqual(["src/gen/spec.ts"]);
+});
+
+test("the spec module's location is part of every compile hash, but only when configured", () => {
+  const dir = tempProject("areas");
+  const plain = compileHash(load(dir), load(dir).nodes.get("Price")!);
+  writeFileSync(join(dir, "ail.config.json"), JSON.stringify({ specModule: "src/gen/spec.ts" }));
+  const withModule = compileHash(load(dir), load(dir).nodes.get("Price")!);
+  writeFileSync(join(dir, "ail.config.json"), JSON.stringify({ specModule: "src/gen/data.ts" }));
+  expect(new Set([plain, withModule, compileHash(load(dir), load(dir).nodes.get("Price")!)]).size).toBe(3);
+});
+
+test("a review across a spec move only shows what really changed", async () => {
+  const { renderReview } = await import("../src/lens.ts");
+  const dir = tempProject("areas");
+  const git = (...a: string[]) => Bun.spawnSync(["git", "-c", "user.email=t@t", "-c", "user.name=t", ...a], { cwd: dir });
+  git("init", "-q"); git("add", "-A"); git("commit", "-qm", "base");
+  moveSpecInto(dir, "ail");
+  const f = join(dir, "ail/lib/lib.ail.md");
+  writeFileSync(f, readFileSync(f, "utf8").replace("price(1999) => 19", "price(1999) => 19\n      price(0) => 0"));
+  const r = renderReview(load(dir), "HEAD");
+  expect(r).toContain("✎ Price");
+  expect(r).not.toContain("＋");
 });

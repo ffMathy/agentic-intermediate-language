@@ -15,7 +15,7 @@ node StopResult : view   level: experience
       And the region named "The promise, one last time" shows "    4. The computer never loses." with "The computer never loses." highlighted
       And the stop reads "Apart from a short index.html, none of its code was written by hand."
   look
-    stop     JourneyStop with number 8, color color.accent, last, figure ResultFrame
+    stop     JourneyStop with number 8, color color.accent, last, figure ResultFrame, browse "#spec/tictactoe/tictactoe.ail.md"
   copy
     result.depth     "result"
     result.chip      "RESULT"

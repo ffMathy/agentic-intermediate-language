@@ -10,7 +10,7 @@ node StopProduct : view   level: experience
       Then the article "stop-2" has the level 3 heading "Product level: the sentence becomes a promise with an owner."
       And the region named "Product-level spec excerpt" shows its eleven lines, with claim 4 and "refined-by: ComputerPlayer" highlighted
   look
-    stop     JourneyStop with number 2, color color.level.product, figure ProductFigure
+    stop     JourneyStop with number 2, color color.level.product, figure ProductFigure, browse "#spec/tictactoe/tictactoe.ail.md"
   copy
     product.depth     "depth 1"
     product.chip      "PRODUCT"

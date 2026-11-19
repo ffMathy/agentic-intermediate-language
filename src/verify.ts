@@ -13,7 +13,7 @@ import { oracleHash } from "./hash.ts";
 
 import { fileHash, readLock } from "./lock.ts";
 import type { AilNode } from "./parse.ts";
-import { AIL_HOME, isCompilable, kebab, modulePath, topoByUses, type Project } from "./project.ts";
+import { AIL_HOME, isCompilable, kebab, modulePath, specModulePath, topoByUses, type Project } from "./project.ts";
 
 export interface Check { kind: string; ok: boolean; severity: "error" | "warning"; detail: string }
 export interface VerifyResult { node: string; ok: boolean; checks: Check[] }
@@ -38,7 +38,8 @@ function allowedImports(p: Project, n: AilNode): { relative: Set<string>; packag
   for (const u of n.uses) { const d = p.nodes.get(u); const mp = d && modulePath(p, d); if (mp) rel.add(strip(mp)); }
   const s = p.target?.settings ?? {};
   if (s["tokens-css"]) rel.add(strip(s["tokens-css"]));
-  if (p.config.specModule) rel.add(strip(p.config.specModule));
+  const sm = specModulePath(p);
+  if (sm) rel.add(strip(sm));
   return { relative: rel, packages: (s["libs"] ?? "").split(/[\s,]+/).filter(Boolean) };
 }
 

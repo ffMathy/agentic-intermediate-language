@@ -20,8 +20,11 @@
   `bun install` in that folder first.
 - `site/` is the website, and it is an AIL project. Change its pages through
   its spec in `site/ail/` and `ail build`, never by editing `site/src/gen`.
-  Its "This page" section shows `site/src/gen/spec.ts`, which `ail build`
-  writes from the spec without a model.
+  Its spec browser (a read-only Monaco editor) shows `site/src/gen/spec.ts`,
+  which `ail build` writes without a model from both `site/ail/` and
+  `examples/tictactoe/ail/`. So after editing the kata's spec, also run
+  `ail build` in `site/` (no model calls are needed for that), or the site's
+  `ail check` fails.
 - If you change the prompts or the context format, compile hashes
   change. Rebuild `examples/tictactoe` and `site` so that `ail check` passes in
   both.

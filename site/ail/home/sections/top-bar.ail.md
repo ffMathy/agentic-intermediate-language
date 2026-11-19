@@ -8,8 +8,8 @@ node TopBar : view   level: experience
     when there is not enough room, the links wrap under the name
     Scenario: the links lead to the right places
       Given the page is open
-      Then the navigation named "Sections" has the links "The journey", "Four readers", "How it builds", "This page in AIL", "Get started" and "GitHub ↗", in that order
-      And they lead to "#journey", "#readers", "#loop", "#this-page", "#start" and the repository
+      Then the navigation named "Sections" has the links "The journey", "Four readers", "How it builds", "Browse the specs", "Get started" and "GitHub ↗", in that order
+      And they lead to "#journey", "#readers", "#loop", "#specs", "#start" and the repository
   look
     bar       a header element: full width, background color.surface, a 1px solid color.border bottom border, box-sizing border-box, pad space.3 space.4
     row       inside, a div with max-width width.content, margin 0 auto; stack(h, gap: space.4, align: center, justify: between, wrap: true) [ brand, nav ]
@@ -25,7 +25,7 @@ node TopBar : view   level: experience
     bar.journey   "The journey"
     bar.readers   "Four readers"
     bar.loop      "How it builds"
-    bar.self      "This page in AIL"
+    bar.self      "Browse the specs"
     bar.start     "Get started"
     bar.github    "GitHub ↗"
   binds
@@ -33,7 +33,7 @@ node TopBar : view   level: experience
     journey  a link to "#journey"
     readers  a link to "#readers"
     loop     a link to "#loop"
-    self     a link to "#this-page"
+    self     a link to "#specs"
     start    a link to "#start"
     github   a link to "https://github.com/ffMathy/agentic-intermediate-language"
   uses  Stack

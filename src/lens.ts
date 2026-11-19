@@ -85,11 +85,16 @@ export function renderLens(p: Project, lens: Lens, opts: { tag?: string; only?: 
 
 /** Nodes whose meaning changed relative to a git ref (cosmetic edits ignored). */
 export function changedNodes(p: Project, ref: string): { changed: string[]; added: string[]; removed: string[]; before: Map<string, AilNode> } {
+  // Read every spec file that existed at the ref, wherever it lived then, so
+  // moving the spec (e.g. into ail/) does not make every node look new.
   const before = new Map<string, AilNode>();
-  for (const f of p.files) {
-    const r = Bun.spawnSync(["git", "show", `${ref}:./${f.file}`], { cwd: p.root, stdout: "pipe", stderr: "pipe" });
+  const ls = Bun.spawnSync(["git", "ls-tree", "-r", "--name-only", "--full-name", ref, "--", "."], { cwd: p.root, stdout: "pipe", stderr: "pipe" });
+  const top = Bun.spawnSync(["git", "rev-parse", "--show-prefix"], { cwd: p.root, stdout: "pipe" }).stdout.toString().trim();
+  for (const full of ls.stdout.toString().split("\n").filter((f) => f.endsWith(".ail.md") && !/(^|\/)node_modules\//.test(f))) {
+    const r = Bun.spawnSync(["git", "show", `${ref}:${full}`], { cwd: p.root, stdout: "pipe", stderr: "pipe" });
     if (r.exitCode !== 0) continue;
-    for (const n of parseFile(f.file, r.stdout.toString()).nodes) before.set(n.name, n);
+    const rel = full.startsWith(top) ? full.slice(top.length) : full;
+    for (const n of parseFile(rel, r.stdout.toString()).nodes) if (!before.has(n.name)) before.set(n.name, n);
   }
   const changed: string[] = [], added: string[] = [];
   for (const n of p.ordered) {

@@ -170,8 +170,9 @@ for node in dependency order:
 
 The only outputs that need no model are the design-token CSS, written straight
 from the catalog, and, when a project sets `specModule`, a data module holding
-the project's own spec files and nodes. The website uses it to show its own
-spec, so that section can never go stale; `ail check` fails if either output is
+spec files (of this project, or of several listed projects). The website uses
+it for its spec browser, which opens the site's own spec and the Tic-Tac-Toe
+spec in a read-only Monaco editor, so it can never go stale; `ail check` fails if either output is
 out of date. Everything else, the entry point and the components
 included, is a node compiled like any other.
 

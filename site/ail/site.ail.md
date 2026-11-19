@@ -11,13 +11,13 @@ that keeps it, the check that proves it, and the game you can play.
 ```
 site.ail.md                              🟢 AIL (this file)
 home/home.ail.md                         🟡 HomePage: the one page, top to bottom
-home/sections/*.ail.md                   🟡 TopBar, GapStrip, GetStarted, Footer
+home/sections/*.ail.md                   🟡 TopBar, GapStrip, SpecBrowser, GetStarted, Footer
 home/hero/hero.ail.md                    🟡 Hero, HeroFigure
 home/journey/journey.ail.md              🟡 Journey, JumpGauge, JourneyStop
 home/journey/stops/*.ail.md              🟡 the eight stops and their figures
 home/readers/readers.ail.md              🟡 Readers, ReadersTree
 home/build-loop/build-loop.ail.md        🟡 BuildLoop, LoopFigure
-parts/*.ail.md                           🟡 Parts (library): Stack, Section, SectionHeading, CodeBlock, CopyCommand, MiniBoard
+parts/*.ail.md                           🟡 Parts (library): Stack, Section, SectionHeading, CodeBlock, CopyCommand, MiniBoard, SpecEditor
 ```
 
 ## Target
@@ -25,7 +25,7 @@ parts/*.ail.md                           🟡 Parts (library): Stack, Section, S
 ```ail
 target
   code         TypeScript 5 in strict mode, ES modules, no `any`; React 19 function components only
-  libs         react react-dom
+  libs         react react-dom @monaco-editor/react
   exports      named exports only; a view or flow exports a component named exactly like its node; export every name `what` mentions and nothing else except types
   props        named exactly as `binds` lists them
   state        a flow owns exactly the state `binds.state` names, with useState; never mutate inputs
@@ -83,6 +83,7 @@ catalog
     color.page=#ffffff  color.surface=#ffffff  color.surface.raised=#f3f4f6  color.border=#d1d5db
     color.text=#111827  color.text.muted=#4b5563  color.on.accent=#ffffff
     color.accent=#6d28d9  color.accent.soft=#f5f3ff  color.focus=#2563eb
+    color.code.bar=#0b1120  color.code.side=#111a2e  color.code.pick=#1e293b  color.dot.red=#ef4444  color.dot.amber=#f59e0b  color.dot.green=#22c55e
     color.code=#0f172a  color.code.text=#e2e8f0  color.code.muted=#94a3b8  color.code.border=#334155
     color.thread=#fde68a  color.thread.soft=rgba(253,230,138,0.22)  color.thread.strong=#eab308
     color.level.product=#16a34a  color.level.experience=#ca8a04  color.level.system=#ea580c  color.level.specialist=#dc2626  color.level.build=#475569
@@ -106,7 +107,7 @@ node AIL : system   level: product
     6. A visitor sees that each level is written for a different kind of reader.            refined-by: Readers
     7. A visitor sees how a change to the spec becomes checked code.                         refined-by: BuildLoop
     8. A visitor can start from Claude Code or from a terminal.                              refined-by: GetStarted
-    9. A visitor can read the spec of this very page.                                        refined-by: ThisPage
+    9. A visitor can browse the specs of this page and of the demo in a code editor.         refined-by: SpecBrowser
   entry     HomePage
   children  HomePage, Parts
 ```

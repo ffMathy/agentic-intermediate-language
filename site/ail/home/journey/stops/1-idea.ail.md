@@ -10,7 +10,7 @@ node StopIdea : view   level: experience
       Then the article "stop-1" has the level 3 heading "It starts as a sentence anyone could say."
       And the region named "The idea, at the top of the spec" shows its four lines, with "The computer never loses." highlighted
   look
-    stop     JourneyStop with number 1, color color.accent, figure IdeaFigure
+    stop     JourneyStop with number 1, color color.accent, figure IdeaFigure, browse "#spec/tictactoe/tictactoe.ail.md"
   copy
     idea.depth      "idea"
     idea.chip       "IDEA"

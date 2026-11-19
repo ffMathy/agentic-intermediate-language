@@ -14,8 +14,10 @@ export interface Config {
   specRoot?: string;
   /** Globs of spec files, relative to the project root (default: every .ail.md under specRoot). */
   sources?: string[];
-  /** Where `ail build` writes the project's own spec as data (e.g. "src/gen/spec.ts"), for pages that show it. */
-  specModule?: string;
+  /** Where `ail build` writes spec files as data, for pages that show them: a
+   * path (this project's spec), or a path plus the projects to include, each
+   * with a key, a display name and its spec folder (relative to this project). */
+  specModule?: string | { path: string; projects: { key: string; name: string; dir: string }[] };
   checksDir?: string;
   lockFile?: string;
   models?: string[];
@@ -119,6 +121,10 @@ export function loadProject(rootArg?: string): Project {
     errors,
   };
 }
+
+/** The spec module's output path, if the project has one. */
+export const specModulePath = (p: { config: Config }): string | null =>
+  typeof p.config.specModule === "string" ? p.config.specModule : p.config.specModule?.path ?? null;
 
 export const kebab = (name: string) =>
   name.replace(/([a-z0-9])([A-Z])/g, "$1-$2").replace(/([A-Z])([A-Z][a-z])/g, "$1-$2").toLowerCase();

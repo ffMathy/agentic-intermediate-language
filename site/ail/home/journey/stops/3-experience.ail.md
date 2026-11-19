@@ -10,7 +10,7 @@ node StopExperience : view   level: experience
       Then the article "stop-3" has the level 3 heading "Experience level: what the player sees, as scenarios anyone can test."
       And the region named "Experience-level spec excerpt" shows its eleven lines, with "the computer places an O" highlighted
   look
-    stop     JourneyStop with number 3, color color.level.experience, figure ExperienceFigure
+    stop     JourneyStop with number 3, color color.level.experience, figure ExperienceFigure, browse "#spec/tictactoe/app/play/play.ail.md"
   copy
     experience.depth     "depth 2"
     experience.chip      "EXPERIENCE"

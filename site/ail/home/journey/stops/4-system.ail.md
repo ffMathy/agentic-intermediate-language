@@ -10,7 +10,7 @@ node StopSystem : view   level: experience
       Then the article "stop-4" has the level 3 heading "System level: one exact shape, one exact rule, examples that run."
       And the region named "System-level spec excerpt" shows its fifteen lines, with "ComputerPlayer" highlighted
   look
-    stop     JourneyStop with number 4, color color.level.system, figure SystemFigure
+    stop     JourneyStop with number 4, color color.level.system, figure SystemFigure, browse "#spec/tictactoe/engine/engine.ail.md"
   copy
     system.depth     "depth 3"
     system.chip      "SYSTEM"

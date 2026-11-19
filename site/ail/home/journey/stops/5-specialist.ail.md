@@ -10,7 +10,7 @@ node StopSpecialist : view   level: experience
       Then the article "stop-5" has the level 3 heading "Specialist level: the promise becomes an algorithm and a proof."
       And the region named "Specialist-level spec excerpt" shows its fifteen lines, with "never loses" and the invariant highlighted
   look
-    stop     JourneyStop with number 5, color color.level.specialist, figure SpecialistFigure
+    stop     JourneyStop with number 5, color color.level.specialist, figure SpecialistFigure, browse "#spec/tictactoe/engine/computer-player/computer-player.ail.md"
   copy
     specialist.depth     "depth 4"
     specialist.chip      "SPECIALIST"

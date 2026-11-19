@@ -43,7 +43,19 @@ function specFilesIn(dir: string): { path: string; text: string }[] {
   return [...new Bun.Glob("**/*.ail.md").scanSync({ cwd: dir })]
     .filter((f) => !/(^|\/)(node_modules|\.[^/]+)\//.test(f))
     .map((f) => ({ path: f.split("\\").join("/"), text: readFileSync(join(dir, f), "utf8") }))
-    .sort((a, b) => a.path.localeCompare(b.path));
+    .sort((a, b) => explorerOrder(a.path, b.path));
+}
+
+/** Explorer order: within each folder, its own files first, then its subfolders, each by name. */
+export function explorerOrder(a: string, b: string): number {
+  const x = a.split("/"), y = b.split("/");
+  for (let i = 0; i < Math.min(x.length, y.length); i++) {
+    if (x[i] === y[i]) continue;
+    const xFile = i === x.length - 1, yFile = i === y.length - 1;
+    if (xFile !== yFile) return xFile ? -1 : 1;
+    return x[i]!.localeCompare(y[i]!);
+  }
+  return x.length - y.length;
 }
 
 /** Spec files (of this project, or of several) as a TypeScript data module, for pages that show them. */

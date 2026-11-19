@@ -1,46 +1,44 @@
-// ail-derived-from: SpecBrowser@ee3b5dffbc8b4bdb
+// ail-derived-from: SpecBrowser@39e5bfb2b50a1609
 import { afterEach, beforeEach, expect, test } from "bun:test";
-import { act, cleanup, fireEvent, render, screen } from "@testing-library/react";
+import { act, cleanup, fireEvent, render, screen, waitFor } from "@testing-library/react";
 import { SpecBrowser } from "../../../src/gen/home/sections/spec-browser";
 import { specProjects } from "../../../src/gen/spec";
 
-function resetHash(): void {
+const scrollTarget = Element.prototype as unknown as { scrollIntoView?: () => void };
+if (typeof scrollTarget.scrollIntoView !== "function") {
+  scrollTarget.scrollIntoView = () => {};
+}
+
+function clearHash(): void {
   window.history.replaceState(null, "", window.location.pathname + window.location.search);
 }
 
 beforeEach(() => {
-  resetHash();
-  if (typeof Element.prototype.scrollIntoView !== "function") {
-    Element.prototype.scrollIntoView = function scrollIntoView(): void {};
-  }
+  clearHash();
 });
 
 afterEach(() => {
   cleanup();
-  resetHash();
+  clearHash();
 });
 
-function isPicked(el: HTMLElement): boolean {
-  return el.getAttribute("aria-pressed") === "true";
+function expectPressed(name: string, pressed: boolean): void {
+  expect(screen.getByRole("button", { name }).getAttribute("aria-pressed")).toBe(pressed ? "true" : "false");
 }
 
 test("this section shows its own spec first", () => {
   render(<SpecBrowser />);
-  const project = screen.getByRole("button", { name: "This website" });
-  expect(isPicked(project)).toBe(true);
-  const file = screen.getByRole("button", { name: "home/sections/spec-browser.ail.md" });
-  expect(isPicked(file)).toBe(true);
+  expectPressed("This website", true);
+  expectPressed("home/sections/spec-browser.ail.md", true);
   const region = screen.getByRole("region", { name: "Source of home/sections/spec-browser.ail.md" });
   expect(region.textContent ?? "").toContain("node SpecBrowser : flow");
 });
 
 test("picking another file", () => {
   render(<SpecBrowser />);
-  act(() => {
-    fireEvent.click(screen.getByRole("button", { name: "site.ail.md" }));
-  });
-  expect(isPicked(screen.getByRole("button", { name: "site.ail.md" }))).toBe(true);
-  expect(isPicked(screen.getByRole("button", { name: "home/sections/spec-browser.ail.md" }))).toBe(false);
+  fireEvent.click(screen.getByRole("button", { name: "site.ail.md" }));
+  expectPressed("site.ail.md", true);
+  expectPressed("home/sections/spec-browser.ail.md", false);
   const region = screen.getByRole("region", { name: "Source of site.ail.md" });
   expect(region.textContent ?? "").toContain("node AIL : system");
 });
@@ -50,23 +48,22 @@ test("showing the demo", () => {
   expect(demo).toBeDefined();
   if (!demo) return;
   const { container } = render(<SpecBrowser />);
-  act(() => {
-    fireEvent.click(screen.getByRole("button", { name: "Tic-Tac-Toe demo" }));
-  });
-  expect(isPicked(screen.getByRole("button", { name: "Tic-Tac-Toe demo" }))).toBe(true);
-  expect(isPicked(screen.getByRole("button", { name: "This website" }))).toBe(false);
-  const firstPath = demo.files[0].path;
-  expect(isPicked(screen.getByRole("button", { name: firstPath }))).toBe(true);
+  fireEvent.click(screen.getByRole("button", { name: "Tic-Tac-Toe demo" }));
+  expectPressed("Tic-Tac-Toe demo", true);
+  expectPressed("This website", false);
+  expectPressed(demo.files[0].path, true);
   const expected = `${demo.nodeCount} nodes in ${demo.files.length} files`;
-  const sizeLines = Array.from(container.querySelectorAll("p")).filter(
-    (p) => (p.textContent ?? "").trim() === expected,
-  );
-  expect(sizeLines.length).toBe(1);
+  const lines = Array.from(container.querySelectorAll("p")).map((p) => (p.textContent ?? "").trim());
+  expect(lines).toContain(expected);
 });
 
-test("opened from a link", () => {
-  window.location.hash = "#spec/tictactoe/app/play/play.ail.md";
-  render(<SpecBrowser />);
-  expect(isPicked(screen.getByRole("button", { name: "Tic-Tac-Toe demo" }))).toBe(true);
-  expect(isPicked(screen.getByRole("button", { name: "app/play/play.ail.md" }))).toBe(true);
+test("opened from a link", async () => {
+  window.history.replaceState(null, "", "#spec/tictactoe/app/play/play.ail.md");
+  await act(async () => {
+    render(<SpecBrowser />);
+  });
+  await waitFor(() => {
+    expectPressed("Tic-Tac-Toe demo", true);
+    expectPressed("app/play/play.ail.md", true);
+  });
 });

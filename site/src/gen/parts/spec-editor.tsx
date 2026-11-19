@@ -1,7 +1,8 @@
-import Editor, { type BeforeMount } from "@monaco-editor/react";
+import Editor from "@monaco-editor/react";
+import type { Monaco } from "@monaco-editor/react";
 import { CodeBlock } from "./code-block";
 
-const beforeMount: BeforeMount = (monaco) => {
+function beforeMount(monaco: Monaco): void {
   if (!monaco.languages.getLanguages().some((language) => language.id === "ail")) {
     monaco.languages.register({ id: "ail" });
     monaco.languages.setMonarchTokensProvider("ail", {
@@ -9,20 +10,22 @@ const beforeMount: BeforeMount = (monaco) => {
         root: [
           [/^#.*$/, "keyword.md"],
           [/^```.*$/, "comment"],
-          [/(^|\s);.*$/, "comment"],
+          [/^;.*$/, "comment"],
+          [/\s;.*$/, "comment"],
           [/"[^"]*"/, "string"],
           [/<-\s*\w+/, "type"],
           [/refined-by:/, "type"],
-          [/^(node|target|catalog|glossary)\b/, "keyword"],
+          [/^(node)(\s+)(\w+)/, ["keyword", "white", "type.identifier"]],
+          [/^(target|catalog|glossary)\b/, "keyword"],
           [
             /^\s+(why|what|how|look|copy|binds|free|uses|children|verify|entry|tokens|term|decide|because|rejected|examples|probes)\b/,
             "keyword",
           ],
-          [/\b(Scenario:|Given|When|Then|And)\b/, "tag"],
+          [/Scenario:/, "tag"],
+          [/\b(Given|When|Then|And)\b/, "tag"],
           [/\blevel:\s*\w+/, "attribute.name"],
           [/@\w+/, "attribute.name"],
           [/=>/, "operator"],
-          [/\b[A-Z][A-Za-z0-9]*\b/, "type.identifier"],
         ],
       },
     });
@@ -47,7 +50,7 @@ const beforeMount: BeforeMount = (monaco) => {
       "editorGutter.background": "#0f172a",
     },
   });
-};
+}
 
 /** shows the given text in a read-only code editor with AIL colours, line numbers and wrapped lines */
 export function SpecEditor({

@@ -25,17 +25,20 @@ node SpecEditor : view   level: experience
     language  in beforeMount, only if no registered language has the id "ail": register the language "ail" and set its Monarch tokenizer to one root state with these rules, in this order:
                 /^#.*$/ → "keyword.md"
                 /^```.*$/ → "comment"
-                /(^|\s);.*$/ → "comment"
+                /^;.*$/ → "comment" (a line that starts with ";")
+                /\s;.*$/ → "comment" (a ";" after whitespace, to the end of the line; a ";" right after a word is ordinary text, as in AIL itself)
                 /"[^"]*"/ → "string"
                 /<-\s*\w+/ → "type"
                 /refined-by:/ → "type"
-                /^(node|target|catalog|glossary)\b/ → "keyword"
+                /^(node)(\s+)(\w+)/ → the groups "keyword", "white", "type.identifier"
+                /^(target|catalog|glossary)\b/ → "keyword"
                 /^\s+(why|what|how|look|copy|binds|free|uses|children|verify|entry|tokens|term|decide|because|rejected|examples|probes)\b/ → "keyword"
-                /\b(Scenario:|Given|When|Then|And)\b/ → "tag"
+                /Scenario:/ → "tag"
+                /\b(Given|When|Then|And)\b/ → "tag"
                 /\blevel:\s*\w+/ → "attribute.name"
                 /@\w+/ → "attribute.name"
                 /=>/ → "operator"
-                /\b[A-Z][A-Za-z0-9]*\b/ → "type.identifier"
+              there is no rule for other capitalised words, so prose keeps the default colour
     theme     also in beforeMount: define the theme "ail-dark" with base "vs-dark", inherit true, rules keyword #c4b5fd bold, keyword.md #f8fafc bold, comment #64748b, string #fde68a, type #6ee7b7, type.identifier #93c5fd, tag #f9a8d4, attribute.name #fdba74, operator #e2e8f0, and colors editor.background #0f172a, editorLineNumber.foreground #475569, editorGutter.background #0f172a
   uses  CodeBlock
 ```

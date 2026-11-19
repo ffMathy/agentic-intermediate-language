@@ -76,3 +76,11 @@ test("a review across a spec move only shows what really changed", async () => {
   expect(r).toContain("✎ Price");
   expect(r).not.toContain("＋");
 });
+
+test("spec files are listed in explorer order: a folder's own files before its subfolders", async () => {
+  const { explorerOrder } = await import("../src/compile.ts");
+  const paths = ["home/journey/stops/1.ail.md", "site.ail.md", "home/home.ail.md", "parts/a.ail.md", "home/hero/hero.ail.md", "home/journey/journey.ail.md"];
+  expect([...paths].sort(explorerOrder)).toEqual([
+    "site.ail.md", "home/home.ail.md", "home/hero/hero.ail.md", "home/journey/journey.ail.md", "home/journey/stops/1.ail.md", "parts/a.ail.md",
+  ]);
+});

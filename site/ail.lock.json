@@ -177,16 +177,16 @@
       "by": "claude-code"
     },
     "SpecBrowser": {
-      "hash": "870c7056b5c5f5da09a418cf788db7a6623b0bb08c64670d329a90b9492c886c",
+      "hash": "a150afedabfabe9fe33bdc8c17519d5728e92ff0f1a3f1b4f95d8119bef06af4",
       "files": {
-        "src/gen/home/sections/spec-browser.tsx": "ab22c3d8aecd6e4782eb3e27551250a400dd592a09d866782260185431833330"
+        "src/gen/home/sections/spec-browser.tsx": "f78949f1dcc24861b555b121331aa5a90686fd1abbcce644d3f121186ba6ac5c"
       },
       "by": "claude-code"
     },
     "SpecEditor": {
-      "hash": "03a89db954483d1524967dad7fbeee5f1c925946235a219c475c3ffae79fa75e",
+      "hash": "38a4b77115501f3b666db53695b529a7e11a38a953ae1f0766c26bfd09e2fc55",
       "files": {
-        "src/gen/parts/spec-editor.tsx": "ade57608512f83646a3d4bbcdaf98e45dbd8aa9059daefc1fc1eb014c414cf40"
+        "src/gen/parts/spec-editor.tsx": "8b760d73fa480c9c7ea8d7053f692262773476d199f2f43af785fe8ffe9c5824"
       },
       "by": "claude-code"
     },
@@ -276,7 +276,7 @@
     }
   },
   "glue": {
-    "src/gen/spec.ts": "b2d469fb4cea4477d7f9e59a110c35c57fb72cb7c950d0ff1431a88b558f24ad",
+    "src/gen/spec.ts": "6677b735fc2a9a7639ec36ee105cae18685a6d2f9ce99fc13707bfe79286ef36",
     "src/gen/tokens.css": "96a00a6a703f636d695fff18053dd9f7b8aec721eac85307f65d1c1dd274718a"
   }
 }

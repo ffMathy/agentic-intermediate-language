@@ -1,4 +1,4 @@
-// ail-derived-from: StopSystem@f5176d9006c4c19d
+// ail-derived-from: StopSystem@55bf1d18390e9553
 import { afterEach, expect, test } from "bun:test";
 import { cleanup, render, screen, within } from "@testing-library/react";
 import { StopSystem } from "../../../../src/gen/home/journey/stops/stop-system";
@@ -7,7 +7,7 @@ afterEach(() => {
   cleanup();
 });
 
-const LINES: string[] = [
+const lines = [
   "node Engine : library   level: system",
   "  why   One set of rules for every part of the game, so playing and watching can never disagree.   <- TicTacToe",
   "  children  GameState, Rules, GameReducer, ComputerPlayer",
@@ -44,8 +44,9 @@ test("the system level", () => {
     name: "System-level spec excerpt",
   });
   const text = region.textContent ?? "";
-  for (const line of LINES) {
-    expect(text).toContain(line);
+  expect(lines.length).toBe(15);
+  for (const line of lines) {
+    expect(text).toContain(line.trim());
   }
 
   const highlighted = Array.from(region.querySelectorAll("*")).filter(

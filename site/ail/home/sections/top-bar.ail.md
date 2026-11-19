@@ -13,8 +13,9 @@ node TopBar : view   level: experience
   look
     bar       a header element: full width, background color.surface, a 1px solid color.border bottom border, box-sizing border-box, pad space.3 space.4
     row       inside, a div with max-width width.content, margin 0 auto; stack(h, gap: space.4, align: center, justify: between, wrap: true) [ brand, nav ]
-    brand     stack(h, gap: space.2, align: center, wrap: true) [ wordmark, name ]
-    wordmark  font.sans at 20px, weight 800, color.accent, letter-spacing -0.01em
+    brand     stack(h, gap: space.2, align: center, wrap: true) [ glass, wordmark, name ]
+    glass     a small beer glass beside the name: an aria-hidden svg, display block, viewBox 0 0 22 28, width 22px, height 28px: path "M3 4 H19 L17.5 26 H4.5 Z" fill color.level.experience, then path "M3 4 H19 L18.6 10 H3.4 Z" fill color.page, both stroke color.text, stroke-width 2, stroke-linejoin round
+    wordmark  font.display at 24px, weight 800, color.text, letter-spacing -0.01em
     name      font.small, color.text.muted
     nav       a nav element; stack(h, gap: space.4, align: center, wrap: true) [ links ]
     link      font.small, weight 600, color.text, no underline, pad space.1 0

@@ -65,7 +65,7 @@ node SectionHeading : view   level: experience
   look
     layout   stack(v, gap: space.3, align: start) [ eyebrow, heading, lead ]
     eyebrow  a p: font.tiny, weight 700, letter-spacing 0.12em, color.accent, margin 0
-    heading  an h2: font.heading, weight 800, line-height 1.15, letter-spacing -0.01em, color.text, margin 0
+    heading  an h2: font.display at font.heading, weight 700, line-height 1.1, letter-spacing -0.01em, color.text, margin 0
     lead     a p: font.lead, line-height 1.6, color.text.muted, max-width width.prose, margin 0
   binds
     props    text: string, eyebrow?: string, lead?: string

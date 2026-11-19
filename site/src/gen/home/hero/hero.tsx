@@ -19,18 +19,23 @@ export function Hero() {
             style={{
               fontSize: "var(--font-tiny)",
               fontWeight: 700,
-              letterSpacing: "0.12em",
-              color: "var(--color-accent)",
+              letterSpacing: "0.08em",
+              color: "var(--color-stop-text)",
+              background: "var(--color-accent-soft)",
+              border: "1px solid var(--color-border)",
+              borderRadius: "var(--radius-pill)",
+              padding: "var(--space-1) var(--space-3)",
               margin: 0,
             }}
           >
-            A SPEC LANGUAGE FOR AI-BUILT SOFTWARE
+            AIL, SAID LIKE THE ALE · A SPEC LANGUAGE FOR AI-BUILT SOFTWARE
           </p>
           <h1
             style={{
+              fontFamily: "var(--font-display)",
               fontSize: "var(--font-hero)",
               fontWeight: 800,
-              lineHeight: 1.1,
+              lineHeight: 1.05,
               letterSpacing: "-0.02em",
               color: "var(--color-text)",
               margin: 0,
@@ -57,7 +62,7 @@ export function Hero() {
                 background: "var(--color-accent)",
                 color: "var(--color-on-accent)",
                 border: "2px solid var(--color-accent)",
-                borderRadius: "var(--radius-md)",
+                borderRadius: "var(--radius-pill)",
                 padding: "var(--space-3) var(--space-6)",
                 fontWeight: 700,
                 textDecoration: "none",
@@ -68,10 +73,10 @@ export function Hero() {
             <a
               href="#stop-8"
               style={{
-                background: "var(--color-surface)",
-                color: "var(--color-accent)",
-                border: "2px solid var(--color-accent)",
-                borderRadius: "var(--radius-md)",
+                background: "transparent",
+                color: "var(--color-text)",
+                border: "2px solid var(--color-text)",
+                borderRadius: "var(--radius-pill)",
                 padding: "var(--space-3) var(--space-6)",
                 fontWeight: 700,
                 textDecoration: "none",

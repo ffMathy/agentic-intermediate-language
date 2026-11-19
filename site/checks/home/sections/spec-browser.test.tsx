@@ -1,92 +1,89 @@
-// ail-derived-from: SpecBrowser@0993ef6ea6ad6a92
+// ail-derived-from: SpecBrowser@e4dc668c38f3f1e3
 import { afterEach, beforeEach, expect, test } from "bun:test";
-import { act, cleanup, fireEvent, render, screen } from "@testing-library/react";
+import { cleanup, fireEvent, render, screen, within } from "@testing-library/react";
 import { SpecBrowser } from "../../../src/gen/home/sections/spec-browser";
 import { specProjects } from "../../../src/gen/spec";
 
-const ownPath = "home/sections/spec-browser.ail.md";
-
-function setHash(hash: string): void {
-  window.history.replaceState(null, "", hash === "" ? window.location.pathname : hash);
-}
+const PLAY_LINK = "#spec/tictactoe/app/play/play.ail.md";
 
 beforeEach(() => {
+  window.location.hash = "";
   if (typeof Element.prototype.scrollIntoView !== "function") {
-    Element.prototype.scrollIntoView = function scrollIntoView(): void {};
+    Element.prototype.scrollIntoView = () => {};
   }
-  setHash("");
 });
 
 afterEach(() => {
   cleanup();
-  setHash("");
-  document.querySelectorAll("a[data-test-link]").forEach((a) => a.remove());
+  window.location.hash = "";
 });
 
-function pressed(name: string): string | null {
-  return screen.getByRole("button", { name }).getAttribute("aria-pressed");
+function projectButton(name: string): HTMLElement {
+  const group = screen.getByRole("group", { name: "Projects" });
+  return within(group).getByRole("button", { name });
 }
 
-test("this section shows its own spec first", () => {
+function fileButton(path: string): HTMLElement {
+  const nav = screen.getByRole("navigation", { name: "Spec files" });
+  return within(nav).getByRole("button", { name: path });
+}
+
+test("the demo's spec is shown first", () => {
   render(<SpecBrowser />);
-  expect(pressed("This website")).toBe("true");
-  expect(pressed(ownPath)).toBe("true");
-  const region = screen.getByRole("region", { name: `Source of ${ownPath}` });
-  expect(region.textContent ?? "").toContain("node SpecBrowser : flow");
+  expect(projectButton("Tic-Tac-Toe demo").getAttribute("aria-pressed")).toBe("true");
+  expect(fileButton("tictactoe.ail.md").getAttribute("aria-pressed")).toBe("true");
+  const region = screen.getByRole("region", { name: "Source of tictactoe.ail.md" });
+  expect(region.textContent ?? "").toContain("node TicTacToe : system");
 });
 
 test("picking another file", () => {
   render(<SpecBrowser />);
-  act(() => {
-    fireEvent.click(screen.getByRole("button", { name: "site.ail.md" }));
-  });
-  expect(pressed("site.ail.md")).toBe("true");
-  expect(pressed(ownPath)).not.toBe("true");
-  const region = screen.getByRole("region", { name: "Source of site.ail.md" });
-  expect(region.textContent ?? "").toContain("node AIL : system");
+  fireEvent.click(fileButton("board/board.ail.md"));
+  expect(fileButton("board/board.ail.md").getAttribute("aria-pressed")).toBe("true");
+  expect(fileButton("tictactoe.ail.md").getAttribute("aria-pressed")).not.toBe("true");
+  const region = screen.getByRole("region", { name: "Source of board/board.ail.md" });
+  expect(region.textContent ?? "").toContain("node BoardView : view");
 });
 
-test("showing the demo", () => {
+test("showing this website's spec", () => {
   const { container } = render(<SpecBrowser />);
-  act(() => {
-    fireEvent.click(screen.getByRole("button", { name: "Tic-Tac-Toe demo" }));
-  });
-  expect(pressed("Tic-Tac-Toe demo")).toBe("true");
-  expect(pressed("This website")).not.toBe("true");
-  const demo = specProjects.find((p) => p.key === "tictactoe");
-  expect(demo).toBeDefined();
-  if (!demo) return;
-  expect(pressed(demo.files[0].path)).toBe("true");
-  const expected = `${demo.nodeCount} nodes in ${demo.files.length} files`;
-  const found = Array.from(container.querySelectorAll("*")).some(
-    (el) => (el.textContent ?? "").trim() === expected,
+  fireEvent.click(projectButton("This website"));
+  expect(projectButton("This website").getAttribute("aria-pressed")).toBe("true");
+  expect(projectButton("Tic-Tac-Toe demo").getAttribute("aria-pressed")).not.toBe("true");
+  const site = specProjects.find((p) => p.key === "site");
+  expect(site).toBeDefined();
+  if (!site) return;
+  const first = site.files[0];
+  expect(first).toBeDefined();
+  expect(fileButton(first.path).getAttribute("aria-pressed")).toBe("true");
+  const expected = `${site.nodeCount} nodes in ${site.files.length} files`;
+  const elements = Array.from(container.querySelectorAll("*"));
+  const sizeLine = elements.find(
+    (el) => (el.textContent ?? "").replace(/\s+/g, " ").trim() === expected,
   );
-  expect(found).toBe(true);
+  expect(sizeLine).toBeDefined();
 });
 
 test("opened from a link", () => {
-  setHash("#spec/tictactoe/app/play/play.ail.md");
+  window.location.hash = PLAY_LINK;
   render(<SpecBrowser />);
-  expect(pressed("Tic-Tac-Toe demo")).toBe("true");
-  expect(pressed("app/play/play.ail.md")).toBe("true");
+  expect(projectButton("Tic-Tac-Toe demo").getAttribute("aria-pressed")).toBe("true");
+  expect(fileButton("app/play/play.ail.md").getAttribute("aria-pressed")).toBe("true");
 });
 
 test("following the same link twice", () => {
-  setHash("#spec/tictactoe/app/play/play.ail.md");
-  render(<SpecBrowser />);
-  expect(pressed("app/play/play.ail.md")).toBe("true");
-  act(() => {
-    fireEvent.click(screen.getByRole("button", { name: "tictactoe.ail.md" }));
-  });
-  expect(pressed("tictactoe.ail.md")).toBe("true");
-  expect(pressed("app/play/play.ail.md")).not.toBe("true");
-  const link = document.createElement("a");
-  link.setAttribute("href", "#spec/tictactoe/app/play/play.ail.md");
-  link.setAttribute("data-test-link", "");
-  link.textContent = "play spec";
-  document.body.appendChild(link);
-  act(() => {
-    fireEvent.click(link);
-  });
-  expect(pressed("app/play/play.ail.md")).toBe("true");
+  window.location.hash = PLAY_LINK;
+  render(
+    <>
+      <SpecBrowser />
+      <a href={PLAY_LINK}>Open play spec</a>
+    </>,
+  );
+  expect(fileButton("app/play/play.ail.md").getAttribute("aria-pressed")).toBe("true");
+  fireEvent.click(fileButton("tictactoe.ail.md"));
+  expect(fileButton("tictactoe.ail.md").getAttribute("aria-pressed")).toBe("true");
+  expect(fileButton("app/play/play.ail.md").getAttribute("aria-pressed")).not.toBe("true");
+  fireEvent.click(screen.getByRole("link", { name: "Open play spec" }));
+  expect(fileButton("app/play/play.ail.md").getAttribute("aria-pressed")).toBe("true");
+  expect(fileButton("tictactoe.ail.md").getAttribute("aria-pressed")).not.toBe("true");
 });

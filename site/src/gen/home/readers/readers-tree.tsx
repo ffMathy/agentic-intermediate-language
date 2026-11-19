@@ -2,9 +2,13 @@ import { Stack } from "../../parts/stack";
 
 type Reader = "stakeholder" | "design" | "engineer" | "specialist";
 
-type Pos = { name: string; x: number; y: number };
+type TreeNode = {
+  name: string;
+  x: number;
+  y: number;
+};
 
-const WIDE: Pos[] = [
+const WIDE_NODES: TreeNode[] = [
   { name: "TicTacToe", x: 272, y: 8 },
   { name: "App", x: 60, y: 56 },
   { name: "BoardKit", x: 172, y: 56 },
@@ -20,25 +24,41 @@ const WIDE: Pos[] = [
   { name: "ChooseOpponent", x: 112, y: 168 },
 ];
 
-const OUTLINE_ORDER: { name: string; x: number }[] = [
-  { name: "TicTacToe", x: 4 },
-  { name: "App", x: 28 },
-  { name: "PlayAGame", x: 52 },
-  { name: "NewGameButton", x: 76 },
-  { name: "ChooseOpponent", x: 76 },
-  { name: "WatchADemo", x: 52 },
-  { name: "BoardKit", x: 28 },
-  { name: "Engine", x: 28 },
-  { name: "GameState", x: 52 },
-  { name: "Rules", x: 52 },
-  { name: "GameReducer", x: 52 },
-  { name: "ComputerPlayer", x: 52 },
-  { name: "UiKit", x: 28 },
+const OUTLINE_ORDER: string[] = [
+  "TicTacToe",
+  "App",
+  "PlayAGame",
+  "NewGameButton",
+  "ChooseOpponent",
+  "WatchADemo",
+  "BoardKit",
+  "Engine",
+  "GameState",
+  "Rules",
+  "GameReducer",
+  "ComputerPlayer",
+  "UiKit",
 ];
 
-const OUTLINE: Pos[] = OUTLINE_ORDER.map((row, i) => ({
-  name: row.name,
-  x: row.x,
+const OUTLINE_X: Record<string, number> = {
+  TicTacToe: 4,
+  App: 28,
+  BoardKit: 28,
+  Engine: 28,
+  UiKit: 28,
+  PlayAGame: 52,
+  WatchADemo: 52,
+  GameState: 52,
+  Rules: 52,
+  GameReducer: 52,
+  ComputerPlayer: 52,
+  NewGameButton: 76,
+  ChooseOpponent: 76,
+};
+
+const OUTLINE_NODES: TreeNode[] = OUTLINE_ORDER.map((name, i) => ({
+  name,
+  x: OUTLINE_X[name],
   y: 4 + 28 * i,
 }));
 
@@ -58,7 +78,10 @@ const EDGES: [string, string][] = [
 ];
 
 const LIT: Record<Reader, { color: string; names: string[] }> = {
-  stakeholder: { color: "var(--color-level-product)", names: ["TicTacToe"] },
+  stakeholder: {
+    color: "var(--color-level-product)",
+    names: ["TicTacToe"],
+  },
   design: {
     color: "var(--color-level-experience)",
     names: [
@@ -81,43 +104,52 @@ const LIT: Record<Reader, { color: string; names: string[] }> = {
   },
 };
 
-const find = (list: Pos[], name: string): Pos =>
-  list.find((p) => p.name === name) as Pos;
+function findNode(nodes: TreeNode[], name: string): TreeNode {
+  return nodes.find((n) => n.name === name) as TreeNode;
+}
 
-const rectStyle = (lit: boolean, color: string) =>
-  lit
-    ? { fill: color, stroke: "none" }
+function rectStyle(lit: boolean, color: string): React.CSSProperties {
+  return lit
+    ? { fill: color }
     : {
         fill: "var(--color-surface-raised)",
         stroke: "var(--color-border)",
         strokeWidth: 1,
         strokeDasharray: "3 3",
       };
+}
 
-const textStyle = (lit: boolean) => ({
-  fill: lit ? "var(--color-on-accent)" : "var(--color-text-muted)",
-  fontWeight: lit ? 700 : 400,
-  fontFamily: "var(--font-mono)",
-});
+function textStyle(lit: boolean): React.CSSProperties {
+  return {
+    fontFamily: "var(--font-mono)",
+    fill: lit ? "var(--color-on-accent)" : "var(--color-text-muted)",
+    fontWeight: lit ? 700 : 400,
+  };
+}
 
-const lineStyle = { stroke: "var(--color-border)", strokeWidth: 1 };
+const LINE_STYLE: React.CSSProperties = {
+  stroke: "var(--color-border)",
+  strokeWidth: 1,
+};
 
-/** "the nodes written at the given reader's level are filled with their level's color, and the rest fade back" */
+/** "a simplified Tic-Tac-Toe tree with thirteen of its nineteen nodes, and a note under it saying which parts are left out; the nodes written at the given reader's level are filled with their level's color, and the rest fade back" */
 export function ReadersTree({ reader }: { reader: Reader }) {
-  const { color, names } = LIT[reader];
   const label = `The Tic-Tac-Toe spec tree, with the level written for the ${reader} highlighted`;
+  const { color, names } = LIT[reader];
+  const isLit = (name: string): boolean => names.includes(name);
+
   return (
     <Stack dir="v" gap="space.2" align="stretch">
       <svg
         className="ail-wide"
-        viewBox="0 0 640 200"
         role="img"
         aria-label={label}
+        viewBox="0 0 640 200"
         style={{ width: "100%", height: "auto" }}
       >
         {EDGES.map(([from, to]) => {
-          const p = find(WIDE, from);
-          const c = find(WIDE, to);
+          const p = findNode(WIDE_NODES, from);
+          const c = findNode(WIDE_NODES, to);
           return (
             <line
               key={`${from}-${to}`}
@@ -125,12 +157,12 @@ export function ReadersTree({ reader }: { reader: Reader }) {
               y1={p.y + 24}
               x2={c.x + 48}
               y2={c.y}
-              style={lineStyle}
+              style={LINE_STYLE}
             />
           );
         })}
-        {WIDE.map((n) => {
-          const lit = names.includes(n.name);
+        {WIDE_NODES.map((n) => {
+          const lit = isLit(n.name);
           return (
             <g key={n.name} data-lit={lit ? "true" : "false"}>
               <rect
@@ -157,25 +189,31 @@ export function ReadersTree({ reader }: { reader: Reader }) {
       </svg>
       <svg
         className="ail-narrow"
-        viewBox="0 0 300 372"
         role="img"
         aria-label={label}
+        viewBox="0 0 300 372"
         style={{ width: "100%", maxWidth: "320px", height: "auto" }}
       >
         {EDGES.map(([from, to]) => {
-          const p = find(OUTLINE, from);
-          const c = find(OUTLINE, to);
-          const lx = p.x + 10;
+          const p = findNode(OUTLINE_NODES, from);
+          const c = findNode(OUTLINE_NODES, to);
+          const cx = p.x + 10;
           const cy = c.y + 11;
           return (
             <g key={`${from}-${to}`}>
-              <line x1={lx} y1={p.y + 22} x2={lx} y2={cy} style={lineStyle} />
-              <line x1={lx} y1={cy} x2={c.x} y2={cy} style={lineStyle} />
+              <line
+                x1={cx}
+                y1={p.y + 22}
+                x2={cx}
+                y2={cy}
+                style={LINE_STYLE}
+              />
+              <line x1={cx} y1={cy} x2={c.x} y2={cy} style={LINE_STYLE} />
             </g>
           );
         })}
-        {OUTLINE.map((n) => {
-          const lit = names.includes(n.name);
+        {OUTLINE_NODES.map((n) => {
+          const lit = isLit(n.name);
           return (
             <g key={n.name} data-lit={lit ? "true" : "false"}>
               <rect

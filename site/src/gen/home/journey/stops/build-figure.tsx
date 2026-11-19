@@ -1,7 +1,9 @@
-const sans = "var(--font-sans)";
-const mono = "var(--font-mono)";
+import type { CSSProperties } from "react";
 
-/** the node and the contracts it uses go into a compiler agent that sees one slice, and come out as a code file and its test */
+const sans: CSSProperties = { fontFamily: "var(--font-sans)" };
+const mono: CSSProperties = { fontFamily: "var(--font-mono)" };
+
+/** the node and the contracts it uses go into a compiler agent that sees one slice, and come out as a code file and its test; under it, two bars compare the 27 lines of the node with the 69 lines of generated code */
 export function BuildFigure() {
   return (
     <svg
@@ -21,10 +23,7 @@ export function BuildFigure() {
         width={104}
         height={64}
         rx={8}
-        style={{
-          fill: "var(--color-surface)",
-          stroke: "var(--color-border)",
-        }}
+        style={{ fill: "var(--color-surface)", stroke: "var(--color-border)" }}
       />
       <rect
         x={4}
@@ -37,7 +36,7 @@ export function BuildFigure() {
         x={16}
         y={44}
         style={{
-          fontFamily: mono,
+          ...mono,
           fontSize: 11,
           fontWeight: 700,
           fill: "var(--color-text)",
@@ -48,22 +47,14 @@ export function BuildFigure() {
       <text
         x={16}
         y={60}
-        style={{
-          fontFamily: sans,
-          fontSize: 10,
-          fill: "var(--color-text-muted)",
-        }}
+        style={{ ...sans, fontSize: 10, fill: "var(--color-text-muted)" }}
       >
         + contracts of
       </text>
       <text
         x={16}
         y={74}
-        style={{
-          fontFamily: sans,
-          fontSize: 10,
-          fill: "var(--color-text-muted)",
-        }}
+        style={{ ...sans, fontSize: 10, fill: "var(--color-text-muted)" }}
       >
         GameState, Rules
       </text>
@@ -90,7 +81,7 @@ export function BuildFigure() {
         y={46}
         textAnchor="middle"
         style={{
-          fontFamily: sans,
+          ...sans,
           fontSize: 13,
           fontWeight: 700,
           fill: "var(--color-on-accent)",
@@ -103,7 +94,7 @@ export function BuildFigure() {
         y={61}
         textAnchor="middle"
         style={{
-          fontFamily: sans,
+          ...sans,
           fontSize: 13,
           fontWeight: 700,
           fill: "var(--color-on-accent)",
@@ -116,7 +107,7 @@ export function BuildFigure() {
         y={78}
         textAnchor="middle"
         style={{
-          fontFamily: sans,
+          ...sans,
           fontSize: 10,
           fill: "var(--color-on-accent)",
           opacity: 0.85,
@@ -143,22 +134,14 @@ export function BuildFigure() {
       <text
         x={256}
         y={52}
-        style={{
-          fontFamily: mono,
-          fontSize: 9,
-          fill: "var(--color-code-text)",
-        }}
+        style={{ ...mono, fontSize: 9, fill: "var(--color-code-text)" }}
       >
         computer-player.ts
       </text>
       <text
         x={256}
         y={68}
-        style={{
-          fontFamily: mono,
-          fontSize: 9,
-          fill: "var(--color-code-muted)",
-        }}
+        style={{ ...mono, fontSize: 9, fill: "var(--color-code-muted)" }}
       >
         + its derived test
       </text>
@@ -166,7 +149,7 @@ export function BuildFigure() {
         x={4}
         y={124}
         style={{
-          fontFamily: sans,
+          ...sans,
           fontSize: 12,
           fontWeight: 700,
           fill: "var(--color-text)",
@@ -177,11 +160,7 @@ export function BuildFigure() {
       <text
         x={4}
         y={148}
-        style={{
-          fontFamily: sans,
-          fontSize: 11,
-          fill: "var(--color-text-muted)",
-        }}
+        style={{ ...sans, fontSize: 11, fill: "var(--color-text-muted)" }}
       >
         the ComputerPlayer node
       </text>
@@ -197,7 +176,7 @@ export function BuildFigure() {
         x={148}
         y={165}
         style={{
-          fontFamily: sans,
+          ...sans,
           fontSize: 11,
           fontWeight: 700,
           fill: "var(--color-text)",
@@ -208,11 +187,7 @@ export function BuildFigure() {
       <text
         x={4}
         y={192}
-        style={{
-          fontFamily: sans,
-          fontSize: 11,
-          fill: "var(--color-text-muted)",
-        }}
+        style={{ ...sans, fontSize: 11, fill: "var(--color-text-muted)" }}
       >
         the generated computer-player.ts
       </text>
@@ -229,7 +204,7 @@ export function BuildFigure() {
         y={209}
         textAnchor="end"
         style={{
-          fontFamily: sans,
+          ...sans,
           fontSize: 11,
           fontWeight: 700,
           fill: "var(--color-on-accent)",
@@ -240,11 +215,7 @@ export function BuildFigure() {
       <text
         x={4}
         y={244}
-        style={{
-          fontFamily: mono,
-          fontSize: 11,
-          fill: "var(--color-text-muted)",
-        }}
+        style={{ ...mono, fontSize: 11, fill: "var(--color-text-muted)" }}
       >
         ail.lock.json pins the file to its node's hash
       </text>

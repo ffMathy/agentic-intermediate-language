@@ -18,7 +18,7 @@ export function CopyCommand({ command }: { command: string }) {
   }, [copied]);
 
   const press = () => {
-    if (typeof navigator === "undefined" || !navigator.clipboard) {
+    if (!navigator.clipboard) {
       return;
     }
     navigator.clipboard.writeText(command).then(

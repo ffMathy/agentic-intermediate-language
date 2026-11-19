@@ -1,4 +1,4 @@
-// ail-derived-from: HeroFigure@9362171defcae741
+// ail-derived-from: HeroFigure@4ff32fd5130d0f8f
 import { afterEach, expect, test } from "bun:test";
 import { cleanup, render, screen } from "@testing-library/react";
 import { HeroFigure } from "../../../src/gen/home/hero/hero-figure";
@@ -15,6 +15,7 @@ test("the picture is described", () => {
   expect(image).toBeTruthy();
   const text = image.textContent ?? "";
   for (const expected of [
+    "Tic-Tac-Toe.",
     "The computer never loses.",
     "Product",
     "Experience",

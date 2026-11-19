@@ -12,14 +12,6 @@ export function IdeaFigure() {
         display: "block",
       }}
     >
-      <path
-        d="M48 122 L40 148 L74 122"
-        style={{
-          fill: "var(--color-surface)",
-          stroke: "var(--color-border)",
-          strokeWidth: 2,
-        }}
-      />
       <rect
         x={10}
         y={10}
@@ -28,6 +20,21 @@ export function IdeaFigure() {
         rx={16}
         style={{
           fill: "var(--color-surface)",
+          stroke: "var(--color-border)",
+          strokeWidth: 2,
+        }}
+      />
+      <path
+        d="M48 121 L40 148 L74 121 Z"
+        style={{
+          fill: "var(--color-surface)",
+          stroke: "none",
+        }}
+      />
+      <path
+        d="M48 124 L40 148 L74 124"
+        style={{
+          fill: "none",
           stroke: "var(--color-border)",
           strokeWidth: 2,
         }}

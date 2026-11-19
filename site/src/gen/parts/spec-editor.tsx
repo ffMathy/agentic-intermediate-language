@@ -1,5 +1,12 @@
-import Editor, { type BeforeMount } from "@monaco-editor/react";
+import Editor from "@monaco-editor/react";
+import type { BeforeMount } from "@monaco-editor/react";
 import { CodeBlock } from "./code-block";
+
+export type SpecEditorProps = {
+  text: string;
+  path: string;
+  label: string;
+};
 
 const beforeMount: BeforeMount = (monaco) => {
   if (!monaco.languages.getLanguages().some((language) => language.id === "ail")) {
@@ -33,34 +40,26 @@ const beforeMount: BeforeMount = (monaco) => {
     base: "vs-dark",
     inherit: true,
     rules: [
-      { token: "keyword", foreground: "#c4b5fd", fontStyle: "bold" },
-      { token: "keyword.md", foreground: "#f8fafc", fontStyle: "bold" },
-      { token: "comment", foreground: "#64748b" },
-      { token: "string", foreground: "#fde68a" },
-      { token: "type", foreground: "#6ee7b7" },
-      { token: "type.identifier", foreground: "#93c5fd" },
-      { token: "tag", foreground: "#f9a8d4" },
-      { token: "attribute.name", foreground: "#fdba74" },
-      { token: "operator", foreground: "#e2e8f0" },
+      { token: "keyword", foreground: "fbbf24", fontStyle: "bold" },
+      { token: "keyword.md", foreground: "f6ead6", fontStyle: "bold" },
+      { token: "comment", foreground: "8a7259" },
+      { token: "string", foreground: "fde68a" },
+      { token: "type", foreground: "a3e635" },
+      { token: "type.identifier", foreground: "fdba74" },
+      { token: "tag", foreground: "f9a8d4" },
+      { token: "attribute.name", foreground: "fca5a5" },
+      { token: "operator", foreground: "f6ead6" },
     ],
     colors: {
-      "editor.background": "#0f172a",
-      "editorLineNumber.foreground": "#475569",
-      "editorGutter.background": "#0f172a",
+      "editor.background": "#1b120a",
+      "editorLineNumber.foreground": "#6b5340",
+      "editorGutter.background": "#1b120a",
     },
   });
 };
 
-/** "shows the given text in a read-only code editor with AIL colours, line numbers and wrapped lines" */
-export function SpecEditor({
-  text,
-  path,
-  label,
-}: {
-  text: string;
-  path: string;
-  label: string;
-}) {
+/** shows the given text in a read-only code editor with AIL colours, line numbers and wrapped lines */
+export function SpecEditor({ text, path, label }: SpecEditorProps) {
   const lines = text.split(/\r?\n/);
   if (lines.length > 0 && lines[lines.length - 1] === "") {
     lines.pop();

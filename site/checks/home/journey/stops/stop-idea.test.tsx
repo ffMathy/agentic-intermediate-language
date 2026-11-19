@@ -1,4 +1,4 @@
-// ail-derived-from: StopIdea@a4a6bb874b09b37a
+// ail-derived-from: StopIdea@31d2ba75f380b2dd
 import { afterEach, expect, test } from "bun:test";
 import { cleanup, render, screen, within } from "@testing-library/react";
 import { StopIdea } from "../../../../src/gen/home/journey/stops/stop-idea";
@@ -24,9 +24,10 @@ test("the idea", () => {
   const article = document.getElementById("stop-1");
   expect(article).not.toBeNull();
   expect(article?.tagName).toBe("ARTICLE");
-  const scoped = within(article as HTMLElement);
+  const scope = within(article as HTMLElement);
+
   expect(
-    scoped.getByRole("heading", {
+    scope.getByRole("heading", {
       level: 3,
       name: "It starts with what the product owner wants.",
     }),
@@ -36,11 +37,12 @@ test("the idea", () => {
     name: "What the product owner asked for",
   });
   const text = region.textContent ?? "";
-  let position = -1;
+
+  let last = -1;
   for (const line of lines) {
-    const found = text.indexOf(line, position + 1);
-    expect(found).toBeGreaterThan(position);
-    position = found;
+    const at = text.indexOf(line, last + 1);
+    expect(at).toBeGreaterThan(last);
+    last = at;
   }
 
   const highlight = "4. The computer never loses.";

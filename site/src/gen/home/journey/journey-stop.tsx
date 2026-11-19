@@ -20,9 +20,9 @@ type JourneyStopProps = {
   browse?: string;
 };
 
-const tokenVar = (name: string): string => `var(--${name.replace(/\./g, "-")})`;
+const tokenVar = (token: string): string => `var(--${token.replace(/\./g, "-")})`;
 
-/** "Every stop has the same anatomy, so the visitor compares levels instead of learning a new layout each time." */
+/** "in this order: the level chip, who reads this level, a level 3 heading, an explanation and a figure, the spec excerpt with the thread highlighted, and what this level turns into" */
 export function JourneyStop({
   number,
   color,
@@ -55,14 +55,25 @@ export function JourneyStop({
       <div style={{ gridColumn: 1, position: "relative" }}>
         <div
           aria-hidden="true"
-          style={{
-            position: "absolute",
-            left: "calc(clamp(32px, 9vw, 56px) / 2 - 2px)",
-            top: 0,
-            width: "4px",
-            background: stopColor,
-            ...(last ? { height: "36px" } : { bottom: 0 }),
-          }}
+          style={
+            last
+              ? {
+                  position: "absolute",
+                  left: "calc(clamp(32px, 9vw, 56px) / 2 - 2px)",
+                  top: 0,
+                  width: "4px",
+                  background: stopColor,
+                  height: "36px",
+                }
+              : {
+                  position: "absolute",
+                  left: "calc(clamp(32px, 9vw, 56px) / 2 - 2px)",
+                  top: 0,
+                  width: "4px",
+                  background: stopColor,
+                  bottom: 0,
+                }
+          }
         />
         <div
           aria-hidden="true"
@@ -131,9 +142,10 @@ export function JourneyStop({
         </Stack>
         <h3
           style={{
+            fontFamily: "var(--font-display)",
             fontSize: "var(--font-stop)",
-            fontWeight: 800,
-            lineHeight: 1.2,
+            fontWeight: 700,
+            lineHeight: 1.15,
             letterSpacing: "-0.01em",
             color: "var(--color-text)",
             margin: 0,
@@ -182,7 +194,7 @@ export function JourneyStop({
           highlight={highlight}
           edge={color}
         />
-        {browse !== undefined ? (
+        {browse !== undefined && (
           <a
             href={browse}
             style={{
@@ -195,7 +207,7 @@ export function JourneyStop({
           >
             Open the whole file in the spec browser ↓
           </a>
-        ) : null}
+        )}
         <p
           style={{
             maxWidth: "var(--width-prose)",
@@ -208,8 +220,7 @@ export function JourneyStop({
             margin: 0,
           }}
         >
-          <span style={{ fontWeight: 700, color: "var(--color-accent)" }}>Turns into:</span>
-          {" "}
+          <span style={{ fontWeight: 700, color: "var(--color-accent)" }}>Turns into:</span>{" "}
           {turnsInto}
         </p>
       </Stack>

@@ -1,6 +1,6 @@
 import { Stack } from "../../../parts/stack";
 
-const trace = [
+const traceLines: { seen: string; source: string }[] = [
   { seen: "“X's turn”", source: "StatusLine copy" },
   { seen: "the O after 300 ms", source: "PlayAGame decision" },
   { seen: "the square the O picks", source: "ComputerPlayer" },
@@ -72,7 +72,7 @@ export function ResultFrame() {
           alignItems: "stretch",
         }}
       >
-        {trace.map((line) => (
+        {traceLines.map((line) => (
           <li
             key={line.source}
             style={{

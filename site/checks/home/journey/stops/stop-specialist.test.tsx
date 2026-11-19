@@ -1,4 +1,4 @@
-// ail-derived-from: StopSpecialist@8f459f55f084ced6
+// ail-derived-from: StopSpecialist@676dfc8af4b3cdf6
 import { afterEach, expect, test } from "bun:test";
 import { cleanup, render, screen, within } from "@testing-library/react";
 import { StopSpecialist } from "../../../../src/gen/home/journey/stops/stop-specialist";
@@ -7,7 +7,7 @@ afterEach(() => {
   cleanup();
 });
 
-const lines: string[] = [
+const lines = [
   "node ComputerPlayer : fn   level: specialist   @ai",
   "  why   Make \"the computer never loses\" true and provable, while still answering instantly.   <- Engine",
   "  what",
@@ -25,7 +25,7 @@ const lines: string[] = [
   "                 and assert that no game ends in a win for X",
 ];
 
-const marks: string[] = [
+const marks = [
   "never loses",
   "no game against choose ends in a win for the other player",
 ];
@@ -37,30 +37,31 @@ test("the specialist level", () => {
     .getAllByRole("article")
     .find((el) => el.id === "stop-5");
   expect(article).toBeDefined();
-  if (!article) return;
+  const stop = article as HTMLElement;
 
   expect(
-    within(article).getByRole("heading", {
+    within(stop).getByRole("heading", {
       level: 3,
       name: "Specialist level: the promise becomes an algorithm and a proof.",
     }),
   ).toBeTruthy();
 
-  const region = within(article).getByRole("region", {
+  const region = within(stop).getByRole("region", {
     name: "Specialist-level spec excerpt",
   });
   const text = region.textContent ?? "";
 
-  let last = -1;
+  let from = 0;
   for (const line of lines) {
-    const at = text.indexOf(line, last + 1);
-    expect(at).toBeGreaterThan(last);
-    last = at;
+    const at = text.indexOf(line, from);
+    expect(at).toBeGreaterThanOrEqual(0);
+    from = at + line.length;
   }
 
-  const elements = Array.from(region.querySelectorAll("*"));
   for (const mark of marks) {
-    const highlighted = elements.filter((el) => el.textContent === mark);
+    const highlighted = Array.from(region.querySelectorAll("*")).filter(
+      (el) => el.textContent === mark,
+    );
     expect(highlighted.length).toBeGreaterThan(0);
   }
 });

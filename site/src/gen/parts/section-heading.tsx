@@ -1,18 +1,17 @@
+import type { ReactElement } from "react";
 import { Stack } from "./stack";
 
-/** shows the eyebrow when given, the text as a level 2 heading, and the lead when given, in that order */
-export function SectionHeading({
-  text,
-  eyebrow,
-  lead,
-}: {
+export type SectionHeadingProps = {
   text: string;
   eyebrow?: string;
   lead?: string;
-}) {
+};
+
+/** shows the eyebrow when given, the text as a level 2 heading, and the lead when given, in that order */
+export function SectionHeading({ text, eyebrow, lead }: SectionHeadingProps): ReactElement {
   return (
     <Stack dir="v" gap="space.3" align="start">
-      {eyebrow !== undefined && (
+      {eyebrow !== undefined ? (
         <p
           style={{
             fontSize: "var(--font-tiny)",
@@ -24,12 +23,13 @@ export function SectionHeading({
         >
           {eyebrow}
         </p>
-      )}
+      ) : null}
       <h2
         style={{
+          fontFamily: "var(--font-display)",
           fontSize: "var(--font-heading)",
-          fontWeight: 800,
-          lineHeight: 1.15,
+          fontWeight: 700,
+          lineHeight: 1.1,
           letterSpacing: "-0.01em",
           color: "var(--color-text)",
           margin: 0,
@@ -37,7 +37,7 @@ export function SectionHeading({
       >
         {text}
       </h2>
-      {lead !== undefined && (
+      {lead !== undefined ? (
         <p
           style={{
             fontSize: "var(--font-lead)",
@@ -49,7 +49,7 @@ export function SectionHeading({
         >
           {lead}
         </p>
-      )}
+      ) : null}
     </Stack>
   );
 }

@@ -1,4 +1,4 @@
-// ail-derived-from: GapStrip@86660b1b2845ee65
+// ail-derived-from: GapStrip@aad6d86125f8684f
 import { afterEach, expect, test } from "bun:test";
 import { cleanup, render, screen } from "@testing-library/react";
 import { GapStrip } from "../../../src/gen/home/sections/gap-strip";
@@ -14,8 +14,9 @@ test("three cards", () => {
     level: 2,
     name: "Between a prompt and the code, there is nothing to review.",
   });
-  const eyebrow = screen.getByText("THE PROBLEM");
   expect(container.contains(heading)).toBe(true);
+
+  const eyebrow = screen.getByText("THE PROBLEM");
   expect(container.contains(eyebrow)).toBe(true);
   expect(
     eyebrow.compareDocumentPosition(heading) & Node.DOCUMENT_POSITION_FOLLOWING,
@@ -23,7 +24,8 @@ test("three cards", () => {
 
   const titles = screen
     .getAllByRole("heading", { level: 3 })
-    .map((h) => (h.textContent ?? "").trim());
+    .filter((el) => container.contains(el))
+    .map((el) => (el.textContent ?? "").trim());
   expect(titles).toEqual([
     "A prompt is too vague",
     "Code is too detailed",

@@ -1,4 +1,4 @@
-// ail-derived-from: IdeaFigure@a427dd64897872d2
+// ail-derived-from: IdeaFigure@6458b7fa320d4df3
 import { afterEach, expect, test } from "bun:test";
 import { cleanup, render, screen } from "@testing-library/react";
 import { IdeaFigure } from "../../../../src/gen/home/journey/stops/idea-figure";

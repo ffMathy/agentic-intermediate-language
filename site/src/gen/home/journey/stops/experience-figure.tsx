@@ -2,6 +2,13 @@ import { MiniBoard } from "../../../parts/mini-board";
 
 /** three small boards: empty, then X in the center, then an O answering in the top-left corner, with "300 ms" between the last two and the status line under them */
 export function ExperienceFigure() {
+  const muted = "var(--color-text-muted)";
+  const captionStyle = {
+    fontFamily: "var(--font-sans)",
+    fontSize: 13,
+    fill: muted,
+  };
+  const captionBold = { ...captionStyle, fontWeight: 700 };
   return (
     <svg
       viewBox="0 0 360 176"
@@ -22,46 +29,36 @@ export function ExperienceFigure() {
         y1={49}
         x2={133}
         y2={49}
-        style={{ stroke: "var(--color-text-muted)", strokeWidth: 2 }}
-      />
-      <path
-        d="M127 44 L135 49 L127 54 Z"
-        style={{ fill: "var(--color-text-muted)" }}
+        style={{ stroke: muted, strokeWidth: 2 }}
       />
       <line
         x1={225}
         y1={49}
         x2={268}
         y2={49}
-        style={{ stroke: "var(--color-text-muted)", strokeWidth: 2 }}
+        style={{ stroke: muted, strokeWidth: 2 }}
       />
-      <path
-        d="M262 44 L270 49 L262 54 Z"
-        style={{ fill: "var(--color-text-muted)" }}
-      />
+      <path d="M127 44 L135 49 L127 54 Z" style={{ fill: muted }} />
+      <path d="M262 44 L270 49 L262 54 Z" style={{ fill: muted }} />
       <circle
         cx={247}
         cy={26}
         r={8}
-        style={{
-          fill: "none",
-          stroke: "var(--color-text-muted)",
-          strokeWidth: 1.5,
-        }}
+        style={{ fill: "none", stroke: muted, strokeWidth: 1.5 }}
       />
       <line
         x1={247}
         y1={26}
         x2={247}
         y2={21}
-        style={{ stroke: "var(--color-text-muted)", strokeWidth: 1.5 }}
+        style={{ stroke: muted, strokeWidth: 1.5 }}
       />
       <line
         x1={247}
         y1={16}
         x2={247}
         y2={14}
-        style={{ stroke: "var(--color-text-muted)", strokeWidth: 1.5 }}
+        style={{ stroke: muted, strokeWidth: 1.5 }}
       />
       <text
         x={247}
@@ -75,79 +72,22 @@ export function ExperienceFigure() {
       >
         300 ms
       </text>
-      <text
-        x={45}
-        y={106}
-        textAnchor="middle"
-        style={{
-          fontFamily: "var(--font-sans)",
-          fontSize: 13,
-          fontWeight: 700,
-          fill: "var(--color-text-muted)",
-        }}
-      >
+      <text x={45} y={106} textAnchor="middle" style={captionBold}>
         Given:
       </text>
-      <text
-        x={45}
-        y={122}
-        textAnchor="middle"
-        style={{
-          fontFamily: "var(--font-sans)",
-          fontSize: 13,
-          fill: "var(--color-text-muted)",
-        }}
-      >
+      <text x={45} y={122} textAnchor="middle" style={captionStyle}>
         vs computer
       </text>
-      <text
-        x={180}
-        y={106}
-        textAnchor="middle"
-        style={{
-          fontFamily: "var(--font-sans)",
-          fontSize: 13,
-          fontWeight: 700,
-          fill: "var(--color-text-muted)",
-        }}
-      >
+      <text x={180} y={106} textAnchor="middle" style={captionBold}>
         When:
       </text>
-      <text
-        x={180}
-        y={122}
-        textAnchor="middle"
-        style={{
-          fontFamily: "var(--font-sans)",
-          fontSize: 13,
-          fill: "var(--color-text-muted)",
-        }}
-      >
+      <text x={180} y={122} textAnchor="middle" style={captionStyle}>
         X picks
       </text>
-      <text
-        x={315}
-        y={106}
-        textAnchor="middle"
-        style={{
-          fontFamily: "var(--font-sans)",
-          fontSize: 13,
-          fontWeight: 700,
-          fill: "var(--color-text-muted)",
-        }}
-      >
+      <text x={315} y={106} textAnchor="middle" style={captionBold}>
         Then:
       </text>
-      <text
-        x={315}
-        y={122}
-        textAnchor="middle"
-        style={{
-          fontFamily: "var(--font-sans)",
-          fontSize: 13,
-          fill: "var(--color-text-muted)",
-        }}
-      >
+      <text x={315} y={122} textAnchor="middle" style={captionStyle}>
         O answers
       </text>
       <rect
@@ -156,10 +96,7 @@ export function ExperienceFigure() {
         width={120}
         height={32}
         rx={16}
-        style={{
-          fill: "var(--color-surface)",
-          stroke: "var(--color-border)",
-        }}
+        style={{ fill: "var(--color-surface)", stroke: "var(--color-border)" }}
       />
       <text
         x={180}

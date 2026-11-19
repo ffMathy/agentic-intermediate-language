@@ -1,7 +1,21 @@
-// ail-derived-from: SpecEditor@08a61a463791af11
-import { afterEach, expect, test } from "bun:test";
+// ail-derived-from: SpecEditor@74cf657a51d43dbd
+import { afterEach, expect, mock, test } from "bun:test";
 import { cleanup, render, screen } from "@testing-library/react";
-import { SpecEditor } from "../../src/gen/parts/spec-editor";
+import type { ReactNode } from "react";
+
+mock.module("@monaco-editor/react", () => {
+  const Editor = (props: { loading?: ReactNode }) => <>{props.loading}</>;
+  return {
+    default: Editor,
+    Editor,
+    loader: {
+      config: () => {},
+      init: () => new Promise(() => {}),
+    },
+  };
+});
+
+const { SpecEditor } = await import("../../src/gen/parts/spec-editor");
 
 afterEach(() => {
   cleanup();

@@ -26,8 +26,8 @@ export function SystemFigure() {
         x={8}
         y={124}
         fontSize={11}
-        fill="var(--color-text-muted)"
         fontFamily="var(--font-sans)"
+        fill="var(--color-text-muted)"
       >
         9 squares, row by row
       </text>
@@ -53,8 +53,8 @@ export function SystemFigure() {
         y={67}
         textAnchor="middle"
         fontSize={13}
-        fill="var(--color-on-accent)"
         fontFamily="var(--font-mono)"
+        fill="var(--color-on-accent)"
       >
         evaluate
       </text>
@@ -96,8 +96,8 @@ export function SystemFigure() {
         y={31}
         textAnchor="middle"
         fontSize={12}
-        fill="var(--color-text)"
         fontFamily="var(--font-mono)"
+        fill="var(--color-text)"
       >
         won · X
       </text>
@@ -115,8 +115,8 @@ export function SystemFigure() {
         y={66}
         textAnchor="middle"
         fontSize={12}
-        fill="var(--color-text)"
         fontFamily="var(--font-mono)"
+        fill="var(--color-text)"
       >
         draw
       </text>
@@ -134,8 +134,8 @@ export function SystemFigure() {
         y={101}
         textAnchor="middle"
         fontSize={12}
-        fill="var(--color-text)"
         fontFamily="var(--font-mono)"
+        fill="var(--color-text)"
       >
         playing
       </text>
@@ -150,8 +150,8 @@ export function SystemFigure() {
         y={150}
         textAnchor="middle"
         fontSize={11}
-        fill="var(--color-text-muted)"
         fontFamily="var(--font-sans)"
+        fill="var(--color-text-muted)"
       >
         Engine: shared by play and watch
       </text>

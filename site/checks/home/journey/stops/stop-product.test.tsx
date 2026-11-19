@@ -1,6 +1,6 @@
-// ail-derived-from: StopProduct@04034fc30e7652ee
+// ail-derived-from: StopProduct@47afee876beb37a0
 import { afterEach, expect, test } from "bun:test";
-import { cleanup, render, screen, within } from "@testing-library/react";
+import { cleanup, render, within } from "@testing-library/react";
 import { StopProduct } from "../../../../src/gen/home/journey/stops/stop-product";
 
 afterEach(() => {
@@ -21,30 +21,32 @@ const lines = [
   "  children  App, BoardKit, Engine, UiKit",
 ];
 
-const squash = (s: string): string => s.replace(/\s+/g, " ").trim();
+const marks = ["4. The computer never loses.", "refined-by: ComputerPlayer"];
 
 test("the product level", () => {
   const { container } = render(<StopProduct />);
-
-  const article = container.querySelector("article#stop-2");
+  const article = container.querySelector("#stop-2");
   expect(article).not.toBeNull();
-  const art = article as HTMLElement;
+  const el = article as HTMLElement;
+  const isArticle =
+    el.tagName.toLowerCase() === "article" || el.getAttribute("role") === "article";
+  expect(isArticle).toBe(true);
 
-  expect(
-    within(art).getByRole("heading", {
-      level: 3,
-      name: "Product level: each requirement becomes a promise with an owner.",
-    }),
-  ).toBeTruthy();
+  within(el).getByRole("heading", {
+    level: 3,
+    name: "Product level: each requirement becomes a promise with an owner.",
+  });
 
-  const region = screen.getByRole("region", { name: "Product-level spec excerpt" });
-  expect(art.contains(region)).toBe(true);
-
-  const text = squash(region.textContent ?? "");
+  const region = within(el).getByRole("region", { name: "Product-level spec excerpt" });
+  const text = region.textContent ?? "";
   for (const line of lines) {
-    expect(text).toContain(squash(line));
+    expect(text).toContain(line);
   }
 
-  expect(within(region).getAllByText("4. The computer never loses.").length).toBeGreaterThan(0);
-  expect(within(region).getAllByText("refined-by: ComputerPlayer").length).toBeGreaterThan(0);
+  for (const mark of marks) {
+    const highlighted = Array.from(region.querySelectorAll("*")).filter(
+      (node) => (node.textContent ?? "").trim() === mark,
+    );
+    expect(highlighted.length).toBeGreaterThan(0);
+  }
 });

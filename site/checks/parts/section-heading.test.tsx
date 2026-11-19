@@ -1,4 +1,4 @@
-// ail-derived-from: SectionHeading@6882c56ca52aad59
+// ail-derived-from: SectionHeading@2859a17e07a8ef82
 import { afterEach, expect, test } from "bun:test";
 import { cleanup, render, screen } from "@testing-library/react";
 import { SectionHeading } from "../../src/gen/parts/section-heading";
@@ -25,7 +25,8 @@ test("a full heading", () => {
   const lead = screen.getByText("Read on.");
 
   expect(
-    eyebrow.compareDocumentPosition(heading) & Node.DOCUMENT_POSITION_FOLLOWING,
+    heading.compareDocumentPosition(eyebrow) &
+      Node.DOCUMENT_POSITION_PRECEDING,
   ).toBeTruthy();
   expect(
     heading.compareDocumentPosition(lead) & Node.DOCUMENT_POSITION_FOLLOWING,
@@ -39,6 +40,6 @@ test("just a heading", () => {
     name: "Start in two minutes",
   });
   expect(heading.textContent).toBe("Start in two minutes");
-  expect(screen.getAllByRole("heading")).toHaveLength(1);
+  expect(screen.getAllByRole("heading").length).toBe(1);
   expect(container.textContent).toBe("Start in two minutes");
 });

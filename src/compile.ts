@@ -12,7 +12,7 @@ import type { AilNode } from "./parse.ts";
 import { plan } from "./plan.ts";
 import { AIL_HOME, isCompilable, kebab, modulePath, topoByUses, type Project } from "./project.ts";
 import type { Provider } from "./providers/index.ts";
-import { checkHeader, checkPath, derivedCheckFile, loadPrompt, needsDerivedCheck, stampCheck, verifyNode, type VerifyResult } from "./verify.ts";
+import { checkHeader, checkPath, checksDir, derivedCheckFile, loadPrompt, needsDerivedCheck, stampCheck, verifyNode, type VerifyResult } from "./verify.ts";
 export { checkPath, loadPrompt } from "./verify.ts";
 
 export interface ParsedReply { stop: string | null; files: Record<string, string> }
@@ -135,6 +135,16 @@ export function prune(p: Project): { removed: string[]; kept: string[] } {
     delete lock.nodes[name];
   }
   writeLock(p, lock);
+  // Derived checks of nodes that are gone, or that moved to another folder.
+  const dir = checksDir(p);
+  if (existsSync(dir)) for (const rel of new Bun.Glob("**/*.test.{ts,tsx}").scanSync({ cwd: dir })) {
+    const abs = join(dir, rel);
+    const name = /^\/\/ ail-derived-from:\s*(\w+)@/.exec(readFileSync(abs, "utf8"))?.[1];
+    if (!name) continue;
+    const n = p.nodes.get(name);
+    const file = relative(p.root, abs);
+    if (!n || !needsDerivedCheck(n) || checkPath(p, n) !== file) { rmSync(abs); removed.push(file); }
+  }
   return { removed, kept };
 }
 

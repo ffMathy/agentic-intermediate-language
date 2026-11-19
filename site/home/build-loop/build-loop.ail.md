@@ -13,18 +13,22 @@ node BuildLoop : view   level: experience
       Then the section with the id "loop" lists the steps "Write", "Build", "Check" and "Ask", in that order
       And it shows the text "Illustrative example."
   look
-    band      Section with id "loop", tone plain
+    band      Section with id "loop", tone plain, holding stack(v, gap: space.8, align: stretch) [ head, grid, stop ]
     head      SectionHeading with text from loop.heading, lead from loop.lead
-    grid      a div: display grid, grid-template-columns repeat(auto-fit, minmax(min(300px, 100%), 1fr)), gap space.8, align-items center
+    grid      a div: display grid, grid-template-columns repeat(auto-fit, minmax(min(300px, 100%), 1fr)), gap space.8, align-items center; its two cells are [ picture, steps ], in that order
     picture   LoopFigure
-    steps     an ol: list-style none, margin 0, pad 0; stack(v, gap: space.4, align: stretch)
-    step      stack(h, gap: space.3, align: start) [ number, words ]
-    number    a 32px circle, flex 0 0 auto, display flex, centered, font.small, weight 800, color color.on.accent; Write color.level.product, Build color.level.build, Check color.step.check, Ask color.level.experience
-    words     stack(v, gap: space.1, align: start) [ title, text ]
+    steps     an ol styled directly (not a Stack): list-style none, margin 0, pad 0, display flex, flex-direction column, gap space.4
+    step      an li styled directly: display flex, flex-direction row, gap space.3, align-items flex-start; holding [ number, words ]
+    number    a span showing the step's number from copy (loop.n1 to loop.n4): a 32px circle, flex 0 0 auto, display flex, centered, font.small, weight 800, color color.on.accent; Write color.level.product, Build color.level.build, Check color.step.check, Ask color.level.experience
+    words     a div styled directly: display flex, flex-direction column, gap space.1; holding [ title, text ]
     title     an h3: font.lead, weight 700, color.text, margin 0
     text      a p: font.body, line-height 1.6, color.text.muted, margin 0
     stop      a div: background color.stop.soft, a 1px solid color.level.experience border, radius.md, pad space.4; the question as a p in font.mono at font.code, color.text, margin 0, with its first word in weight 700, color color.stop.text; then the note as a p in font.small, color.text.muted, margin space.2 0 0
   copy
+    loop.n1         "1"
+    loop.n2         "2"
+    loop.n3         "3"
+    loop.n4         "4"
     loop.heading    "How a spec becomes code you can trust"
     loop.lead       "Four steps, repeated for every change. You only ever edit the spec."
     loop.1.title    "Write"

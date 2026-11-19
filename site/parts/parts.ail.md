@@ -64,7 +64,7 @@ node SectionHeading : view   level: experience
       Then a level 2 heading reads "Start in two minutes" and nothing else is shown
   look
     layout   stack(v, gap: space.3, align: start) [ eyebrow, heading, lead ]
-    eyebrow  font.tiny, weight 700, letter-spacing 0.12em, color.accent, margin 0
+    eyebrow  a p: font.tiny, weight 700, letter-spacing 0.12em, color.accent, margin 0
     heading  an h2: font.heading, weight 800, line-height 1.15, letter-spacing -0.01em, color.text, margin 0
     lead     a p: font.lead, line-height 1.6, color.text.muted, max-width width.prose, margin 0
   binds

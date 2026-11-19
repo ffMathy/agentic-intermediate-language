@@ -13,13 +13,13 @@ export type StackProps = {
 
 const tokenVar = (token: string): string => `var(--${token.split(".").join("-")})`;
 
-const alignMap: Record<string, string> = {
+const alignMap: Record<string, CSSProperties["alignItems"]> = {
   start: "flex-start",
   center: "center",
   end: "flex-end",
 };
 
-const justifyMap: Record<string, string> = {
+const justifyMap: Record<string, CSSProperties["justifyContent"]> = {
   start: "flex-start",
   center: "center",
   between: "space-between",
@@ -31,8 +31,8 @@ export function Stack({ dir, gap, align, justify, wrap, pad, style, children }: 
     display: "flex",
     flexDirection: dir === "v" ? "column" : "row",
     gap: gap !== undefined ? tokenVar(gap) : undefined,
-    alignItems: align !== undefined && align in alignMap ? alignMap[align] : "stretch",
-    justifyContent: justify !== undefined && justify in justifyMap ? justifyMap[justify] : "flex-start",
+    alignItems: (align !== undefined ? alignMap[align] : undefined) ?? "stretch",
+    justifyContent: (justify !== undefined ? justifyMap[justify] : undefined) ?? "flex-start",
     flexWrap: wrap === true ? "wrap" : "nowrap",
     padding: pad !== undefined ? tokenVar(pad) : undefined,
   };

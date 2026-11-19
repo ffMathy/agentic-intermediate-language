@@ -31,30 +31,28 @@ export function LoopFigure() {
         cx={180}
         cy={180}
         r={130}
-        fill="none"
-        stroke="var(--color-border)"
         strokeWidth={2}
+        style={{ fill: "none", stroke: "var(--color-border)" }}
       />
       {heads.map((transform) => (
         <path
           key={transform}
           d="M-6 -6 L6 0 L-6 6 Z"
-          fill="var(--color-text-muted)"
           transform={transform}
+          style={{ fill: "var(--color-text-muted)" }}
         />
       ))}
       {steps.map((step) => (
         <g key={step.name}>
-          <circle cx={step.cx} cy={step.cy} r={32} fill={step.color} />
+          <circle cx={step.cx} cy={step.cy} r={32} style={{ fill: step.color }} />
           <text
             x={step.cx}
             y={step.cy - 8}
             textAnchor="middle"
             fontSize={11}
             fontWeight={700}
-            fill="var(--color-on-accent)"
             opacity={0.85}
-            fontFamily="var(--font-sans)"
+            style={{ fill: "var(--color-on-accent)", fontFamily: "var(--font-sans)" }}
           >
             {step.number}
           </text>
@@ -64,8 +62,7 @@ export function LoopFigure() {
             textAnchor="middle"
             fontSize={13}
             fontWeight={700}
-            fill="var(--color-on-accent)"
-            fontFamily="var(--font-sans)"
+            style={{ fill: "var(--color-on-accent)", fontFamily: "var(--font-sans)" }}
           >
             {step.name}
           </text>
@@ -77,21 +74,19 @@ export function LoopFigure() {
         width={28}
         height={22}
         rx={4}
-        fill="var(--color-text-muted)"
+        style={{ fill: "var(--color-text-muted)" }}
       />
       <path
         d="M172 176 V168 A8 8 0 0 1 188 168 V176"
-        stroke="var(--color-text-muted)"
         strokeWidth={3}
-        fill="none"
+        style={{ fill: "none", stroke: "var(--color-text-muted)" }}
       />
       <text
         x={180}
         y={218}
         textAnchor="middle"
         fontSize={12}
-        fill="var(--color-text)"
-        fontFamily="var(--font-mono)"
+        style={{ fill: "var(--color-text)", fontFamily: "var(--font-mono)" }}
       >
         ail.lock.json
       </text>

@@ -1,4 +1,4 @@
-// ail-derived-from: Footer@81f649921247d6e0
+// ail-derived-from: Footer@0b547c03aff7f827
 import { afterEach, expect, test } from "bun:test";
 import { cleanup, render, screen } from "@testing-library/react";
 import { Footer } from "../../../src/gen/home/sections/footer";
@@ -9,6 +9,7 @@ afterEach(() => {
 
 test("the links", () => {
   render(<Footer />);
+
   expect(screen.getByRole("link", { name: "GitHub" }).getAttribute("href")).toBe(
     "https://github.com/ffMathy/agentic-intermediate-language",
   );

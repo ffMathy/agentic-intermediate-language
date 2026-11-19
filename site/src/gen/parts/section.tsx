@@ -1,7 +1,7 @@
 import type { ReactNode } from "react";
 import { Stack } from "./stack";
 
-export type SectionProps = {
+type SectionProps = {
   id?: string;
   tone: "plain" | "raised";
   label?: string;

@@ -2,7 +2,7 @@ import type { ReactNode } from "react";
 import { Stack } from "../../parts/stack";
 import { CodeBlock } from "../../parts/code-block";
 
-type JourneyStopProps = {
+interface JourneyStopProps {
   number: number;
   color: string;
   depth: string;
@@ -18,11 +18,9 @@ type JourneyStopProps = {
   figure: ReactNode;
   last?: boolean;
   browse?: string;
-};
+}
 
-const tokenVar = (name: string): string => `var(--${name.replace(/\./g, "-")})`;
-
-/** "Every stop has the same anatomy, so the visitor compares levels instead of learning a new layout each time." */
+/** Every stop has the same anatomy, so the visitor compares levels instead of learning a new layout each time. */
 export function JourneyStop({
   number,
   color,
@@ -40,7 +38,7 @@ export function JourneyStop({
   last,
   browse,
 }: JourneyStopProps) {
-  const stopColor = tokenVar(color);
+  const stopColor = `var(--${color.replace(/\./g, "-")})`;
   return (
     <article
       id={`stop-${number}`}
@@ -208,8 +206,7 @@ export function JourneyStop({
             margin: 0,
           }}
         >
-          <span style={{ fontWeight: 700, color: "var(--color-accent)" }}>Turns into:</span>
-          {" "}
+          <span style={{ fontWeight: 700, color: "var(--color-accent)" }}>Turns into:</span>{" "}
           {turnsInto}
         </p>
       </Stack>

@@ -47,3 +47,20 @@ test.skipIf(!installed || !chromium)("screenshots are rendered for every scenari
   for (const s of shots) expect(readFileSync(s.file).subarray(1, 4).toString()).toBe("PNG");
   expect(JSON.parse(readFileSync(join(out, "shots.json"), "utf8")).length).toBe(3);
 }, 60_000);
+
+test.skipIf(!installed)("a test that adds something outside the component still pictures the whole screen", async () => {
+  const { writeFileSync, rmSync } = await import("node:fs");
+  const file = join(KATA, "checks", "zz-shots-leftover.test.tsx");
+  writeFileSync(file, `import { test } from "bun:test";
+import { render } from "@testing-library/react";
+test("leaves a link behind", () => {
+  render(<section><h2>Browser</h2></section>);
+  const a = document.createElement("a"); a.textContent = "Open play"; document.body.appendChild(a);
+});
+`);
+  try {
+    const [screen] = captureScreens(loadProject(KATA), file);
+    expect(screen!.html).toContain("<h2>Browser</h2>");
+    expect(screen!.html).toContain("Open play");
+  } finally { rmSync(file); }
+});

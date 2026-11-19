@@ -12,7 +12,7 @@ export function SectionHeading({
 }) {
   return (
     <Stack dir="v" gap="space.3" align="start">
-      {eyebrow !== undefined && (
+      {eyebrow !== undefined ? (
         <p
           style={{
             fontSize: "var(--font-tiny)",
@@ -24,7 +24,7 @@ export function SectionHeading({
         >
           {eyebrow}
         </p>
-      )}
+      ) : null}
       <h2
         style={{
           fontSize: "var(--font-heading)",
@@ -37,7 +37,7 @@ export function SectionHeading({
       >
         {text}
       </h2>
-      {lead !== undefined && (
+      {lead !== undefined ? (
         <p
           style={{
             fontSize: "var(--font-lead)",
@@ -49,7 +49,7 @@ export function SectionHeading({
         >
           {lead}
         </p>
-      )}
+      ) : null}
     </Stack>
   );
 }

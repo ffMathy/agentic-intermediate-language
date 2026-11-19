@@ -60,7 +60,7 @@ export function BuildLoop() {
           >
             {steps.map((step) => (
               <li
-                key={step.title}
+                key={step.n}
                 style={{
                   display: "flex",
                   flexDirection: "row",

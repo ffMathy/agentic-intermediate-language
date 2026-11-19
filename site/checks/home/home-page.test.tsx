@@ -1,4 +1,4 @@
-// ail-derived-from: HomePage@0cfd1c65c1a22926
+// ail-derived-from: HomePage@bc73168c42f79adb
 import { afterEach, expect, test } from "bun:test";
 import { cleanup, render, screen } from "@testing-library/react";
 import { HomePage } from "../../src/gen/home/home-page";
@@ -7,16 +7,21 @@ afterEach(() => {
   cleanup();
 });
 
+const normalize = (text: string | null): string =>
+  (text ?? "").replace(/\s+/g, " ").trim();
+
 test("one story, in order", () => {
   render(<HomePage />);
+
   const h1s = screen.getAllByRole("heading", { level: 1 });
   expect(h1s.length).toBe(1);
-  expect((h1s[0].textContent ?? "").trim()).toBe(
+  expect(normalize(h1s[0].textContent)).toBe(
     "Write one sentence. Watch it become working software.",
   );
+
   const h2s = screen
     .getAllByRole("heading", { level: 2 })
-    .map((h) => (h.textContent ?? "").trim());
+    .map((heading) => normalize(heading.textContent));
   expect(h2s).toEqual([
     "Between a prompt and the code, there is nothing to review.",
     "Follow one sentence all the way down",
@@ -29,7 +34,8 @@ test("one story, in order", () => {
 
 test("every top bar link has a place to land", () => {
   const { container } = render(<HomePage />);
+
   for (const id of ["journey", "readers", "loop", "specs", "start"]) {
-    expect(container.querySelector(`[id="${id}"]`)).not.toBeNull();
+    expect(container.ownerDocument.getElementById(id)).not.toBeNull();
   }
 });

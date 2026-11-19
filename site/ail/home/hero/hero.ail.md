@@ -28,7 +28,7 @@ node Hero : view   level: experience
     note      a p: font.small, color.text.muted, margin 0
     picture   HeroFigure, centered in its column
   copy
-    hero.eyebrow   "A SPEC LANGUAGE FOR AI-BUILT SOFTWARE"
+    hero.eyebrow   "AIL, SAID LIKE THE ALE · A SPEC LANGUAGE FOR AI-BUILT SOFTWARE"
     hero.headline  "Write one sentence. Watch it become working software."
     hero.subhead   "Write what you want in plain words, then add detail level by level. AI agents build the code from it, checks prove it does what you wrote, and everyone on the team reviews the level written for them."
     hero.follow    "Follow the sentence ↓"

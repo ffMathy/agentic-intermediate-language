@@ -70,7 +70,10 @@ glossary
 
 ## Design tokens
 
-Values contain no spaces, because the catalog separates tokens with spaces.
+AIL sounds like ale, so the page is poured like one: a cream page like the
+head on a glass, amber for actions and links, code on a stout-dark panel, and
+the golden thread we follow down the spec. Values contain no spaces, because
+the catalog separates tokens with spaces.
 
 ```ail
 catalog
@@ -81,14 +84,14 @@ catalog
     font.sans=Inter,system-ui,sans-serif  font.mono=Inconsolata,ui-monospace,monospace
     font.hero=clamp(34px,5.5vw,56px)  font.heading=clamp(26px,3.5vw,36px)  font.stop=clamp(22px,2.6vw,28px)
     font.lead=18px  font.body=16px  font.small=14px  font.code=14px  font.tiny=12px  font.micro=11px
-    color.page=#ffffff  color.surface=#ffffff  color.surface.raised=#f3f4f6  color.border=#d1d5db
-    color.text=#111827  color.text.muted=#4b5563  color.on.accent=#ffffff
-    color.accent=#6d28d9  color.accent.soft=#f5f3ff  color.focus=#2563eb
-    color.code.bar=#0b1120  color.code.side=#111a2e  color.code.pick=#1e293b  color.dot.red=#ef4444  color.dot.amber=#f59e0b  color.dot.green=#22c55e
-    color.code=#0f172a  color.code.text=#e2e8f0  color.code.muted=#94a3b8  color.code.border=#334155
-    color.thread=#fde68a  color.thread.soft=rgba(253,230,138,0.22)  color.thread.strong=#eab308
-    color.level.product=#16a34a  color.level.experience=#ca8a04  color.level.system=#ea580c  color.level.specialist=#dc2626  color.level.build=#475569
-    color.step.check=#2563eb  color.pass=#16a34a  color.stop.soft=#fffbeb  color.stop.text=#b45309
+    color.page=#fffaf0  color.surface=#fffdf8  color.surface.raised=#f6ead3  color.border=#e3cfa9
+    color.text=#2a1a0e  color.text.muted=#6b5340  color.on.accent=#ffffff
+    color.accent=#b45309  color.accent.soft=#fdf1dc  color.focus=#c2410c
+    color.code.bar=#140c06  color.code.side=#20150c  color.code.pick=#3a2716  color.dot.red=#ef4444  color.dot.amber=#f59e0b  color.dot.green=#22c55e
+    color.code=#1b120a  color.code.text=#f6ead6  color.code.muted=#b8a084  color.code.border=#4a3422
+    color.thread=#fde68a  color.thread.soft=rgba(253,230,138,0.22)  color.thread.strong=#d97706
+    color.level.product=#4d7c0f  color.level.experience=#ca8a04  color.level.system=#c2410c  color.level.specialist=#9f1239  color.level.build=#57534e
+    color.step.check=#0f766e  color.pass=#15803d  color.stop.soft=#fff7e6  color.stop.text=#9a3412
     color.player.x=#2563eb  color.player.o=#dc2626
 ```
 

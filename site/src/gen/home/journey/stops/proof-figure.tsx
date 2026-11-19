@@ -6,13 +6,13 @@ const chips = [
   { y: 234, fill: "var(--color-level-build)", label: "test · never loses" },
 ];
 
-const threadStyle = {
+const threadStroke = {
   stroke: "var(--color-thread-strong)",
   strokeWidth: 4,
   strokeLinecap: "round" as const,
 };
 
-/** "five stacked chips, one per level the promise passed through, joined by the yellow thread, ending in a green check" */
+/** five stacked chips, one per level the promise passed through, joined by the yellow thread, ending in a green check */
 export function ProofFigure() {
   return (
     <svg
@@ -26,15 +26,15 @@ export function ProofFigure() {
         display: "block",
       }}
     >
-      <line x1={30} y1={27} x2={30} y2={251} style={threadStyle} />
+      <line x1={30} y1={27} x2={30} y2={251} style={threadStroke} />
       {chips.map((chip) => (
         <line
-          key={`connector-${chip.y}`}
+          key={`link-${chip.y}`}
           x1={30}
           y1={chip.y + 17}
           x2={50}
           y2={chip.y + 17}
-          style={threadStyle}
+          style={threadStroke}
         />
       ))}
       {chips.map((chip) => (
@@ -69,10 +69,7 @@ export function ProofFigure() {
         y1={251}
         x2={258}
         y2={251}
-        style={{
-          stroke: "var(--color-thread-strong)",
-          strokeWidth: 4,
-        }}
+        style={{ stroke: "var(--color-thread-strong)", strokeWidth: 4 }}
       />
       <circle cx={274} cy={251} r={16} style={{ fill: "var(--color-pass)" }} />
       <path

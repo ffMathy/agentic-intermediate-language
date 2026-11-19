@@ -2,7 +2,7 @@ import { Section } from "../../parts/section";
 import { Stack } from "../../parts/stack";
 import { HeroFigure } from "./hero-figure";
 
-/** an eyebrow, the page's only level 1 heading, a short explanation, three links and a note, beside a picture of the sentence sinking through the levels */
+/** "an eyebrow, the page's only level 1 heading, a short explanation, three links and a note, beside a picture of the sentence sinking through the levels" */
 export function Hero() {
   return (
     <Section tone="plain">
@@ -24,7 +24,7 @@ export function Hero() {
               margin: 0,
             }}
           >
-            A SPEC LANGUAGE FOR AI-BUILT SOFTWARE
+            AIL, SAID LIKE THE ALE · A SPEC LANGUAGE FOR AI-BUILT SOFTWARE
           </p>
           <h1
             style={{

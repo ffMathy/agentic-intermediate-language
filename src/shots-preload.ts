@@ -5,7 +5,7 @@
 // file's afterEach runs, so the body is also saved just before its top-level
 // elements, or their children, are removed. Bun does not expose test names here; `ail` pairs these
 // records, in order, with the tests of the run's JUnit report.
-import { afterEach } from "bun:test";
+import { afterEach, beforeEach } from "bun:test";
 import { writeFileSync } from "node:fs";
 
 const out = process.env.AIL_SHOTS_OUT;
@@ -67,17 +67,34 @@ if (out) {
   };
 
   let lastFull: { html: string; head: string } | null = null;
+  // Set once the test's screen starts being torn down: later saves would only
+  // see what is left over (say, a link the test added outside the component).
+  let frozen = false;
   const save = () => {
     const body = globalThis.document?.body;
     // Unmounting leaves empty containers behind: those are not a screen.
-    if (!body || !body.innerHTML.replace(/<div><\/div>/g, "").trim()) return;
+    if (frozen || !body || !body.innerHTML.replace(/<div><\/div>/g, "").trim()) return;
     const head = [...document.head.querySelectorAll("style")].map((s) => s.outerHTML).join("\n");
     lastFull = { html: bodyHtml(body), head };
   };
+  const teardown = () => { save(); frozen = true; };
+
+  // React roots: Testing Library's cleanup unmounts them. Save just before.
+  try {
+    const client = require(require.resolve("react-dom/client", { paths: [process.cwd()] }));
+    const createRoot = client.createRoot;
+    client.createRoot = (...args: unknown[]) => {
+      const root = createRoot(...args);
+      const unmount = root.unmount.bind(root);
+      root.unmount = () => { teardown(); return unmount(); };
+      return root;
+    };
+  } catch { /* not a React project: the DOM hooks below still apply */ }
+
+  // Any other way of clearing the page: save before the body's top-level
+  // elements, or their children, are removed.
   const removeChild = Node.prototype.removeChild;
   Node.prototype.removeChild = function <T extends Node>(this: Node, child: T): T {
-    // Testing Library unmounts the React root (emptying its container), then
-    // removes the container from the body: save before either.
     if (this === document.body || this.parentNode === document.body) save();
     return removeChild.call(this, child) as T;
   };
@@ -86,10 +103,10 @@ if (out) {
     if (this.parentNode === document.body || this.parentNode?.parentNode === document.body) save();
     remove.call(this);
   };
+  beforeEach(() => { lastFull = null; frozen = false; });
   afterEach(() => {
-    save(); // when this runs before Testing Library's cleanup, the body is still there
+    save(); // when this runs before Testing Library's cleanup, the body is still all there
     shots.push(lastFull ?? { html: "", head: "" });
-    lastFull = null;
     writeFileSync(out, JSON.stringify(shots)); // bun test emits no exit event, so write as we go
   });
 }

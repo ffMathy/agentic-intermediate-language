@@ -1,18 +1,10 @@
 import { useId } from "react";
-import type { CSSProperties, ReactNode } from "react";
 import { Section } from "../../parts/section";
 import { SectionHeading } from "../../parts/section-heading";
 import { Stack } from "../../parts/stack";
 import { CopyCommand } from "../../parts/copy-command";
 
-const cardsStyle: CSSProperties = {
-  display: "grid",
-  gridTemplateColumns: "repeat(auto-fit, minmax(min(320px, 100%), 1fr))",
-  gap: "var(--space-6)",
-  alignItems: "start",
-};
-
-const cardStyle: CSSProperties = {
+const cardStyle = {
   background: "var(--color-surface)",
   border: "1px solid var(--color-border)",
   borderRadius: "var(--radius-lg)",
@@ -20,59 +12,59 @@ const cardStyle: CSSProperties = {
   minWidth: 0,
 };
 
-const titleStyle: CSSProperties = {
+const titleStyle = {
   fontSize: "var(--font-lead)",
   fontWeight: 700,
   color: "var(--color-text)",
   margin: 0,
 };
 
-const subtitleStyle: CSSProperties = {
+const subtitleStyle = {
   fontSize: "var(--font-small)",
   color: "var(--color-text-muted)",
   margin: 0,
 };
 
-const textStyle: CSSProperties = {
+const textStyle = {
   fontSize: "var(--font-body)",
   lineHeight: 1.6,
   color: "var(--color-text-muted)",
   margin: 0,
 };
 
-const tableStyle: CSSProperties = {
+const tableStyle = {
   width: "100%",
-  borderCollapse: "collapse",
+  borderCollapse: "collapse" as const,
 };
 
-const rowStyle: CSSProperties = {
+const rowStyle = {
   borderBottom: "1px solid var(--color-border)",
 };
 
-const cellStyle: CSSProperties = {
+const cellStyle = {
   padding: "var(--space-2) var(--space-2) var(--space-2) 0",
   verticalAlign: "top",
   fontSize: "var(--font-small)",
-  textAlign: "left",
+  textAlign: "left" as const,
 };
 
-const commandCellStyle: CSSProperties = {
+const commandCellStyle = {
   ...cellStyle,
   fontFamily: "var(--font-mono)",
   fontSize: "var(--font-code)",
   fontWeight: 600,
   color: "var(--color-accent)",
-  whiteSpace: "nowrap",
+  whiteSpace: "nowrap" as const,
 };
 
-const closingStyle: CSSProperties = {
+const closingStyle = {
   fontSize: "var(--font-small)",
   fontWeight: 600,
   color: "var(--color-text)",
   margin: 0,
 };
 
-const exampleStyle: CSSProperties = {
+const exampleStyle = {
   background: "var(--color-accent)",
   color: "var(--color-on-accent)",
   border: "2px solid var(--color-accent)",
@@ -82,7 +74,7 @@ const exampleStyle: CSSProperties = {
   textDecoration: "none",
 };
 
-const repoStyle: CSSProperties = {
+const repoStyle = {
   background: "var(--color-surface)",
   color: "var(--color-accent)",
   border: "2px solid var(--color-accent)",
@@ -92,22 +84,10 @@ const repoStyle: CSSProperties = {
   textDecoration: "none",
 };
 
-function Card(props: { title: string; children: ReactNode }) {
-  const titleId = useId();
-  return (
-    <div role="region" aria-labelledby={titleId} style={cardStyle}>
-      <Stack dir="v" gap="space.3" align="stretch">
-        <h3 id={titleId} style={titleStyle}>
-          {props.title}
-        </h3>
-        {props.children}
-      </Stack>
-    </div>
-  );
-}
-
-/** Turn interest into a first try, from wherever the visitor already works: Claude Code or a terminal. */
+/** "two cards, "In Claude Code" and "In a terminal", side by side when there is room" */
 export function GetStarted() {
+  const claudeId = useId();
+  const cliId = useId();
   return (
     <Section id="start" tone="plain">
       <Stack dir="v" gap="space.6" align="stretch">
@@ -115,47 +95,64 @@ export function GetStarted() {
           text="Start in two minutes"
           lead="Install it, then describe a feature in plain words. You get a spec you can review, and code that is checked against it."
         />
-        <div style={cardsStyle}>
-          <Card title="In Claude Code">
-            <p style={subtitleStyle}>No API key. It runs on your Claude subscription.</p>
-            <CopyCommand command="/plugin marketplace add ffMathy/agentic-intermediate-language" />
-            <CopyCommand command="/plugin install ail@agentic-intermediate-language" />
-            <p style={textStyle}>
-              Then ask for features in plain words. Claude changes the spec, and /ail:build compiles whatever changed.
-            </p>
-          </Card>
-          <Card title="In a terminal">
-            <p style={subtitleStyle}>Needs Bun 1.2 or later.</p>
-            <CopyCommand command="bun add -g github:ffMathy/agentic-intermediate-language" />
-            <table style={tableStyle}>
-              <thead>
-                <tr style={rowStyle}>
-                  <th style={cellStyle}>Command</th>
-                  <th style={cellStyle}>What it does</th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr style={rowStyle}>
-                  <td style={commandCellStyle}>ail build</td>
-                  <td style={cellStyle}>
-                    Compile whatever changed, then check everything: the spec, the code, every test, and each screen against its look.
-                  </td>
-                </tr>
-                <tr style={rowStyle}>
-                  <td style={commandCellStyle}>ail show [what]</td>
-                  <td style={cellStyle}>The tree, a node, one reader&apos;s view, or what changed.</td>
-                </tr>
-              </tbody>
-            </table>
-            <p style={closingStyle}>That&apos;s the whole tool: two commands.</p>
-            <p style={textStyle}>
-              Run these inside a project, meaning any folder with an ail.config.json. To try the tic-tac-toe demo from this page:
-            </p>
-            <CopyCommand command="git clone https://github.com/ffMathy/agentic-intermediate-language && cd agentic-intermediate-language" />
-            <CopyCommand command="bun install && bun link" />
-            <CopyCommand command="cd examples/tictactoe && bun install && ail build" />
-            <CopyCommand command="ail show stakeholder" />
-          </Card>
+        <div
+          style={{
+            display: "grid",
+            gridTemplateColumns: "repeat(auto-fit, minmax(min(320px, 100%), 1fr))",
+            gap: "var(--space-6)",
+            alignItems: "start",
+          }}
+        >
+          <div role="region" aria-labelledby={claudeId} style={cardStyle}>
+            <Stack dir="v" gap="space.3" align="stretch">
+              <h3 id={claudeId} style={titleStyle}>
+                In Claude Code
+              </h3>
+              <p style={subtitleStyle}>No API key. It runs on your Claude subscription.</p>
+              <CopyCommand command="/plugin marketplace add ffMathy/agentic-intermediate-language" />
+              <CopyCommand command="/plugin install ail@agentic-intermediate-language" />
+              <p style={textStyle}>
+                Then ask for features in plain words. Claude changes the spec, and /ail:build compiles whatever changed.
+              </p>
+            </Stack>
+          </div>
+          <div role="region" aria-labelledby={cliId} style={cardStyle}>
+            <Stack dir="v" gap="space.3" align="stretch">
+              <h3 id={cliId} style={titleStyle}>
+                In a terminal
+              </h3>
+              <p style={subtitleStyle}>Needs Bun 1.2 or later.</p>
+              <CopyCommand command="bun add -g github:ffMathy/agentic-intermediate-language" />
+              <table style={tableStyle}>
+                <thead>
+                  <tr style={rowStyle}>
+                    <th style={cellStyle}>Command</th>
+                    <th style={cellStyle}>What it does</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr style={rowStyle}>
+                    <td style={commandCellStyle}>ail build</td>
+                    <td style={cellStyle}>
+                      Compile whatever changed, then check everything: the spec, the code, every test, and each screen against its look.
+                    </td>
+                  </tr>
+                  <tr style={rowStyle}>
+                    <td style={commandCellStyle}>ail show [what]</td>
+                    <td style={cellStyle}>The tree, a node, one reader's view, or what changed.</td>
+                  </tr>
+                </tbody>
+              </table>
+              <p style={closingStyle}>That's the whole tool: two commands.</p>
+              <p style={textStyle}>
+                Run these inside a project, meaning any folder with an ail.config.json. To try the tic-tac-toe demo from this page:
+              </p>
+              <CopyCommand command="git clone https://github.com/ffMathy/agentic-intermediate-language && cd agentic-intermediate-language" />
+              <CopyCommand command="bun install && bun link" />
+              <CopyCommand command="cd examples/tictactoe && bun install && ail build" />
+              <CopyCommand command="ail show stakeholder" />
+            </Stack>
+          </div>
         </div>
         <Stack dir="h" gap="space.3" align="center" wrap={true}>
           <a

@@ -2,9 +2,11 @@ import { Stack } from "../../parts/stack";
 
 type Reader = "stakeholder" | "design" | "engineer" | "specialist";
 
-type Pos = { name: string; x: number; y: number };
+type WideNode = { name: string; x: number; y: number };
 
-const WIDE: Pos[] = [
+type OutlineNode = { name: string; x: number };
+
+const WIDE_NODES: WideNode[] = [
   { name: "TicTacToe", x: 272, y: 8 },
   { name: "App", x: 60, y: 56 },
   { name: "BoardKit", x: 172, y: 56 },
@@ -20,7 +22,7 @@ const WIDE: Pos[] = [
   { name: "ChooseOpponent", x: 112, y: 168 },
 ];
 
-const OUTLINE_ORDER: { name: string; x: number }[] = [
+const OUTLINE_NODES: OutlineNode[] = [
   { name: "TicTacToe", x: 4 },
   { name: "App", x: 28 },
   { name: "PlayAGame", x: 52 },
@@ -35,12 +37,6 @@ const OUTLINE_ORDER: { name: string; x: number }[] = [
   { name: "ComputerPlayer", x: 52 },
   { name: "UiKit", x: 28 },
 ];
-
-const OUTLINE: Pos[] = OUTLINE_ORDER.map((row, i) => ({
-  name: row.name,
-  x: row.x,
-  y: 4 + 28 * i,
-}));
 
 const EDGES: [string, string][] = [
   ["TicTacToe", "App"],
@@ -57,35 +53,38 @@ const EDGES: [string, string][] = [
   ["PlayAGame", "ChooseOpponent"],
 ];
 
-const LIT: Record<Reader, { color: string; names: string[] }> = {
-  stakeholder: { color: "var(--color-level-product)", names: ["TicTacToe"] },
-  design: {
-    color: "var(--color-level-experience)",
-    names: [
-      "App",
-      "BoardKit",
-      "UiKit",
-      "PlayAGame",
-      "WatchADemo",
-      "NewGameButton",
-      "ChooseOpponent",
-    ],
-  },
-  engineer: {
-    color: "var(--color-level-system)",
-    names: ["Engine", "GameState", "Rules", "GameReducer"],
-  },
-  specialist: {
-    color: "var(--color-level-specialist)",
-    names: ["ComputerPlayer"],
-  },
+const READER_NODES: Record<Reader, string[]> = {
+  stakeholder: ["TicTacToe"],
+  design: [
+    "App",
+    "BoardKit",
+    "UiKit",
+    "PlayAGame",
+    "WatchADemo",
+    "NewGameButton",
+    "ChooseOpponent",
+  ],
+  engineer: ["Engine", "GameState", "Rules", "GameReducer"],
+  specialist: ["ComputerPlayer"],
 };
 
-const find = (list: Pos[], name: string): Pos =>
-  list.find((p) => p.name === name) as Pos;
+const READER_COLOR: Record<Reader, string> = {
+  stakeholder: "var(--color-level-product)",
+  design: "var(--color-level-experience)",
+  engineer: "var(--color-level-system)",
+  specialist: "var(--color-level-specialist)",
+};
 
-const rectStyle = (lit: boolean, color: string) =>
-  lit
+function wideNode(name: string): WideNode {
+  return WIDE_NODES.find((n) => n.name === name) as WideNode;
+}
+
+function outlineRow(name: string): number {
+  return OUTLINE_NODES.findIndex((n) => n.name === name);
+}
+
+function rectStyle(lit: boolean, color: string) {
+  return lit
     ? { fill: color, stroke: "none" }
     : {
         fill: "var(--color-surface-raised)",
@@ -93,19 +92,19 @@ const rectStyle = (lit: boolean, color: string) =>
         strokeWidth: 1,
         strokeDasharray: "3 3",
       };
+}
 
-const textStyle = (lit: boolean) => ({
-  fill: lit ? "var(--color-on-accent)" : "var(--color-text-muted)",
-  fontWeight: lit ? 700 : 400,
-  fontFamily: "var(--font-mono)",
-});
+function textStyle(lit: boolean) {
+  return lit
+    ? { fill: "var(--color-on-accent)", fontWeight: 700 }
+    : { fill: "var(--color-text-muted)", fontWeight: 400 };
+}
 
-const lineStyle = { stroke: "var(--color-border)", strokeWidth: 1 };
-
-/** "the nodes written at the given reader's level are filled with their level's color, and the rest fade back" */
+/** "a simplified Tic-Tac-Toe tree with thirteen of its nineteen nodes, and a note under it saying which parts are left out; the nodes written at the given reader's level are filled with their level's color, and the rest fade back" */
 export function ReadersTree({ reader }: { reader: Reader }) {
-  const { color, names } = LIT[reader];
   const label = `The Tic-Tac-Toe spec tree, with the level written for the ${reader} highlighted`;
+  const litNames = READER_NODES[reader];
+  const color = READER_COLOR[reader];
   return (
     <Stack dir="v" gap="space.2" align="stretch">
       <svg
@@ -115,22 +114,23 @@ export function ReadersTree({ reader }: { reader: Reader }) {
         aria-label={label}
         style={{ width: "100%", height: "auto" }}
       >
-        {EDGES.map(([from, to]) => {
-          const p = find(WIDE, from);
-          const c = find(WIDE, to);
+        {EDGES.map(([parent, child]) => {
+          const p = wideNode(parent);
+          const c = wideNode(child);
           return (
             <line
-              key={`${from}-${to}`}
+              key={`${parent}-${child}`}
               x1={p.x + 48}
               y1={p.y + 24}
               x2={c.x + 48}
               y2={c.y}
-              style={lineStyle}
+              stroke="var(--color-border)"
+              strokeWidth={1}
             />
           );
         })}
-        {WIDE.map((n) => {
-          const lit = names.includes(n.name);
+        {WIDE_NODES.map((n) => {
+          const lit = litNames.includes(n.name);
           return (
             <g key={n.name} data-lit={lit ? "true" : "false"}>
               <rect
@@ -147,7 +147,7 @@ export function ReadersTree({ reader }: { reader: Reader }) {
                 textAnchor="middle"
                 dominantBaseline="central"
                 fontSize={11}
-                style={textStyle(lit)}
+                style={{ fontFamily: "var(--font-mono)", ...textStyle(lit) }}
               >
                 {n.name}
               </text>
@@ -162,25 +162,42 @@ export function ReadersTree({ reader }: { reader: Reader }) {
         aria-label={label}
         style={{ width: "100%", maxWidth: "320px", height: "auto" }}
       >
-        {EDGES.map(([from, to]) => {
-          const p = find(OUTLINE, from);
-          const c = find(OUTLINE, to);
-          const lx = p.x + 10;
-          const cy = c.y + 11;
+        {EDGES.map(([parent, child]) => {
+          const pi = outlineRow(parent);
+          const ci = outlineRow(child);
+          const px = OUTLINE_NODES[pi].x + 10;
+          const cx = OUTLINE_NODES[ci].x;
+          const bottom = 4 + 28 * pi + 22;
+          const centre = 4 + 28 * ci + 11;
           return (
-            <g key={`${from}-${to}`}>
-              <line x1={lx} y1={p.y + 22} x2={lx} y2={cy} style={lineStyle} />
-              <line x1={lx} y1={cy} x2={c.x} y2={cy} style={lineStyle} />
+            <g key={`${parent}-${child}`}>
+              <line
+                x1={px}
+                y1={bottom}
+                x2={px}
+                y2={centre}
+                stroke="var(--color-border)"
+                strokeWidth={1}
+              />
+              <line
+                x1={px}
+                y1={centre}
+                x2={cx}
+                y2={centre}
+                stroke="var(--color-border)"
+                strokeWidth={1}
+              />
             </g>
           );
         })}
-        {OUTLINE.map((n) => {
-          const lit = names.includes(n.name);
+        {OUTLINE_NODES.map((n, i) => {
+          const lit = litNames.includes(n.name);
+          const y = 4 + 28 * i;
           return (
             <g key={n.name} data-lit={lit ? "true" : "false"}>
               <rect
                 x={n.x}
-                y={n.y}
+                y={y}
                 width={180}
                 height={22}
                 rx={6}
@@ -188,11 +205,11 @@ export function ReadersTree({ reader }: { reader: Reader }) {
               />
               <text
                 x={n.x + 10}
-                y={n.y + 11}
+                y={y + 11}
                 textAnchor="start"
                 dominantBaseline="central"
                 fontSize={13}
-                style={textStyle(lit)}
+                style={{ fontFamily: "var(--font-mono)", ...textStyle(lit) }}
               >
                 {n.name}
               </text>

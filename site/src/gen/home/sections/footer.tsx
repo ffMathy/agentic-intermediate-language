@@ -46,14 +46,11 @@ export function Footer() {
             margin: 0,
           }}
         >
-          This page was compiled from the spec in site/ail/, and the game from the spec in examples/tictactoe/ail/. Apart from the spec and a short index.html, nothing in either was written by hand.
+          Brewed in AIL. This page was compiled from the spec in site/ail/, and the game from the spec in examples/tictactoe/ail/. Apart from the spec and a short index.html, nothing in either was written by hand.
         </p>
         <nav aria-label="More about AIL">
           <Stack dir="h" gap="space.4" align="center" wrap={true}>
-            <a
-              href="https://github.com/ffMathy/agentic-intermediate-language"
-              style={linkStyle}
-            >
+            <a href="https://github.com/ffMathy/agentic-intermediate-language" style={linkStyle}>
               GitHub
             </a>
             <a

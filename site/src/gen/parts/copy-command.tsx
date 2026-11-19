@@ -2,7 +2,12 @@ import { useEffect, useState } from "react";
 import { Stack } from "./stack";
 
 /** "shows one command on a dark row with a "Copy" button at its right end" */
-export function CopyCommand({ command }: { command: string }) {
+export type CopyCommandProps = {
+  command: string;
+};
+
+/** "pressing "Copy" puts exactly the command on the clipboard; once that succeeds the button reads "Copied" for 1.5 seconds, then "Copy" again" */
+export function CopyCommand({ command }: CopyCommandProps) {
   const [copied, setCopied] = useState(false);
 
   useEffect(() => {
@@ -18,10 +23,11 @@ export function CopyCommand({ command }: { command: string }) {
   }, [copied]);
 
   const press = () => {
-    if (typeof navigator === "undefined" || !navigator.clipboard) {
+    const clipboard = typeof navigator === "undefined" ? undefined : navigator.clipboard;
+    if (!clipboard) {
       return;
     }
-    navigator.clipboard.writeText(command).then(
+    clipboard.writeText(command).then(
       () => {
         setCopied(true);
       },

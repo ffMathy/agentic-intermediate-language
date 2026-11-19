@@ -39,6 +39,6 @@ node SpecEditor : view   level: experience
                 /@\w+/ → "attribute.name"
                 /=>/ → "operator"
               there is no rule for other capitalised words, so prose keeps the default colour
-    theme     also in beforeMount: define the theme "ail-dark" with base "vs-dark", inherit true, rules keyword #c4b5fd bold, keyword.md #f8fafc bold, comment #64748b, string #fde68a, type #6ee7b7, type.identifier #93c5fd, tag #f9a8d4, attribute.name #fdba74, operator #e2e8f0, and colors editor.background #0f172a, editorLineNumber.foreground #475569, editorGutter.background #0f172a
+    theme     also in beforeMount: define the theme "ail-dark" with base "vs-dark", inherit true, rules keyword #fbbf24 bold, keyword.md #f6ead6 bold, comment #8a7259, string #fde68a, type #a3e635, type.identifier #fdba74, tag #f9a8d4, attribute.name #fca5a5, operator #f6ead6, and colors editor.background #1b120a, editorLineNumber.foreground #6b5340, editorGutter.background #1b120a (the stout panel of the ale palette)
   uses  CodeBlock
 ```

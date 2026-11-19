@@ -10,28 +10,28 @@ node SpecBrowser : flow   level: experience
   why   Reading real specs is the fastest way to learn AIL, so both example specs can be browsed the way developers read code.   <- HomePage
   what
     the section has the id "specs", so the page can link to it
-    two projects can be browsed: this website and the Tic-Tac-Toe demo; this website is shown first
+    two projects can be browsed: the Tic-Tac-Toe demo and this website; the demo is shown first
     for the shown project: how big its spec is, its spec files grouped by folder, and the picked file in a read-only editor
     the size is counted from the spec itself: how many nodes, in how many files
-    at first the file that describes this very section is picked
+    at first the demo's root file is picked: the top of its spec
     showing another project picks its first file
     a link anywhere on the page can open a file here: when the page address ends with "#spec/", a project's key, "/" and one of its file paths, that project and file are shown and this section scrolls into view
     following such a link again works too, even when the page address already ends with it
-    Scenario: this section shows its own spec first
+    Scenario: the demo's spec is shown first
       Given the page is open
-      Then the project "This website" is shown as picked
-      And the file "home/sections/spec-browser.ail.md" is shown as picked
-      And the region named "Source of home/sections/spec-browser.ail.md" contains "node SpecBrowser : flow"
+      Then the project "Tic-Tac-Toe demo" is shown as picked
+      And the file "tictactoe.ail.md" is shown as picked
+      And the region named "Source of tictactoe.ail.md" contains "node TicTacToe : system"
     Scenario: picking another file
       Given the page is open
-      When the visitor picks the file "site.ail.md"
-      Then "site.ail.md" is shown as picked and "home/sections/spec-browser.ail.md" is not
-      And the region named "Source of site.ail.md" contains "node AIL : system"
-    Scenario: showing the demo
+      When the visitor picks the file "board/board.ail.md"
+      Then "board/board.ail.md" is shown as picked and "tictactoe.ail.md" is not
+      And the region named "Source of board/board.ail.md" contains "node BoardView : view"
+    Scenario: showing this website's spec
       Given the page is open
-      When the visitor picks the project "Tic-Tac-Toe demo"
+      When the visitor picks the project "This website"
       Then that project is shown as picked and its first file is picked
-      And the size line reads the demo's number of nodes and of files
+      And the size line reads the website's number of nodes and of files
     Scenario: opened from a link
       Given the page address ends with "#spec/tictactoe/app/play/play.ail.md"
       When the page opens
@@ -61,14 +61,14 @@ node SpecBrowser : flow   level: experience
   copy
     browse.eyebrow    "Dogfooding"
     browse.heading    "Browse the specs"
-    browse.lead       "Read both example specs the way you read code: this website, written in AIL and compiled by ail build, and the Tic-Tac-Toe demo. The files come straight from the specs at build time, so they are always current."
+    browse.lead       "Read both example specs the way you read code: the Tic-Tac-Toe demo, and this website itself, which is written in AIL and compiled by ail build too. The files come straight from the specs at build time, so they are always current."
     browse.size       "{nodes} nodes in {files} files"
     browse.projects   "Projects"
     browse.files      "Spec files"
     browse.source     "Source of {path}"
   binds
-    data      specProjects from the spec module; the projects' keys are "site" (this website) and "tictactoe" (the demo)
-    state     useState for the shown project's key, starting at "site", and useState for the picked file's path, starting at "home/sections/spec-browser.ail.md"
+    data      specProjects from the spec module, in this order: "tictactoe" (the demo), then "site" (this website)
+    state     useState for the shown project's key, starting at "tictactoe", and useState for the picked file's path, starting at "tictactoe.ail.md"
     hash      open(hash): when hash starts with "#spec/", the rest up to its first "/" is a project key and the remainder a file path; if that project has that file, show both and scroll the section element into view
     links     call open(location.hash) on mount and on every hashchange event of window; also listen for click events on document, and when the click's target is inside an a element whose href attribute starts with "#spec/", call open with that attribute (a link equal to the current address fires no hashchange); remove both listeners on unmount
     project   one button per entry of specProjects, in order, showing its name; aria-pressed true on the shown one; pressing another one shows it and picks its first file

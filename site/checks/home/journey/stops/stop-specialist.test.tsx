@@ -1,6 +1,6 @@
-// ail-derived-from: StopSpecialist@5a8dac0ba3dbeeca
+// ail-derived-from: StopSpecialist@7ccf3bcdc3904540
 import { afterEach, expect, test } from "bun:test";
-import { cleanup, render, within } from "@testing-library/react";
+import { cleanup, render, screen, within } from "@testing-library/react";
 import { StopSpecialist } from "../../../../src/gen/home/journey/stops/stop-specialist";
 
 afterEach(() => {
@@ -25,23 +25,14 @@ const lines: string[] = [
   "                 and assert that no game ends in a win for X",
 ];
 
-const marks: string[] = [
-  "never loses",
-  "no game against choose ends in a win for the other player",
-];
-
 test("the specialist level", () => {
   render(<StopSpecialist />);
 
-  const article = document.getElementById("stop-5");
-  expect(article).not.toBeNull();
-  if (article === null) {
-    return;
-  }
-  const isArticle =
-    article.tagName.toLowerCase() === "article" ||
-    article.getAttribute("role") === "article";
-  expect(isArticle).toBe(true);
+  const article = screen
+    .getAllByRole("article")
+    .find((el) => el.id === "stop-5");
+  expect(article).toBeDefined();
+  if (!article) return;
 
   const scope = within(article);
   scope.getByRole("heading", {
@@ -53,15 +44,19 @@ test("the specialist level", () => {
     name: "Specialist-level spec excerpt",
   });
   const text = region.textContent ?? "";
+
+  let from = 0;
   for (const line of lines) {
-    expect(text).toContain(line);
+    const at = text.indexOf(line, from);
+    expect(at).toBeGreaterThanOrEqual(0);
+    from = at + line.length;
   }
 
-  const elements = Array.from(region.querySelectorAll("*"));
-  for (const mark of marks) {
-    const highlighted = elements.some(
-      (el) => (el.textContent ?? "") === mark,
-    );
-    expect(highlighted).toBe(true);
-  }
+  const marks = Array.from(region.querySelectorAll("mark")).map(
+    (m) => m.textContent ?? "",
+  );
+  expect(marks).toContain("never loses");
+  expect(marks).toContain(
+    "no game against choose ends in a win for the other player",
+  );
 });

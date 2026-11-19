@@ -106,6 +106,7 @@ node AIL : system   level: product
     6. A visitor sees that each level is written for a different kind of reader.            refined-by: Readers
     7. A visitor sees how a change to the spec becomes checked code.                         refined-by: BuildLoop
     8. A visitor can start from Claude Code or from a terminal.                              refined-by: GetStarted
+    9. A visitor can read the spec of this very page.                                        refined-by: ThisPage
   entry     HomePage
   children  HomePage, Parts
 ```

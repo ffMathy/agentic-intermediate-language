@@ -2,7 +2,7 @@
   "version": 1,
   "nodes": {
     "AIL": {
-      "hash": "8e8bce894755e217a0a688453a92fd37a61878e4e2a13f2dac27759428e84c6b",
+      "hash": "aef255cd7bab714bc3bf3a83c10ddb132d1f1a94647f89593174550ea8f20d1a",
       "files": {
         "src/gen/main.tsx": "8acbb2147f921cbd142dd6bc480d40efe9b930051e77b2cfb6e90d1ac4f2edb8"
       },
@@ -58,9 +58,9 @@
       "by": "claude-code"
     },
     "GetStarted": {
-      "hash": "feb2962ffe348ebf9d67263213c60b5a0dd6de6daf9586b8f4ec4fd0e6172837",
+      "hash": "48917a001ef70860bcbbdf304b7d4d1b2181b69468a193449c1fe930c39bbcae",
       "files": {
-        "src/gen/home/sections/get-started.tsx": "56432a36ef7bac8e79c66c5f5f8d60691b2c0c8d065e2ca6cd74756b1c3d71c0"
+        "src/gen/home/sections/get-started.tsx": "9f1c95bdba093504a12b6b44aa401be2d556838a99e4cf615d73ebf163ba8df9"
       },
       "by": "claude-code"
     },
@@ -79,9 +79,9 @@
       "by": "claude-code"
     },
     "HomePage": {
-      "hash": "e65b7dbf862c3041249cde297ab0df5bed801dd5b6236215567964cd8837c49c",
+      "hash": "f1e7e3a7e3e0c4783fb4f3ee67d9c767f84f4ab3651ece5da0665db4cd97c1fc",
       "files": {
-        "src/gen/home/home-page.tsx": "70403e6a76544ada35a868b7f10fb3963dc838424c89a42a7c1f5ddddeab99b9"
+        "src/gen/home/home-page.tsx": "3fb8dfea4bf571a9d45965db5f76f899bbf33df524fc756e8c7cc18e6466cc72"
       },
       "by": "claude-code"
     },
@@ -198,23 +198,23 @@
       "by": "claude-code"
     },
     "StopExperience": {
-      "hash": "56a1de032c51652d4ed7c190c0195558963eeed1ed92ee2af55c2e22d39a058d",
+      "hash": "0f3eca6bc609abd438be4e73395d41f0aae30f71b4ee936c7399b575d0ed481f",
       "files": {
-        "src/gen/home/journey/stops/stop-experience.tsx": "bd9fe8ed942bb36ac9b9fe23dd06b005c45a49bd13eb84540fc30bc2e39b2556"
+        "src/gen/home/journey/stops/stop-experience.tsx": "e555ab6081ea158542c7bf207302b3190e1ab1a14c434937f678c1d70c919485"
       },
       "by": "claude-code"
     },
     "StopIdea": {
-      "hash": "94c314697e5981c39829ffcf37754d29f824dcaf795c0b6c1a029e7c8f7b4fba",
+      "hash": "4cfa19c19b0ca47fc7cbde87bef1bac813f4e96287a88c93e10c673b9341272a",
       "files": {
-        "src/gen/home/journey/stops/stop-idea.tsx": "f4ef8330d69d5abd82de8e63cf214c87042a1793900454c25f13d67c02731df6"
+        "src/gen/home/journey/stops/stop-idea.tsx": "5b07cd83ded0f84e662eb22618926d177d05d4707359ee788775692361700b22"
       },
       "by": "claude-code"
     },
     "StopProduct": {
-      "hash": "13f7ba8ad4856cf6bb8ad99b1cdf11f42ce3bf3593aed28ac7ffcfc5a5decafb",
+      "hash": "ef5c5c1d924715ae4dc0fa8d8178874b2347cf1ab48c4983a3b0aa9aee15573b",
       "files": {
-        "src/gen/home/journey/stops/stop-product.tsx": "3c44206e74fc3bae22a826224883b116a4ba0238783b6f884b659b7be1135a10"
+        "src/gen/home/journey/stops/stop-product.tsx": "327cd92b24965c7785595eac768b9e71bc8a3d886a56b98db1d5ef24907cda0c"
       },
       "by": "claude-code"
     },
@@ -226,23 +226,23 @@
       "by": "claude-code"
     },
     "StopResult": {
-      "hash": "6ea17b7ce0571e02567cb52ba64e31b883656f564fe3c92b81dd6ca4d40163c9",
+      "hash": "c62996795332dd77e1a50d4fb2351c26d00ceddef874832050c960701bc95d9e",
       "files": {
-        "src/gen/home/journey/stops/stop-result.tsx": "b469d2c7e306098c5fc688665157bf6183534d4cc0750f5701e4d80dd1d1c79f"
+        "src/gen/home/journey/stops/stop-result.tsx": "de8a6b75db52824702743b0220d63e01538211fc3802490ca6118572984a7004"
       },
       "by": "claude-code"
     },
     "StopSpecialist": {
-      "hash": "22604daf0b06f8962d238990d7261f722e501b54c15ce363e21e113e30e05f0e",
+      "hash": "5347cd70c74ec5c7a24ae48734b92a742efb02e584e5ff68cf41688b2f26614e",
       "files": {
-        "src/gen/home/journey/stops/stop-specialist.tsx": "d835f370881021e9be87e08d3a4bfdbf38dce92484a6415e0fcc95cb6618134b"
+        "src/gen/home/journey/stops/stop-specialist.tsx": "7c4adbd066016d946009c4c5068a66c2f7569e8eb9b43204b6d6a6195353b03c"
       },
       "by": "claude-code"
     },
     "StopSystem": {
-      "hash": "bb959a79108c22ce5c6986f9fa5adde540ac80fc49080c439ae21ef9d0aba0b3",
+      "hash": "eeefb07924eaaa92ba3c63e960e839380cca7b73020dd51f91c69a8b3c0c880c",
       "files": {
-        "src/gen/home/journey/stops/stop-system.tsx": "be6eb1c30089c0d403b8b9635e1904012ad2ba036cdc44a9eb77e3b9cbab334d"
+        "src/gen/home/journey/stops/stop-system.tsx": "0f0ed709c9bc08095da8a20ed8d38c66d0fca7b03469cde042bb89d86826e948"
       },
       "by": "claude-code"
     },
@@ -253,15 +253,23 @@
       },
       "by": "claude-code"
     },
-    "TopBar": {
-      "hash": "8d73d2d9bedda3ad7975b2895311a4ce23ff6d527774ff86e2d1f67cc8ac3908",
+    "ThisPage": {
+      "hash": "a06edc17c8995b8f1bfe668379407e79cd945d7b869f0057e6192d8f926af353",
       "files": {
-        "src/gen/home/sections/top-bar.tsx": "3c7adf8803bc8f56896fe427647a1d8ad10ade6bdfb39affab309ac59025b842"
+        "src/gen/home/sections/this-page.tsx": "2cd96d06034f860f225d8cd40d9413d36d1d5407edfcde12ce201267fce55745"
+      },
+      "by": "claude-code"
+    },
+    "TopBar": {
+      "hash": "f9cc448dcff5b25e71918048e56ff1161b7d261999e1b9e11b5daf78ca450e87",
+      "files": {
+        "src/gen/home/sections/top-bar.tsx": "0e00e938776766cef6ef7a4bcd20b57711c2d1ee15b522c587a16e01c5558481"
       },
       "by": "claude-code"
     }
   },
   "glue": {
+    "src/gen/spec.ts": "b55bc1dbefeb437af0eb9ca6a9a4a2e7fe8496f525d5f819d2ffcaff6c4245d6",
     "src/gen/tokens.css": "a0c5a91a74170ec428bcf281480a8a70b3ace55bcd3d556a389c608980a825fe"
   }
 }

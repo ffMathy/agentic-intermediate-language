@@ -1,5 +1,6 @@
 // `ail check`: is the spec sound, is the code built from it, and does the code
 // do what it says? One read-only answer for people, agents and CI.
+import { staleGlue } from "./compile.ts";
 import { lint, type Diagnostic } from "./lint.ts";
 import { plan, type PlanEntry } from "./plan.ts";
 import type { Project } from "./project.ts";
@@ -7,6 +8,8 @@ import { formatVerify, verifyProject, type VerifyResult, type Check } from "./ve
 
 export interface CheckReport {
   ok: boolean;
+  /** Model-free outputs (token CSS, spec module) that are out of date. */
+  glue: string[];
   lint: Diagnostic[];
   plan: PlanEntry[];
   verify: { results: VerifyResult[]; typecheck: Check | null; ok: boolean };
@@ -16,8 +19,9 @@ export function runCheck(p: Project, nodes: string[] = []): CheckReport {
   const l = lint(p);
   const pl = plan(p);
   const v = verifyProject(p, nodes);
-  const ok = !l.some((d) => d.severity === "error") && pl.every((e) => e.status === "fresh") && v.ok;
-  return { ok, lint: l, plan: pl, verify: v };
+  const glue = staleGlue(p);
+  const ok = !l.some((d) => d.severity === "error") && pl.every((e) => e.status === "fresh") && !glue.length && v.ok;
+  return { ok, glue, lint: l, plan: pl, verify: v };
 }
 
 export function formatCheck(r: CheckReport): string {
@@ -28,8 +32,9 @@ export function formatCheck(r: CheckReport): string {
   for (const d of [...errors, ...warnings]) out.push(`    ${d.severity === "error" ? "✗" : "!"} ${d.file}:${d.line} ${d.code}: ${d.message}`);
 
   const todo = r.plan.filter((e) => e.status !== "fresh");
-  out.push(todo.length ? `✗ build    ${todo.length} node(s) not built from the current spec — run \`ail build\`` : `✓ build    ${r.plan.length} node(s) up to date`);
+  out.push(todo.length || r.glue.length ? `✗ build    ${todo.length + r.glue.length} output(s) not built from the current spec — run \`ail build\`` : `✓ build    ${r.plan.length} node(s) up to date`);
   for (const e of todo) out.push(`    ${e.node} ${e.status}${e.reason ? ` (${e.reason})` : ""}`);
+  for (const g of r.glue) out.push(`    ${g} out of date (written by ail build without a model)`);
 
   const failed = r.verify.results.filter((x) => !x.ok);
   const tests = r.verify.results.flatMap((x) => x.checks).filter((c) => c.kind === "tests" && c.ok).reduce((n, c) => n + (Number(/\d+/.exec(c.detail)?.[0]) || 0), 0);

@@ -9,7 +9,13 @@ export const AIL_HOME = resolve(import.meta.dir, "..");
 export interface Config {
   /** Lint warns when a node spans more lines than this (default 80): split it into children. */
   maxNodeLines?: number;
+  /** Folder that holds the spec (default "."). Node folders, and so the
+   * generated code's folders, are measured from here. */
+  specRoot?: string;
+  /** Globs of spec files, relative to the project root (default: every .ail.md under specRoot). */
   sources?: string[];
+  /** Where `ail build` writes the project's own spec as data (e.g. "src/gen/spec.ts"), for pages that show it. */
+  specModule?: string;
   checksDir?: string;
   lockFile?: string;
   models?: string[];
@@ -25,6 +31,8 @@ export interface Target {
 
 export interface Project {
   root: string;
+  /** Absolute path of the folder that holds the spec. */
+  specRoot: string;
   config: Config;
   files: ParsedFile[];
   nodes: Map<string, AilNode>;
@@ -61,10 +69,17 @@ export function loadProject(rootArg?: string): Project {
   const root = rootArg ? resolve(rootArg) : findRoot();
   const cfgFile = join(root, "ail.config.json");
   const config: Config = existsSync(cfgFile) ? JSON.parse(readFileSync(cfgFile, "utf8")) : {};
+  const specRoot = resolve(root, config.specRoot ?? ".");
   const sources = config.sources
     ? [...new Set(config.sources.flatMap((pattern) => [...new Bun.Glob(pattern).scanSync({ cwd: root })].filter((f) => !/(^|\/)(node_modules|\.[^/]+)\//.test(f)).map((f) => resolve(root, f))))].sort()
-    : walk(root).sort();
-  const files = sources.map((f) => parseFile(relative(root, f), readFileSync(f, "utf8")));
+    : (existsSync(specRoot) ? walk(specRoot) : []).sort();
+  const files = sources.map((f) => {
+    const parsed = parseFile(relative(root, f), readFileSync(f, "utf8"));
+    // Node folders are measured from the spec root, not the project root.
+    const dir = relative(specRoot, dirname(f)).split("\\").join("/");
+    for (const n of parsed.nodes) n.dir = dir.startsWith("..") ? n.dir : dir;
+    return parsed;
+  });
   const errors = files.flatMap((f) => f.errors);
 
   const nodes = new Map<string, AilNode>();
@@ -98,7 +113,7 @@ export function loadProject(rootArg?: string): Project {
   for (const f of files) for (const c of f.catalogs) Object.assign(tokens, c.tokens);
 
   return {
-    root, config, files, nodes, ordered, parent, roots, target,
+    root, specRoot, config, files, nodes, ordered, parent, roots, target,
     glossary: files.flatMap((f) => f.glossary),
     tokens,
     errors,

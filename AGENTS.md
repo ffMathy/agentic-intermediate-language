@@ -19,7 +19,9 @@
 - `bun test` includes end-to-end checks of `examples/tictactoe`, which needs
   `bun install` in that folder first.
 - `site/` is the website, and it is an AIL project. Change its pages through
-  its spec and `ail build`, never by editing `site/src/gen`.
+  its spec in `site/ail/` and `ail build`, never by editing `site/src/gen`.
+  Its "This page" section shows `site/src/gen/spec.ts`, which `ail build`
+  writes from the spec without a model.
 - If you change the prompts or the context format, compile hashes
   change. Rebuild `examples/tictactoe` and `site` so that `ail check` passes in
   both.

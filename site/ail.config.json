@@ -1,4 +1,4 @@
 {
-  "sources": ["**/*.ail.md"],
-  "profilePaths": ["../profiles"]
+  "specRoot": "ail",
+  "specModule": "src/gen/spec.ts"
 }

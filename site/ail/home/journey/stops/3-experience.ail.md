@@ -18,7 +18,7 @@ node StopExperience : view   level: experience
     experience.headline  "Experience level: what the player sees, as scenarios anyone can test."
     experience.body      "One level down, the play screen describes the computer's answer as a Given / When / Then scenario. Decisions record why, and what was rejected: the computer waits 300 ms, so the player's own move feels like it counted."
     experience.label     "Experience-level spec excerpt"
-    experience.file      "examples/tictactoe/app/play/play.ail.md"
+    experience.file      "examples/tictactoe/ail/app/play/play.ail.md"
     experience.line.1    "node PlayAGame : flow   level: experience"
     experience.line.2    "  …"
     experience.line.3    "    Scenario: the computer answers"

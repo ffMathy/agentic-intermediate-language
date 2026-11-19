@@ -4,10 +4,11 @@ import { GapStrip } from "./sections/gap-strip";
 import { Journey } from "./journey/journey";
 import { Readers } from "./readers/readers";
 import { BuildLoop } from "./build-loop/build-loop";
+import { ThisPage } from "./sections/this-page";
 import { GetStarted } from "./sections/get-started";
 import { Footer } from "./sections/footer";
 
-/** "the parts appear in this order: TopBar, Hero, GapStrip, Journey, Readers, BuildLoop, GetStarted, Footer" */
+/** One page that says what AIL is, shows it working on a real spec from the first sentence to the running game, and shows how to start. */
 export function HomePage() {
   return (
     <div
@@ -27,6 +28,7 @@ export function HomePage() {
         <Journey />
         <Readers />
         <BuildLoop />
+        <ThisPage />
         <GetStarted />
       </main>
       <Footer />

@@ -30,7 +30,7 @@ export function StopSystem() {
         "      evaluate(boardFrom(\"XOX/XOO/OXX\")) => ({ kind: \"draw\" })",
       ]}
       label="System-level spec excerpt"
-      file="examples/tictactoe/engine/engine.ail.md"
+      file="examples/tictactoe/ail/engine/engine.ail.md"
       highlight={["ComputerPlayer"]}
       turnsInto="rules.ts, plus one unit test per example line. ComputerPlayer looks ahead with these same rules."
       figure={<SystemFigure />}

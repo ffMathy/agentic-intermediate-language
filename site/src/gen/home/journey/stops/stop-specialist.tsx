@@ -30,7 +30,7 @@ export function StopSpecialist() {
         "                 and assert that no game ends in a win for X",
       ]}
       label="Specialist-level spec excerpt"
-      file="examples/tictactoe/engine/computer-player/computer-player.ail.md"
+      file="examples/tictactoe/ail/engine/computer-player/computer-player.ail.md"
       highlight={[
         "never loses",
         "no game against choose ends in a win for the other player",

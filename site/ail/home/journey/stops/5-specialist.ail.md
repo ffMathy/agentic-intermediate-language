@@ -18,7 +18,7 @@ node StopSpecialist : view   level: experience
     specialist.headline  "Specialist level: the promise becomes an algorithm and a proof."
     specialist.body      "This is where “never loses” is made true. The node fixes the algorithm, the exact scoring, the tie-break and an invariant, and says how the promise will be checked. Rejected alternatives stay in the spec, so nobody argues them again."
     specialist.label     "Specialist-level spec excerpt"
-    specialist.file      "examples/tictactoe/engine/computer-player/computer-player.ail.md"
+    specialist.file      "examples/tictactoe/ail/engine/computer-player/computer-player.ail.md"
     specialist.line.1    "node ComputerPlayer : fn   level: specialist   @ai"
     specialist.line.2    "  why   Make "the computer never loses" true and provable, while still answering instantly.   <- Engine"
     specialist.line.3    "  what"

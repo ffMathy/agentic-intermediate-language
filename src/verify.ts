@@ -38,6 +38,7 @@ function allowedImports(p: Project, n: AilNode): { relative: Set<string>; packag
   for (const u of n.uses) { const d = p.nodes.get(u); const mp = d && modulePath(p, d); if (mp) rel.add(strip(mp)); }
   const s = p.target?.settings ?? {};
   if (s["tokens-css"]) rel.add(strip(s["tokens-css"]));
+  if (p.config.specModule) rel.add(strip(p.config.specModule));
   return { relative: rel, packages: (s["libs"] ?? "").split(/[\s,]+/).filter(Boolean) };
 }
 

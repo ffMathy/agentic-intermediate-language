@@ -23,7 +23,7 @@ node GetStarted : view   level: experience
       Then the heading "Start in two minutes" is followed by the lead "Install it, then describe a feature in plain words. You get a spec you can review, and code that is checked against it."
       And under the cards, the link "Read the Tic-Tac-Toe spec" leads to the example's spec folder and the link "View on GitHub ↗" leads to the repository, in that order
   look
-    band      Section with id "start", tone raised
+    band      Section with id "start", tone plain
     layout    stack(v, gap: space.6, align: stretch) [ head, cards, next ]
     head      SectionHeading with text from start.heading, lead from start.lead
     cards     a div: display grid, grid-template-columns repeat(auto-fit, minmax(min(320px, 100%), 1fr)), gap space.6, align-items start

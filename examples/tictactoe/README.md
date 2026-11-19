@@ -1,13 +1,14 @@
 # Tic-Tac-Toe kata
 
-The complete AIL example. [`tictactoe.ail.md`](tictactoe.ail.md) is the root
-of the spec, and the folders below it mirror the tree: `app/play` and
-`app/demo` are two areas that both reuse `board/` and `engine/`. Everything
-under `src/gen/` (same folders) and `index.html` is generated.
+The complete AIL example. The whole spec lives in [`ail/`](ail), apart from
+everything else. [`ail/tictactoe.ail.md`](ail/tictactoe.ail.md) is the root, and
+the folders below it mirror the tree: `app/play` and `app/demo` are two areas
+that both reuse `board/` and `engine/`. Everything under `src/gen/` is
+generated, in the same folders.
 
 | path | what it is | written by |
 |---|---|---|
-| `**/*.ail.md` | the spec, from product claims down to a minimax proof | people |
+| `ail/**/*.ail.md` | the spec, from product claims down to a minimax proof | people |
 | `src/gen/**/*.ts(x)` | one module per compilable node, in the same folders as its spec | a model, via `ail build` or `/ail:build` |
 | `src/gen/tokens.css` | the design tokens as CSS variables | `ail build`, straight from the catalog; no model involved |
 | `index.html` | the page that loads the app | people |

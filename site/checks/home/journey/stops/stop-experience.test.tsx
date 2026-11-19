@@ -1,4 +1,4 @@
-// ail-derived-from: StopExperience@da9d6b6963b98c59
+// ail-derived-from: StopExperience@01c9b0f351dcdd4a
 import { afterEach, expect, test } from "bun:test";
 import { cleanup, render, screen, within } from "@testing-library/react";
 import { StopExperience } from "../../../../src/gen/home/journey/stops/stop-experience";
@@ -7,10 +7,6 @@ afterEach(() => {
   cleanup();
 });
 
-const headline =
-  "Experience level: what the player sees, as scenarios anyone can test.";
-const label = "Experience-level spec excerpt";
-const mark = "the computer places an O";
 const lines = [
   "node PlayAGame : flow   level: experience",
   "  …",
@@ -28,31 +24,26 @@ const lines = [
 test("the experience level", () => {
   render(<StopExperience />);
 
-  const article = screen
-    .getAllByRole("article")
-    .find((el) => el.id === "stop-3");
-  expect(article).toBeDefined();
-  if (!article) return;
+  const article = document.getElementById("stop-3");
+  expect(article).not.toBeNull();
+  const articleEl = article as HTMLElement;
+  expect(articleEl.tagName.toLowerCase() === "article" || articleEl.getAttribute("role") === "article").toBe(true);
+  expect(
+    within(articleEl).getByRole("heading", {
+      level: 3,
+      name: "Experience level: what the player sees, as scenarios anyone can test.",
+    }),
+  ).toBeTruthy();
 
-  const heading = within(article).getByRole("heading", {
-    level: 3,
-    name: headline,
-  });
-  expect(heading).toBeTruthy();
-
-  const region = within(article).getByRole("region", { name: label });
+  const region = screen.getByRole("region", { name: "Experience-level spec excerpt" });
   const text = region.textContent ?? "";
-
-  let cursor = 0;
+  let from = 0;
   for (const line of lines) {
-    const needle = line.trim();
-    const at = text.indexOf(needle, cursor);
+    const at = text.indexOf(line, from);
     expect(at).toBeGreaterThanOrEqual(0);
-    cursor = at + needle.length;
+    from = at + line.length;
   }
 
-  const highlighted = Array.from(region.querySelectorAll("*")).filter(
-    (el) => (el.textContent ?? "").trim() === mark,
-  );
-  expect(highlighted.length).toBeGreaterThan(0);
+  const marks = Array.from(region.querySelectorAll("mark")).map((m) => m.textContent ?? "");
+  expect(marks).toContain("the computer places an O");
 });

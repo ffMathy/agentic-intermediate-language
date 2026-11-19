@@ -53,18 +53,23 @@ Two graphs live in one file:
 
 ### Folders, splitting and reuse
 
-A spec can be one file or many. Any `.ail.md` file in any subfolder takes
-part, and **the folders mirror the tree**:
+A spec can be one file or many. The spec lives in its own folder (the
+project's `specRoot`, `ail/` in both examples), apart from generated code and
+tests. Any `.ail.md` file in any subfolder of it takes part, and **the folders
+mirror the tree**:
 
 ```
-tictactoe.ail.md                                 TicTacToe (product)
-app/app.ail.md                                   App: switches areas
-app/play/play.ail.md                             the play area
-app/demo/demo.ail.md                             the watch area
-board/board.ail.md                               BoardKit (library): BoardView, StatusLine
-engine/engine.ail.md                             Engine (library): GameState, Rules, GameReducer
-engine/computer-player/computer-player.ail.md    grew big, so it got its own folder
+ail/tictactoe.ail.md                                 TicTacToe (product)
+ail/app/app.ail.md                                   App: switches areas
+ail/app/play/play.ail.md                             the play area
+ail/app/demo/demo.ail.md                             the watch area
+ail/board/board.ail.md                               BoardKit (library): BoardView, StatusLine
+ail/engine/engine.ail.md                             Engine (library): GameState, Rules, GameReducer
+ail/engine/computer-player/computer-player.ail.md    grew big, so it got its own folder
 ```
+
+Node folders are measured from `specRoot`, so `ail/app/play/` generates
+`src/gen/app/play/`. Moving the spec folder changes no compile hash.
 
 - **Generated code mirrors the folders.** The target's paths use `{dir}` (e.g.
   `src/gen/{dir}/{kebab}.tsx`). Imports between folders are computed for each
@@ -163,8 +168,11 @@ for node in dependency order:
   submit: write → verify → lock, or roll back and retry with the failures
 ```
 
-The only output that needs no model is the design-token CSS, written straight
-from the catalog. Everything else, the entry point and the components
+The only outputs that need no model are the design-token CSS, written straight
+from the catalog, and, when a project sets `specModule`, a data module holding
+the project's own spec files and nodes. The website uses it to show its own
+spec, so that section can never go stale; `ail check` fails if either output is
+out of date. Everything else, the entry point and the components
 included, is a node compiled like any other.
 
 ### Why there are no profiles

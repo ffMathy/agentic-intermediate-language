@@ -1,6 +1,7 @@
+import type { CSSProperties } from "react";
 import { Stack } from "../../parts/stack";
 
-const linkStyle = {
+const linkStyle: CSSProperties = {
   fontSize: "var(--font-small)",
   fontWeight: 600,
   color: "var(--color-text)",
@@ -8,15 +9,19 @@ const linkStyle = {
   padding: "var(--space-1) 0",
 };
 
-const links = [
-  { href: "#journey", text: "The journey" },
-  { href: "#readers", text: "Four readers" },
-  { href: "#loop", text: "How it builds" },
-  { href: "#start", text: "Get started" },
-  { href: "https://github.com/ffMathy/agentic-intermediate-language", text: "GitHub ↗" },
+const links: { href: string; label: string }[] = [
+  { href: "#journey", label: "The journey" },
+  { href: "#readers", label: "Four readers" },
+  { href: "#loop", label: "How it builds" },
+  { href: "#this-page", label: "This page in AIL" },
+  { href: "#start", label: "Get started" },
+  {
+    href: "https://github.com/ffMathy/agentic-intermediate-language",
+    label: "GitHub ↗",
+  },
 ];
 
-/** the name of the project on the left, and five links on the right */
+/** "the name of the project on the left, and six links on the right" */
 export function TopBar() {
   return (
     <header
@@ -48,7 +53,12 @@ export function TopBar() {
           >
             AIL
           </span>
-          <span style={{ fontSize: "var(--font-small)", color: "var(--color-text-muted)" }}>
+          <span
+            style={{
+              fontSize: "var(--font-small)",
+              color: "var(--color-text-muted)",
+            }}
+          >
             Agentic Intermediate Language
           </span>
         </Stack>
@@ -56,7 +66,7 @@ export function TopBar() {
           <Stack dir="h" gap="space.4" align="center" wrap={true}>
             {links.map((link) => (
               <a key={link.href} href={link.href} style={linkStyle}>
-                {link.text}
+                {link.label}
               </a>
             ))}
           </Stack>

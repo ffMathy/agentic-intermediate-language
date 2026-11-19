@@ -1,4 +1,4 @@
-// ail-derived-from: StopSystem@8dc84e0679abb3b3
+// ail-derived-from: StopSystem@62a0745243c7ad56
 import { afterEach, expect, test } from "bun:test";
 import { cleanup, render, screen, within } from "@testing-library/react";
 import { StopSystem } from "../../../../src/gen/home/journey/stops/stop-system";
@@ -7,7 +7,7 @@ afterEach(() => {
   cleanup();
 });
 
-const lines: string[] = [
+const lines = [
   "node Engine : library   level: system",
   "  why   One set of rules for every part of the game, so playing and watching can never disagree.   <- TicTacToe",
   "  children  GameState, Rules, GameReducer, ComputerPlayer",
@@ -30,30 +30,28 @@ test("the system level", () => {
 
   const article = screen
     .getAllByRole("article")
-    .find((el) => el.id === "stop-4");
+    .find((element) => element.id === "stop-4");
   expect(article).toBeDefined();
-  if (!article) return;
-
-  expect(
-    within(article).getByRole("heading", {
-      level: 3,
-      name: "System level: one exact shape, one exact rule, examples that run.",
-    }),
-  ).toBeTruthy();
-
-  const region = screen.getByRole("region", { name: "System-level spec excerpt" });
-  const text = region.textContent ?? "";
-
-  let position = 0;
-  for (const line of lines) {
-    const needle = line.trim();
-    const found = text.indexOf(needle, position);
-    expect(found).toBeGreaterThanOrEqual(0);
-    position = found + needle.length;
+  if (!article) {
+    return;
   }
 
-  const highlighted = Array.from(region.querySelectorAll("*")).filter(
-    (el) => el.textContent === "ComputerPlayer",
-  );
-  expect(highlighted.length).toBeGreaterThan(0);
+  const heading = within(article).getByRole("heading", {
+    level: 3,
+    name: "System level: one exact shape, one exact rule, examples that run.",
+  });
+  expect(heading).toBeTruthy();
+
+  const region = within(article).getByRole("region", {
+    name: "System-level spec excerpt",
+  });
+  const text = region.textContent ?? "";
+  for (const line of lines) {
+    expect(text).toContain(line);
+  }
+
+  const highlighted = within(region).getAllByText("ComputerPlayer", {
+    exact: true,
+  });
+  expect(highlighted.length).toBeGreaterThanOrEqual(1);
 });

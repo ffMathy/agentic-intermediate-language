@@ -43,6 +43,10 @@ export function buildContext(p: Project, n: AilNode): string {
     const css = p.target?.settings["tokens-css"];
     if (css) out.push(`They are CSS variables defined in ${css}: token a.b.c → var(--a-b-c).`);
   }
+  if (p.config.specModule && path) {
+    out.push(`\n## The project's own spec, as data`);
+    out.push(`"${importSpecifier(path, p.config.specModule)}" exports specFiles (path and full text of every spec file, paths relative to the spec folder, sorted by path) and specNodes (name, kind, level, file and parent of every node, in tree order). Import it only if this node's spec shows the spec.`);
+  }
   if (p.glossary.length) {
     out.push(`\n## Glossary`);
     out.push(p.glossary.map((t) => `- ${t.term}: ${t.plain} — formally ${t.formal}`).join("\n"));

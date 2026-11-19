@@ -1,0 +1,27 @@
+[
+  {
+    "node": "HomePage",
+    "test": "one story, in order",
+    "file": "home/home-page/01-one-story-in-order.png"
+  },
+  {
+    "node": "HomePage",
+    "test": "every top bar link has a place to land",
+    "file": "home/home-page/02-every-top-bar-link-has-a-place-to-land.png"
+  },
+  {
+    "node": "TopBar",
+    "test": "the links lead to the right places",
+    "file": "home/sections/top-bar/01-the-links-lead-to-the-right-places.png"
+  },
+  {
+    "node": "AdoptSection",
+    "test": "adopting is explained",
+    "file": "home/adopt/adopt-section/01-adopting-is-explained.png"
+  },
+  {
+    "node": "AdoptFigure",
+    "test": "the picture",
+    "file": "home/adopt/adopt-figure/01-the-picture.png"
+  }
+]

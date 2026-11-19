@@ -1,7 +1,6 @@
 import { Stack } from "../../parts/stack";
 
 const linkStyle = {
-  fontFamily: "var(--font-sans)",
   fontSize: "var(--font-small)",
   fontWeight: 600,
   color: "var(--color-text)",
@@ -30,12 +29,34 @@ export function TopBar() {
         style={{ maxWidth: "var(--width-content)", margin: "0 auto" }}
       >
         <Stack dir="h" gap="space.2" align="center" wrap={true}>
+          <svg
+            aria-hidden="true"
+            viewBox="0 0 22 28"
+            width="22px"
+            height="28px"
+            style={{ display: "block", width: "22px", height: "28px" }}
+          >
+            <path
+              d="M3 4 H19 L17.5 26 H4.5 Z"
+              fill="var(--color-level-experience)"
+              stroke="var(--color-text)"
+              strokeWidth={2}
+              strokeLinejoin="round"
+            />
+            <path
+              d="M3 4 H19 L18.6 10 H3.4 Z"
+              fill="var(--color-page)"
+              stroke="var(--color-text)"
+              strokeWidth={2}
+              strokeLinejoin="round"
+            />
+          </svg>
           <span
             style={{
-              fontFamily: "var(--font-sans)",
-              fontSize: "20px",
+              fontFamily: "var(--font-display)",
+              fontSize: "24px",
               fontWeight: 800,
-              color: "var(--color-accent)",
+              color: "var(--color-text)",
               letterSpacing: "-0.01em",
             }}
           >

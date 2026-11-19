@@ -36,6 +36,7 @@
   --color-thread-strong: #d97706;
   --font-body: 16px;
   --font-code: 14px;
+  --font-display: Fraunces,Georgia,serif;
   --font-heading: clamp(26px,3.5vw,36px);
   --font-hero: clamp(34px,5.5vw,56px);
   --font-lead: 18px;

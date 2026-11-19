@@ -18,10 +18,10 @@ node GapStrip : view   level: experience
     heading   SectionHeading with eyebrow from gap.eyebrow, text from gap.heading
     cards     a div: display grid, grid-template-columns repeat(auto-fit, minmax(min(260px, 100%), 1fr)), gap space.4
     card      background color.surface, a 1px solid color.border border, radius.lg, pad space.6; stack(v, gap: space.3, align: start) [ icon, title, body ]
-    third     the third card has a 2px solid color.accent border instead, and a tip under its body
+    third     the third card is dark like the code panels: background color.code, a 1px solid color.code border; its title color color.thread, its body color color.code.text, and a tip under its body in color color.code.muted
     title     an h3: font.lead, weight 700, line-height 1.3, color.text, margin 0
     body      a p: font.body, line-height 1.6, color.text.muted, margin 0
-    tip       a p: font.small, weight 600, color.accent, margin 0
+    tip       a p: font.small, weight 600, margin 0 (its color is set by third)
     icon      an aria-hidden svg, viewBox 0 0 40 40, width 40px, height 40px
     icon.1    a cloud: path "M12 30 H30 A7 7 0 0 0 30 16 A10 10 0 0 0 11 14 A8 8 0 0 0 12 30 Z", fill none, stroke color.text.muted, stroke-width 2
     icon.2    rect x 2 y 6 width 36 height 28 rx 4 fill color.code; three lines stroke color.code.text, stroke-width 2, stroke-linecap round: 8,14 to 28,14; 8,20 to 22,20; 8,26 to 32,26

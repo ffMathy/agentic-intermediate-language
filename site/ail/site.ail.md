@@ -72,7 +72,8 @@ glossary
 
 AIL sounds like ale, so the page is poured like one: a cream page like the
 head on a glass, amber for actions and links, code on a stout-dark panel, and
-the golden thread we follow down the spec. Values contain no spaces, because
+the golden thread we follow down the spec. Headings are set in a serif with
+some character, like a brewery's label. Values contain no spaces, because
 the catalog separates tokens with spaces.
 
 ```ail
@@ -81,7 +82,7 @@ catalog
     space.1=4px  space.2=8px  space.3=12px  space.4=16px  space.6=24px  space.8=32px  space.12=48px  space.16=64px
     radius.sm=6px  radius.md=8px  radius.lg=12px  radius.xl=20px  radius.pill=999px
     width.content=1080px  width.prose=68ch
-    font.sans=Inter,system-ui,sans-serif  font.mono=Inconsolata,ui-monospace,monospace
+    font.sans=Inter,system-ui,sans-serif  font.mono=Inconsolata,ui-monospace,monospace  font.display=Fraunces,Georgia,serif
     font.hero=clamp(34px,5.5vw,56px)  font.heading=clamp(26px,3.5vw,36px)  font.stop=clamp(22px,2.6vw,28px)
     font.lead=18px  font.body=16px  font.small=14px  font.code=14px  font.tiny=12px  font.micro=11px
     color.page=#fffaf0  color.surface=#fffdf8  color.surface.raised=#f6ead3  color.border=#e3cfa9

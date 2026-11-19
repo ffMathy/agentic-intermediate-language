@@ -117,6 +117,12 @@ ail show changes --shots .ail/shots
 - **Gaps become questions.** A compiler that would have to guess replies
   `STOP: <question>`, and you answer it in the spec.
 
+The spec is a tree of tasks that are all alike, compiled one node at a time,
+each by a fresh call that sees only its own slice. The idea is inspired by
+[Recursive Language Models](https://arxiv.org/abs/2512.24601) (Zhang, Kraska
+and Khattab, MIT CSAIL), where a model calls itself on just the parts of a long
+input it needs.
+
 The full design is in [docs/proposal.md](docs/proposal.md).
 
 ## Repository layout

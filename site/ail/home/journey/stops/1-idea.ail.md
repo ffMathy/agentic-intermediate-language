@@ -45,8 +45,8 @@ node IdeaFigure : view   level: experience
       Then an image named "A product owner says: Tic-Tac-Toe. The computer never loses." is shown
   look
     svg        viewBox 0 0 320 210, width 100%, max-width 320px, height auto, display block
-    tail       path "M48 122 L40 148 L74 122" fill color.surface, stroke color.border, stroke-width 2, drawn first
     bubble     rect x 10 y 10 width 300 height 114 rx 16, fill color.surface, stroke color.border, stroke-width 2
+    tail       drawn after the bubble, so no border line crosses where it joins: first path "M48 121 L40 148 L74 121 Z" fill color.surface, no stroke (it covers the bubble's border there); then path "M48 124 L40 148 L74 124", fill none, stroke color.border, stroke-width 2
     game       text at 160, 40, text-anchor middle, font-size 16, weight 600, fill color.text.muted
     highlight  rect x 78 y 88 width 164 height 30 rx 4, fill color.thread
     line.1     text at 160, 74, text-anchor middle, font-size 24, weight 700, fill color.text

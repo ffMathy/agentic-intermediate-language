@@ -1,10 +1,17 @@
-import { useId } from "react";
+import type { CSSProperties } from "react";
 import { Section } from "../../parts/section";
 import { SectionHeading } from "../../parts/section-heading";
 import { Stack } from "../../parts/stack";
 import { CopyCommand } from "../../parts/copy-command";
 
-const cardStyle = {
+const cardsStyle: CSSProperties = {
+  display: "grid",
+  gridTemplateColumns: "repeat(auto-fit, minmax(min(320px, 100%), 1fr))",
+  gap: "var(--space-6)",
+  alignItems: "start",
+};
+
+const cardStyle: CSSProperties = {
   background: "var(--color-surface)",
   border: "1px solid var(--color-border)",
   borderRadius: "var(--radius-lg)",
@@ -12,59 +19,59 @@ const cardStyle = {
   minWidth: 0,
 };
 
-const titleStyle = {
+const titleStyle: CSSProperties = {
   fontSize: "var(--font-lead)",
   fontWeight: 700,
   color: "var(--color-text)",
   margin: 0,
 };
 
-const subtitleStyle = {
+const subtitleStyle: CSSProperties = {
   fontSize: "var(--font-small)",
   color: "var(--color-text-muted)",
   margin: 0,
 };
 
-const textStyle = {
+const textStyle: CSSProperties = {
   fontSize: "var(--font-body)",
   lineHeight: 1.6,
   color: "var(--color-text-muted)",
   margin: 0,
 };
 
-const tableStyle = {
+const tableStyle: CSSProperties = {
   width: "100%",
-  borderCollapse: "collapse" as const,
+  borderCollapse: "collapse",
 };
 
-const rowStyle = {
+const rowStyle: CSSProperties = {
   borderBottom: "1px solid var(--color-border)",
 };
 
-const cellStyle = {
+const cellStyle: CSSProperties = {
   padding: "var(--space-2) var(--space-2) var(--space-2) 0",
   verticalAlign: "top",
   fontSize: "var(--font-small)",
-  textAlign: "left" as const,
+  textAlign: "left",
 };
 
-const commandCellStyle = {
+const commandCellStyle: CSSProperties = {
   ...cellStyle,
   fontFamily: "var(--font-mono)",
   fontSize: "var(--font-code)",
   fontWeight: 600,
   color: "var(--color-accent)",
-  whiteSpace: "nowrap" as const,
+  whiteSpace: "nowrap",
 };
 
-const closingStyle = {
+const closingStyle: CSSProperties = {
   fontSize: "var(--font-small)",
   fontWeight: 600,
   color: "var(--color-text)",
   margin: 0,
 };
 
-const exampleStyle = {
+const exampleStyle: CSSProperties = {
   background: "var(--color-accent)",
   color: "var(--color-on-accent)",
   border: "2px solid var(--color-accent)",
@@ -74,7 +81,7 @@ const exampleStyle = {
   textDecoration: "none",
 };
 
-const repoStyle = {
+const repoStyle: CSSProperties = {
   background: "var(--color-surface)",
   color: "var(--color-accent)",
   border: "2px solid var(--color-accent)",
@@ -84,10 +91,8 @@ const repoStyle = {
   textDecoration: "none",
 };
 
-/** "two cards, "In Claude Code" and "In a terminal", side by side when there is room" */
+/** the section has the id "start", so the page can link to it */
 export function GetStarted() {
-  const claudeId = useId();
-  const cliId = useId();
   return (
     <Section id="start" tone="plain">
       <Stack dir="v" gap="space.6" align="stretch">
@@ -95,17 +100,10 @@ export function GetStarted() {
           text="Start in two minutes"
           lead="Install it, then describe a feature in plain words. You get a spec you can review, and code that is checked against it."
         />
-        <div
-          style={{
-            display: "grid",
-            gridTemplateColumns: "repeat(auto-fit, minmax(min(320px, 100%), 1fr))",
-            gap: "var(--space-6)",
-            alignItems: "start",
-          }}
-        >
-          <div role="region" aria-labelledby={claudeId} style={cardStyle}>
+        <div style={cardsStyle}>
+          <section aria-labelledby="start-claude-title" style={cardStyle}>
             <Stack dir="v" gap="space.3" align="stretch">
-              <h3 id={claudeId} style={titleStyle}>
+              <h3 id="start-claude-title" style={titleStyle}>
                 In Claude Code
               </h3>
               <p style={subtitleStyle}>No API key. It runs on your Claude subscription.</p>
@@ -115,10 +113,10 @@ export function GetStarted() {
                 Then ask for features in plain words. Claude changes the spec, and /ail:build compiles whatever changed.
               </p>
             </Stack>
-          </div>
-          <div role="region" aria-labelledby={cliId} style={cardStyle}>
+          </section>
+          <section aria-labelledby="start-cli-title" style={cardStyle}>
             <Stack dir="v" gap="space.3" align="stretch">
-              <h3 id={cliId} style={titleStyle}>
+              <h3 id="start-cli-title" style={titleStyle}>
                 In a terminal
               </h3>
               <p style={subtitleStyle}>Needs Bun 1.2 or later.</p>
@@ -152,7 +150,7 @@ export function GetStarted() {
               <CopyCommand command="cd examples/tictactoe && bun install && ail build" />
               <CopyCommand command="ail show stakeholder" />
             </Stack>
-          </div>
+          </section>
         </div>
         <Stack dir="h" gap="space.3" align="center" wrap={true}>
           <a

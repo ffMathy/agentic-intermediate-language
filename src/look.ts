@@ -37,11 +37,14 @@ export function lookTask(p: Project, n: AilNode, shots: Shot[]): string {
 
 /** Parse "MATCHES" or "MISMATCH" followed by "- " lines. Anything else counts as a mismatch, quoted. */
 export function parseVerdict(reply: string): { ok: boolean; problems: string[] } {
-  const text = reply.trim();
-  if (/^MATCHES\b/.test(text)) return { ok: true, problems: [] };
-  const problems = text.split("\n").filter((l) => /^\s*[-*]\s+/.test(l)).map((l) => l.replace(/^\s*[-*]\s+/, "").trim());
-  if (/^MISMATCH\b/.test(text) && problems.length) return { ok: false, problems };
-  return { ok: false, problems: [`the judge's reply was not understood: ${text.slice(0, 300)}`] };
+  // The verdict is the last line that is exactly MATCHES or MISMATCH; a model
+  // may think aloud before it.
+  const lines = reply.trim().split("\n");
+  const at = lines.map((l) => l.trim()).findLastIndex((l) => l === "MATCHES" || l === "MISMATCH");
+  if (at >= 0 && lines[at]!.trim() === "MATCHES") return { ok: true, problems: [] };
+  const problems = at >= 0 ? lines.slice(at + 1).filter((l) => /^\s*[-*]\s+/.test(l)).map((l) => l.replace(/^\s*[-*]\s+/, "").trim()) : [];
+  if (at >= 0 && problems.length) return { ok: false, problems };
+  return { ok: false, problems: [`the judge's reply was not understood: ${reply.trim().slice(0, 300)}`] };
 }
 
 /**

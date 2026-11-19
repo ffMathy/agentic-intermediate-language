@@ -11,6 +11,8 @@ test("the judge's verdict: MATCHES, or MISMATCH with one problem per line", () =
   expect(parseVerdict("MISMATCH\n- a win: the squares are green — the spec says: color.highlight\n- draw: x")).toEqual({
     ok: false, problems: ["a win: the squares are green — the spec says: color.highlight", "draw: x"],
   });
+  // thinking aloud before the verdict is fine
+  expect(parseVerdict("Column a, b, c in order. Fine.\n\nMATCHES")).toEqual({ ok: true, problems: [] });
   // anything else is not taken as a pass
   expect(parseVerdict("Looks fine to me!").ok).toBe(false);
   expect(parseVerdict("MISMATCH").ok).toBe(false);

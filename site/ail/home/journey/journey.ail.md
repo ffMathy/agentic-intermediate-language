@@ -87,7 +87,7 @@ node JourneyStop : view   level: experience
     on a 390px-wide screen each figure's drawing is at least 300px wide, so a 360-unit figure draws at no less than 0.83 scale
     the last stop's rail ends at its marker
     Scenario: a stop
-      Given the number 4, the chip "SYSTEM", the reader "engineers", the headline "System level", the excerpt label "Spec excerpt" and the turns-into text "Tests."
+      Given the number 4, the color "color.level.system", the chip "SYSTEM", the reader "engineers", the headline "System level", the excerpt label "Spec excerpt" and the turns-into text "Tests."
       Then an article with the id "stop-4" shows the marker "4", "SYSTEM", "Who reads this: engineers" and a level 3 heading "System level"
       And it holds the region named "Spec excerpt" and the text "Turns into:" followed by "Tests."
     Scenario: a stop with a file to browse
@@ -103,7 +103,7 @@ node JourneyStop : view   level: experience
     top       stack(h, gap: space.3, align: center, wrap: true) [ chip, reader ]
     chip      a span: background the stop's color, color color.on.accent, font.micro, weight 700, letter-spacing 0.08em, radius.pill, pad space.1 space.3
     reader    font.small, color.text.muted
-    headline  an h3: font.stop, weight 800, line-height 1.2, letter-spacing -0.01em, color.text, margin 0
+    headline  an h3: font.display at font.stop, weight 700, line-height 1.15, letter-spacing -0.01em, color.text, margin 0
     body      a div: display grid, grid-template-columns repeat(auto-fit, minmax(min(300px, 100%), 1fr)), gap space.6, align-items start; holds explain, then figure
     explain   a p: font.body, line-height 1.6, color.text.muted, max-width width.prose, margin 0
     excerpt   CodeBlock with lines, label, caption from file, highlight, and edge the stop's color
@@ -115,6 +115,7 @@ node JourneyStop : view   level: experience
     stop.turns   "Turns into:"
     stop.browse  "Open the whole file in the spec browser ↓"
   binds
+    color    the color prop is a token name such as "color.level.system", used as the CSS variable var(--color-level-system)
     props    number: number, color: token name, depth: string, chip: string, reader: string, headline: string, explanation: string, lines: string[], label: string, file: string, highlight: string[], turnsInto: string, figure: React node, last?: boolean, browse?: string (the link's target)
   uses  Stack, CodeBlock
 ```

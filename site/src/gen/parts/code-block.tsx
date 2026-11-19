@@ -1,7 +1,6 @@
 import type { CSSProperties, ReactNode } from "react";
 import { Stack } from "./stack";
 
-/** binds.props: lines: string[], label: string, edge?: token name, highlight?: string[], caption?: string */
 export type CodeBlockProps = {
   lines: string[];
   label: string;
@@ -10,7 +9,20 @@ export type CodeBlockProps = {
   caption?: string;
 };
 
-const tokenVar = (token: string): string => `var(--${token.replace(/\./g, "-")})`;
+const tokenVar = (token: string): string => `var(--${token.split(".").join("-")})`;
+
+const preStyle: CSSProperties = {
+  background: "var(--color-code)",
+  color: "var(--color-code-text)",
+  fontFamily: "var(--font-mono)",
+  fontSize: "var(--font-code)",
+  lineHeight: 1.6,
+  padding: "var(--space-4)",
+  borderRadius: "var(--radius-md)",
+  margin: 0,
+  whiteSpace: "pre-wrap",
+  overflowWrap: "anywhere",
+};
 
 const markStyle: CSSProperties = {
   background: "var(--color-thread-soft)",
@@ -27,19 +39,19 @@ const captionStyle: CSSProperties = {
   overflowWrap: "anywhere",
 };
 
-const renderLine = (line: string, phrases: string[]): ReactNode[] => {
+const markLine = (line: string, phrases: string[]): ReactNode[] => {
   const parts: ReactNode[] = [];
   let plain = "";
   let i = 0;
   while (i < line.length) {
-    const found = phrases.find((phrase) => line.startsWith(phrase, i));
+    const found = phrases.find((p) => line.startsWith(p, i));
     if (found !== undefined) {
       if (plain !== "") {
         parts.push(plain);
         plain = "";
       }
       parts.push(
-        <mark key={i} style={markStyle}>
+        <mark key={parts.length} style={markStyle}>
           {found}
         </mark>,
       );
@@ -55,27 +67,16 @@ const renderLine = (line: string, phrases: string[]): ReactNode[] => {
   return parts;
 };
 
-/** shows the given lines exactly, one per line, keeping every space; an empty line stays an empty line */
+/** "shows the given lines exactly, one per line, keeping every space; an empty line stays an empty line" */
 export function CodeBlock({ lines, label, edge, highlight, caption }: CodeBlockProps) {
-  const phrases = (highlight ?? []).filter((phrase) => phrase !== "");
-  const preStyle: CSSProperties = {
-    background: "var(--color-code)",
-    color: "var(--color-code-text)",
-    fontFamily: "var(--font-mono)",
-    fontSize: "var(--font-code)",
-    lineHeight: 1.6,
-    padding: "var(--space-4)",
-    borderRadius: "var(--radius-md)",
-    margin: 0,
-    whiteSpace: "pre-wrap",
-    overflowWrap: "anywhere",
-    ...(edge !== undefined ? { borderLeft: `4px solid ${tokenVar(edge)}` } : {}),
-  };
+  const phrases = (highlight ?? []).filter((p) => p !== "");
+  const style: CSSProperties =
+    edge === undefined ? preStyle : { ...preStyle, borderLeft: `4px solid ${tokenVar(edge)}` };
   return (
     <Stack dir="v" gap="space.2" align="stretch">
-      <pre role="region" aria-label={label} style={preStyle}>
+      <pre role="region" aria-label={label} style={style}>
         {lines.map((line, index) => {
-          const n = line.length - line.trimStart().length;
+          const n = line.length - line.replace(/^ +/, "").length;
           const lineStyle: CSSProperties = {
             display: "block",
             paddingLeft: `${n + 4}ch`,
@@ -83,12 +84,12 @@ export function CodeBlock({ lines, label, edge, highlight, caption }: CodeBlockP
           };
           return (
             <span key={index} style={lineStyle}>
-              {line === "" ? " " : renderLine(line, phrases)}
+              {line === "" ? " " : markLine(line, phrases)}
             </span>
           );
         })}
       </pre>
-      {caption ? <div style={captionStyle}>{caption}</div> : null}
+      {caption !== undefined ? <div style={captionStyle}>{caption}</div> : null}
     </Stack>
   );
 }

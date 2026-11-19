@@ -1,4 +1,3 @@
-/** Props of MiniBoard: "x: number, y: number, cell: number, marks: string, highlight?: number[], numbers?: boolean". */
 export type MiniBoardProps = {
   x: number;
   y: number;
@@ -8,19 +7,19 @@ export type MiniBoardProps = {
   numbers?: boolean;
 };
 
-/** "draws a 3 by 3 board inside a larger picture, at the position and size it is given" */
+/** draws a 3 by 3 board inside a larger picture, at the position and size it is given */
 export function MiniBoard({ x, y, cell, marks, highlight, numbers }: MiniBoardProps) {
-  const squares = [0, 1, 2, 3, 4, 5, 6, 7, 8];
   const lit = highlight ?? [];
+  const squares = [0, 1, 2, 3, 4, 5, 6, 7, 8];
   return (
     <g>
       {squares.map((i) => {
-        const column = i % 3;
         const row = Math.floor(i / 3);
+        const col = i % 3;
         return (
           <rect
-            key={`square-${i}`}
-            x={x + column * cell}
+            key={`r${i}`}
+            x={x + col * cell}
             y={y + row * cell}
             width={cell}
             height={cell}
@@ -33,15 +32,15 @@ export function MiniBoard({ x, y, cell, marks, highlight, numbers }: MiniBoardPr
         );
       })}
       {squares.map((i) => {
-        const column = i % 3;
         const row = Math.floor(i / 3);
-        const cx = x + column * cell + cell / 2;
+        const col = i % 3;
+        const cx = x + col * cell + cell / 2;
         const cy = y + row * cell + cell / 2;
         const mark = marks.charAt(i);
         if (mark === "X" || mark === "O") {
           return (
             <text
-              key={`mark-${i}`}
+              key={`t${i}`}
               x={cx}
               y={cy}
               textAnchor="middle"
@@ -60,7 +59,7 @@ export function MiniBoard({ x, y, cell, marks, highlight, numbers }: MiniBoardPr
         if (numbers) {
           return (
             <text
-              key={`number-${i}`}
+              key={`t${i}`}
               x={cx}
               y={cy}
               textAnchor="middle"

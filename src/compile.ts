@@ -43,6 +43,13 @@ export function renderGlue(p: Project): Record<string, string> {
   return file ? { [file]: tokensCss(p) } : {};
 }
 
+/** Is a project-relative path inside the target's `generated` globs? */
+export function isGenerated(p: Project, rel: string): boolean {
+  if (rel.startsWith("..") || rel.startsWith("/")) return false;
+  const globs = (p.target?.settings["generated"] ?? "").split(/[\s,]+/).filter(Boolean);
+  return globs.some((g) => new Bun.Glob(g).match(rel));
+}
+
 export function writeGlue(p: Project): string[] {
   const glue = renderGlue(p);
   const lock = readLock(p);
@@ -55,10 +62,12 @@ export function writeGlue(p: Project): string[] {
     lock.glue[rel] = sha256(body);
     written.push(rel);
   }
-  // Glue that is no longer produced: delete it if untouched, forget it either way.
-  for (const [rel, h] of Object.entries(lock.glue)) {
+  // Glue that is no longer produced is forgotten. It is deleted only when it
+  // is untouched and still inside the target's generated paths, so a file
+  // that became hand-written (like index.html) is never removed.
+  if (p.target) for (const [rel, h] of Object.entries(lock.glue)) {
     if (rel in glue) continue;
-    if (fileHash(p, rel) === h) rmSync(join(p.root, rel));
+    if (fileHash(p, rel) === h && isGenerated(p, rel)) rmSync(join(p.root, rel));
     delete lock.glue[rel];
   }
   writeLock(p, lock);
@@ -111,6 +120,8 @@ export function submit(p: Project, n: AilNode, files: Record<string, string>, by
  * compilable) and delete their generated files, unless someone edited them.
  */
 export function prune(p: Project): { removed: string[]; kept: string[] } {
+  // Without a target nothing is compilable, and pruning would delete everything.
+  if (!p.target) return { removed: [], kept: [] };
   const lock = readLock(p);
   const removed: string[] = [], kept: string[] = [];
   for (const [name, entry] of Object.entries(lock.nodes)) {
@@ -170,12 +181,16 @@ export async function mapLimit<T, R>(items: T[], limit: number, fn: (item: T) =>
   const out: R[] = new Array(items.length);
   let next = 0;
   const worker = async () => { while (next < items.length) { const i = next++; out[i] = await fn(items[i]!); } };
-  await Promise.all(Array.from({ length: Math.max(1, Math.min(limit, items.length)) }, worker));
+  await Promise.all(Array.from({ length: Math.min(validJobs(limit), items.length) }, worker));
   return out;
 }
 
+/** A concurrency limit, made safe: anything but a positive integer means 1. */
+export const validJobs = (n: number) => (Number.isInteger(n) && n >= 1 ? n : 1);
+
 /** A simple counting semaphore. */
-function semaphore(limit: number) {
+function semaphore(requested: number) {
+  const limit = validJobs(requested);
   let active = 0;
   const queue: (() => void)[] = [];
   return async <T>(fn: () => Promise<T>): Promise<T> => {
@@ -214,7 +229,12 @@ export async function compile(p: Project, names: string[], opts: CompileOptions)
       const max = opts.maxAttempts ?? 3;
       for (let attempt = 1; attempt <= max; attempt++) {
         log(`${n.name}: attempt ${attempt} with ${opts.provider.id}`);
-        const raw = await opts.provider.complete({ system: loadPrompt("compile-leaf"), prompt, temperature: opts.temperature, meta: { node: n.name, sample: attempt - 1, purpose: "compile" } });
+        let raw: string;
+        try {
+          raw = await opts.provider.complete({ system: loadPrompt("compile-leaf"), prompt, temperature: opts.temperature, meta: { node: n.name, sample: attempt - 1, purpose: "compile" } });
+        } catch (e) {
+          return { node: n.name, status: "failed" as const, attempts: attempt, detail: `the model call failed: ${(e as Error).message}` };
+        }
         const reply = parseReply(raw);
         if (reply.stop) return { node: n.name, status: "stopped" as const, attempts: attempt, detail: reply.stop };
         const res = submit(p, n, reply.files, opts.provider.id);

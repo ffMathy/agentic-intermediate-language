@@ -92,7 +92,7 @@ export function loadProject(rootArg?: string): Project {
   const target = targets[0] ?? null;
 
   // A system node depends on its entry, so it may import it.
-  for (const n of nodes.values()) if (n.entry && !n.uses.includes(n.entry)) n.uses.push(n.entry);
+  for (const n of nodes.values()) if (n.entry && nodes.has(n.entry) && !n.uses.includes(n.entry)) n.uses.push(n.entry);
 
   const tokens: Record<string, string> = {};
   for (const f of files) for (const c of f.catalogs) Object.assign(tokens, c.tokens);

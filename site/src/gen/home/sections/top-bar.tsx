@@ -8,12 +8,11 @@ const linkStyle = {
   padding: "var(--space-1) 0",
 };
 
-/** "the name of the project on the left, and six links on the right" */
+/** the name of the project on the left, and seven links on the right */
 export function TopBar() {
   return (
     <header
       style={{
-        width: "100%",
         background: "var(--color-surface)",
         borderBottom: "1px solid var(--color-border)",
         boxSizing: "border-box",
@@ -26,7 +25,10 @@ export function TopBar() {
         align="center"
         justify="between"
         wrap={true}
-        style={{ maxWidth: "var(--width-content)", margin: "0 auto" }}
+        style={{
+          maxWidth: "var(--width-content)",
+          margin: "0 auto",
+        }}
       >
         <Stack dir="h" gap="space.2" align="center" wrap={true}>
           <svg
@@ -34,7 +36,7 @@ export function TopBar() {
             viewBox="0 0 22 28"
             width="22px"
             height="28px"
-            style={{ display: "block", width: "22px", height: "28px" }}
+            style={{ display: "block" }}
           >
             <path
               d="M3 4 H19 L17.5 26 H4.5 Z"
@@ -81,6 +83,9 @@ export function TopBar() {
             </a>
             <a href="#loop" style={linkStyle}>
               How it builds
+            </a>
+            <a href="#adopt" style={linkStyle}>
+              Adopt an app
             </a>
             <a href="#specs" style={linkStyle}>
               Browse the specs

@@ -19,7 +19,12 @@ export function anthropicProvider(model: string): Provider {
         thinking: { type: "adaptive" },
         output_config: { effort: (process.env.AIL_EFFORT as "low" | "medium" | "high" | "xhigh" | "max") ?? "high" },
         system: req.system,
-        messages: [{ role: "user", content: req.prompt }],
+        messages: [{ role: "user", content: req.images?.length
+          ? [...req.images.flatMap((im) => [
+              { type: "text", text: im.label },
+              { type: "image", source: { type: "base64", media_type: im.mediaType, data: im.data } },
+            ]), { type: "text", text: req.prompt }]
+          : req.prompt }],
       } as Parameters<Anthropic["beta"]["messages"]["stream"]>[0]);
       const message = await stream.finalMessage();
       if (message.stop_reason === "refusal") throw new Error(`model declined the request (${model})`);

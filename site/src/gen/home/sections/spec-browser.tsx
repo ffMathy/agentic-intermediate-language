@@ -1,15 +1,21 @@
-import { useEffect, useState } from "react";
-import type { ReactNode } from "react";
+import { Fragment, useEffect, useState } from "react";
 import { specProjects } from "../../spec";
 import { Section } from "../../parts/section";
 import { SectionHeading } from "../../parts/section-heading";
 import { SpecEditor } from "../../parts/spec-editor";
 import { Stack } from "../../parts/stack";
 
-/** Reading real specs is the fastest way to learn AIL, so both example specs can be browsed the way developers read code. */
+const folderOf = (path: string): string => {
+  const index = path.lastIndexOf("/");
+  return index >= 0 ? path.slice(0, index) : "";
+};
+
+const slashes = (path: string): number => path.split("/").length - 1;
+
+/** "Reading real specs is the fastest way to learn AIL, so both example specs can be browsed the way developers read code." */
 export function SpecBrowser() {
-  const [shownKey, setShownKey] = useState<string>("site");
-  const [pickedPath, setPickedPath] = useState<string>("home/sections/spec-browser.ail.md");
+  const [shown, setShown] = useState<string>("site");
+  const [picked, setPicked] = useState<string>("home/sections/spec-browser.ail.md");
 
   useEffect(() => {
     const open = (hash: string): void => {
@@ -17,18 +23,18 @@ export function SpecBrowser() {
         return;
       }
       const rest = hash.slice("#spec/".length);
-      const slash = rest.indexOf("/");
-      if (slash < 0) {
+      const index = rest.indexOf("/");
+      if (index < 0) {
         return;
       }
-      const key = rest.slice(0, slash);
-      const path = rest.slice(slash + 1);
+      const key = rest.slice(0, index);
+      const path = rest.slice(index + 1);
       const project = specProjects.find((p) => p.key === key);
       if (!project || !project.files.some((f) => f.path === path)) {
         return;
       }
-      setShownKey(key);
-      setPickedPath(path);
+      setShown(key);
+      setPicked(path);
       document.getElementById("specs")?.scrollIntoView();
     };
     const onHashChange = (): void => {
@@ -40,8 +46,8 @@ export function SpecBrowser() {
         return;
       }
       const anchor = target.closest("a");
-      const href = anchor ? anchor.getAttribute("href") : null;
-      if (href !== null && href.startsWith("#spec/")) {
+      const href = anchor?.getAttribute("href");
+      if (href && href.startsWith("#spec/")) {
         open(href);
       }
     };
@@ -54,62 +60,9 @@ export function SpecBrowser() {
     };
   }, []);
 
-  const shown = specProjects.find((p) => p.key === shownKey) ?? specProjects[0];
-  const pickedFile = shown.files.find((f) => f.path === pickedPath);
-
-  const rows: ReactNode[] = [];
-  let previousFolder = "";
-  for (const file of shown.files) {
-    const lastSlash = file.path.lastIndexOf("/");
-    const folder = lastSlash < 0 ? "" : file.path.slice(0, lastSlash);
-    const name = lastSlash < 0 ? file.path : file.path.slice(lastSlash + 1);
-    if (folder !== previousFolder && folder !== "") {
-      const folderDepth = folder.split("/").length - 1 + 1;
-      rows.push(
-        <div
-          key={`folder:${folder}`}
-          style={{
-            fontFamily: "var(--font-mono)",
-            fontSize: "var(--font-tiny)",
-            color: "var(--color-code-muted)",
-            padding: "var(--space-1) var(--space-3)",
-            paddingLeft: `calc(var(--space-3) + ${12 * (folderDepth - 1)}px)`,
-          }}
-        >
-          {`${folder}/`}
-        </div>,
-      );
-    }
-    previousFolder = folder;
-    const depth = file.path.split("/").length - 1;
-    const isPicked = file.path === pickedPath;
-    rows.push(
-      <button
-        key={file.path}
-        type="button"
-        aria-label={file.path}
-        title={file.path}
-        aria-pressed={isPicked}
-        onClick={() => setPickedPath(file.path)}
-        style={{
-          display: "block",
-          width: "100%",
-          textAlign: "left",
-          fontFamily: "var(--font-mono)",
-          fontSize: "var(--font-tiny)",
-          color: "var(--color-code-text)",
-          background: isPicked ? "var(--color-code-pick)" : "transparent",
-          border: "none",
-          borderLeft: isPicked ? "2px solid var(--color-accent)" : "2px solid transparent",
-          padding: "var(--space-1) var(--space-3)",
-          paddingLeft: `calc(var(--space-3) + ${12 * depth}px)`,
-          cursor: "pointer",
-        }}
-      >
-        {name}
-      </button>,
-    );
-  }
+  const project = specProjects.find((p) => p.key === shown) ?? specProjects[0];
+  const files = project.files;
+  const pickedFile = files.find((f) => f.path === picked);
 
   return (
     <Section id="specs" tone="raised">
@@ -140,22 +93,31 @@ export function SpecBrowser() {
             }}
           >
             <div aria-hidden="true" style={{ display: "flex", gap: "6px" }}>
-              <div style={{ width: "10px", height: "10px", borderRadius: "var(--radius-pill)", background: "var(--color-dot-red)" }} />
-              <div style={{ width: "10px", height: "10px", borderRadius: "var(--radius-pill)", background: "var(--color-dot-amber)" }} />
-              <div style={{ width: "10px", height: "10px", borderRadius: "var(--radius-pill)", background: "var(--color-dot-green)" }} />
+              {["red", "amber", "green"].map((dot) => (
+                <span
+                  key={dot}
+                  style={{
+                    display: "block",
+                    width: "10px",
+                    height: "10px",
+                    borderRadius: "var(--radius-pill)",
+                    background: `var(--color-dot-${dot})`,
+                  }}
+                />
+              ))}
             </div>
             <div role="group" aria-label="Projects" style={{ display: "flex", gap: "var(--space-1)" }}>
-              {specProjects.map((project) => {
-                const isShown = project.key === shown.key;
+              {specProjects.map((p) => {
+                const isShown = p.key === project.key;
                 return (
                   <button
-                    key={project.key}
+                    key={p.key}
                     type="button"
                     aria-pressed={isShown}
                     onClick={() => {
-                      if (project.key !== shown.key) {
-                        setShownKey(project.key);
-                        setPickedPath(project.files[0]?.path ?? "");
+                      if (p.key !== project.key) {
+                        setShown(p.key);
+                        setPicked(p.files[0]?.path ?? "");
                       }
                     }}
                     style={{
@@ -169,7 +131,7 @@ export function SpecBrowser() {
                       cursor: "pointer",
                     }}
                   >
-                    {project.name}
+                    {p.name}
                   </button>
                 );
               })}
@@ -182,7 +144,7 @@ export function SpecBrowser() {
                 color: "var(--color-code-muted)",
               }}
             >
-              {`${shown.nodeCount} nodes in ${shown.files.length} files`}
+              {`${project.nodeCount} nodes in ${files.length} files`}
             </p>
           </div>
           <div style={{ display: "flex", flexWrap: "wrap" }}>
@@ -197,13 +159,59 @@ export function SpecBrowser() {
                 boxSizing: "border-box",
               }}
             >
-              {rows}
+              {files.map((file, index) => {
+                const folder = folderOf(file.path);
+                const previous = index > 0 ? folderOf(files[index - 1].path) : "";
+                const showFolder = folder !== "" && (index === 0 || folder !== previous);
+                const isPicked = file.path === picked;
+                const name = file.path.slice(file.path.lastIndexOf("/") + 1);
+                return (
+                  <Fragment key={file.path}>
+                    {showFolder && (
+                      <div
+                        style={{
+                          fontFamily: "var(--font-mono)",
+                          fontSize: "var(--font-tiny)",
+                          color: "var(--color-code-muted)",
+                          padding: "var(--space-1) var(--space-3)",
+                          paddingLeft: `calc(var(--space-3) + ${12 * slashes(folder)}px)`,
+                        }}
+                      >
+                        {`${folder}/`}
+                      </div>
+                    )}
+                    <button
+                      type="button"
+                      aria-label={file.path}
+                      title={file.path}
+                      aria-pressed={isPicked}
+                      onClick={() => setPicked(file.path)}
+                      style={{
+                        display: "block",
+                        width: "100%",
+                        textAlign: "left",
+                        fontFamily: "var(--font-mono)",
+                        fontSize: "var(--font-tiny)",
+                        color: "var(--color-code-text)",
+                        background: isPicked ? "var(--color-code-pick)" : "transparent",
+                        border: "none",
+                        borderLeft: isPicked ? "2px solid var(--color-accent)" : "2px solid transparent",
+                        padding: "var(--space-1) var(--space-3)",
+                        paddingLeft: `calc(var(--space-3) + ${12 * slashes(file.path)}px)`,
+                        cursor: "pointer",
+                      }}
+                    >
+                      {name}
+                    </button>
+                  </Fragment>
+                );
+              })}
             </nav>
             <div style={{ flex: "999 1 420px", minWidth: 0, height: "560px" }}>
               <SpecEditor
-                text={pickedFile ? pickedFile.text : ""}
-                path={`${shown.key}/${pickedPath}`}
-                label={`Source of ${pickedPath}`}
+                text={pickedFile?.text ?? ""}
+                path={`${project.key}/${picked}`}
+                label={`Source of ${picked}`}
               />
             </div>
           </div>

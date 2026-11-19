@@ -1,6 +1,33 @@
+import type { CSSProperties } from "react";
 import { Stack } from "../../parts/stack";
 
-const linkStyle = {
+const barStyle: CSSProperties = {
+  width: "100%",
+  background: "var(--color-surface)",
+  borderBottom: "1px solid var(--color-border)",
+  boxSizing: "border-box",
+  padding: "var(--space-3) var(--space-4)",
+};
+
+const rowStyle: CSSProperties = {
+  maxWidth: "var(--width-content)",
+  margin: "0 auto",
+};
+
+const wordmarkStyle: CSSProperties = {
+  fontFamily: "var(--font-sans)",
+  fontSize: "20px",
+  fontWeight: 800,
+  color: "var(--color-accent)",
+  letterSpacing: "-0.01em",
+};
+
+const nameStyle: CSSProperties = {
+  fontSize: "var(--font-small)",
+  color: "var(--color-text-muted)",
+};
+
+const linkStyle: CSSProperties = {
   fontSize: "var(--font-small)",
   fontWeight: 600,
   color: "var(--color-text)",
@@ -8,49 +35,21 @@ const linkStyle = {
   padding: "var(--space-1) 0",
 };
 
-/** TopBar: "the name of the project on the left, and six links on the right" */
+/** "the name of the project on the left, and six links on the right" */
 export function TopBar() {
   return (
-    <header
-      style={{
-        width: "100%",
-        background: "var(--color-surface)",
-        borderBottom: "1px solid var(--color-border)",
-        boxSizing: "border-box",
-        padding: "var(--space-3) var(--space-4)",
-      }}
-    >
+    <header style={barStyle}>
       <Stack
         dir="h"
         gap="space.4"
         align="center"
         justify="between"
         wrap={true}
-        style={{
-          maxWidth: "var(--width-content)",
-          margin: "0 auto",
-        }}
+        style={rowStyle}
       >
         <Stack dir="h" gap="space.2" align="center" wrap={true}>
-          <span
-            style={{
-              fontFamily: "var(--font-sans)",
-              fontSize: "20px",
-              fontWeight: 800,
-              color: "var(--color-accent)",
-              letterSpacing: "-0.01em",
-            }}
-          >
-            AIL
-          </span>
-          <span
-            style={{
-              fontSize: "var(--font-small)",
-              color: "var(--color-text-muted)",
-            }}
-          >
-            Agentic Intermediate Language
-          </span>
+          <span style={wordmarkStyle}>AIL</span>
+          <span style={nameStyle}>Agentic Intermediate Language</span>
         </Stack>
         <nav aria-label="Sections">
           <Stack dir="h" gap="space.4" align="center" wrap={true}>

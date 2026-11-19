@@ -16,7 +16,12 @@ export function openaiProvider(model: string): Provider {
         },
         body: JSON.stringify({
           model,
-          messages: [{ role: "system", content: req.system }, { role: "user", content: req.prompt }],
+          messages: [{ role: "system", content: req.system }, { role: "user", content: req.images?.length
+            ? [...req.images.flatMap((im) => [
+                { type: "text", text: im.label },
+                { type: "image_url", image_url: { url: `data:${im.mediaType};base64,${im.data}` } },
+              ]), { type: "text", text: req.prompt }]
+            : req.prompt }],
           ...(req.temperature !== undefined ? { temperature: req.temperature } : {}),
         }),
       });

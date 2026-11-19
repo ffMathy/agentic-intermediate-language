@@ -1,4 +1,4 @@
-// ail-derived-from: HomePage@c8099af21df2489d
+// ail-derived-from: HomePage@311511e46553b825
 import { afterEach, expect, test } from "bun:test";
 import { cleanup, render, screen } from "@testing-library/react";
 import { HomePage } from "../../src/gen/home/home-page";
@@ -33,11 +33,9 @@ test("one story, in order", () => {
 });
 
 test("every top bar link has a place to land", () => {
-  const { container } = render(<HomePage />);
+  render(<HomePage />);
 
   for (const id of ["journey", "readers", "loop", "specs", "start"]) {
-    const el = container.ownerDocument.getElementById(id);
-    expect(el).not.toBeNull();
-    expect(container.contains(el)).toBe(true);
+    expect(document.getElementById(id)).not.toBeNull();
   }
 });

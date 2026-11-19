@@ -20,7 +20,7 @@ bun install
 ```
 
 ```bash
-ail check
+ail build
 ```
 
 ```bash
@@ -32,14 +32,14 @@ Things to try:
 - `ail show` prints the tree, with each node's status and how many nodes use it.
 - `ail show stakeholder` gives the plain-language view;
   `ail show specialist ai` shows the computer player with its why chain.
-- Change the 300 ms in `PlayAGame` and run `ail check`. Only `PlayAGame` needs
-  rebuilding.
+- Change the 300 ms in `PlayAGame` and run `ail show`. Only `PlayAGame` is
+  stale.
 - Change the `how` of `ComputerPlayer`. Only `ComputerPlayer` needs
   rebuilding: its users depend on its contract, not its implementation.
 - Add an example to `BoardView`'s `what` and run `ail show changes --since HEAD`.
   It shows that the change reaches both the play area and the watch area.
-- Run `ail build` (or `/ail:build` in Claude Code) to rebuild. It needs no API
-  key when Claude Code is logged in.
+- Run `ail build` (or `/ail:build` in Claude Code) to rebuild and check. It
+  needs no API key when Claude Code is logged in.
 - Delete the tie-break line from `ComputerPlayer` and run
-  `ail check ComputerPlayer --samples 3`. The models stop and ask instead of
+  `ail build ComputerPlayer --samples 3`. The models stop and ask instead of
   guessing.

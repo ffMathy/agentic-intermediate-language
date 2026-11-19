@@ -1,8 +1,7 @@
-import Editor from "@monaco-editor/react";
-import type { Monaco } from "@monaco-editor/react";
+import Editor, { type BeforeMount } from "@monaco-editor/react";
 import { CodeBlock } from "./code-block";
 
-function beforeMount(monaco: Monaco): void {
+const beforeMount: BeforeMount = (monaco) => {
   if (!monaco.languages.getLanguages().some((language) => language.id === "ail")) {
     monaco.languages.register({ id: "ail" });
     monaco.languages.setMonarchTokensProvider("ail", {
@@ -34,15 +33,15 @@ function beforeMount(monaco: Monaco): void {
     base: "vs-dark",
     inherit: true,
     rules: [
-      { token: "keyword", foreground: "c4b5fd", fontStyle: "bold" },
-      { token: "keyword.md", foreground: "f8fafc", fontStyle: "bold" },
-      { token: "comment", foreground: "64748b" },
-      { token: "string", foreground: "fde68a" },
-      { token: "type", foreground: "6ee7b7" },
-      { token: "type.identifier", foreground: "93c5fd" },
-      { token: "tag", foreground: "f9a8d4" },
-      { token: "attribute.name", foreground: "fdba74" },
-      { token: "operator", foreground: "e2e8f0" },
+      { token: "keyword", foreground: "#c4b5fd", fontStyle: "bold" },
+      { token: "keyword.md", foreground: "#f8fafc", fontStyle: "bold" },
+      { token: "comment", foreground: "#64748b" },
+      { token: "string", foreground: "#fde68a" },
+      { token: "type", foreground: "#6ee7b7" },
+      { token: "type.identifier", foreground: "#93c5fd" },
+      { token: "tag", foreground: "#f9a8d4" },
+      { token: "attribute.name", foreground: "#fdba74" },
+      { token: "operator", foreground: "#e2e8f0" },
     ],
     colors: {
       "editor.background": "#0f172a",
@@ -50,7 +49,7 @@ function beforeMount(monaco: Monaco): void {
       "editorGutter.background": "#0f172a",
     },
   });
-}
+};
 
 /** shows the given text in a read-only code editor with AIL colours, line numbers and wrapped lines */
 export function SpecEditor({
@@ -63,7 +62,7 @@ export function SpecEditor({
   label: string;
 }) {
   const lines = text.split(/\r?\n/);
-  if (lines.length > 0 && lines[lines.length - 1] === "") {
+  if (lines.length > 1 && lines[lines.length - 1] === "") {
     lines.pop();
   }
   const fallback = (

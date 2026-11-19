@@ -12,7 +12,10 @@ Build the AIL project, with Claude Code as the compiler.
    Nodes that don't depend on each other may run in parallel.
 3. Never write generated files yourself, and never answer a `STOP:` question in
    code. Collect the questions.
-4. Finish with `ail_check`. Report:
+4. Finish with `ail_check` with `look: true`: it checks everything, and has a
+   model compare the screens of built nodes with their look where nobody has
+   yet. Report:
    - which nodes were compiled
    - which were rejected, with the failing checks
+   - which screens don't match their look, and why
    - which stopped, with the question the spec must answer

@@ -26,7 +26,7 @@ Restart Claude Code so the plugin's tools load.
 | Command | `/ail:show [what]` | The tree, a node, an audience's view (`stakeholder`, `design`, `engineer`, `specialist`), or `changes` |
 | Skill | `ail` | Loaded automatically when you work on `*.ail.md` files: how to write, split, share and review nodes |
 | Subagent | `ail-leaf-compiler` | Compiles one node; its only tools are `ail_context` and `ail_submit` |
-| MCP tools | `ail_show`, `ail_check`, `ail_context`, `ail_submit` | What Claude uses under the hood |
+| MCP tools | `ail_show`, `ail_check`, `ail_context`, `ail_submit` | What Claude uses under the hood (`ail_check` is the check that ends every build) |
 | Hooks | — | Block edits to generated files, and check the spec after every `.ail.md` edit |
 
 That's the whole surface: two commands for you, everything else for Claude.
@@ -42,13 +42,15 @@ That's the whole surface: two commands for you, everything else for Claude.
 2. **Review the spec, not the code.** Run `/ail:show changes` to see the nodes
    whose meaning changed, grouped by level, each with its why chain and every
    area a shared contract change reaches. Run `/ail:show stakeholder` for the
-   plain-language view.
+   plain-language view. For screens, `ail show changes --shots .ail/shots`
+   also renders the final screen of every scenario the change touches, so you
+   (and Claude) can look at them.
 3. **Build.** Run `/ail:build`. For every node that isn't up to date, Claude
    starts the `ail-leaf-compiler` subagent. It sees only that node's slice of
    the spec, and its code is accepted only if every check passes. If the spec
    leaves something open, the subagent stops and asks instead of guessing, and
    you answer in the spec.
-4. **Finish.** Claude runs `ail_check`: the spec is sound, everything is built
+4. **Finish.** The build ends with a check: the spec is sound, everything is built
    from it, and every test passes.
 
 Try to edit a generated file directly and the hook refuses, pointing you back
@@ -58,10 +60,6 @@ to the spec.
 
 ```bash
 bun add -g github:ffMathy/agentic-intermediate-language
-```
-
-```bash
-ail check
 ```
 
 ```bash
@@ -79,14 +77,30 @@ model.
 
 In CI, give Claude Code a token from `claude setup-token` as
 `CLAUDE_CODE_OAUTH_TOKEN` if the job needs to build. Usually it doesn't:
-commit what `ail build` produced, and let CI run `ail check` through the
+commit what `ail build` produced, and let CI run `ail build` through the
 bundled GitHub Action:
 
 ```yaml
-- uses: ffMathy/agentic-intermediate-language@main
-  with:
-    project: path/to/your/project
+jobs:
+  spec:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write        # screenshots are pushed to the ail-shots branch
+      pull-requests: write   # one review comment per project
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: ffMathy/agentic-intermediate-language@main
+        with:
+          project: path/to/your/project
 ```
+
+On pull requests, the action comments with the review of the spec changes
+and screenshots of the proofs: the final screen of each scenario of every
+changed node with a `look`, and of the nodes that use it. Set
+`screenshots: false` or `comment: false` to turn either off. On forks, whose
+token can't push or comment, those steps only warn.
 
 ## Starting a new project
 

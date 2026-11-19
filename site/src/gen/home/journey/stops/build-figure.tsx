@@ -1,4 +1,7 @@
-/** "the node and the contracts it uses go into a compiler agent that sees one slice, and come out as a code file and its test" */
+const sans = "var(--font-sans)";
+const mono = "var(--font-mono)";
+
+/** the node and the contracts it uses go into a compiler agent that sees one slice, and come out as a code file and its test */
 export function BuildFigure() {
   return (
     <svg
@@ -34,7 +37,7 @@ export function BuildFigure() {
         x={16}
         y={44}
         style={{
-          fontFamily: "var(--font-mono)",
+          fontFamily: mono,
           fontSize: 11,
           fontWeight: 700,
           fill: "var(--color-text)",
@@ -46,7 +49,7 @@ export function BuildFigure() {
         x={16}
         y={60}
         style={{
-          fontFamily: "var(--font-sans)",
+          fontFamily: sans,
           fontSize: 10,
           fill: "var(--color-text-muted)",
         }}
@@ -57,7 +60,7 @@ export function BuildFigure() {
         x={16}
         y={74}
         style={{
-          fontFamily: "var(--font-sans)",
+          fontFamily: sans,
           fontSize: 10,
           fill: "var(--color-text-muted)",
         }}
@@ -87,7 +90,7 @@ export function BuildFigure() {
         y={46}
         textAnchor="middle"
         style={{
-          fontFamily: "var(--font-sans)",
+          fontFamily: sans,
           fontSize: 13,
           fontWeight: 700,
           fill: "var(--color-on-accent)",
@@ -100,7 +103,7 @@ export function BuildFigure() {
         y={61}
         textAnchor="middle"
         style={{
-          fontFamily: "var(--font-sans)",
+          fontFamily: sans,
           fontSize: 13,
           fontWeight: 700,
           fill: "var(--color-on-accent)",
@@ -113,7 +116,7 @@ export function BuildFigure() {
         y={78}
         textAnchor="middle"
         style={{
-          fontFamily: "var(--font-sans)",
+          fontFamily: sans,
           fontSize: 10,
           fill: "var(--color-on-accent)",
           opacity: 0.85,
@@ -141,7 +144,7 @@ export function BuildFigure() {
         x={256}
         y={52}
         style={{
-          fontFamily: "var(--font-mono)",
+          fontFamily: mono,
           fontSize: 9,
           fill: "var(--color-code-text)",
         }}
@@ -152,7 +155,7 @@ export function BuildFigure() {
         x={256}
         y={68}
         style={{
-          fontFamily: "var(--font-mono)",
+          fontFamily: mono,
           fontSize: 9,
           fill: "var(--color-code-muted)",
         }}
@@ -163,7 +166,7 @@ export function BuildFigure() {
         x={4}
         y={124}
         style={{
-          fontFamily: "var(--font-sans)",
+          fontFamily: sans,
           fontSize: 12,
           fontWeight: 700,
           fill: "var(--color-text)",
@@ -175,7 +178,7 @@ export function BuildFigure() {
         x={4}
         y={148}
         style={{
-          fontFamily: "var(--font-sans)",
+          fontFamily: sans,
           fontSize: 11,
           fill: "var(--color-text-muted)",
         }}
@@ -194,7 +197,7 @@ export function BuildFigure() {
         x={148}
         y={165}
         style={{
-          fontFamily: "var(--font-sans)",
+          fontFamily: sans,
           fontSize: 11,
           fontWeight: 700,
           fill: "var(--color-text)",
@@ -206,7 +209,7 @@ export function BuildFigure() {
         x={4}
         y={192}
         style={{
-          fontFamily: "var(--font-sans)",
+          fontFamily: sans,
           fontSize: 11,
           fill: "var(--color-text-muted)",
         }}
@@ -226,7 +229,7 @@ export function BuildFigure() {
         y={209}
         textAnchor="end"
         style={{
-          fontFamily: "var(--font-sans)",
+          fontFamily: sans,
           fontSize: 11,
           fontWeight: 700,
           fill: "var(--color-on-accent)",
@@ -238,7 +241,7 @@ export function BuildFigure() {
         x={4}
         y={244}
         style={{
-          fontFamily: "var(--font-mono)",
+          fontFamily: mono,
           fontSize: 11,
           fill: "var(--color-text-muted)",
         }}

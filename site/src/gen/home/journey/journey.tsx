@@ -36,7 +36,7 @@ export function Journey() {
             color: "var(--color-text-muted)",
           }}
         >
-          the thread we are following
+          {"the thread we are following"}
         </span>
       </Stack>
       <JumpGauge />

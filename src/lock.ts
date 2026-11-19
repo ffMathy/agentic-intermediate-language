@@ -5,7 +5,13 @@ import { join } from "node:path";
 import { sha256 } from "./hash.ts";
 import type { Project } from "./project.ts";
 
-export interface LockEntry { hash: string; files: Record<string, string>; by?: string }
+export interface LockEntry {
+  hash: string;
+  files: Record<string, string>;
+  by?: string;
+  /** The build (compile hash) whose screens a model found to match the node's look. */
+  look?: string;
+}
 export interface Lock { version: 1; nodes: Record<string, LockEntry>; glue: Record<string, string> }
 
 export const lockPath = (p: Project) => join(p.root, p.config.lockFile ?? "ail.lock.json");

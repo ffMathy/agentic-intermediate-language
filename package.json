@@ -29,5 +29,8 @@
   ],
   "engines": {
     "bun": ">=1.2"
+  },
+  "optionalDependencies": {
+    "playwright": "1.63.0"
   }
 }

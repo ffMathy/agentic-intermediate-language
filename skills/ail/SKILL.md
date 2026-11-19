@@ -9,7 +9,7 @@ does observably, and **how** its key decisions were made. Detail is delegated
 to children. People review the spec; generated code (the target's `generated`
 paths) is never edited by hand, and hooks block attempts to.
 
-Tools: `ail_show` (look around), `ail_check` (is everything right?),
+Tools: `ail_show` (look around), `ail_check` (is everything right? `/ail:build` ends with it),
 `ail_context` and `ail_submit` (used by the `ail-leaf-compiler` agent). To
 compile, run `/ail:build`.
 
@@ -75,7 +75,7 @@ or `binds`, or move it one level down. Define domain words once in the
 ## Workflows
 **Change behaviour.** Edit the `.ail.md` file. Start at the highest level the
 change affects and refine downwards. The post-edit hook lints the spec. Then
-run `/ail:build`, and finally `ail_check`.
+run `/ail:build`, which ends by checking everything.
 
 **A STOP question.** The compiler refused to guess. Answer the question in the
 spec (an example, a tie-break, or a `free` entry), then rebuild. Never answer
@@ -88,6 +88,12 @@ change reaches. For each node, ask:
 - Does every decision have a `because`?
 - Did `free` grow?
 - Is every product claim still refined?
+
+For nodes with a `look`, run `ail show changes --shots .ail/shots` in a
+terminal and look at the screenshots: the final screen of each scenario. A
+screen that is wrong while its check passes means the `look` is missing
+something. On pull requests, the GitHub Action posts the same review and
+screenshots as a comment, so there is nothing to attach by hand.
 
 Don't review generated code. If it's wrong, the spec is missing something.
 

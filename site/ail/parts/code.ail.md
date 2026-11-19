@@ -49,9 +49,9 @@ node CopyCommand : flow   level: experience
     pressing "Copy" puts exactly the command on the clipboard; once that succeeds the button reads "Copied" for 1.5 seconds, then "Copy" again
     when the clipboard can't be written, the button keeps reading "Copy"
     Scenario: copying
-      Given the command "ail check" and a working clipboard
-      When the visitor presses the button named "Copy ail check"
-      Then the clipboard holds "ail check"
+      Given the command "ail build" and a working clipboard
+      When the visitor presses the button named "Copy ail build"
+      Then the clipboard holds "ail build"
       And the button reads "Copied"
       When 1500 ms pass
       Then the button reads "Copy" again

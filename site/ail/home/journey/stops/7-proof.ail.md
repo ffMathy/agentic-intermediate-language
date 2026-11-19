@@ -16,7 +16,7 @@ node StopProof : view   level: experience
     proof.chip      "PROOF"
     proof.reader    "everyone: a green check means the sentence at the top is true"
     proof.headline  "Proof: the verify line becomes a test that plays every game."
-    proof.body      "The verify line from the specialist level was turned into a derived check, pinned to a hash of the node. It tries every possible sequence of X moves against the computer and asserts that X never wins. ail check runs it with every other example and scenario, on your machine and in CI."
+    proof.body      "The verify line from the specialist level was turned into a derived check, pinned to a hash of the node. It tries every possible sequence of X moves against the computer and asserts that X never wins. Every ail build runs it with every other example and scenario, on your machine and in CI."
     proof.label     "Derived check excerpt"
     proof.file      "examples/tictactoe/checks/engine/computer-player/computer-player.test.ts"
     proof.line.1    "// ail-derived-from: ComputerPlayer@0c990bfbddc62e20"
@@ -28,7 +28,7 @@ node StopProof : view   level: experience
     proof.line.7    "});"
     proof.mark.1    "never loses"
     proof.mark.2    "expect(xWins).toBe(0);"
-    proof.turns     "A green ail check. If a change to the spec or the code ever let X win, the check would fail and the change would be rejected."
+    proof.turns     "A green ail build. If a change to the spec or the code ever let X win, the check would fail and the change would be rejected."
   binds
     stop     JourneyStop with depth proof.depth, chip proof.chip, reader proof.reader, headline proof.headline, explanation proof.body, lines proof.line.1 to proof.line.7, label proof.label, file proof.file, highlight [proof.mark.1, proof.mark.2], turnsInto proof.turns
   uses      JourneyStop, ProofFigure

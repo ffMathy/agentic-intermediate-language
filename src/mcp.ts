@@ -4,12 +4,15 @@
 import { formatCheck, runCheck } from "./check.ts";
 import { checkPath, submit } from "./compile.ts";
 import { buildContext } from "./context.ts";
+import { formatLook, hasLook, lookCheck, recordLook, unjudged } from "./look.ts";
 import { loadProject, modulePath, type Project } from "./project.ts";
+import { getProvider, resolveModels } from "./providers/index.ts";
 import { show } from "./show.ts";
 import { formatVerify } from "./verify.ts";
 
 type Json = Record<string, unknown>;
-interface Tool { name: string; description: string; inputSchema: Json; run: (p: Project, args: Json) => { text: string; isError?: boolean } }
+type ToolResult = { text: string; isError?: boolean };
+interface Tool { name: string; description: string; inputSchema: Json; run: (p: Project, args: Json) => ToolResult | Promise<ToolResult> }
 
 const str = { type: "string" };
 const obj = (properties: Json, required: string[] = []) => ({ type: "object", properties, required, additionalProperties: false });
@@ -29,9 +32,24 @@ export const TOOLS: Tool[] = [
   },
   {
     name: "ail_check",
-    description: "Is the spec sound, is every node built from the current spec, and does the code pass every check the spec implies? Read-only.",
-    inputSchema: obj({ nodes: { type: "array", items: str } }),
-    run: (p, a) => { const r = runCheck(p, (a.nodes as string[]) ?? []); return { text: formatCheck(r), isError: !r.ok }; },
+    description: "Is the spec sound, is every node built from the current spec, and does the code pass every check the spec implies? With look: true, a model also compares the screens of built nodes whose screens nobody has compared yet with their look (and records it).",
+    inputSchema: obj({ nodes: { type: "array", items: str }, look: { type: "boolean" } }),
+    run: async (p, a) => {
+      const nodes = (a.nodes as string[]) ?? [];
+      const looks: string[] = [];
+      let ok = true;
+      if (a.look === true) {
+        const provider = getProvider(resolveModels([], p.config.models)[0]!);
+        for (const name of unjudged(p).filter((n) => !nodes.length || nodes.includes(n))) {
+          const r = await lookCheck(p, p.nodes.get(name)!, provider);
+          if (r.ok && !r.skipped) recordLook(p, name);
+          ok &&= r.ok;
+          looks.push(formatLook(r));
+        }
+      }
+      const r = runCheck(p, nodes);
+      return { text: [formatCheck(r), ...looks].join("\n"), isError: !r.ok || !ok };
+    },
   },
   {
     name: "ail_context",
@@ -41,9 +59,9 @@ export const TOOLS: Tool[] = [
   },
   {
     name: "ail_submit",
-    description: "Hand in a node's module (content) and, when its context asked for one, its derived check (checks). They are written, verified against the spec and recorded — or rolled back with the failures returned. The only way to write generated code.",
+    description: "Hand in a node's module (content) and, when its context asked for one, its derived check (checks). They are written, verified against the spec and recorded — or rolled back with the failures returned. For a node with a look, a model then compares the final screen of each test with the look; if they differ, the module stays in place but you must fix it and submit again. The only way to write generated code.",
     inputSchema: obj({ node: str, content: str, checks: str }, ["node", "content"]),
-    run: (p, a) => {
+    run: async (p, a) => {
       const n = needNode(p, a.node);
       const path = modulePath(p, n);
       if (!path) throw new Error(`${n.name} has no output path`);
@@ -51,12 +69,17 @@ export const TOOLS: Tool[] = [
       if (typeof a.checks === "string") files[checkPath(p, n)] = a.checks;
       const r = submit(p, n, files, "mcp");
       const detail = r.verify ? formatVerify({ results: [r.verify], typecheck: null, ok: r.ok }) : "";
-      return { text: r.ok ? `accepted: ${path}\n${detail}` : `rejected: ${r.error}\n${detail}`, isError: !r.ok };
+      if (!r.ok) return { text: `rejected: ${r.error}\n${detail}`, isError: true };
+      if (!hasLook(n)) return { text: `accepted: ${path}\n${detail}` };
+      const look = await lookCheck(p, n, getProvider(resolveModels([], p.config.models)[0]!)).catch((e) => ({ node: n.name, ok: true, problems: [], shots: [], skipped: (e as Error).message }));
+      if (look.ok && !look.skipped) recordLook(p, n.name);
+      if (look.ok) return { text: `accepted: ${path}\n${detail}\n${formatLook(look)}` };
+      return { text: `${path} passes its checks, but its screens don't match its look. Fix the module and submit again:\n${look.problems.map((x) => `- ${x}`).join("\n")}`, isError: true };
     },
   },
 ];
 
-export function handle(msg: Json, root?: string): Json | null {
+export async function handle(msg: Json, root?: string): Promise<Json | null> {
   const id = msg.id as number | string | undefined;
   const method = msg.method as string;
   const reply = (result: Json) => ({ jsonrpc: "2.0", id, result });
@@ -76,7 +99,7 @@ export function handle(msg: Json, root?: string): Json | null {
       const tool = TOOLS.find((t) => t.name === params.name);
       if (!tool) return { jsonrpc: "2.0", id, error: { code: -32602, message: `unknown tool ${params.name}` } };
       try {
-        const r = tool.run(loadProject(root), params.arguments ?? {});
+        const r = await tool.run(loadProject(root), params.arguments ?? {});
         return reply({ content: [{ type: "text", text: r.text }], isError: r.isError ?? false });
       } catch (e) {
         return reply({ content: [{ type: "text", text: (e as Error).message }], isError: true });
@@ -99,7 +122,7 @@ export async function serve(root?: string) {
       if (!line) continue;
       let msg: Json;
       try { msg = JSON.parse(line); } catch { process.stdout.write(JSON.stringify({ jsonrpc: "2.0", id: null, error: { code: -32700, message: "parse error" } }) + "\n"); continue; }
-      const out = handle(msg, root);
+      const out = await handle(msg, root);
       if (out) process.stdout.write(JSON.stringify(out) + "\n");
     }
   }

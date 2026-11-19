@@ -2,7 +2,8 @@ name: pages
 
 # The website is an AIL project (site/). Nothing here calls a model: the page
 # was compiled by `ail build` and committed. This workflow proves it is still
-# built from its spec and passes its checks, then publishes it, together with
+# built from its spec and passes its checks (`ail build` with nothing to
+# compile only checks), then publishes it, together with
 # the Tic-Tac-Toe demo at /demo/.
 
 on:
@@ -33,10 +34,10 @@ jobs:
           (cd examples/tictactoe && bun install --frozen-lockfile)
       - name: The site is built from its spec and passes its checks
         working-directory: site
-        run: bun run check
+        run: bun run build
       - name: The demo is built from its spec and passes its checks
         working-directory: examples/tictactoe
-        run: bun run check
+        run: bun run build
       - name: Bundle
         run: |
           (cd site && bun build ./index.html --outdir ../_site --production)

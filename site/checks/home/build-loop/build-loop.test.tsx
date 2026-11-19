@@ -1,4 +1,4 @@
-// ail-derived-from: BuildLoop@2640cc7359d0ae68
+// ail-derived-from: BuildLoop@1a74ac1d05d6f034
 import { afterEach, expect, test } from "bun:test";
 import { cleanup, render, within } from "@testing-library/react";
 import { BuildLoop } from "../../../src/gen/home/build-loop/build-loop";
@@ -9,16 +9,17 @@ afterEach(() => {
 
 test("four steps", () => {
   const { container } = render(<BuildLoop />);
+
   const section = container.querySelector("#loop");
   expect(section).not.toBeNull();
   const band = section as HTMLElement;
 
-  const items = within(band).getAllByRole("listitem");
+  const list = within(band).getByRole("list");
+  const items = within(list).getAllByRole("listitem");
+  expect(items.length).toBe(4);
+
   const titles = items.map((item) =>
-    within(item)
-      .getAllByRole("heading", { level: 3 })
-      .map((h) => (h.textContent ?? "").trim())
-      .join(""),
+    within(item).getByRole("heading", { level: 3 }).textContent?.trim(),
   );
   expect(titles).toEqual(["Write", "Build", "Check", "Ask"]);
 

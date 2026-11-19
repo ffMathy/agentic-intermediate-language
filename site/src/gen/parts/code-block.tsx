@@ -1,7 +1,7 @@
 import type { CSSProperties, ReactNode } from "react";
 import { Stack } from "./stack";
 
-type CodeBlockProps = {
+export type CodeBlockProps = {
   lines: string[];
   label: string;
   edge?: string;
@@ -9,18 +9,7 @@ type CodeBlockProps = {
   caption?: string;
 };
 
-const blockStyle: CSSProperties = {
-  background: "var(--color-code)",
-  color: "var(--color-code-text)",
-  fontFamily: "var(--font-mono)",
-  fontSize: "var(--font-code)",
-  lineHeight: 1.6,
-  padding: "var(--space-4)",
-  borderRadius: "var(--radius-md)",
-  margin: 0,
-  whiteSpace: "pre-wrap",
-  overflowWrap: "anywhere",
-};
+const tokenVar = (token: string): string => `var(--${token.split(".").join("-")})`;
 
 const markStyle: CSSProperties = {
   background: "var(--color-thread-soft)",
@@ -30,70 +19,93 @@ const markStyle: CSSProperties = {
   borderRadius: "2px",
 };
 
-const captionStyle: CSSProperties = {
-  fontFamily: "var(--font-mono)",
-  fontSize: "var(--font-tiny)",
-  color: "var(--color-text-muted)",
-  overflowWrap: "anywhere",
-};
-
-function tokenVar(name: string): string {
-  return `var(--${name.replace(/\./g, "-")})`;
-}
-
-function markLine(line: string, phrases: string[]): ReactNode[] {
+const markLine = (line: string, phrases: string[]): ReactNode[] => {
   const parts: ReactNode[] = [];
+  let rest = 0;
   let plain = "";
-  let i = 0;
-  while (i < line.length) {
-    const found = phrases.find((p) => line.startsWith(p, i));
-    if (found !== undefined) {
-      if (plain !== "") {
-        parts.push(plain);
-        plain = "";
+  while (rest < line.length) {
+    let bestAt = -1;
+    let bestPhrase = "";
+    for (const phrase of phrases) {
+      const at = line.indexOf(phrase, rest);
+      if (at === -1) {
+        continue;
       }
-      parts.push(
-        <mark key={i} style={markStyle}>
-          {found}
-        </mark>,
-      );
-      i += found.length;
-    } else {
-      plain += line[i];
-      i += 1;
+      if (bestAt === -1 || at < bestAt || (at === bestAt && phrase.length > bestPhrase.length)) {
+        bestAt = at;
+        bestPhrase = phrase;
+      }
     }
+    if (bestAt === -1) {
+      plain += line.slice(rest);
+      break;
+    }
+    plain += line.slice(rest, bestAt);
+    if (plain !== "") {
+      parts.push(plain);
+      plain = "";
+    }
+    parts.push(
+      <mark key={parts.length} style={markStyle}>
+        {bestPhrase}
+      </mark>,
+    );
+    rest = bestAt + bestPhrase.length;
   }
   if (plain !== "") {
     parts.push(plain);
   }
   return parts;
-}
+};
 
 /** "shows the given lines exactly, one per line, keeping every space; an empty line stays an empty line" */
 export function CodeBlock({ lines, label, edge, highlight, caption }: CodeBlockProps) {
-  const phrases = (highlight ?? []).filter((p) => p !== "");
-  const preStyle: CSSProperties =
-    edge === undefined
-      ? blockStyle
-      : { ...blockStyle, borderLeft: `4px solid ${tokenVar(edge)}` };
+  const phrases = (highlight ?? []).filter((phrase) => phrase !== "");
+  const preStyle: CSSProperties = {
+    background: "var(--color-code)",
+    color: "var(--color-code-text)",
+    fontFamily: "var(--font-mono)",
+    fontSize: "var(--font-code)",
+    lineHeight: 1.6,
+    padding: "var(--space-4)",
+    borderRadius: "var(--radius-md)",
+    margin: 0,
+    whiteSpace: "pre-wrap",
+    overflowWrap: "anywhere",
+    ...(edge !== undefined ? { borderLeft: `4px solid ${tokenVar(edge)}` } : {}),
+  };
   return (
     <Stack dir="v" gap="space.2" align="stretch">
       <pre role="region" aria-label={label} style={preStyle}>
         {lines.map((line, index) => {
-          const n = line.length - line.trimStart().length;
-          const lineStyle: CSSProperties = {
-            display: "block",
-            paddingLeft: `${n + 4}ch`,
-            textIndent: `-${n + 4}ch`,
-          };
+          const n = line.length - line.replace(/^ +/, "").length;
+          const indent = n + 4;
           return (
-            <span key={index} style={lineStyle}>
+            <span
+              key={index}
+              style={{
+                display: "block",
+                paddingLeft: `${indent}ch`,
+                textIndent: `-${indent}ch`,
+              }}
+            >
               {line === "" ? " " : markLine(line, phrases)}
             </span>
           );
         })}
       </pre>
-      {caption !== undefined && <div style={captionStyle}>{caption}</div>}
+      {caption !== undefined ? (
+        <div
+          style={{
+            fontFamily: "var(--font-mono)",
+            fontSize: "var(--font-tiny)",
+            color: "var(--color-text-muted)",
+            overflowWrap: "anywhere",
+          }}
+        >
+          {caption}
+        </div>
+      ) : null}
     </Stack>
   );
 }

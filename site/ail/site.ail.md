@@ -1,7 +1,8 @@
 # The AIL website
 
 This page is itself written in AIL and compiled by `ail build`. The GitHub
-Pages workflow runs `ail check` on it and bundles what is committed. The
+Pages workflow runs `ail build` on it (with nothing to compile, that only
+checks) and bundles what is committed. The
 Tic-Tac-Toe demo is published next to it at `./demo/`.
 
 The page tells one story: a single sentence from the real Tic-Tac-Toe spec,
@@ -61,7 +62,7 @@ glossary
   term level     plain "how detailed a part of the spec is, and who it is for"      formal product, experience, system or specialist
   term reader    plain "the kind of person a level is written for"                  formal a lens of ail show
   term build     plain "turning the spec into working code"                         formal ail build
-  term check     plain "proving the code still does what the spec says"             formal ail check
+  term check     plain "proving the code still does what the spec says"             formal the check that ends every ail build
   term thread    plain "the one promise this page follows down the spec"            formal "The computer never loses." in examples/tictactoe
   term stop      plain "one step of the journey down the spec"                      formal JourneyStop
   term demo      plain "the Tic-Tac-Toe game built entirely from a spec"            formal examples/tictactoe, published at ./demo/

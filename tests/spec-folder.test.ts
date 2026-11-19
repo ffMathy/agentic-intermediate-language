@@ -145,3 +145,14 @@ test("errorExcerpt keeps each failed test's name, error and diff", async () => {
     "      at <anonymous> (/p/checks/x.test.ts:2:3)",
   ]);
 });
+
+test("a derived check is told its own import paths, not the module's", async () => {
+  const { checkImports } = await import("../src/context.ts");
+  const dir = tempProject("areas");
+  writeFileSync(join(dir, "ail.config.json"), JSON.stringify({ specModule: "src/gen/spec.ts", checksDir: "checks" }));
+  const p = load(dir);
+  const n = p.nodes.get("Price")!;
+  const text = checkImports(p, n, `checks/${n.dir}/x.test.ts`);
+  const up = "../".repeat(n.dir.split("/").filter(Boolean).length + 1);
+  expect(text).toContain(`"${up}src/gen/spec"`);
+});

@@ -7,6 +7,7 @@ reads and lights up the level written for them in the Tic-Tac-Toe tree.
 node Readers : flow   level: experience
   why   Explain why levels exist: each level of the tree is written for one kind of reader, and each reader's view goes only as deep as they need.   <- HomePage
   what
+    the section has the id "readers", so the page can link to it
     four tabs, "Stakeholder", "Design", "Engineer" and "Specialist", named together as "Readers"; "Stakeholder" is picked first
     the panel under the tabs says what that reader reads, shows the command that renders their view, and lights up the level written for them in the tree
     the left and right arrow keys move between tabs, wrapping around, and move focus with them

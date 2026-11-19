@@ -9,12 +9,14 @@ the one that describes this browser.
 node SpecBrowser : flow   level: experience
   why   Reading real specs is the fastest way to learn AIL, so both example specs can be browsed the way developers read code.   <- HomePage
   what
+    the section has the id "specs", so the page can link to it
     two projects can be browsed: this website and the Tic-Tac-Toe demo; this website is shown first
     for the shown project: how big its spec is, its spec files grouped by folder, and the picked file in a read-only editor
     the size is counted from the spec itself: how many nodes, in how many files
     at first the file that describes this very section is picked
     showing another project picks its first file
     a link anywhere on the page can open a file here: when the page address ends with "#spec/", a project's key, "/" and one of its file paths, that project and file are shown and this section scrolls into view
+    following such a link again works too, even when the page address already ends with it
     Scenario: this section shows its own spec first
       Given the page is open
       Then the project "This website" is shown as picked
@@ -34,6 +36,11 @@ node SpecBrowser : flow   level: experience
       Given the page address ends with "#spec/tictactoe/app/play/play.ail.md"
       When the page opens
       Then the project "Tic-Tac-Toe demo" and the file "app/play/play.ail.md" are shown as picked
+    Scenario: following the same link twice
+      Given the page address ends with "#spec/tictactoe/app/play/play.ail.md" and the page is open
+      When the visitor picks the file "tictactoe.ail.md"
+      And the visitor clicks a link on the page to "#spec/tictactoe/app/play/play.ail.md"
+      Then the file "app/play/play.ail.md" is shown as picked again
   look
     band      Section with id "specs", tone raised
     layout    stack(v, gap: space.6, align: stretch) [ head, window ]
@@ -62,7 +69,8 @@ node SpecBrowser : flow   level: experience
   binds
     data      specProjects from the spec module; the projects' keys are "site" (this website) and "tictactoe" (the demo)
     state     useState for the shown project's key, starting at "site", and useState for the picked file's path, starting at "home/sections/spec-browser.ail.md"
-    hash      on mount, and on every hashchange event of window (removed on unmount): when location.hash starts with "#spec/", the rest up to its first "/" is a project key and the remainder a file path; if that project has that file, show both and scroll the section element into view
+    hash      open(hash): when hash starts with "#spec/", the rest up to its first "/" is a project key and the remainder a file path; if that project has that file, show both and scroll the section element into view
+    links     call open(location.hash) on mount and on every hashchange event of window; also listen for click events on document, and when the click's target is inside an a element whose href attribute starts with "#spec/", call open with that attribute (a link equal to the current address fires no hashchange); remove both listeners on unmount
     project   one button per entry of specProjects, in order, showing its name; aria-pressed true on the shown one; pressing another one shows it and picks its first file
     size      nodes is the shown project's nodeCount, files the number of its files
     list      the shown project's files in their order; before a file whose folder (its path up to the last "/") differs from the previous file's folder, a folder row showing that folder followed by "/"; files at the top level have no folder row

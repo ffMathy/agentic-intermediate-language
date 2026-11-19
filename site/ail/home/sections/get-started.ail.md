@@ -4,6 +4,7 @@
 node GetStarted : view   level: experience
   why   Turn interest into a first try, from wherever the visitor already works: Claude Code or a terminal.   <- HomePage
   what
+    the section has the id "start", so the page can link to it
     two cards, "In Claude Code" and "In a terminal", side by side when there is room
     every command has its own copy button
     the terminal card lists the three commands that make up the whole tool

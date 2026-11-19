@@ -25,6 +25,15 @@ export function whatOnly(n: AilNode): string {
   return [header, ...(visible.length ? visible.flatMap((s) => s.raw) : ["  ; (no public contract)"])].join("\n");
 }
 
+/** Where a derived check imports from: its paths differ from the module's, since it lives elsewhere. */
+export function checkImports(p: Project, n: AilNode, check: string): string {
+  const mp = modulePath(p, n), sm = specModulePath(p);
+  return [
+    mp ? `From ${check}, import the module under test from "${importSpecifier(check, mp)}".` : "",
+    sm ? `Import spec files, if needed, from "${importSpecifier(check, sm)}" (not the module's own path to it).` : "",
+  ].filter(Boolean).join(" ");
+}
+
 export function buildContext(p: Project, n: AilNode): string {
   const out: string[] = [];
   const path = modulePath(p, n);
@@ -77,7 +86,7 @@ export function buildContext(p: Project, n: AilNode): string {
     if (!file || pinned !== oracleHash(p, n).slice(0, 16)) {
       const rel = checkPath(p, n);
       out.push(`\n## Derived check needed`);
-      out.push(`This node's scenarios / verify items have no current derived check. Write ${rel} as well, and submit it together with the module. It imports the module relative to itself and starts with the line:\n${checkHeader(p, n)}\n\n${loadPrompt("derive-checks")}`);
+      out.push(`This node's scenarios / verify items have no current derived check. Write ${rel} as well, and submit it together with the module. ${checkImports(p, n, rel)} It starts with the line:\n${checkHeader(p, n)}\n\n${loadPrompt("derive-checks")}`);
     }
   }
 

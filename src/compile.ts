@@ -5,7 +5,7 @@
 // write the files its node owns, and nothing is accepted unless verify passes.
 import { existsSync, mkdirSync, readFileSync, writeFileSync, rmSync } from "node:fs";
 import { dirname, join, relative, resolve } from "node:path";
-import { buildContext } from "./context.ts";
+import { buildContext, checkImports } from "./context.ts";
 import { compileHash, oracleHash, sha256 } from "./hash.ts";
 import { fileHash, readLock, writeLock } from "./lock.ts";
 import { parseFile, type AilNode } from "./parse.ts";
@@ -337,7 +337,7 @@ export async function derive(p: Project, n: AilNode, provider: Provider): Promis
       buildContext(p, n),
       "## Task",
       `Write the derived check file ${rel} for ${n.name}: one test per scenario (named exactly as the scenario) and one per verify item.`,
-      `The module under test is ${modulePath(p, n)}; import it relative to ${rel}. The first line must be:`,
+      `The module under test is ${modulePath(p, n)}. ${checkImports(p, n, rel)} The first line must be:`,
       header,
       "Reply with exactly one block:",
       `=== FILE: ${rel} ===`, "<complete file contents>", "=== END ===",

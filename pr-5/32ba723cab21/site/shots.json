@@ -1,0 +1,102 @@
+[
+  {
+    "node": "HomePage",
+    "test": "one story, in order",
+    "file": "home/home-page/01-one-story-in-order.png"
+  },
+  {
+    "node": "HomePage",
+    "test": "every top bar link has a place to land",
+    "file": "home/home-page/02-every-top-bar-link-has-a-place-to-land.png"
+  },
+  {
+    "node": "Journey",
+    "test": "eight stops in order",
+    "file": "home/journey/journey/01-eight-stops-in-order.png"
+  },
+  {
+    "node": "Journey",
+    "test": "the thread is explained",
+    "file": "home/journey/journey/02-the-thread-is-explained.png"
+  },
+  {
+    "node": "JourneyStop",
+    "test": "a stop",
+    "file": "home/journey/journey-stop/01-a-stop.png"
+  },
+  {
+    "node": "JourneyStop",
+    "test": "a stop with a file to browse",
+    "file": "home/journey/journey-stop/02-a-stop-with-a-file-to-browse.png"
+  },
+  {
+    "node": "StopIdea",
+    "test": "the idea",
+    "file": "home/journey/stops/stop-idea/01-the-idea.png"
+  },
+  {
+    "node": "IdeaFigure",
+    "test": "the picture",
+    "file": "home/journey/stops/idea-figure/01-the-picture.png"
+  },
+  {
+    "node": "StopProduct",
+    "test": "the product level",
+    "file": "home/journey/stops/stop-product/01-the-product-level.png"
+  },
+  {
+    "node": "StopProof",
+    "test": "the proof",
+    "file": "home/journey/stops/stop-proof/01-the-proof.png"
+  },
+  {
+    "node": "BuildLoop",
+    "test": "four steps",
+    "file": "home/build-loop/build-loop/01-four-steps.png"
+  },
+  {
+    "node": "GetStarted",
+    "test": "in Claude Code",
+    "file": "home/sections/get-started/01-in-claude-code.png"
+  },
+  {
+    "node": "GetStarted",
+    "test": "in a terminal",
+    "file": "home/sections/get-started/02-in-a-terminal.png"
+  },
+  {
+    "node": "GetStarted",
+    "test": "what to do next",
+    "file": "home/sections/get-started/03-what-to-do-next.png"
+  },
+  {
+    "node": "CodeBlock",
+    "test": "shown exactly",
+    "file": "parts/code-block/01-shown-exactly.png"
+  },
+  {
+    "node": "CodeBlock",
+    "test": "the thread is marked",
+    "file": "parts/code-block/02-the-thread-is-marked.png"
+  },
+  {
+    "node": "CodeBlock",
+    "test": "a caption",
+    "file": "parts/code-block/03-a-caption.png"
+  },
+  {
+    "node": "CodeBlock",
+    "test": "a long line wraps under itself",
+    "file": "parts/code-block/04-a-long-line-wraps-under-itself.png"
+  },
+  {
+    "node": "CopyCommand",
+    "test": "copying",
+    "file": "parts/copy-command/01-copying.png"
+  },
+  {
+    "node": "SpecEditor",
+    "test": "readable before the editor loads",
+    "file": "parts/spec-editor/01-readable-before-the-editor-loads.png"
+  }
+]

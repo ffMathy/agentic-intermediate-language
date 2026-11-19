@@ -1,8 +1,8 @@
 const steps = [
-  { cx: 180, cy: 50, number: "1", name: "Write", color: "var(--color-level-product)" },
-  { cx: 310, cy: 180, number: "2", name: "Build", color: "var(--color-level-build)" },
-  { cx: 180, cy: 310, number: "3", name: "Check", color: "var(--color-step-check)" },
-  { cx: 50, cy: 180, number: "4", name: "Ask", color: "var(--color-level-experience)" },
+  { cx: 180, cy: 50, n: "1", name: "Write", color: "var(--color-level-product)" },
+  { cx: 310, cy: 180, n: "2", name: "Build", color: "var(--color-level-build)" },
+  { cx: 180, cy: 310, n: "3", name: "Check", color: "var(--color-step-check)" },
+  { cx: 50, cy: 180, n: "4", name: "Ask", color: "var(--color-level-experience)" },
 ];
 
 const heads = [
@@ -32,30 +32,31 @@ export function LoopFigure() {
         cy={180}
         r={130}
         fill="none"
-        style={{ stroke: "var(--color-border)" }}
+        stroke="var(--color-border)"
         strokeWidth={2}
       />
       {heads.map((transform) => (
         <path
           key={transform}
           d="M-6 -6 L6 0 L-6 6 Z"
+          fill="var(--color-text-muted)"
           transform={transform}
-          style={{ fill: "var(--color-text-muted)" }}
         />
       ))}
       {steps.map((step) => (
         <g key={step.name}>
-          <circle cx={step.cx} cy={step.cy} r={32} style={{ fill: step.color }} />
+          <circle cx={step.cx} cy={step.cy} r={32} fill={step.color} />
           <text
             x={step.cx}
             y={step.cy - 8}
             textAnchor="middle"
             fontSize={11}
             fontWeight={700}
+            fill="var(--color-on-accent)"
             opacity={0.85}
-            style={{ fill: "var(--color-on-accent)", fontFamily: "var(--font-sans)" }}
+            fontFamily="var(--font-sans)"
           >
-            {step.number}
+            {step.n}
           </text>
           <text
             x={step.cx}
@@ -63,7 +64,8 @@ export function LoopFigure() {
             textAnchor="middle"
             fontSize={13}
             fontWeight={700}
-            style={{ fill: "var(--color-on-accent)", fontFamily: "var(--font-sans)" }}
+            fill="var(--color-on-accent)"
+            fontFamily="var(--font-sans)"
           >
             {step.name}
           </text>
@@ -75,20 +77,21 @@ export function LoopFigure() {
         width={28}
         height={22}
         rx={4}
-        style={{ fill: "var(--color-text-muted)" }}
+        fill="var(--color-text-muted)"
       />
       <path
         d="M172 176 V168 A8 8 0 0 1 188 168 V176"
-        fill="none"
+        stroke="var(--color-text-muted)"
         strokeWidth={3}
-        style={{ stroke: "var(--color-text-muted)" }}
+        fill="none"
       />
       <text
         x={180}
         y={218}
         textAnchor="middle"
         fontSize={12}
-        style={{ fill: "var(--color-text)", fontFamily: "var(--font-mono)" }}
+        fill="var(--color-text)"
+        fontFamily="var(--font-mono)"
       >
         ail.lock.json
       </text>

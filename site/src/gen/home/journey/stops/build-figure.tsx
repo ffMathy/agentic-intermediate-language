@@ -1,3 +1,6 @@
+const sans = "var(--font-sans)";
+const mono = "var(--font-mono)";
+
 /** the node and the contracts it uses go into a compiler agent that sees one slice, and come out as a code file and its test */
 export function BuildFigure() {
   return (
@@ -30,65 +33,91 @@ export function BuildFigure() {
       <text
         x={16}
         y={44}
-        fontSize={11}
-        fontWeight={700}
-        style={{ fontFamily: "var(--font-mono)", fill: "var(--color-text)" }}
+        style={{
+          fontFamily: mono,
+          fontSize: 11,
+          fontWeight: 700,
+          fill: "var(--color-text)",
+        }}
       >
         ComputerPlayer
       </text>
       <text
         x={16}
         y={60}
-        fontSize={10}
-        style={{ fontFamily: "var(--font-sans)", fill: "var(--color-text-muted)" }}
+        style={{
+          fontFamily: sans,
+          fontSize: 10,
+          fill: "var(--color-text-muted)",
+        }}
       >
         + contracts of
       </text>
       <text
         x={16}
         y={74}
-        fontSize={10}
-        style={{ fontFamily: "var(--font-sans)", fill: "var(--color-text-muted)" }}
+        style={{
+          fontFamily: sans,
+          fontSize: 10,
+          fill: "var(--color-text-muted)",
+        }}
       >
         GameState, Rules
       </text>
       <line
         x1={108}
         y1={52}
-        x2={130}
+        x2={126}
         y2={52}
-        strokeWidth={2}
-        style={{ stroke: "var(--color-text-muted)" }}
+        style={{ stroke: "var(--color-text-muted)", strokeWidth: 2 }}
       />
       <line
-        x1={228}
+        x1={234}
         y1={52}
         x2={248}
         y2={52}
-        strokeWidth={2}
-        style={{ stroke: "var(--color-text-muted)" }}
+        style={{ stroke: "var(--color-text-muted)", strokeWidth: 2 }}
       />
       <polygon
-        points="132,52 148,24 212,24 228,52 212,80 148,80"
+        points="128,52 144,14 216,14 232,52 216,90 144,90"
         style={{ fill: "var(--color-level-build)" }}
       />
       <text
         x={180}
-        y={50}
+        y={46}
         textAnchor="middle"
-        fontSize={12}
-        fontWeight={700}
-        style={{ fontFamily: "var(--font-sans)", fill: "var(--color-on-accent)" }}
+        style={{
+          fontFamily: sans,
+          fontSize: 13,
+          fontWeight: 700,
+          fill: "var(--color-on-accent)",
+        }}
       >
-        compiler agent
+        compiler
       </text>
       <text
         x={180}
-        y={66}
+        y={61}
         textAnchor="middle"
-        fontSize={10}
-        opacity={0.85}
-        style={{ fontFamily: "var(--font-sans)", fill: "var(--color-on-accent)" }}
+        style={{
+          fontFamily: sans,
+          fontSize: 13,
+          fontWeight: 700,
+          fill: "var(--color-on-accent)",
+        }}
+      >
+        agent
+      </text>
+      <text
+        x={180}
+        y={78}
+        textAnchor="middle"
+        style={{
+          fontFamily: sans,
+          fontSize: 10,
+          fill: "var(--color-on-accent)",
+          opacity: 0.85,
+        }}
       >
         sees one slice
       </text>
@@ -111,33 +140,45 @@ export function BuildFigure() {
       <text
         x={256}
         y={52}
-        fontSize={9}
-        style={{ fontFamily: "var(--font-mono)", fill: "var(--color-code-text)" }}
+        style={{
+          fontFamily: mono,
+          fontSize: 9,
+          fill: "var(--color-code-text)",
+        }}
       >
         computer-player.ts
       </text>
       <text
         x={256}
         y={68}
-        fontSize={9}
-        style={{ fontFamily: "var(--font-mono)", fill: "var(--color-code-muted)" }}
+        style={{
+          fontFamily: mono,
+          fontSize: 9,
+          fill: "var(--color-code-muted)",
+        }}
       >
         + its derived test
       </text>
       <text
         x={4}
         y={124}
-        fontSize={12}
-        fontWeight={700}
-        style={{ fontFamily: "var(--font-sans)", fill: "var(--color-text)" }}
+        style={{
+          fontFamily: sans,
+          fontSize: 12,
+          fontWeight: 700,
+          fill: "var(--color-text)",
+        }}
       >
         What a reviewer reads
       </text>
       <text
         x={4}
         y={148}
-        fontSize={11}
-        style={{ fontFamily: "var(--font-sans)", fill: "var(--color-text-muted)" }}
+        style={{
+          fontFamily: sans,
+          fontSize: 11,
+          fill: "var(--color-text-muted)",
+        }}
       >
         the ComputerPlayer node
       </text>
@@ -152,17 +193,23 @@ export function BuildFigure() {
       <text
         x={148}
         y={165}
-        fontSize={11}
-        fontWeight={700}
-        style={{ fontFamily: "var(--font-sans)", fill: "var(--color-text)" }}
+        style={{
+          fontFamily: sans,
+          fontSize: 11,
+          fontWeight: 700,
+          fill: "var(--color-text)",
+        }}
       >
         27 lines
       </text>
       <text
         x={4}
         y={192}
-        fontSize={11}
-        style={{ fontFamily: "var(--font-sans)", fill: "var(--color-text-muted)" }}
+        style={{
+          fontFamily: sans,
+          fontSize: 11,
+          fill: "var(--color-text-muted)",
+        }}
       >
         the generated computer-player.ts
       </text>
@@ -178,17 +225,23 @@ export function BuildFigure() {
         x={350}
         y={209}
         textAnchor="end"
-        fontSize={11}
-        fontWeight={700}
-        style={{ fontFamily: "var(--font-sans)", fill: "var(--color-on-accent)" }}
+        style={{
+          fontFamily: sans,
+          fontSize: 11,
+          fontWeight: 700,
+          fill: "var(--color-on-accent)",
+        }}
       >
         69 lines
       </text>
       <text
         x={4}
         y={244}
-        fontSize={11}
-        style={{ fontFamily: "var(--font-mono)", fill: "var(--color-text-muted)" }}
+        style={{
+          fontFamily: mono,
+          fontSize: 11,
+          fill: "var(--color-text-muted)",
+        }}
       >
         ail.lock.json pins the file to its node's hash
       </text>

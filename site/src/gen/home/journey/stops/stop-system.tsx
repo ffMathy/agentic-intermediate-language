@@ -16,14 +16,17 @@ export function StopSystem() {
         "node Engine : library   level: system",
         "  why   One set of rules for every part of the game, so playing and watching can never disagree.   <- TicTacToe",
         "  children  GameState, Rules, GameReducer, ComputerPlayer",
-        "",
+        "…",
         "node Rules : fn   level: system",
+        "  …",
         "    evaluate(board: Board) -> Status",
         "      the first line in LINES order whose three cells hold the same mark → won(mark, line)",
         "      otherwise, if every cell is filled → draw",
         "      otherwise → playing",
+        "    …",
         "    examples",
         "      evaluate(boardFrom(\"XXX/OO_/___\")) => ({ kind: \"won\", mark: \"X\", line: [0, 1, 2] })",
+        "      …",
         "      evaluate(boardFrom(\"XOX/XOO/OXX\")) => ({ kind: \"draw\" })",
       ]}
       label="System-level spec excerpt"

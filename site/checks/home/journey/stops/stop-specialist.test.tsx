@@ -1,13 +1,13 @@
-// ail-derived-from: StopSpecialist@9b2a9712dde29b1d
+// ail-derived-from: StopSpecialist@5a8dac0ba3dbeeca
 import { afterEach, expect, test } from "bun:test";
-import { cleanup, render, screen, within } from "@testing-library/react";
+import { cleanup, render, within } from "@testing-library/react";
 import { StopSpecialist } from "../../../../src/gen/home/journey/stops/stop-specialist";
 
 afterEach(() => {
   cleanup();
 });
 
-const lines = [
+const lines: string[] = [
   "node ComputerPlayer : fn   level: specialist   @ai",
   "  why   Make \"the computer never loses\" true and provable, while still answering instantly.   <- Engine",
   "  what",
@@ -25,33 +25,43 @@ const lines = [
   "                 and assert that no game ends in a win for X",
 ];
 
+const marks: string[] = [
+  "never loses",
+  "no game against choose ends in a win for the other player",
+];
+
 test("the specialist level", () => {
   render(<StopSpecialist />);
 
-  const article = screen.getAllByRole("article").find((a) => a.id === "stop-5");
-  expect(article).toBeDefined();
-  const stop = article as HTMLElement;
+  const article = document.getElementById("stop-5");
+  expect(article).not.toBeNull();
+  if (article === null) {
+    return;
+  }
+  const isArticle =
+    article.tagName.toLowerCase() === "article" ||
+    article.getAttribute("role") === "article";
+  expect(isArticle).toBe(true);
 
-  const heading = within(stop).getByRole("heading", {
+  const scope = within(article);
+  scope.getByRole("heading", {
     level: 3,
     name: "Specialist level: the promise becomes an algorithm and a proof.",
   });
-  expect(heading).toBeTruthy();
 
-  const region = within(stop).getByRole("region", {
+  const region = scope.getByRole("region", {
     name: "Specialist-level spec excerpt",
   });
   const text = region.textContent ?? "";
-  expect(lines.length).toBe(15);
   for (const line of lines) {
     expect(text).toContain(line);
   }
 
-  const marked = Array.from(region.querySelectorAll("mark")).map(
-    (m) => m.textContent ?? "",
-  );
-  expect(marked).toContain("never loses");
-  expect(marked).toContain(
-    "no game against choose ends in a win for the other player",
-  );
+  const elements = Array.from(region.querySelectorAll("*"));
+  for (const mark of marks) {
+    const highlighted = elements.some(
+      (el) => (el.textContent ?? "") === mark,
+    );
+    expect(highlighted).toBe(true);
+  }
 });

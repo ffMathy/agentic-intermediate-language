@@ -90,11 +90,11 @@ node JourneyStop : view   level: experience
       Then an article with the id "stop-4" shows the marker "4", "SYSTEM", "Who reads this: engineers" and a level 3 heading "System level"
       And it holds the region named "Spec excerpt" and the text "Turns into:" followed by "Tests."
   look
-    stop      an article with id "stop-{number}": display grid, grid-template-columns 56px minmax(0, 1fr), column-gap space.4, pad 0 0 space.12 0, scroll-margin-top space.4; below 600px viewport width grid-template-columns 32px minmax(0, 1fr) and column-gap space.3
+    stop      an article with id "stop-{number}": display grid, grid-template-columns clamp(32px, 9vw, 56px) minmax(0, 1fr) (the rail column), column-gap clamp(12px, 3vw, 16px), pad 0 0 space.12 0, scroll-margin-top space.4
     rail      column 1, position relative
-    segment   an aria-hidden div, position absolute, left 26px, top 0, width 4px, background the stop's color; bottom 0, or height 36px when last; below 600px viewport width left 14px
-    marker    an aria-hidden div, position relative, margin-left 10px, width 36px, height 36px, box-sizing border-box, radius.pill, background the stop's color, a 3px solid color.surface border, box-shadow 0 0 0 1px the stop's color, color color.on.accent, font.small, weight 700, display flex, centered; below 600px viewport width margin-left 2px, width 28px, height 28px, font.micro
-    depth     a div, position relative, margin-top space.2, width 56px, text-align center, font.micro, weight 700, uppercase, letter-spacing 0.08em, color.text.muted, background color.page, pad space.1 0; below 600px viewport width it is not shown (the chip already names the level)
+    segment   an aria-hidden div, position absolute, left calc(clamp(32px, 9vw, 56px) / 2 - 2px) (centred in the rail column), top 0, width 4px, background the stop's color; bottom 0, or height 36px when last
+    marker    an aria-hidden div, position relative, margin-left calc((clamp(32px, 9vw, 56px) - clamp(28px, 7vw, 36px)) / 2), width clamp(28px, 7vw, 36px), height clamp(28px, 7vw, 36px), box-sizing border-box, radius.pill, background the stop's color, a 3px solid color.surface border, box-shadow 0 0 0 1px the stop's color, color color.on.accent, font size clamp(var(--font-micro), 3vw, var(--font-small)), weight 700, display flex, centered
+    depth     a div with class "ail-wide" (so it is not shown below 600px viewport width; the chip already names the level), position relative, margin-top space.2, width 56px, text-align center, font.micro, weight 700, uppercase, letter-spacing 0.08em, color.text.muted, background color.page, pad space.1 0
     content   column 2; stack(v, gap: space.4, align: stretch) [ top, headline, body, excerpt, turns ]
     top       stack(h, gap: space.3, align: center, wrap: true) [ chip, reader ]
     chip      a span: background the stop's color, color color.on.accent, font.micro, weight 700, letter-spacing 0.08em, radius.pill, pad space.1 space.3
@@ -104,7 +104,7 @@ node JourneyStop : view   level: experience
     explain   a p: font.body, line-height 1.6, color.text.muted, max-width width.prose, margin 0
     excerpt   CodeBlock with lines, label, caption from file, highlight, and edge the stop's color
     turns     a p: max-width width.prose, background color.accent.soft, radius.md, pad space.2 space.4, font.small, line-height 1.5, color.text, margin 0; the label in weight 700 color.accent, then one space, then the text
-    figure    a div: background color.surface.raised, radius.lg, pad space.4 (pad space.3 space.1 below 600px viewport width), min-height 200px, min-width 0, display flex, align-items center, justify-content center
+    figure    a div: background color.surface.raised, radius.lg, pad clamp(12px, 2vw, 16px) clamp(4px, 2vw, 16px), min-height 200px, min-width 0, display flex, align-items center, justify-content center
   copy
     stop.reader  "Who reads this: {reader}"
     stop.turns   "Turns into:"

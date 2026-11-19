@@ -1,4 +1,4 @@
-// ail-derived-from: JourneyStop@61aad169d5c29f47
+// ail-derived-from: JourneyStop@b4ab241648fd3625
 import { afterEach, expect, test } from "bun:test";
 import { cleanup, render, within } from "@testing-library/react";
 import { JourneyStop } from "../../../src/gen/home/journey/journey-stop";
@@ -7,13 +7,10 @@ afterEach(() => {
   cleanup();
 });
 
-function normalize(text: string | null): string {
-  return (text ?? "").replace(/\s+/g, " ").trim();
-}
-
-function hasElementWithText(root: Element, text: string): boolean {
-  const all = Array.from(root.querySelectorAll("*"));
-  return all.some((el) => normalize(el.textContent) === text);
+function elementsWithText(root: Element, text: string): Element[] {
+  return Array.from(root.querySelectorAll("*")).filter(
+    (el) => (el.textContent ?? "").trim() === text,
+  );
 }
 
 test("a stop", () => {
@@ -21,17 +18,17 @@ test("a stop", () => {
     <JourneyStop
       number={4}
       color="level.system"
-      depth="deeper"
+      depth="design"
       chip="SYSTEM"
       reader="engineers"
       headline="System level"
-      explanation="Each promise becomes a check engineers can run."
+      explanation="An explanation of this level."
       lines={["4. The computer never loses.", "5. New game"]}
       label="Spec excerpt"
       file="examples/tictactoe/tictactoe.ail.md"
       highlight={["never loses"]}
       turnsInto="Tests."
-      figure={<span>figure</span>}
+      figure={<svg aria-hidden="true" viewBox="0 0 360 200" />}
     />,
   );
 
@@ -39,18 +36,16 @@ test("a stop", () => {
   expect(article).not.toBeNull();
   const stop = article as HTMLElement;
 
-  expect(hasElementWithText(stop, "4")).toBe(true);
-  expect(hasElementWithText(stop, "SYSTEM")).toBe(true);
-  expect(hasElementWithText(stop, "Who reads this: engineers")).toBe(true);
+  expect(elementsWithText(stop, "4").length).toBeGreaterThan(0);
 
-  const heading = within(stop).getByRole("heading", {
-    level: 3,
-    name: "System level",
-  });
-  expect(heading).toBeTruthy();
+  const scope = within(stop);
+  expect(scope.getAllByText("SYSTEM").length).toBeGreaterThan(0);
 
-  const region = within(stop).getByRole("region", { name: "Spec excerpt" });
-  expect(region).toBeTruthy();
+  expect(elementsWithText(stop, "Who reads this: engineers").length).toBeGreaterThan(0);
 
-  expect(hasElementWithText(stop, "Turns into: Tests.")).toBe(true);
+  expect(scope.getByRole("heading", { level: 3, name: "System level" })).toBeTruthy();
+
+  expect(scope.getByRole("region", { name: "Spec excerpt" })).toBeTruthy();
+
+  expect(elementsWithText(stop, "Turns into: Tests.").length).toBeGreaterThan(0);
 });

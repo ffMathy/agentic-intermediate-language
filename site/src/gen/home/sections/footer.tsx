@@ -6,7 +6,7 @@ const linkStyle = {
   textDecoration: "underline",
 };
 
-/** a strip of the four level colors, one sentence on where this page and the game came from, and four links */
+/** "a strip of the four level colors, one sentence on where this page and the game came from, and four links" */
 export function Footer() {
   return (
     <footer
@@ -29,7 +29,7 @@ export function Footer() {
         style={{
           maxWidth: "var(--width-content)",
           margin: "0 auto",
-          boxSizing: "border-box",
+          boxSizing: "content-box",
           padding: "var(--space-8) var(--space-4)",
         }}
       >

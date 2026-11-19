@@ -14,6 +14,7 @@ export function StopProduct() {
       explanation="In the root node, the sentence sits beside five other promises. Each one must name a deeper node that makes it true, and a check rejects jargon and code at this level, so anyone can review it."
       lines={[
         "node TicTacToe : system   level: product",
+        "  …",
         "  what",
         "    1. Two players take turns placing their mark on a 3 × 3 board.          refined-by: PlayAGame",
         "    2. Three marks in a line wins; a full board with no winner is a draw.   refined-by: Rules",
@@ -21,6 +22,7 @@ export function StopProduct() {
         "    4. The computer never loses.                                            refined-by: ComputerPlayer",
         "    5. You can start a new game at any time.                                refined-by: NewGameButton",
         "    6. You can watch the computer play itself, move by move.                refined-by: WatchADemo",
+        "  entry     App",
         "  children  App, BoardKit, Engine, UiKit",
       ]}
       label="Product-level spec excerpt"

@@ -51,8 +51,8 @@ export function ProductFigure() {
               y={y + 18}
               fontSize={12}
               fontFamily="var(--font-sans)"
-              fontWeight={four ? 700 : undefined}
               fill="var(--color-text)"
+              fontWeight={four ? 700 : undefined}
             >
               {row.promise}
             </text>
@@ -63,7 +63,7 @@ export function ProductFigure() {
               height={28}
               rx={6}
               fill={four ? "var(--color-level-specialist)" : "var(--color-surface)"}
-              stroke={four ? "none" : "var(--color-border)"}
+              stroke={four ? undefined : "var(--color-border)"}
               strokeWidth={four ? undefined : 1}
             />
             <text
@@ -71,8 +71,8 @@ export function ProductFigure() {
               y={y + 18}
               fontSize={11}
               fontFamily="var(--font-mono)"
-              fontWeight={four ? 700 : undefined}
               fill={four ? "var(--color-on-accent)" : "var(--color-text)"}
+              fontWeight={four ? 700 : undefined}
             >
               {row.owner}
             </text>

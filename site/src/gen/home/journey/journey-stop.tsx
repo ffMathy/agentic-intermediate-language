@@ -2,7 +2,7 @@ import type { ReactNode } from "react";
 import { Stack } from "../../parts/stack";
 import { CodeBlock } from "../../parts/code-block";
 
-type JourneyStopProps = {
+export type JourneyStopProps = {
   number: number;
   color: string;
   depth: string;
@@ -19,9 +19,7 @@ type JourneyStopProps = {
   last?: boolean;
 };
 
-function tokenVar(name: string): string {
-  return `var(--${name.split(".").join("-")})`;
-}
+const cssVar = (token: string): string => `var(--${token.replace(/\./g, "-")})`;
 
 /** "a numbered marker on a vertical rail in the stop's color, with a short depth label under the marker" */
 export function JourneyStop({
@@ -40,14 +38,14 @@ export function JourneyStop({
   figure,
   last,
 }: JourneyStopProps) {
-  const stopColor = tokenVar(color);
+  const stopColor = cssVar(color);
   return (
     <article
       id={`stop-${number}`}
       style={{
         display: "grid",
-        gridTemplateColumns: "56px minmax(0, 1fr)",
-        columnGap: "var(--space-4)",
+        gridTemplateColumns: "clamp(32px, 9vw, 56px) minmax(0, 1fr)",
+        columnGap: "clamp(12px, 3vw, 16px)",
         padding: "0 0 var(--space-12) 0",
         scrollMarginTop: "var(--space-4)",
       }}
@@ -59,7 +57,7 @@ export function JourneyStop({
             last
               ? {
                   position: "absolute",
-                  left: "26px",
+                  left: "calc(clamp(32px, 9vw, 56px) / 2 - 2px)",
                   top: 0,
                   width: "4px",
                   background: stopColor,
@@ -67,7 +65,7 @@ export function JourneyStop({
                 }
               : {
                   position: "absolute",
-                  left: "26px",
+                  left: "calc(clamp(32px, 9vw, 56px) / 2 - 2px)",
                   top: 0,
                   width: "4px",
                   background: stopColor,
@@ -79,16 +77,16 @@ export function JourneyStop({
           aria-hidden="true"
           style={{
             position: "relative",
-            marginLeft: "10px",
-            width: "36px",
-            height: "36px",
+            marginLeft: "calc((clamp(32px, 9vw, 56px) - clamp(28px, 7vw, 36px)) / 2)",
+            width: "clamp(28px, 7vw, 36px)",
+            height: "clamp(28px, 7vw, 36px)",
             boxSizing: "border-box",
             borderRadius: "var(--radius-pill)",
             background: stopColor,
             border: "3px solid var(--color-surface)",
             boxShadow: `0 0 0 1px ${stopColor}`,
             color: "var(--color-on-accent)",
-            fontSize: "var(--font-small)",
+            fontSize: "clamp(var(--font-micro), 3vw, var(--font-small))",
             fontWeight: 700,
             display: "flex",
             alignItems: "center",
@@ -98,6 +96,7 @@ export function JourneyStop({
           {number}
         </div>
         <div
+          className="ail-wide"
           style={{
             position: "relative",
             marginTop: "var(--space-2)",
@@ -156,51 +155,25 @@ export function JourneyStop({
             display: "grid",
             gridTemplateColumns: "repeat(auto-fit, minmax(min(300px, 100%), 1fr))",
             gap: "var(--space-6)",
-            alignItems: "start",
+            alignItems: "center",
           }}
         >
-          <Stack dir="v" gap="space.4" align="stretch" style={{ minWidth: 0 }}>
-            <p
-              style={{
-                fontSize: "var(--font-body)",
-                lineHeight: 1.6,
-                color: "var(--color-text-muted)",
-                maxWidth: "var(--width-prose)",
-                margin: 0,
-              }}
-            >
-              {explanation}
-            </p>
-            <CodeBlock
-              lines={lines}
-              label={label}
-              caption={file}
-              highlight={highlight}
-              edge={color}
-            />
-            <p
-              style={{
-                background: "var(--color-accent-soft)",
-                borderRadius: "var(--radius-md)",
-                padding: "var(--space-2) var(--space-4)",
-                fontSize: "var(--font-small)",
-                lineHeight: 1.5,
-                color: "var(--color-text)",
-                margin: 0,
-              }}
-            >
-              <span style={{ fontWeight: 700, color: "var(--color-accent)" }}>
-                Turns into:
-              </span>
-              {" "}
-              {turnsInto}
-            </p>
-          </Stack>
+          <p
+            style={{
+              fontSize: "var(--font-body)",
+              lineHeight: 1.6,
+              color: "var(--color-text-muted)",
+              maxWidth: "var(--width-prose)",
+              margin: 0,
+            }}
+          >
+            {explanation}
+          </p>
           <div
             style={{
               background: "var(--color-surface-raised)",
               borderRadius: "var(--radius-lg)",
-              padding: "var(--space-4)",
+              padding: "clamp(12px, 2vw, 16px) clamp(4px, 2vw, 16px)",
               minHeight: "200px",
               minWidth: 0,
               display: "flex",
@@ -211,6 +184,28 @@ export function JourneyStop({
             {figure}
           </div>
         </div>
+        <CodeBlock
+          lines={lines}
+          label={label}
+          caption={file}
+          highlight={highlight}
+          edge={color}
+        />
+        <p
+          style={{
+            maxWidth: "var(--width-prose)",
+            background: "var(--color-accent-soft)",
+            borderRadius: "var(--radius-md)",
+            padding: "var(--space-2) var(--space-4)",
+            fontSize: "var(--font-small)",
+            lineHeight: 1.5,
+            color: "var(--color-text)",
+            margin: 0,
+          }}
+        >
+          <span style={{ fontWeight: 700, color: "var(--color-accent)" }}>Turns into:</span>{" "}
+          {turnsInto}
+        </p>
       </Stack>
     </article>
   );

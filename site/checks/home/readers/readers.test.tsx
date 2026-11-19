@@ -1,4 +1,4 @@
-// ail-derived-from: Readers@fdaf64ad82ccb44f
+// ail-derived-from: Readers@e0290b2b8895b022
 import { afterEach, expect, test } from "bun:test";
 import { act, cleanup, fireEvent, render, screen } from "@testing-library/react";
 import { Readers } from "../../../src/gen/home/readers/readers";
@@ -36,7 +36,7 @@ test("arrow keys", () => {
   });
   expect(document.activeElement).toBe(stakeholder);
   act(() => {
-    fireEvent.keyDown(stakeholder, { key: "ArrowLeft", code: "ArrowLeft" });
+    fireEvent.keyDown(stakeholder, { key: "ArrowLeft" });
   });
   const specialist = screen.getByRole("tab", { name: "Specialist" });
   expect(specialist.getAttribute("aria-selected")).toBe("true");

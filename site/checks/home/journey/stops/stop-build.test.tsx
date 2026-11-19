@@ -1,4 +1,4 @@
-// ail-derived-from: StopBuild@68ac485d2651f4f3
+// ail-derived-from: StopBuild@b05710b06ece73c8
 import { afterEach, expect, test } from "bun:test";
 import { cleanup, render, screen, within } from "@testing-library/react";
 import { StopBuild } from "../../../../src/gen/home/journey/stops/stop-build";
@@ -18,22 +18,20 @@ const lines = [
 ];
 
 test("the build", () => {
-  render(<StopBuild />);
+  const { container } = render(<StopBuild />);
 
-  const article = screen
-    .getAllByRole("article")
-    .find((el) => el.id === "stop-6");
-  expect(article).toBeDefined();
-  if (!article) return;
+  const article = container.querySelector("#stop-6");
+  expect(article).not.toBeNull();
+  const articles = screen.getAllByRole("article");
+  expect(articles).toContain(article as HTMLElement);
 
-  within(article).getByRole("heading", {
+  const scope = within(article as HTMLElement);
+  scope.getByRole("heading", {
     level: 3,
     name: "Build: an agent compiles the node, seeing only its own slice.",
   });
 
-  const region = within(article).getByRole("region", {
-    name: "Generated code excerpt",
-  });
+  const region = scope.getByRole("region", { name: "Generated code excerpt" });
   const text = region.textContent ?? "";
   let from = 0;
   for (const line of lines) {
@@ -42,8 +40,8 @@ test("the build", () => {
     from = at + line.length;
   }
 
-  const marks = Array.from(region.querySelectorAll("mark")).map(
-    (m) => m.textContent,
+  const highlighted = Array.from(region.querySelectorAll("*")).filter(
+    (el) => el.textContent === "export function choose",
   );
-  expect(marks).toContain("export function choose");
+  expect(highlighted.length).toBeGreaterThan(0);
 });

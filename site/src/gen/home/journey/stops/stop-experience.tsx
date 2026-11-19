@@ -14,6 +14,7 @@ export function StopExperience() {
       explanation="One level down, the play screen describes the computer's answer as a Given / When / Then scenario. Decisions record why, and what was rejected: the computer waits 300 ms, so the player's own move feels like it counted."
       lines={[
         "node PlayAGame : flow   level: experience",
+        "  …",
         "    Scenario: the computer answers",
         "      Given the opponent is the computer",
         "      When X picks a square",

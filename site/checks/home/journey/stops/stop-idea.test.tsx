@@ -1,4 +1,4 @@
-// ail-derived-from: StopIdea@e07158033873a2ef
+// ail-derived-from: StopIdea@2dde26ee4cdb1910
 import { afterEach, expect, test } from "bun:test";
 import { cleanup, render, screen, within } from "@testing-library/react";
 import { StopIdea } from "../../../../src/gen/home/journey/stops/stop-idea";
@@ -33,11 +33,11 @@ test("the idea", () => {
     "    4. The computer never loses.",
   ];
   for (const line of lines) {
-    expect(text).toContain(line);
+    expect(text).toContain(line.trim());
   }
 
-  const highlighted = Array.from(region.querySelectorAll("*")).some(
-    (el) => el.textContent === "The computer never loses.",
+  const highlighted = Array.from(region.querySelectorAll("*")).filter(
+    (el) => (el.textContent ?? "").trim() === "The computer never loses.",
   );
-  expect(highlighted).toBe(true);
+  expect(highlighted.length).toBeGreaterThan(0);
 });

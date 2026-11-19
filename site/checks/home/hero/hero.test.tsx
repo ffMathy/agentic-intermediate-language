@@ -1,4 +1,4 @@
-// ail-derived-from: Hero@04d878f3482ff3d5
+// ail-derived-from: Hero@618b4bf9a9cbf40c
 import { afterEach, expect, test } from "bun:test";
 import { cleanup, render, screen } from "@testing-library/react";
 import { Hero } from "../../../src/gen/home/hero/hero";
@@ -13,8 +13,8 @@ test("the links go to the right places", () => {
   const follow = screen.getByRole("link", { name: "Follow the sentence ↓" });
   expect(follow.getAttribute("href")).toBe("#journey");
 
-  const play = screen.getByRole("link", { name: "Play the finished game" });
-  expect(play.getAttribute("href")).toBe("./demo/");
+  const play = screen.getByRole("link", { name: "Try to beat the computer ↓" });
+  expect(play.getAttribute("href")).toBe("#stop-8");
 
   const github = screen.getByRole("link", { name: "View on GitHub ↗" });
   expect(github.getAttribute("href")).toBe(

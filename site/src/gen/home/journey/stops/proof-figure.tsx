@@ -1,14 +1,16 @@
-import { Fragment } from "react";
-
-const stroke = "var(--color-thread-strong)";
-
-const chips: { y: number; fill: string; label: string }[] = [
-  { y: 10, fill: "var(--color-level-product)", label: "promise · product" },
-  { y: 66, fill: "var(--color-level-experience)", label: "scenario · experience" },
-  { y: 122, fill: "var(--color-level-system)", label: "rules · system" },
-  { y: 178, fill: "var(--color-level-specialist)", label: "invariant · specialist" },
-  { y: 234, fill: "var(--color-level-build)", label: "test · never loses" },
+const chips = [
+  { y: 10, color: "var(--color-level-product)", label: "promise · product" },
+  { y: 66, color: "var(--color-level-experience)", label: "scenario · experience" },
+  { y: 122, color: "var(--color-level-system)", label: "rules · system" },
+  { y: 178, color: "var(--color-level-specialist)", label: "invariant · specialist" },
+  { y: 234, color: "var(--color-level-build)", label: "test · never loses" },
 ];
+
+const threadStroke = {
+  stroke: "var(--color-thread-strong)",
+  strokeWidth: 4,
+  strokeLinecap: "round" as const,
+};
 
 /** five stacked chips, one per level the promise passed through, joined by the yellow thread, ending in a green check */
 export function ProofFigure() {
@@ -24,63 +26,64 @@ export function ProofFigure() {
         display: "block",
       }}
     >
-      <line
-        x1={30}
-        y1={27}
-        x2={30}
-        y2={251}
-        stroke={stroke}
-        strokeWidth={4}
-        strokeLinecap="round"
-      />
+      <line x1={30} y1={27} x2={30} y2={251} style={threadStroke} />
       {chips.map((chip) => (
-        <Fragment key={chip.label}>
-          <line
-            x1={30}
-            y1={chip.y + 17}
-            x2={50}
-            y2={chip.y + 17}
-            stroke={stroke}
-            strokeWidth={4}
-            strokeLinecap="round"
-          />
-          <rect
-            x={50}
-            y={chip.y}
-            width={200}
-            height={34}
-            rx={17}
-            fill={chip.fill}
-          />
-          <text
-            x={150}
-            y={chip.y + 22}
-            textAnchor="middle"
-            fontSize={12}
-            fontWeight={700}
-            fontFamily="var(--font-sans)"
-            fill="var(--color-on-accent)"
-          >
-            {chip.label}
-          </text>
-        </Fragment>
+        <line
+          key={`branch-${chip.y}`}
+          x1={30}
+          y1={chip.y + 17}
+          x2={50}
+          y2={chip.y + 17}
+          style={threadStroke}
+        />
+      ))}
+      {chips.map((chip) => (
+        <rect
+          key={`chip-${chip.y}`}
+          x={50}
+          y={chip.y}
+          width={200}
+          height={34}
+          rx={17}
+          style={{ fill: chip.color }}
+        />
+      ))}
+      {chips.map((chip) => (
+        <text
+          key={`label-${chip.y}`}
+          x={150}
+          y={chip.y + 22}
+          textAnchor="middle"
+          style={{
+            fontFamily: "var(--font-sans)",
+            fontSize: 12,
+            fontWeight: 700,
+            fill: "var(--color-on-accent)",
+          }}
+        >
+          {chip.label}
+        </text>
       ))}
       <line
         x1={250}
         y1={251}
         x2={258}
         y2={251}
-        stroke={stroke}
-        strokeWidth={4}
+        style={{
+          stroke: "var(--color-thread-strong)",
+          strokeWidth: 4,
+        }}
       />
-      <circle cx={274} cy={251} r={16} fill="var(--color-pass)" />
+      <circle cx={274} cy={251} r={16} style={{ fill: "var(--color-pass)" }} />
       <path
         d="M266 251 L272 257 L283 245"
-        stroke="var(--color-on-accent)"
-        strokeWidth={3}
-        fill="none"
-        strokeLinecap="round"
-        strokeLinejoin="round"
+        style={{
+          stroke: "var(--color-on-accent)",
+          strokeWidth: 3,
+          fill: "none",
+          strokeLinecap: "round",
+          strokeLinejoin: "round",
+        }}
       />
     </svg>
   );

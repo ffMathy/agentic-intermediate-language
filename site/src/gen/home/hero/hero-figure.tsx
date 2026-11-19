@@ -7,8 +7,6 @@ const strata = [
   { y: 270, color: "var(--color-level-specialist)", name: "Specialist", reader: "experts" },
 ];
 
-const sans = { fontFamily: "var(--font-sans)" };
-
 /** a picture of a speech bubble saying "The computer never loses.", four colored layers named Product, Experience, System and Specialist, a block of code and a small game board, joined by one yellow line */
 export function HeroFigure() {
   return (
@@ -26,8 +24,11 @@ export function HeroFigure() {
     >
       <path
         d="M44 66 L40 86 L68 66"
-        strokeWidth={1.5}
-        style={{ fill: "var(--color-surface)", stroke: "var(--color-border)" }}
+        style={{
+          fill: "var(--color-surface)",
+          stroke: "var(--color-border)",
+          strokeWidth: 1.5,
+        }}
       />
       <rect
         x={20}
@@ -35,40 +36,59 @@ export function HeroFigure() {
         width={280}
         height={56}
         rx={12}
-        strokeWidth={1.5}
-        style={{ fill: "var(--color-surface)", stroke: "var(--color-border)" }}
+        style={{
+          fill: "var(--color-surface)",
+          stroke: "var(--color-border)",
+          strokeWidth: 1.5,
+        }}
       />
       <text
         x={160}
         y={44}
         textAnchor="middle"
-        fontSize={18}
-        fontWeight={600}
-        style={{ ...sans, fill: "var(--color-text)" }}
+        style={{
+          fontFamily: "var(--font-sans)",
+          fontSize: 18,
+          fontWeight: 600,
+          fill: "var(--color-text)",
+        }}
       >
         The computer never loses.
       </text>
-      {strata.map((s) => (
-        <g key={s.name}>
-          <rect x={40} y={s.y} width={240} height={52} rx={8} style={{ fill: s.color }} />
+      {strata.map((stratum) => (
+        <g key={stratum.name}>
+          <rect
+            x={40}
+            y={stratum.y}
+            width={240}
+            height={52}
+            rx={8}
+            style={{ fill: stratum.color }}
+          />
           <text
             x={52}
-            y={s.y + 31}
-            fontSize={13}
-            fontWeight={600}
-            style={{ ...sans, fill: "var(--color-on-accent)" }}
+            y={stratum.y + 31}
+            style={{
+              fontFamily: "var(--font-sans)",
+              fontSize: 13,
+              fontWeight: 600,
+              fill: "var(--color-on-accent)",
+            }}
           >
-            {s.name}
+            {stratum.name}
           </text>
           <text
             x={268}
-            y={s.y + 31}
+            y={stratum.y + 31}
             textAnchor="end"
-            fontSize={11}
-            opacity={0.85}
-            style={{ ...sans, fill: "var(--color-on-accent)" }}
+            style={{
+              fontFamily: "var(--font-sans)",
+              fontSize: 11,
+              fill: "var(--color-on-accent)",
+              opacity: 0.85,
+            }}
           >
-            {s.reader}
+            {stratum.reader}
           </text>
         </g>
       ))}
@@ -77,13 +97,19 @@ export function HeroFigure() {
         y1={104}
         x2={28}
         y2={312}
-        strokeWidth={1.5}
-        style={{ stroke: "var(--color-text-muted)", fill: "none" }}
+        style={{
+          stroke: "var(--color-text-muted)",
+          strokeWidth: 1.5,
+          fill: "none",
+        }}
       />
       <path
         d="M23 304 L28 314 L33 304"
-        strokeWidth={1.5}
-        style={{ stroke: "var(--color-text-muted)", fill: "none" }}
+        style={{
+          stroke: "var(--color-text-muted)",
+          strokeWidth: 1.5,
+          fill: "none",
+        }}
       />
       <text
         x={14}
@@ -91,8 +117,11 @@ export function HeroFigure() {
         transform="rotate(-90 14 209)"
         textAnchor="middle"
         dominantBaseline="middle"
-        fontSize={11}
-        style={{ ...sans, fill: "var(--color-text-muted)" }}
+        style={{
+          fontFamily: "var(--font-sans)",
+          fontSize: 11,
+          fill: "var(--color-text-muted)",
+        }}
       >
         more precise
       </text>
@@ -101,36 +130,52 @@ export function HeroFigure() {
         y1={66}
         x2={160}
         y2={406}
-        strokeWidth={3}
-        strokeLinecap="round"
-        strokeDasharray={400}
         style={{
           stroke: "var(--color-thread)",
+          strokeWidth: 3,
+          strokeLinecap: "round",
+          strokeDasharray: 400,
           animation: "ail-thread 2.4s ease-out 1 both",
         }}
       />
-      <rect x={40} y={330} width={240} height={64} rx={8} style={{ fill: "var(--color-code)" }} />
+      <rect
+        x={40}
+        y={330}
+        width={240}
+        height={64}
+        rx={8}
+        style={{ fill: "var(--color-code)" }}
+      />
       <text
         x={54}
         y={352}
-        fontSize={11}
-        style={{ fontFamily: "var(--font-mono)", fill: "var(--color-code-text)" }}
+        style={{
+          fontFamily: "var(--font-mono)",
+          fontSize: 11,
+          fill: "var(--color-code-text)",
+        }}
       >
-        export function choose(
+        {"export function choose("}
       </text>
       <text
         x={66}
         y={368}
-        fontSize={11}
-        style={{ fontFamily: "var(--font-mono)", fill: "var(--color-code-text)" }}
+        style={{
+          fontFamily: "var(--font-mono)",
+          fontSize: 11,
+          fill: "var(--color-code-text)",
+        }}
       >
         {"board: Board, me: Mark = \"O\""}
       </text>
       <text
         x={54}
         y={384}
-        fontSize={11}
-        style={{ fontFamily: "var(--font-mono)", fill: "var(--color-code-text)" }}
+        style={{
+          fontFamily: "var(--font-mono)",
+          fontSize: 11,
+          fill: "var(--color-code-text)",
+        }}
       >
         {"): number {"}
       </text>

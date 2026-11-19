@@ -1,14 +1,25 @@
-import { Fragment } from "react";
 import type { CSSProperties, ReactNode } from "react";
 import { Stack } from "./stack";
 
-interface CodeBlockProps {
-  lines: string[];
-  label: string;
-  edge?: string;
-  highlight?: string[];
-  caption?: string;
-}
+type Segment = {
+  text: string;
+  marked: boolean;
+};
+
+const tokenVar = (token: string): string => `var(--${token.split(".").join("-")})`;
+
+const preStyle: CSSProperties = {
+  background: "var(--color-code)",
+  color: "var(--color-code-text)",
+  fontFamily: "var(--font-mono)",
+  fontSize: "var(--font-code)",
+  lineHeight: 1.6,
+  padding: "var(--space-4)",
+  borderRadius: "var(--radius-md)",
+  margin: 0,
+  whiteSpace: "pre-wrap",
+  overflowWrap: "anywhere",
+};
 
 const markStyle: CSSProperties = {
   background: "var(--color-thread-soft)",
@@ -25,69 +36,93 @@ const captionStyle: CSSProperties = {
   overflowWrap: "anywhere",
 };
 
-function tokenVar(token: string): string {
-  return "var(--" + token.split(".").join("-") + ")";
-}
-
-function renderLine(line: string, phrases: string[]): ReactNode[] {
-  const parts: ReactNode[] = [];
-  let rest = 0;
+const splitLine = (line: string, phrases: string[]): Segment[] => {
+  const segments: Segment[] = [];
+  let pos = 0;
   let plainStart = 0;
-  while (rest < line.length) {
-    let foundAt = -1;
-    let foundPhrase = "";
+  while (pos < line.length) {
+    let bestIndex = -1;
+    let bestLength = 0;
     for (const phrase of phrases) {
-      const at = line.indexOf(phrase, rest);
-      if (at !== -1 && (foundAt === -1 || at < foundAt)) {
-        foundAt = at;
-        foundPhrase = phrase;
+      if (phrase.length === 0) {
+        continue;
+      }
+      const index = line.indexOf(phrase, pos);
+      if (index === -1) {
+        continue;
+      }
+      if (bestIndex === -1 || index < bestIndex || (index === bestIndex && phrase.length > bestLength)) {
+        bestIndex = index;
+        bestLength = phrase.length;
       }
     }
-    if (foundAt === -1) {
+    if (bestIndex === -1) {
       break;
     }
-    if (foundAt > plainStart) {
-      parts.push(line.slice(plainStart, foundAt));
+    if (bestIndex > plainStart) {
+      segments.push({ text: line.slice(plainStart, bestIndex), marked: false });
     }
-    parts.push(
-      <mark key={foundAt} style={markStyle}>
-        {foundPhrase}
-      </mark>,
-    );
-    rest = foundAt + foundPhrase.length;
-    plainStart = rest;
+    segments.push({ text: line.slice(bestIndex, bestIndex + bestLength), marked: true });
+    pos = bestIndex + bestLength;
+    plainStart = pos;
   }
   if (plainStart < line.length) {
-    parts.push(line.slice(plainStart));
+    segments.push({ text: line.slice(plainStart), marked: false });
   }
-  return parts;
-}
+  return segments;
+};
 
-/** Spec excerpts and code must be shown exactly, with the followed promise easy to spot. */
-export function CodeBlock({ lines, label, edge, highlight, caption }: CodeBlockProps) {
-  const phrases = (highlight ?? []).filter((phrase) => phrase.length > 0);
-  const blockStyle: CSSProperties = {
-    background: "var(--color-code)",
-    color: "var(--color-code-text)",
-    fontFamily: "var(--font-mono)",
-    fontSize: "var(--font-code)",
-    lineHeight: 1.6,
-    padding: "var(--space-4)",
-    borderRadius: "var(--radius-md)",
-    margin: 0,
-    overflowX: "auto",
-    whiteSpace: "pre",
-    ...(edge !== undefined ? { borderLeft: "4px solid " + tokenVar(edge) } : {}),
+const renderLine = (line: string, phrases: string[], index: number): ReactNode => {
+  const leading = line.length - line.trimStart().length;
+  const offset = `${leading + 4}ch`;
+  const style: CSSProperties = {
+    display: "block",
+    paddingLeft: offset,
+    textIndent: `-${offset}`,
   };
+  if (line.length === 0) {
+    return (
+      <span key={index} style={style}>
+        {" "}
+      </span>
+    );
+  }
+  return (
+    <span key={index} style={style}>
+      {splitLine(line, phrases).map((segment, i) =>
+        segment.marked ? (
+          <mark key={i} style={markStyle}>
+            {segment.text}
+          </mark>
+        ) : (
+          segment.text
+        ),
+      )}
+    </span>
+  );
+};
+
+/** Shows the given lines exactly, one per line, keeping every space; every occurrence of each highlight phrase is marked, in every line. */
+export function CodeBlock({
+  lines,
+  label,
+  edge,
+  highlight,
+  caption,
+}: {
+  lines: string[];
+  label: string;
+  edge?: string;
+  highlight?: string[];
+  caption?: string;
+}) {
+  const phrases = highlight ?? [];
+  const blockStyle: CSSProperties =
+    edge === undefined ? preStyle : { ...preStyle, borderLeft: `4px solid ${tokenVar(edge)}` };
   return (
     <Stack dir="v" gap="space.2" align="stretch">
       <pre role="region" aria-label={label} style={blockStyle}>
-        {lines.map((line, index) => (
-          <Fragment key={index}>
-            {index > 0 ? "\n" : null}
-            {renderLine(line, phrases)}
-          </Fragment>
-        ))}
+        {lines.map((line, index) => renderLine(line, phrases, index))}
       </pre>
       {caption !== undefined ? <div style={captionStyle}>{caption}</div> : null}
     </Stack>

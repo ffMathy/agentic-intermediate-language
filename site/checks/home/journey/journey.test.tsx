@@ -1,4 +1,4 @@
-// ail-derived-from: Journey@04502606031f0ff2
+// ail-derived-from: Journey@ea5f50d26cd4b7f6
 import { afterEach, expect, test } from "bun:test";
 import { cleanup, render, screen, within } from "@testing-library/react";
 import { Journey } from "../../../src/gen/home/journey/journey";
@@ -8,19 +8,15 @@ afterEach(() => {
 });
 
 test("eight stops in order", () => {
-  render(<Journey />);
-  const section = document.getElementById("journey");
+  const { container } = render(<Journey />);
+  const section = container.querySelector("#journey");
   expect(section).not.toBeNull();
   const band = section as HTMLElement;
 
   const headings = within(band).getAllByRole("heading", { level: 3 });
   expect(headings.length).toBe(8);
-  expect((headings[0].textContent ?? "").trim()).toBe(
-    "It starts as a sentence anyone could say.",
-  );
-  expect((headings[7].textContent ?? "").trim()).toBe(
-    "The result: try to beat it.",
-  );
+  expect(headings[0].textContent).toBe("It starts as a sentence anyone could say.");
+  expect(headings[7].textContent).toBe("The result: try to beat it.");
 
   const stopIds = Array.from(band.querySelectorAll("[id]"))
     .map((el) => el.id)
@@ -39,10 +35,5 @@ test("eight stops in order", () => {
 
 test("the thread is explained", () => {
   render(<Journey />);
-  const section = document.getElementById("journey");
-  expect(section).not.toBeNull();
-  expect(
-    within(section as HTMLElement).getByText("the thread we are following"),
-  ).toBeTruthy();
-  expect(screen.getAllByText("the thread we are following").length).toBe(1);
+  expect(screen.getByText("the thread we are following")).toBeTruthy();
 });

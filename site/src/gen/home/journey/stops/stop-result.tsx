@@ -16,7 +16,7 @@ export function StopResult() {
       label="The promise, one last time"
       file="examples/tictactoe/tictactoe.ail.md"
       highlight={["The computer never loses."]}
-      turnsInto="Every square, word and move in this game comes from the spec above. None of its code was written by hand."
+      turnsInto="Every square, word and move in this game comes from the spec above. Apart from a short index.html, none of its code was written by hand."
       figure={<ResultFrame />}
       last={true}
     />

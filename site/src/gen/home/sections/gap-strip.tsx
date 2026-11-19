@@ -50,19 +50,30 @@ function Icon({ children }: { children: ReactNode }) {
   );
 }
 
-/** "a heading and three cards: a request is too vague, code is too detailed, and AIL is the layer in between" */
+const lineStyle: CSSProperties = {
+  stroke: "var(--color-code-text)",
+  strokeWidth: 2,
+  strokeLinecap: "round",
+};
+
+/** "an eyebrow, a heading and three cards: a request is too vague, code is too detailed, and AIL is the layer in between" */
 export function GapStrip() {
   return (
     <Section tone="raised">
-      <SectionHeading text="Between a prompt and the code, there was nothing to review." />
+      <SectionHeading
+        eyebrow="THE PROBLEM"
+        text="Between a prompt and the code, there is nothing to review."
+      />
       <div style={cardsStyle}>
         <Stack dir="v" gap="space.3" align="start" pad="space.6" style={cardStyle}>
           <Icon>
             <path
               d="M12 30 H30 A7 7 0 0 0 30 16 A10 10 0 0 0 11 14 A8 8 0 0 0 12 30 Z"
-              fill="none"
-              stroke="var(--color-text-muted)"
-              strokeWidth={2}
+              style={{
+                fill: "none",
+                stroke: "var(--color-text-muted)",
+                strokeWidth: 2,
+              }}
             />
           </Icon>
           <h3 style={titleStyle}>A prompt is too vague</h3>
@@ -72,10 +83,10 @@ export function GapStrip() {
         </Stack>
         <Stack dir="v" gap="space.3" align="start" pad="space.6" style={cardStyle}>
           <Icon>
-            <rect x={2} y={6} width={36} height={28} rx={4} fill="var(--color-code)" />
-            <line x1={8} y1={14} x2={28} y2={14} stroke="var(--color-code-text)" strokeWidth={2} strokeLinecap="round" />
-            <line x1={8} y1={20} x2={22} y2={20} stroke="var(--color-code-text)" strokeWidth={2} strokeLinecap="round" />
-            <line x1={8} y1={26} x2={32} y2={26} stroke="var(--color-code-text)" strokeWidth={2} strokeLinecap="round" />
+            <rect x="2" y="6" width="36" height="28" rx="4" style={{ fill: "var(--color-code)" }} />
+            <line x1="8" y1="14" x2="28" y2="14" style={lineStyle} />
+            <line x1="8" y1="20" x2="22" y2="20" style={lineStyle} />
+            <line x1="8" y1="26" x2="32" y2="26" style={lineStyle} />
           </Icon>
           <h3 style={titleStyle}>Code is too detailed</h3>
           <p style={bodyStyle}>
@@ -84,10 +95,10 @@ export function GapStrip() {
         </Stack>
         <Stack dir="v" gap="space.3" align="start" pad="space.6" style={thirdCardStyle}>
           <Icon>
-            <rect x={4} y={6} width={32} height={6} rx={3} fill="var(--color-level-product)" />
-            <rect x={4} y={14} width={32} height={6} rx={3} fill="var(--color-level-experience)" />
-            <rect x={4} y={22} width={32} height={6} rx={3} fill="var(--color-level-system)" />
-            <rect x={4} y={30} width={32} height={6} rx={3} fill="var(--color-level-specialist)" />
+            <rect x="4" y="6" width="32" height="6" rx="3" style={{ fill: "var(--color-level-product)" }} />
+            <rect x="4" y="14" width="32" height="6" rx="3" style={{ fill: "var(--color-level-experience)" }} />
+            <rect x="4" y="22" width="32" height="6" rx="3" style={{ fill: "var(--color-level-system)" }} />
+            <rect x="4" y="30" width="32" height="6" rx="3" style={{ fill: "var(--color-level-specialist)" }} />
           </Icon>
           <h3 style={titleStyle}>AIL is the layer in between</h3>
           <p style={bodyStyle}>

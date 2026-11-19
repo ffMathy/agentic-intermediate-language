@@ -1,6 +1,4 @@
-import { Fragment } from "react";
-
-type MiniBoardProps = {
+export type MiniBoardProps = {
   x: number;
   y: number;
   cell: number;
@@ -9,37 +7,37 @@ type MiniBoardProps = {
   numbers?: boolean;
 };
 
-/** draws a 3 by 3 board inside a larger picture, at the position and size it is given */
+/** "draws a 3 by 3 board inside a larger picture, at the position and size it is given" */
 export function MiniBoard({ x, y, cell, marks, highlight = [], numbers = false }: MiniBoardProps) {
   const squares = [0, 1, 2, 3, 4, 5, 6, 7, 8];
   return (
     <g>
-      {squares.map((index) => {
-        const column = index % 3;
-        const row = Math.floor(index / 3);
+      {squares.map((i) => {
+        const column = i % 3;
+        const row = Math.floor(i / 3);
         const left = x + column * cell;
         const top = y + row * cell;
-        const centerX = left + cell / 2;
-        const centerY = top + cell / 2;
-        const mark = marks.charAt(index);
-        const lit = highlight.includes(index);
+        const cx = left + cell / 2;
+        const cy = top + cell / 2;
+        const mark = marks.charAt(i);
+        const lit = highlight.includes(i);
         return (
-          <Fragment key={index}>
+          <g key={i}>
             <rect
               x={left}
               y={top}
               width={cell}
               height={cell}
+              strokeWidth={1.5}
               style={{
                 fill: lit ? "var(--color-thread)" : "var(--color-surface)",
                 stroke: "var(--color-border)",
-                strokeWidth: 1.5,
               }}
             />
             {mark === "X" || mark === "O" ? (
               <text
-                x={centerX}
-                y={centerY}
+                x={cx}
+                y={cy}
                 textAnchor="middle"
                 dominantBaseline="central"
                 fontSize={cell * 0.62}
@@ -53,8 +51,8 @@ export function MiniBoard({ x, y, cell, marks, highlight = [], numbers = false }
               </text>
             ) : numbers ? (
               <text
-                x={centerX}
-                y={centerY}
+                x={cx}
+                y={cy}
                 textAnchor="middle"
                 dominantBaseline="central"
                 fontSize={cell * 0.36}
@@ -63,10 +61,10 @@ export function MiniBoard({ x, y, cell, marks, highlight = [], numbers = false }
                   fill: "var(--color-text-muted)",
                 }}
               >
-                {String(index)}
+                {String(i)}
               </text>
             ) : null}
-          </Fragment>
+          </g>
         );
       })}
     </g>

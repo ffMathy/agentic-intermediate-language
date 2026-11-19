@@ -1,4 +1,4 @@
-// ail-derived-from: StopProof@e4793e7b7e6ef8a5
+// ail-derived-from: StopProof@6064990e34a61351
 import { afterEach, expect, test } from "bun:test";
 import { cleanup, render, screen, within } from "@testing-library/react";
 import { StopProof } from "../../../../src/gen/home/journey/stops/stop-proof";
@@ -26,10 +26,11 @@ test("the proof", () => {
   expect(article).toBeDefined();
   const stop = article as HTMLElement;
 
-  within(stop).getByRole("heading", {
+  const heading = within(stop).getByRole("heading", {
     level: 3,
     name: "Proof: the verify line becomes a test that plays every game.",
   });
+  expect(heading).toBeTruthy();
 
   const region = within(stop).getByRole("region", {
     name: "Derived check excerpt",

@@ -1,4 +1,4 @@
-// ail-derived-from: StopExperience@b2635cc8c6be046a
+// ail-derived-from: StopExperience@da9d6b6963b98c59
 import { afterEach, expect, test } from "bun:test";
 import { cleanup, render, screen, within } from "@testing-library/react";
 import { StopExperience } from "../../../../src/gen/home/journey/stops/stop-experience";
@@ -7,8 +7,13 @@ afterEach(() => {
   cleanup();
 });
 
+const headline =
+  "Experience level: what the player sees, as scenarios anyone can test.";
+const label = "Experience-level spec excerpt";
+const mark = "the computer places an O";
 const lines = [
   "node PlayAGame : flow   level: experience",
+  "  …",
   "    Scenario: the computer answers",
   "      Given the opponent is the computer",
   "      When X picks a square",
@@ -25,26 +30,29 @@ test("the experience level", () => {
 
   const article = screen
     .getAllByRole("article")
-    .find((element) => element.id === "stop-3");
+    .find((el) => el.id === "stop-3");
   expect(article).toBeDefined();
   if (!article) return;
 
   const heading = within(article).getByRole("heading", {
     level: 3,
-    name: "Experience level: what the player sees, as scenarios anyone can test.",
+    name: headline,
   });
   expect(heading).toBeTruthy();
 
-  const region = screen.getByRole("region", {
-    name: "Experience-level spec excerpt",
-  });
+  const region = within(article).getByRole("region", { name: label });
   const text = region.textContent ?? "";
+
+  let cursor = 0;
   for (const line of lines) {
-    expect(text).toContain(line);
+    const needle = line.trim();
+    const at = text.indexOf(needle, cursor);
+    expect(at).toBeGreaterThanOrEqual(0);
+    cursor = at + needle.length;
   }
 
   const highlighted = Array.from(region.querySelectorAll("*")).filter(
-    (element) => element.textContent === "the computer places an O",
+    (el) => (el.textContent ?? "").trim() === mark,
   );
   expect(highlighted.length).toBeGreaterThan(0);
 });

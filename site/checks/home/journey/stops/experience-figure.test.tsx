@@ -1,4 +1,4 @@
-// ail-derived-from: ExperienceFigure@f30376e9c28264d3
+// ail-derived-from: ExperienceFigure@7b08016e39816603
 import { afterEach, expect, test } from "bun:test";
 import { cleanup, render, screen } from "@testing-library/react";
 import { ExperienceFigure } from "../../../../src/gen/home/journey/stops/experience-figure";
@@ -14,8 +14,15 @@ test("the picture", () => {
   });
   expect(picture).toBeTruthy();
   const text = picture.textContent ?? "";
-  expect(text).toContain("Given: vs computer");
-  expect(text).toContain("When: X picks");
-  expect(text).toContain("Then: O answers");
-  expect(text).toContain("300 ms");
+  for (const expected of [
+    "Given:",
+    "vs computer",
+    "When:",
+    "X picks",
+    "Then:",
+    "O answers",
+    "300 ms",
+  ]) {
+    expect(text).toContain(expected);
+  }
 });

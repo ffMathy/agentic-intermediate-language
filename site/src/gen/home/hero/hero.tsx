@@ -48,7 +48,7 @@ export function Hero() {
               margin: 0,
             }}
           >
-            AIL is a spec language for building software with AI agents. You write what you want in plain words, then refine it level by level until it is precise enough that any model builds the same behaviour, and checks prove the code does what the sentence says. Below, one real sentence goes all the way down.
+            Write what you want in plain words, then add detail level by level. AI agents build the code from it, checks prove it does what you wrote, and everyone on the team reviews the level written for them.
           </p>
           <Stack dir="h" gap="space.3" align="center" wrap={true}>
             <a
@@ -66,7 +66,7 @@ export function Hero() {
               Follow the sentence ↓
             </a>
             <a
-              href="./demo/"
+              href="#stop-8"
               style={{
                 background: "var(--color-surface)",
                 color: "var(--color-accent)",
@@ -77,14 +77,14 @@ export function Hero() {
                 textDecoration: "none",
               }}
             >
-              Play the finished game
+              Try to beat the computer ↓
             </a>
             <a
               href="https://github.com/ffMathy/agentic-intermediate-language"
               style={{
                 color: "var(--color-text)",
                 fontWeight: 600,
-                padding: "var(--space-3) var(--space-2)",
+                padding: "var(--space-3) 0",
                 textDecoration: "none",
               }}
             >

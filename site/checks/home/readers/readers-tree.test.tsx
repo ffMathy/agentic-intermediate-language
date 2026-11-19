@@ -1,4 +1,4 @@
-// ail-derived-from: ReadersTree@8bcd7311f3acebdd
+// ail-derived-from: ReadersTree@afe39a61f5698f80
 import { afterEach, expect, test } from "bun:test";
 import { cleanup, render, screen } from "@testing-library/react";
 import { ReadersTree } from "../../../src/gen/home/readers/readers-tree";
@@ -7,22 +7,22 @@ afterEach(() => {
   cleanup();
 });
 
-test("the stakeholder's part", () => {
+test("the stakeholder's level", () => {
   render(<ReadersTree reader="stakeholder" />);
 
-  const tree = screen.getByRole("img", {
-    name: "The Tic-Tac-Toe spec tree, with what the stakeholder reads highlighted",
+  const images = screen.getAllByRole("img", {
+    name: "The Tic-Tac-Toe spec tree, with the level written for the stakeholder highlighted",
   });
+  expect(images.length).toBeGreaterThanOrEqual(1);
 
-  const nodes = Array.from(tree.querySelectorAll("g[data-lit]"));
-  const lit = nodes.filter((node) => node.getAttribute("data-lit") === "true");
-
+  const wide = images[0];
+  const nodes = Array.from(wide.querySelectorAll("g[data-lit]"));
+  expect(nodes.length).toBe(13);
+  const lit = nodes.filter((g) => g.getAttribute("data-lit") === "true");
   expect(lit.length).toBe(1);
-  expect((lit[0]?.textContent ?? "").trim()).toBe("TicTacToe");
+  expect((lit[0].textContent ?? "").trim()).toBe("TicTacToe");
 
-  const ticTacToe = nodes.find(
-    (node) => (node.textContent ?? "").trim() === "TicTacToe",
-  );
-  expect(ticTacToe).toBeDefined();
-  expect(ticTacToe?.getAttribute("data-lit")).toBe("true");
+  expect(
+    screen.getByText("Simplified: the six parts inside BoardKit and UiKit are not drawn."),
+  ).toBeTruthy();
 });

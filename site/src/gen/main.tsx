@@ -1,5 +1,4 @@
 import { createRoot } from "react-dom/client";
-import "./tokens.css";
 import { HomePage } from "./home/home-page";
 
 const root = document.getElementById("root");

@@ -11,34 +11,34 @@ export type StackProps = {
   children?: ReactNode;
 };
 
-const tokenVar = (name: string): string => `var(--${name.split(".").join("-")})`;
+function tokenVar(name: string): string {
+  return `var(--${name.split(".").join("-")})`;
+}
 
-const alignMap: Record<string, CSSProperties["alignItems"]> = {
-  start: "flex-start",
-  center: "center",
-  end: "flex-end",
-};
+function alignItems(align: StackProps["align"]): CSSProperties["alignItems"] {
+  if (align === "start") return "flex-start";
+  if (align === "center") return "center";
+  if (align === "end") return "flex-end";
+  return "stretch";
+}
 
-const justifyMap: Record<string, CSSProperties["justifyContent"]> = {
-  start: "flex-start",
-  center: "center",
-  between: "space-between",
-};
+function justifyContent(justify: StackProps["justify"]): CSSProperties["justifyContent"] {
+  if (justify === "start") return "flex-start";
+  if (justify === "center") return "center";
+  if (justify === "between") return "space-between";
+  return "flex-start";
+}
 
 /** "lays out its children in a column or a row, in the order given, with an even gap between them" */
 export function Stack({ dir, gap, align, justify, wrap, pad, style, children }: StackProps) {
   const base: CSSProperties = {
     display: "flex",
     flexDirection: dir === "v" ? "column" : "row",
-    alignItems: (align !== undefined && alignMap[align]) || "stretch",
-    justifyContent: (justify !== undefined && justifyMap[justify]) || "flex-start",
+    alignItems: alignItems(align),
+    justifyContent: justifyContent(justify),
     flexWrap: wrap === true ? "wrap" : "nowrap",
   };
-  if (gap !== undefined) {
-    base.gap = tokenVar(gap);
-  }
-  if (pad !== undefined) {
-    base.padding = tokenVar(pad);
-  }
+  if (gap !== undefined) base.gap = tokenVar(gap);
+  if (pad !== undefined) base.padding = tokenVar(pad);
   return <div style={{ ...base, ...style }}>{children}</div>;
 }

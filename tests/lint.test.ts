@@ -37,20 +37,10 @@ test("why must trace to an ancestor", () => {
   expect(codes(dir)).toContain("bad-why-ref");
 });
 
-test("jargon and code are rejected at plain-language levels", () => {
+test("code notation is rejected at plain-language levels", () => {
   const dir = tempProject();
-  edit(dir, "1. You can add two numbers.", "1. You can add two numbers with a reducer.");
-  expect(codes(dir)).toContain("jargon");
-  const dir2 = tempProject();
-  edit(dir2, "1. You can add two numbers.", "1. You can call addNumbers(a, b).");
-  expect(codes(dir2)).toContain("code-in-plain-level");
-});
-
-test("glossary terms are allowed even if they look like jargon", () => {
-  const dir = tempProject();
-  edit(dir, "1. You can add two numbers.", "1. You can add two numbers with a reducer.");
-  writeFileSync(join(dir, "glossary.ail.md"), '```ail\nglossary\n  term reducer  plain "the adding machine"  formal Add\n```\n');
-  expect(codes(dir)).not.toContain("jargon");
+  edit(dir, "1. You can add two numbers.", "1. You can call addNumbers(a, b).");
+  expect(codes(dir)).toContain("code-in-plain-level");
 });
 
 test("product nodes may not carry how/look/binds", () => {
@@ -68,12 +58,14 @@ test("levels may only deepen", () => {
   expect(codes(dir)).toContain("level-order");
 });
 
-test("unknown tokens and components are caught", () => {
+test("unknown tokens and components are caught, and components must be used", () => {
   const dir = tempProject();
-  edit(dir, "  uses  Add", "  look\n    gap space.99, Button.huge\n  uses  Add");
+  edit(dir, "  uses  Add", "  look\n    gap space.99, Button.huge, then Add.small\n  uses  Pick2");
+  writeFileSync(join(dir, "extra.ail.md"), "```ail\ncatalog\n  tokens\n    space.1=4px\n```\n");
   const c = codes(dir);
   expect(c).toContain("unknown-token");
   expect(c).toContain("unknown-component");
+  expect(c).toContain("missing-uses");
 });
 
 test("dependency cycles are caught", () => {

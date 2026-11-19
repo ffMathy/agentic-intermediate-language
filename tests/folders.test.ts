@@ -28,7 +28,7 @@ test("generated paths and imports mirror the spec's folders", () => {
   const p = load(tempProject("areas"));
   expect(modulePath(p, p.nodes.get("Price")!)).toBe("src/gen/lib/price.ts");
   expect(modulePath(p, p.nodes.get("AreaA")!)).toBe("src/gen/a/area-a.ts");
-  expect(buildContext(p, p.nodes.get("AreaB")!)).toContain('### Price — import from "../lib/price"');
+  expect(buildContext(p, p.nodes.get("AreaB")!)).toContain('### Price — built at src/gen/lib/price.ts, so import from "../lib/price"');
 });
 
 test("a shared node has one owner and many users, and lints clean", () => {
@@ -95,4 +95,15 @@ test("review shows every area a shared contract change reaches", () => {
   const r = renderReview(load(dir), "HEAD");
   expect(r).toContain("✎ Price");
   expect(r).toContain("**Contract changed** — this reaches AreaA (system, a/), AreaB (system, b/)");
+});
+
+test("prune also removes the derived checks of removed and moved nodes", () => {
+  const dir = tempProject("areas");
+  mkdirSync(join(dir, "checks/b"), { recursive: true });
+  mkdirSync(join(dir, "checks/old"), { recursive: true });
+  writeFileSync(join(dir, "checks/old/gone.test.ts"), "// ail-derived-from: Gone@abc\n");
+  writeFileSync(join(dir, "checks/old/area-b.test.ts"), "// ail-derived-from: AreaB@abc\n");
+  writeFileSync(join(dir, "checks/b/hand-written.test.ts"), "// no header: written by a person\n");
+  expect(prune(load(dir)).removed.sort()).toEqual(["checks/old/area-b.test.ts", "checks/old/gone.test.ts"]);
+  expect(existsSync(join(dir, "checks/b/hand-written.test.ts"))).toBe(true);
 });

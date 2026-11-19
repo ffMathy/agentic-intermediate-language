@@ -1,23 +1,35 @@
-import { Stack } from "../catalog";
-import { Hero } from "./sections/hero";
-import { Steps } from "./sections/steps";
-import { SpecSample } from "./sections/spec-sample";
+import { TopBar } from "./sections/top-bar";
+import { Hero } from "./hero/hero";
+import { GapStrip } from "./sections/gap-strip";
+import { Journey } from "./journey/journey";
+import { Readers } from "./readers/readers";
+import { BuildLoop } from "./build-loop/build-loop";
 import { GetStarted } from "./sections/get-started";
-import { Commands } from "./sections/commands";
 import { Footer } from "./sections/footer";
 
-/** HomePage: the sections appear in this order: Hero, Steps, SpecSample, GetStarted, Commands, Footer. */
+/** "the parts appear in this order: TopBar, Hero, GapStrip, Journey, Readers, BuildLoop, GetStarted, Footer" */
 export function HomePage() {
   return (
-    <div style={{ maxWidth: "880px", marginLeft: "auto", marginRight: "auto" }}>
-      <Stack dir="v" gap="space.12" align="stretch" pad="space.6">
+    <div
+      style={{
+        background: "var(--color-page)",
+        color: "var(--color-text)",
+        fontFamily: "var(--font-sans)",
+        fontSize: "var(--font-body)",
+        lineHeight: 1.6,
+        minHeight: "100vh",
+      }}
+    >
+      <TopBar />
+      <main>
         <Hero />
-        <Steps />
-        <SpecSample />
+        <GapStrip />
+        <Journey />
+        <Readers />
+        <BuildLoop />
         <GetStarted />
-        <Commands />
-        <Footer />
-      </Stack>
+      </main>
+      <Footer />
     </div>
   );
 }

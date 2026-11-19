@@ -1,16 +1,55 @@
-/** SectionHeading: shows the given text as a level 2 heading, optionally linkable by the given id. */
-export function SectionHeading(props: { text: string; id?: string }) {
+import { Stack } from "./stack";
+
+/** shows the eyebrow when given, the text as a level 2 heading, and the lead when given, in that order */
+export function SectionHeading({
+  text,
+  eyebrow,
+  lead,
+}: {
+  text: string;
+  eyebrow?: string;
+  lead?: string;
+}) {
   return (
-    <h2
-      id={props.id}
-      style={{
-        fontSize: "var(--font-heading)",
-        fontWeight: 700,
-        color: "var(--color-text)",
-        margin: 0,
-      }}
-    >
-      {props.text}
-    </h2>
+    <Stack dir="v" gap="space.3" align="start">
+      {eyebrow !== undefined ? (
+        <p
+          style={{
+            fontSize: "var(--font-tiny)",
+            fontWeight: 700,
+            letterSpacing: "0.12em",
+            color: "var(--color-accent)",
+            margin: 0,
+          }}
+        >
+          {eyebrow}
+        </p>
+      ) : null}
+      <h2
+        style={{
+          fontSize: "var(--font-heading)",
+          fontWeight: 800,
+          lineHeight: 1.15,
+          letterSpacing: "-0.01em",
+          color: "var(--color-text)",
+          margin: 0,
+        }}
+      >
+        {text}
+      </h2>
+      {lead !== undefined ? (
+        <p
+          style={{
+            fontSize: "var(--font-lead)",
+            lineHeight: 1.6,
+            color: "var(--color-text-muted)",
+            maxWidth: "var(--width-prose)",
+            margin: 0,
+          }}
+        >
+          {lead}
+        </p>
+      ) : null}
+    </Stack>
   );
 }

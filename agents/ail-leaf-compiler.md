@@ -15,7 +15,7 @@ from its own spec and its dependencies' contracts, nothing else.
    - Follow every `how` decision. Never use a `rejected` alternative.
    - `look`, `copy` and `binds` are spec: same layout, tokens, components,
      text and prop names.
-   - Mirror the golden examples' structure, naming and comment style.
+   - Follow every setting in the context's Target section.
    - Import only what the context lists, using exactly the specifiers it prints.
    - Choose only what `free` allows.
 3. If the context has a "Derived check needed" section, also write that test

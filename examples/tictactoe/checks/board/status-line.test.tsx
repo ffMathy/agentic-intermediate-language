@@ -1,21 +1,26 @@
-// ail-derived-from: StatusLine@8d34d5e32154cd22
+// ail-derived-from: StatusLine@6b4190ea7974b3c7
 import { afterEach, expect, test } from "bun:test";
 import { cleanup, render } from "@testing-library/react";
-import type { ReactElement } from "react";
 import { StatusLine } from "../../src/gen/board/status-line";
+import type { Mark, Status } from "../../src/gen/engine/game-state";
 
-afterEach(cleanup);
+afterEach(() => {
+  cleanup();
+});
 
-const text = (ui: ReactElement) => render(ui).container.querySelector('[aria-live="polite"]')!.textContent;
+function renderedText(status: Status, next: Mark): string {
+  const { container } = render(<StatusLine status={status} next={next} />);
+  return (container.textContent ?? "").replace(/\s+/g, " ").trim();
+}
 
 test("whose turn", () => {
-  expect(text(<StatusLine status={{ kind: "playing" }} next="O" />)).toBe("O's turn");
+  expect(renderedText({ kind: "playing" }, "O")).toBe("O's turn");
 });
 
 test("a win", () => {
-  expect(text(<StatusLine status={{ kind: "won", mark: "X", line: [0, 1, 2] }} next="X" />)).toBe("X wins!");
+  expect(renderedText({ kind: "won", mark: "X", line: [0, 1, 2] }, "O")).toBe("X wins!");
 });
 
 test("a draw", () => {
-  expect(text(<StatusLine status={{ kind: "draw" }} next="X" />)).toBe("It's a draw");
+  expect(renderedText({ kind: "draw" }, "O")).toBe("It's a draw");
 });

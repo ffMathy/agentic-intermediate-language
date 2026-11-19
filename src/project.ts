@@ -1,5 +1,5 @@
-// Loads an AIL project: config, sources, the profile it uses, and the
-// derived tree (children) and dependency graph (uses).
+// Loads an AIL project: config, sources, its `target`, and the derived tree
+// (children) and dependency graph (uses).
 import { existsSync, readFileSync, readdirSync, statSync } from "node:fs";
 import { dirname, join, posix, relative, resolve } from "node:path";
 import { parseFile, type AilNode, type ParsedFile, type Term } from "./parse.ts";
@@ -10,24 +10,17 @@ export interface Config {
   /** Lint warns when a node spans more lines than this (default 80): split it into children. */
   maxNodeLines?: number;
   sources?: string[];
-  profilePaths?: string[];
   checksDir?: string;
   lockFile?: string;
   models?: string[];
 }
 
-export interface Golden { name: string; kind: string; il: string; files: Record<string, string> }
-
-export interface Profile {
-  id: string;
-  dir: string;
+/** What the code is generated for: the project's own conventions, written in its spec. */
+export interface Target {
   settings: Record<string, string>;
   order: string[];
-  tokens: Record<string, string>;
-  components: string[];
-  jargon: string[];
-  goldens: Golden[];
-  skill: string;
+  file: string;
+  line: number;
 }
 
 export interface Project {
@@ -38,11 +31,9 @@ export interface Project {
   ordered: AilNode[];
   parent: Map<string, string>;
   roots: AilNode[];
-  profile: Profile | null;
+  target: Target | null;
   glossary: Term[];
   tokens: Record<string, string>;
-  components: string[];
-  jargon: string[];
   errors: { file: string; line: number; message: string }[];
 }
 
@@ -64,41 +55,6 @@ function walk(dir: string, out: string[] = []): string[] {
     else if (name.endsWith(".ail.md")) out.push(p);
   }
   return out;
-}
-
-export function loadProfile(id: string, searchPaths: string[]): Profile | null {
-  for (const base of searchPaths) {
-    const dir = join(base, id);
-    const file = join(dir, "profile.ail.md");
-    if (!existsSync(file)) continue;
-    const parsed = parseFile(file, readFileSync(file, "utf8"));
-    const p = parsed.profiles.find((x) => x.id === id);
-    if (!p) continue;
-    const tokens: Record<string, string> = {};
-    const components: string[] = [];
-    for (const c of parsed.catalogs) { Object.assign(tokens, c.tokens); components.push(...c.components); }
-    const goldens: Golden[] = [];
-    const gdir = join(dir, "golden");
-    if (existsSync(gdir)) {
-      for (const name of readdirSync(gdir).sort()) {
-        const d = join(gdir, name);
-        if (!statSync(d).isDirectory()) continue;
-        const ilFile = join(d, "node.ail.md");
-        if (!existsSync(ilFile)) continue;
-        const il = readFileSync(ilFile, "utf8");
-        const kind = parseFile(ilFile, il).nodes[0]?.kind ?? "node";
-        const files: Record<string, string> = {};
-        for (const f of readdirSync(d).sort()) if (f !== "node.ail.md") files[f] = readFileSync(join(d, f), "utf8");
-        goldens.push({ name, kind, il, files });
-      }
-    }
-    const skillFile = join(dir, "SKILL.md");
-    return {
-      id, dir, settings: p.settings, order: p.order, tokens, components, jargon: parsed.jargon, goldens,
-      skill: existsSync(skillFile) ? readFileSync(skillFile, "utf8") : "",
-    };
-  }
-  return null;
 }
 
 export function loadProject(rootArg?: string): Project {
@@ -131,20 +87,20 @@ export function loadProject(rootArg?: string): Project {
   roots.forEach(visit);
   for (const n of nodes.values()) visit(n);
 
-  const profilePaths = [...(config.profilePaths ?? []).map((p) => resolve(root, p)), join(root, "profiles"), join(AIL_HOME, "profiles")];
-  const use = files.flatMap((f) => f.uses)[0];
-  const profile = use ? loadProfile(use.profile, profilePaths) : null;
-  if (use && !profile) errors.push({ file: files.find((f) => f.uses.length)!.file, line: use.line, message: `profile "${use.profile}" not found in ${profilePaths.join(", ")}` });
+  const targets = files.flatMap((f) => f.targets.map((t) => ({ ...t, file: f.file })));
+  for (const t of targets.slice(1)) errors.push({ file: t.file, line: t.line, message: `a project has one \`target\`; another is defined at ${targets[0]!.file}:${targets[0]!.line}` });
+  const target = targets[0] ?? null;
 
-  const tokens = { ...(profile?.tokens ?? {}) };
-  const components = [...(profile?.components ?? [])];
-  for (const f of files) for (const c of f.catalogs) { Object.assign(tokens, c.tokens); components.push(...c.components); }
+  // A system node depends on its entry, so it may import it.
+  for (const n of nodes.values()) if (n.entry && nodes.has(n.entry) && !n.uses.includes(n.entry)) n.uses.push(n.entry);
+
+  const tokens: Record<string, string> = {};
+  for (const f of files) for (const c of f.catalogs) Object.assign(tokens, c.tokens);
 
   return {
-    root, config, files, nodes, ordered, parent, roots, profile,
+    root, config, files, nodes, ordered, parent, roots, target,
     glossary: files.flatMap((f) => f.glossary),
-    tokens, components,
-    jargon: [...(profile?.jargon ?? []), ...files.flatMap((f) => f.jargon)],
+    tokens,
     errors,
   };
 }
@@ -152,16 +108,16 @@ export function loadProject(rootArg?: string): Project {
 export const kebab = (name: string) =>
   name.replace(/([a-z0-9])([A-Z])/g, "$1-$2").replace(/([A-Z])([A-Z][a-z])/g, "$1-$2").toLowerCase();
 
-/** The module path a node compiles to, per the profile's `path.<kind>`. */
+/** The module path a node compiles to, per the target's `path.<kind>`. */
 export function modulePath(p: Project, n: AilNode): string | null {
-  const tpl = p.profile?.settings[`path.${n.kind}`];
+  const tpl = p.target?.settings[`path.${n.kind}`];
   if (!tpl) return null;
   return posix.normalize(tpl.replace("{dir}", n.dir).replace("{kebab}", kebab(n.name)).replace("{name}", n.name));
 }
 
-/** Nodes the LLM compiles: those with a module path that aren't glue kinds. */
+/** Nodes a model compiles: every node whose kind has a path in the target. */
 export function isCompilable(p: Project, n: AilNode): boolean {
-  return modulePath(p, n) !== null && n.kind !== "system";
+  return modulePath(p, n) !== null;
 }
 
 export function ancestors(p: Project, name: string): AilNode[] {

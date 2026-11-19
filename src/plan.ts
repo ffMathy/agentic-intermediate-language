@@ -19,7 +19,7 @@ export function plan(p: Project): PlanEntry[] {
     if (entry && !entry.files[path]) return { node: n.name, status: "stale" as const, hash, path, reason: `moved from ${Object.keys(entry.files).join(", ")}` };
     if (!entry || actual === null) return { node: n.name, status: "missing" as const, hash, path, reason: entry ? "file deleted" : "never compiled" };
     if (entry.files[path] !== actual) return { node: n.name, status: "drifted" as const, hash, path, reason: "generated file was edited by hand" };
-    if (entry.hash !== hash) return { node: n.name, status: "stale" as const, hash, path, reason: "spec, contract of a dependency, or profile changed" };
+    if (entry.hash !== hash) return { node: n.name, status: "stale" as const, hash, path, reason: "its spec, a dependency's contract, or the target changed" };
     return { node: n.name, status: "fresh" as const, hash, path, reason: "" };
   })];
 }

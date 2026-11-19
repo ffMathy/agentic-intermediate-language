@@ -5,6 +5,9 @@ import { ancestors, dependencies, descendants, isCompilable, modulePath, type Pr
 export type Severity = "error" | "warning";
 export interface Diagnostic { severity: Severity; code: string; message: string; node?: string; file: string; line: number }
 
+/** Dotted names that are file names or products, not component variants (e.g. Node.js). */
+const FILE_SUFFIX = /^(js|jsx|ts|tsx|css|html|md|json|io|com|org|dev|app)$/;
+
 const kebabName = (name: string) => name.replace(/([a-z0-9])([A-Z])/g, "$1-$2").replace(/([A-Z])([A-Z][a-z])/g, "$1-$2").toLowerCase();
 const levelIdx = (l: Level | null) => (l ? LEVELS.indexOf(l) : 2);
 
@@ -31,11 +34,9 @@ export function lint(p: Project): Diagnostic[] {
 
   for (const e of p.errors) d.push({ severity: "error", code: "parse", message: e.message, file: e.file, line: e.line });
 
-  if (!p.profile && p.nodes.size) push("warning", "no-profile", null, "no `use profile <id>` statement; nothing can be compiled", 1, p.files[0]?.file);
+  if (!p.target && p.nodes.size) push("error", "no-target", null, "no `target` block: nothing says what to generate, so nothing can be built", 1, p.files[0]?.file);
 
-  const glossaryWords = new Set(p.glossary.map((t) => t.term.toLowerCase()));
   const tokenFamilies = new Set(Object.keys(p.tokens).map((t) => t.split(".")[0]!));
-  const componentFamilies = new Set(p.components.map((c) => c.split(".")[0]!));
   const multiParent = new Map<string, string[]>();
   for (const n of p.nodes.values()) for (const c of n.children) multiParent.set(c, [...(multiParent.get(c) ?? []), n.name]);
 
@@ -97,11 +98,6 @@ export function lint(p: Project): Diagnostic[] {
         const lines = s.inline ? [s.inline, ...s.body] : s.body;
         lines.forEach((raw, i) => {
           const line = plainText(raw);
-          for (const j of p.jargon) {
-            if (glossaryWords.has(j)) continue;
-            if (new RegExp(`\\b${j.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")}\\b`, "i").test(line))
-              push("error", "jargon", n, `"${j}" is jargon at the ${n.level} level; use a glossary term or move it to a deeper node`, s.line + i);
-          }
           for (const [re, what] of CODE_PATTERNS) {
             const m = re.exec(line);
             if (m) { push("error", "code-in-plain-level", n, `${what} "${m[0]}" in ${s.key} at the ${n.level} level; keep notation in look/binds or a deeper node`, s.line + i); break; }
@@ -110,16 +106,37 @@ export function lint(p: Project): Diagnostic[] {
       }
     }
 
-    // --- catalog references -----------------------------------------------
-    for (const s of n.sections.filter((x) => x.key === "look")) {
-      const text = [s.inline, ...s.body].join(" ").replace(/"[^"]*"/g, " ");
-      for (const m of text.matchAll(/\b([a-z][a-z0-9]*(?:\.[a-z0-9]+)+)\b/g)) {
+    // --- tokens and components ---------------------------------------------
+    // A design token must be in the catalog. A component is just a node: a
+    // look that shows `Button.primary` or `Stack` must use that node.
+    const owners = new Set(anc.map((a) => a.name));
+    const byLowerName = new Map([...p.nodes.keys()].map((k) => [k.toLowerCase(), k]));
+    for (const s of n.sections.filter((x) => x.key === "look" || x.key === "binds")) {
+      // Quoted text (straight, curly or single quotes) is copy, not a reference.
+      const text = [s.inline, ...s.body].join(" ").replace(/"[^"]*"|“[^”]*”|‘[^’]*’|'[^']*'/g, " ");
+      if (s.key === "look") for (const m of text.matchAll(/\b([a-z][a-z0-9]*(?:\.[a-z0-9]+)+)\b/g)) {
         const t = m[1]!;
         if (tokenFamilies.has(t.split(".")[0]!) && !(t in p.tokens)) push("error", "unknown-token", n, `design token "${t}" is not in the catalog`, s.line);
       }
-      for (const m of text.matchAll(/\b([A-Z][A-Za-z]*(?:\.[a-z0-9]+)+)\b/g)) {
-        const c = m[1]!;
-        if (componentFamilies.has(c.split(".")[0]!) && !p.components.includes(c)) push("error", "unknown-component", n, `component "${c}" is not in the catalog`, s.line);
+      const named = new Set<string>();
+      for (const m of text.matchAll(/\b([A-Z][A-Za-z0-9]*)((?:\.[a-z0-9]+)*)\b/g)) {
+        const [whole, name, variants] = [m[0], m[1]!, m[2]!.split(".").filter(Boolean)];
+        const target = p.nodes.get(name);
+        if (target) {
+          named.add(name);
+          // `Button.primary` must name a variant the Button node itself mentions.
+          const own = [...target.sections.filter((x) => ["look", "binds", "what"].includes(x.key)).flatMap((x) => [x.inline, ...x.body])].join(" ");
+          for (const v of variants) if (s.key === "look" && !new RegExp(`\\b${v}\\b`).test(own))
+            push("error", "unknown-variant", n, `"${whole}": ${name} mentions no "${v}" variant in its look, binds or what`, s.line);
+        } else if (variants.length && s.key === "look" && !FILE_SUFFIX.test(variants.at(-1)!))
+          push("error", "unknown-component", n, `"${whole}" names no node; components are nodes (e.g. a view in a \`library\`)`, s.line);
+      }
+      // Layout notation such as `stack(…)` names a node in lower case.
+      for (const m of text.matchAll(/\b([a-z][a-zA-Z0-9]*)\(/g)) { const k = byLowerName.get(m[1]!.toLowerCase()); if (k) named.add(k); }
+      for (const name of named) {
+        // A node may mention its owners or its users without depending on them.
+        if (name === n.name || owners.has(name) || dependencies(p, name).has(n.name)) continue;
+        if (!n.uses.includes(name)) push("error", "missing-uses", n, `${s.key} refers to ${name}, but ${n.name} does not list it under \`uses\``, s.line);
       }
     }
 
@@ -127,10 +144,12 @@ export function lint(p: Project): Diagnostic[] {
     for (const e of n.examples) if (!e.expected) push("error", "example-syntax", n, `example "${e.expr}" needs "=> expected"`, e.line);
     for (const dec of n.decisions) if (!dec.because) push("warning", "decision-without-because", n, `decision "${dec.what}" has no \`because\``, dec.line);
 
-    if (p.profile && n.children.length === 0 && n.kind !== "system" && !modulePath(p, n))
-      push("warning", "no-path", n, `leaf ${n.name} (kind ${n.kind}) has no path.${n.kind} in profile ${p.profile.id}; it will not be compiled`);
-    if (p.profile && isCompilable(p, n) && n.examples.length === 0 && n.scenarios.length === 0 && !n.sections.some((s) => s.key === "verify") && n.kind !== "data")
+    if (p.target && n.children.length === 0 && n.kind !== "library" && !modulePath(p, n))
+      push("warning", "no-path", n, `leaf ${n.name} (kind ${n.kind}) has no path.${n.kind} in the target; it will not be built`);
+    if (p.target && isCompilable(p, n) && n.examples.length === 0 && n.scenarios.length === 0 && !n.sections.some((s) => s.key === "verify") && n.kind !== "data" && n.kind !== "system")
       push("warning", "unverifiable", n, `${n.name} has no examples, scenarios or verify section; nothing proves the generated code right`);
+    if (p.target && n.kind === "system" && n.entry && !modulePath(p, n))
+      push("warning", "no-entry-path", n, `${n.name} has an entry but the target has no path.system, so no entry module will be built`);
     if (n.kind === "system" && n.entry && !p.nodes.has(n.entry)) push("error", "unknown-node", n, `entry "${n.entry}" is not defined`);
   }
 

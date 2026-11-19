@@ -17,7 +17,7 @@ test("ail check passes on the kata", async () => {
   console.log = (s: string) => { out += s; };
   try { expect(await main(["check", "--root", KATA])).toBe(0); } finally { console.log = log; }
   expect(out).toContain("✓ spec");
-  expect(out).toContain("✓ build    11 node(s) up to date");
+  expect(out).toContain("✓ build    16 node(s) up to date");
   expect(out).toMatch(/✓ behavior \d+ test\(s\) passed, typecheck ok/);
 }, 60_000);
 

@@ -29,6 +29,6 @@ node App : flow   level: experience
     state   useState("play")
     mode    value = area, onChange(a) = set area
     area    PlayAGame when "play", WatchADemo when "watch"
-  uses      PlayAGame, WatchADemo
+  uses      PlayAGame, WatchADemo, Stack, Segmented
   children  PlayAGame, WatchADemo
 ```

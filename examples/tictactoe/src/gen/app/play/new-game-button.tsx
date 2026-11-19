@@ -1,9 +1,13 @@
-import { Button } from "../../catalog";
+import { Button } from "../../ui/button";
 
-/** NewGameButton: pressing "New game" asks for a new game, once. */
-export function NewGameButton(props: { onPress: () => void }) {
+export type NewGameButtonProps = {
+  onPress: () => void;
+};
+
+/** When the player presses "New game" Then a new game is asked for, once */
+export function NewGameButton({ onPress }: NewGameButtonProps) {
   return (
-    <Button variant="secondary" width="auto" onPress={props.onPress}>
+    <Button variant="secondary" onPress={onPress}>
       New game
     </Button>
   );

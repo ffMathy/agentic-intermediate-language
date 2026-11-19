@@ -13,8 +13,8 @@ any vendor, produces software that behaves the same.
 Models are not deterministic, and no prompt will make them so. AIL's answer:
 
 1. **Leave the model nothing important to decide.** Every degree of freedom is
-   fixed by the spec, the profile, the catalog or a golden example, or it is
-   explicitly listed as `free`.
+   fixed by the spec (including its `target` conventions and design tokens), or
+   it is explicitly listed as `free`.
 2. **Never trust, always verify.** Generated code is accepted only if it passes
    every check the spec implies. The IL is the oracle; the model is a search
    procedure.
@@ -66,7 +66,7 @@ engine/engine.ail.md                             Engine (library): GameState, Ru
 engine/computer-player/computer-player.ail.md    grew big, so it got its own folder
 ```
 
-- **Generated code mirrors the folders.** Profile paths use `{dir}` (e.g.
+- **Generated code mirrors the folders.** The target's paths use `{dir}` (e.g.
   `src/gen/{dir}/{kebab}.tsx`). Imports between folders are computed for each
   context, so a model never guesses a relative path.
 - **Splitting.** When a node outgrows its size budget (`maxNodeLines`, default
@@ -100,9 +100,8 @@ depths:
 - Plain claims are **proven by children**. *"The computer never loses"* is a
   product sentence; the specialist node `ComputerPlayer` makes it true, and a
   derived check enumerates every game to prove it.
-- Lint (part of `ail check`) enforces the vocabulary. Jargon from the profile's list, or code
-  notation (calls, operators, camelCase, braces), in `product`/`experience`
-  prose is an error. Notation belongs in `look`, `copy` or `binds`, or one
+- Lint (part of `ail check`) enforces the vocabulary. Code notation (calls,
+  operators, camelCase, braces) in `product`/`experience` prose is an error. Notation belongs in `look`, `copy` or `binds`, or one
   level deeper.
 - A **glossary** gives each domain word a plain meaning and a formal one, so
   upper levels stay readable without becoming ambiguous.
@@ -113,11 +112,10 @@ depths:
 
 | Lever | Mechanism |
 |---|---|
-| Profiles | Every default (language, framework, file layout, naming, styling, exports, comments) is fixed once at the root and inherited. |
-| Closed vocabularies | Design tokens, catalog components, `copy` keys. "A bit of padding" becomes `space.4`. |
+| The `target` | Every convention a model would otherwise pick itself (language, framework, file layout, naming, styling, exports, comments) is written once in the project's root spec, and reviewed like the rest of it. |
+| Closed vocabularies | Design tokens, component nodes, `copy` keys. "A bit of padding" becomes `space.4`. |
 | Executable `what` | `expr => expected` examples are translated mechanically into tests. Scenarios and `verify` items become derived checks, generated once, reviewed, and pinned to a hash of the spec. |
 | Explicit freedom | Anything not in `free` must follow from the spec. Otherwise the compiler replies `STOP: <question>` instead of guessing. |
-| Golden examples | A few node → code pairs per kind anchor structure and style more strongly than written rules can. |
 | Encapsulated context | Each leaf is compiled from a small, fixed slice of the spec. A smaller context means less variance. |
 | Content hashing | Canonical forms ignore comments, whitespace and section order. Cosmetic edits never recompile anything; changing a dependency's `how` doesn't recompile its dependants. |
 | Divergence sampling | `ail check --samples N` compares N samples × M models on verification, export surface and `probes`. |
@@ -130,7 +128,7 @@ The surface is deliberately small:
 | Piece | Job |
 |---|---|
 | `ail check` | Is the spec sound (lint), is everything built from it (plan), and does it pass (verify)? `--samples N` adds divergence sampling. |
-| `ail build` | Regenerate glue, prune what was removed, derive tests from scenarios, then compile every node that changed. |
+| `ail build` | Write the token CSS, prune what was removed, derive tests from scenarios, then compile every node that changed (independent nodes in parallel). |
 | `ail show` | The tree, a node, a view for one audience, or the changes (a semantic diff against a git ref). |
 | MCP server | four tools: `ail_show`, `ail_check`, `ail_context`, `ail_submit` |
 | Plugin | the `ail` skill, the `/ail:build` and `/ail:show` commands, the `ail-leaf-compiler` subagent, and hooks that block edits to generated files and lint every `.ail.md` edit |
@@ -165,8 +163,25 @@ for node in dependency order:
   submit: write → verify → lock, or roll back and retry with the failures
 ```
 
-Glue that needs no judgement (design-token CSS, the entry point, catalog
-components) is rendered from templates without any model call.
+The only output that needs no model is the design-token CSS, written straight
+from the catalog. Everything else, the entry point and the components
+included, is a node compiled like any other.
+
+### Why there are no profiles
+
+An earlier version had *profiles*: named, shareable packages of conventions,
+components, templates and golden examples, looked up by id. Every project used
+the same one, so it was a reuse mechanism with a single user. Now:
+
+- the conventions are a `target` block in the project's own spec
+- the components are ordinary nodes in a `library`
+- the design tokens are the project's own `catalog`
+- `index.html` is a normal hand-written file
+- the golden examples are gone; `ail check --samples` shows whether that costs
+  determinism
+
+Sharing conventions across projects means copying a `target` block, which is
+fine until a second team actually needs more.
 
 ## 6. Evidence so far
 
@@ -204,7 +219,7 @@ All of this is in this repository and can be re-run:
   node to own a set of files.
 - **Namespaces.** Node names are unique across the whole project. Large
   projects may want folder-qualified names (`board.BoardView`).
-- **More profiles.** A backend profile (HTTP + database) would test whether the
+- **A backend target.** An HTTP + database project would test whether the
   approach holds outside the UI.
 - **Self-hosting.** Specifying the `ail` toolchain in AIL would be a real test
   of the format.

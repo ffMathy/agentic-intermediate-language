@@ -45,7 +45,7 @@ node BoardView : view   level: experience
     props    board: Board, status: Status, locked: boolean, onPlace(index: number)
     square   a native button, disabled when it can't be picked
   free  [ internal component split ]
-  uses  GameState
+  uses  GameState, Text
 ```
 
 ```ail
@@ -73,5 +73,5 @@ node StatusLine : view   level: experience
     status.draw  "It's a draw"
   binds
     props    status: Status, next: Mark
-  uses  GameState
+  uses  GameState, Text
 ```

@@ -35,7 +35,7 @@ export const TOOLS: Tool[] = [
   },
   {
     name: "ail_context",
-    description: "The encapsulated compile context for one node: profile, catalog, glossary, why chain, the node, its dependencies' contracts, golden examples, and (when needed) instructions for its derived check. Implement the node from this context only, then call ail_submit.",
+    description: "The encapsulated compile context for one node: the target, design tokens, glossary, why chain, the node, its dependencies' contracts, and (when needed) instructions for its derived check. Implement the node from this context only, then call ail_submit.",
     inputSchema: obj({ node: str }, ["node"]),
     run: (p, a) => ({ text: buildContext(p, needNode(p, a.node)) }),
   },

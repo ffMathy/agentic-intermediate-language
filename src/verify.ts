@@ -36,8 +36,7 @@ function allowedImports(p: Project, n: AilNode): { relative: Set<string>; packag
   const strip = (s: string) => normalize(s).replace(/\.(tsx?|css)$/, "");
   const rel = new Set<string>();
   for (const u of n.uses) { const d = p.nodes.get(u); const mp = d && modulePath(p, d); if (mp) rel.add(strip(mp)); }
-  const s = p.profile?.settings ?? {};
-  if (s["catalog-module"]) rel.add(strip(s["catalog-module"]));
+  const s = p.target?.settings ?? {};
   if (s["tokens-css"]) rel.add(strip(s["tokens-css"]));
   return { relative: rel, packages: (s["libs"] ?? "").split(/[\s,]+/).filter(Boolean) };
 }
@@ -54,7 +53,7 @@ export function checkImports(p: Project, n: AilNode, source: string): Check {
     } else if (!allowed.packages.some((pkg) => spec === pkg || spec.startsWith(pkg + "/"))) bad.push(spec);
   }
   return bad.length
-    ? fail("imports", `imports outside its \`uses\`/profile libs: ${bad.join(", ")} — add the dependency to \`uses\` in the IL, or remove the import`)
+    ? fail("imports", `imports outside its \`uses\` and the target's libs: ${bad.join(", ")} — add the dependency to \`uses\` in the IL, or remove the import`)
     : pass("imports");
 }
 

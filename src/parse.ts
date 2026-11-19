@@ -2,8 +2,8 @@
 //
 // Only fenced code blocks tagged `ail` carry meaning; everything else in the
 // Markdown file is commentary for humans. Inside a block, every line at
-// column 0 starts a statement (`node`, `profile`, `catalog`, `glossary`,
-// `jargon`, `use`), and indented lines form its body. A body is a list of
+// column 0 starts a statement (`node`, `target`, `catalog`, `glossary`), and
+// indented lines form its body. A body is a list of
 // sections: a keyword at the body's base indent followed by more-indented
 // continuation lines.
 
@@ -61,11 +61,9 @@ export interface Term { term: string; plain: string; formal: string; line: numbe
 export interface ParsedFile {
   file: string;
   nodes: AilNode[];
-  uses: { profile: string; line: number }[];
-  profiles: { id: string; settings: Record<string, string>; order: string[]; line: number }[];
-  catalogs: { tokens: Record<string, string>; components: string[]; line: number }[];
+  targets: { settings: Record<string, string>; order: string[]; line: number }[];
+  catalogs: { tokens: Record<string, string>; line: number }[];
   glossary: Term[];
-  jargon: string[];
   errors: { file: string; line: number; message: string }[];
 }
 
@@ -232,7 +230,7 @@ function parseNode(header: string, sections: Section[], file: string, line: numb
 }
 
 export function parseFile(file: string, markdown: string): ParsedFile {
-  const out: ParsedFile = { file, nodes: [], uses: [], profiles: [], catalogs: [], glossary: [], jargon: [], errors: [] };
+  const out: ParsedFile = { file, nodes: [], targets: [], catalogs: [], glossary: [], errors: [] };
   for (const block of extractBlocks(markdown)) {
     // split into statements at column 0
     const stmts: { header: string; line: number; body: { text: string; raw: string; line: number }[]; raw: string[] }[] = [];
@@ -248,27 +246,21 @@ export function parseFile(file: string, markdown: string): ParsedFile {
       const word = st.header.split(/\s+/)[0];
       try {
         if (word === "node") out.nodes.push(parseNode(st.header, parseSections(st.body), file, st.line, trimTrailingBlank(st.raw)));
-        else if (word === "use") {
-          const m = /^use\s+profile\s+(\S+)$/.exec(st.header);
-          if (!m) throw new Error(`expected "use profile <id>", got "${st.header}"`);
-          out.uses.push({ profile: m[1]!, line: st.line });
-        } else if (word === "profile") {
-          const id = st.header.split(/\s+/)[1];
-          if (!id) throw new Error("profile needs an id");
+        else if (word === "target") {
+          if (st.header !== "target") throw new Error(`"target" takes no arguments; put settings on the indented lines below it`);
           const settings: Record<string, string> = {};
           const order: string[] = [];
           for (const s of parseSections(st.body)) { settings[s.key] = sectionText(s); order.push(s.key); }
-          out.profiles.push({ id, settings, order, line: st.line });
+          out.targets.push({ settings, order, line: st.line });
         } else if (word === "catalog") {
           const tokens: Record<string, string> = {};
-          const components: string[] = [];
           for (const s of parseSections(st.body)) {
             const words = sectionText(s).split(/\s+/).filter(Boolean);
             if (s.key === "tokens") for (const w of words) { const [k, v] = w.split("="); tokens[k!] = v ?? ""; }
-            else if (s.key === "components") components.push(...words);
+            else if (s.key === "components") throw new Error("catalog components are ordinary nodes now: specify them as views (e.g. in a `library` node) and list them under `uses`");
             else throw new Error(`unknown catalog section "${s.key}"`);
           }
-          out.catalogs.push({ tokens, components, line: st.line });
+          out.catalogs.push({ tokens, line: st.line });
         } else if (word === "glossary") {
           for (const b of st.body) {
             const t = b.text.trim();
@@ -277,9 +269,6 @@ export function parseFile(file: string, markdown: string): ParsedFile {
             if (!m) { out.errors.push({ file, line: b.line, message: `malformed glossary term: "${t}"` }); continue; }
             out.glossary.push({ term: m[1] ?? m[2]!, plain: m[3]!, formal: m[4]!.trim(), line: b.line });
           }
-        } else if (word === "jargon") {
-          const text = [st.header.slice(6), ...st.body.map((b) => b.text)].join(" ");
-          for (const m of text.matchAll(/"([^"]+)"|([^\s,"]+)/g)) out.jargon.push((m[1] ?? m[2]!).toLowerCase());
         } else {
           throw new Error(`unknown statement "${word}"`);
         }

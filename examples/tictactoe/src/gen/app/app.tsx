@@ -1,26 +1,35 @@
 import { useState } from "react";
-import { Segmented, Stack } from "../catalog";
-import { WatchADemo } from "./demo/watch-a-demo";
 import { PlayAGame } from "./play/play-a-game";
+import { WatchADemo } from "./demo/watch-a-demo";
+import { Stack } from "../ui/stack";
+import { Segmented } from "../ui/segmented";
 
-/** App: two areas, "Play" and "Watch", picked with one control named "Mode"; each starts fresh when picked. */
+/** two areas, "Play" and "Watch", picked with one control named "Mode"; "Play" is shown first */
 export function App() {
-  const [area, setArea] = useState<"play" | "watch">("play");
+  const [area, setArea] = useState("play");
   return (
-    <div style={{ width: "100%", maxWidth: "360px", margin: "0 auto", background: "var(--color-surface)" }}>
-      <Stack dir="v" gap="space.4" align="stretch" pad="space.6">
-        <Segmented
-          label="Mode"
-          width="fill"
-          options={[
-            { value: "play", label: "Play" },
-            { value: "watch", label: "Watch" },
-          ]}
-          value={area}
-          onChange={setArea}
-        />
-        {area === "play" ? <PlayAGame /> : <WatchADemo />}
-      </Stack>
-    </div>
+    <Stack
+      dir="v"
+      gap="space.4"
+      align="stretch"
+      pad="space.6"
+      style={{
+        maxWidth: "360px",
+        marginLeft: "auto",
+        marginRight: "auto",
+        background: "var(--color-surface)",
+      }}
+    >
+      <Segmented
+        label="Mode"
+        options={[
+          { value: "play", label: "Play" },
+          { value: "watch", label: "Watch" },
+        ]}
+        value={area}
+        onChange={(a) => setArea(a)}
+      />
+      {area === "play" ? <PlayAGame /> : <WatchADemo />}
+    </Stack>
   );
 }

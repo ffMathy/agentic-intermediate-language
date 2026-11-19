@@ -54,7 +54,7 @@ node PlayAGame : flow   level: experience
     StatusLine      status = game.status, next = game.next
     BoardView       board = game.board, status = game.status, locked = computer is thinking, onPlace(i) = dispatch place(i)
     NewGameButton   onPress() = dispatch newGame
-  uses      ChooseOpponent, StatusLine, BoardView, NewGameButton, GameState, GameReducer, ComputerPlayer
+  uses      ChooseOpponent, StatusLine, BoardView, NewGameButton, GameState, GameReducer, ComputerPlayer, Stack
   children  NewGameButton, ChooseOpponent
 ```
 
@@ -71,6 +71,7 @@ node NewGameButton : view   level: experience
     newgame.label  "New game"
   binds
     props    onPress()
+  uses  Button
 ```
 
 ```ail
@@ -91,5 +92,5 @@ node ChooseOpponent : view   level: experience
     opponent.computer  "Computer"
   binds
     props   opponent: Opponent, onChange(opponent: Opponent)
-  uses  GameState
+  uses  GameState, Segmented
 ```

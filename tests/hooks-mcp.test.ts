@@ -6,7 +6,8 @@ import { KATA } from "./helpers.ts";
 
 test("pre hook blocks edits to generated files only", () => {
   expect(preHook({ tool_input: { file_path: "src/gen/rules.ts" } }, KATA).code).toBe(2);
-  expect(preHook({ tool_input: { file_path: "index.html" } }, KATA).code).toBe(2);
+  expect(preHook({ tool_input: { file_path: "src/gen/main.tsx" } }, KATA).code).toBe(2);
+  expect(preHook({ tool_input: { file_path: "index.html" } }, KATA).code).toBe(0);
   expect(preHook({ tool_input: { file_path: "tictactoe.ail.md" } }, KATA).code).toBe(0);
   expect(preHook({ tool_input: { file_path: "checks/rules.test.ts" } }, KATA).code).toBe(0);
 });

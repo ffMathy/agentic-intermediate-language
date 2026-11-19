@@ -52,7 +52,7 @@ Then, anywhere inside a project (any folder with an `ail.config.json`):
 | `ail show [what]` | Same as `/ail:show` |
 
 That's the whole tool. Change detection, deriving tests from scenarios,
-regenerating glue and cleaning up after moved or deleted nodes all happen
+writing the token CSS and cleaning up after moved or deleted nodes all happen
 inside `ail build` and `ail check`.
 
 ## Try the demo locally
@@ -112,7 +112,6 @@ The full design is in [docs/proposal.md](docs/proposal.md).
 ```
 src/                 the ail CLI and MCP server (Bun, TypeScript)
 prompts/             instructions given to the compiling model
-profiles/            target profiles: settings, catalog, glue templates, golden examples
 skills/ commands/ agents/ hooks/ .claude-plugin/    the Claude Code plugin
 examples/tictactoe/  the demo: spec, generated code, derived checks, lock file
 site/                the website, written in AIL

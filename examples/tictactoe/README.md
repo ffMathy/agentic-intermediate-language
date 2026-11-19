@@ -9,7 +9,8 @@ under `src/gen/` (same folders) and `index.html` is generated.
 |---|---|---|
 | `**/*.ail.md` | the spec, from product claims down to a minimax proof | people |
 | `src/gen/**/*.ts(x)` | one module per compilable node, in the same folders as its spec | a model, via `ail build` or `/ail:build` |
-| `src/gen/tokens.css`, `src/gen/catalog/`, `src/gen/main.tsx`, `index.html` | deterministic glue | `ail build`, from the profile; no model involved |
+| `src/gen/tokens.css` | the design tokens as CSS variables | `ail build`, straight from the catalog; no model involved |
+| `index.html` | the page that loads the app | people |
 | `checks/**/*.test.ts(x)` | derived checks for scenarios and `verify` items, pinned to a spec hash | generated once, then reviewed |
 | `ail.lock.json` | which compile hash produced which file | `ail` |
 

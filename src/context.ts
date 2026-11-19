@@ -1,9 +1,9 @@
 // `ail context <Node>`: the encapsulated slice of the spec one compile step sees.
 //
-// Included: profile, catalog, glossary, the `why` chain of ancestors, the node
-// itself, the `what` (contract) of every node it `uses`, and the profile's
-// golden examples for the node's kind. Excluded: everything else, in
-// particular any sibling's `how`. Encapsulation is enforced by construction.
+// Included: the target, the design tokens, the glossary, the `why` chain of
+// ancestors, the node itself, and the contract (`what` + `binds`) of every
+// node it `uses`. Excluded: everything else, in particular any other node's
+// `how` or code. Encapsulation is enforced by construction.
 import { dirname, relative } from "node:path";
 import type { AilNode } from "./parse.ts";
 import { ancestors, modulePath, type Project } from "./project.ts";
@@ -30,16 +30,18 @@ export function buildContext(p: Project, n: AilNode): string {
   const path = modulePath(p, n);
   out.push(`# AIL compile context: ${n.name}`);
   out.push(`kind: ${n.kind} · level: ${n.level ?? "?"}${n.tags.length ? " · tags: " + n.tags.map((t) => "@" + t).join(" ") : ""}`);
-  out.push(`output file: ${path ?? "(none — this node has no path in the profile)"}`);
+  out.push(`output file: ${path ?? "(none — this node's kind has no path in the target)"}`);
 
-  if (p.profile) {
-    const pr = p.profile;
-    out.push(`\n## Profile ${pr.id} (normative defaults)`);
-    out.push(pr.order.map((k) => `- ${k}: ${pr.settings[k]}`).join("\n"));
-    out.push(`\n## Catalog`);
-    out.push(`tokens: ${Object.entries(p.tokens).map(([k, v]) => (v ? `${k}=${v}` : k)).join("  ")}`);
-    out.push(`components: ${p.components.join("  ")}`);
-    if (pr.skill) out.push(`\n## Profile idioms\n${pr.skill.replace(/^---[\s\S]*?---\s*/, "").trim()}`);
+  if (p.target) {
+    const t = p.target;
+    out.push(`\n## Target (the project's conventions — normative)`);
+    out.push(t.order.map((k) => `- ${k}: ${t.settings[k]}`).join("\n"));
+  }
+  if (Object.keys(p.tokens).length) {
+    out.push(`\n## Design tokens`);
+    out.push(Object.entries(p.tokens).map(([k, v]) => (v ? `${k}=${v}` : k)).join("  "));
+    const css = p.target?.settings["tokens-css"];
+    if (css) out.push(`They are CSS variables defined in ${css}: token a.b.c → var(--a-b-c).`);
   }
   if (p.glossary.length) {
     out.push(`\n## Glossary`);
@@ -61,18 +63,10 @@ export function buildContext(p: Project, n: AilNode): string {
     out.push(`They are compiled before you, at exactly the import specifiers shown. Use their names and props as written; never re-create them.`);
     for (const d of deps) {
       const dp = modulePath(p, d);
-      out.push(`\n### ${d.name}${dp && path ? ` — import from "${importSpecifier(path, dp)}"` : ""}`);
+      out.push(`\n### ${d.name}${dp && path ? ` — built at ${dp}, so import from "${importSpecifier(path, dp)}"` : ""}`);
       out.push(fence(whatOnly(d)));
     }
   }
-  const tokensCss = p.profile?.settings["tokens-css"];
-  const catalogDir = p.profile?.settings["catalog-module"];
-  if (path && (tokensCss || catalogDir)) {
-    out.push(`\n## Shared modules`);
-    if (catalogDir) out.push(`- catalog components: import { ... } from "${importSpecifier(path, catalogDir)}"`);
-    if (tokensCss) out.push(`- design tokens are CSS variables defined in ${tokensCss}: token a.b.c → var(--a-b-c)`);
-  }
-
   if (needsDerivedCheck(n)) {
     const { file, pinned } = derivedCheckFile(p, n);
     if (!file || pinned !== oracleHash(p, n).slice(0, 16)) {
@@ -82,15 +76,6 @@ export function buildContext(p: Project, n: AilNode): string {
     }
   }
 
-  const goldens = (p.profile?.goldens ?? []).filter((g) => g.kind === n.kind);
-  if (goldens.length) {
-    out.push(`\n## Golden examples for kind "${n.kind}" (match their structure and style exactly)`);
-    for (const g of goldens) {
-      out.push(`\n### ${g.name}`);
-      out.push(g.il.trim());
-      for (const [f, body] of Object.entries(g.files)) out.push(`\n${f}:\n` + fence(body, f.split(".").pop()));
-    }
-  }
   return out.join("\n") + "\n";
 }
 

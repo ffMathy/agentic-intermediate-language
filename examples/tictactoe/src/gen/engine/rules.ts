@@ -12,11 +12,17 @@ export const LINES: number[][] = [
   [2, 4, 6],
 ];
 
-/** evaluate(board): the first line in LINES order holding three equal marks wins; otherwise a full board is a draw; otherwise playing */
+/** evaluate: the first line in LINES order whose three cells hold the same mark → won(mark, line); otherwise, if every cell is filled → draw; otherwise → playing */
 export function evaluate(board: Board): Status {
-  for (const [a, b, c] of LINES as [number, number, number][]) {
+  for (const line of LINES) {
+    const [a, b, c] = line;
     const mark = board[a];
-    if (mark && mark === board[b] && mark === board[c]) return { kind: "won", mark, line: [a, b, c] };
+    if (mark !== null && mark === board[b] && mark === board[c]) {
+      return { kind: "won", mark, line: [...line] };
+    }
   }
-  return board.every((cell) => cell !== null) ? { kind: "draw" } : { kind: "playing" };
+  if (board.every((cell) => cell !== null)) {
+    return { kind: "draw" };
+  }
+  return { kind: "playing" };
 }

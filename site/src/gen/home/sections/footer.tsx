@@ -1,19 +1,75 @@
-import { Stack, Text } from "../../catalog";
+import { Stack } from "../../parts/stack";
 
-/** Footer: one row of three links, separated by space. */
+const linkStyle = {
+  color: "var(--color-code-text)",
+  fontWeight: 600,
+  textDecoration: "underline",
+};
+
+/** "a strip of the four level colors, one sentence on where this page and the game came from, and four links" */
 export function Footer() {
   return (
-    <footer style={{ borderTop: "1px solid var(--color-border)" }}>
-      <Stack dir="h" gap="space.4" align="center" pad="space.6">
-        <a href="https://github.com/ffMathy/agentic-intermediate-language/blob/main/docs/proposal.md" style={{ color: "var(--color-text-muted)" }}>
-          <Text variant="body">Design</Text>
-        </a>
-        <a href="https://github.com/ffMathy/agentic-intermediate-language" style={{ color: "var(--color-text-muted)" }}>
-          <Text variant="body">Source</Text>
-        </a>
-        <a href="https://github.com/ffMathy/agentic-intermediate-language/tree/main/examples/tictactoe" style={{ color: "var(--color-text-muted)" }}>
-          <Text variant="body">Demo spec</Text>
-        </a>
+    <footer
+      style={{
+        background: "var(--color-code)",
+        color: "var(--color-code-muted)",
+        fontSize: "var(--font-small)",
+      }}
+    >
+      <div style={{ height: "4px", display: "flex" }}>
+        <div style={{ flex: 1, background: "var(--color-level-product)" }} />
+        <div style={{ flex: 1, background: "var(--color-level-experience)" }} />
+        <div style={{ flex: 1, background: "var(--color-level-system)" }} />
+        <div style={{ flex: 1, background: "var(--color-level-specialist)" }} />
+      </div>
+      <Stack
+        dir="v"
+        gap="space.4"
+        align="start"
+        style={{
+          maxWidth: "var(--width-content)",
+          margin: "0 auto",
+          boxSizing: "content-box",
+          padding: "var(--space-8) var(--space-4)",
+        }}
+      >
+        <p
+          style={{
+            lineHeight: 1.6,
+            maxWidth: "var(--width-prose)",
+            margin: 0,
+          }}
+        >
+          This page was compiled from site/*.ail.md, and the game from examples/tictactoe/*.ail.md. Apart from the spec and a short index.html, nothing in either was written by hand.
+        </p>
+        <nav aria-label="More about AIL">
+          <Stack dir="h" gap="space.4" align="center" wrap={true}>
+            <a
+              href="https://github.com/ffMathy/agentic-intermediate-language"
+              style={linkStyle}
+            >
+              GitHub
+            </a>
+            <a
+              href="https://github.com/ffMathy/agentic-intermediate-language/blob/main/docs/proposal.md"
+              style={linkStyle}
+            >
+              Design proposal
+            </a>
+            <a
+              href="https://github.com/ffMathy/agentic-intermediate-language/blob/main/docs/claude-code.md"
+              style={linkStyle}
+            >
+              Claude Code guide
+            </a>
+            <a
+              href="https://github.com/ffMathy/agentic-intermediate-language/tree/main/site"
+              style={linkStyle}
+            >
+              This site's spec
+            </a>
+          </Stack>
+        </nav>
       </Stack>
     </footer>
   );

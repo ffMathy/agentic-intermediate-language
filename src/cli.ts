@@ -11,8 +11,9 @@ import { defaultBase, show } from "./show.ts";
 const HELP = `ail — write the spec, let agents build the code.
 
   ail build [Node…]     Compile whatever changed, then check everything: the spec is
-                        sound, the code is built from it, every check passes, and a model
-                        has compared each screen with its look. With nothing to compile it
+                        sound, the code is built from it, every check passes, a model
+                        has compared each screen with its look, and, with run.app set,
+                        the app behaves as the spec says end to end. With nothing to compile it
                         only checks, so CI runs it too. Uses Claude Code's login (a Claude
                         subscription works) unless ANTHROPIC_API_KEY is set.
                         --model M     claude-code[:model], anthropic:<id>, openai:<id>, command:<cli>
@@ -22,10 +23,10 @@ const HELP = `ail — write the spec, let agents build the code.
                         --shots DIR   also screenshot the final screen of every scenario of
                                       nodes with a look (needs Playwright)
                         --samples N   also compile N times per model and compare behaviour
-                        --app URL     also run the end-to-end checks against the app running there
-  ail adopt --app URL   Does the app running at URL behave as the spec says? Runs each
-            [Node…]     flow's end-to-end check (checks/e2e/) in a browser: against a legacy
-                        app while you write its spec, then against the one ail build made.
+  ail adopt [Node…]     Does the app behave as the spec says? Starts it as ail.config.json's
+                        run says (run.legacy while you write the spec of an existing app,
+                        else run.app), runs each flow's end-to-end check, and stops it.
+                        --app NAME    another entry of run
   ail show [what]       The tree (default), a <Node>, an audience
                         (stakeholder | design | engineer | specialist [tag]),
                         or changes [--since <ref>]
@@ -84,17 +85,15 @@ async function main(argv: string[]): Promise<number> {
         names: nodesOrDie(p, rest), models: a.flags.model, force: flag(a, "force") === "true",
         jobs: Number(flag(a, "jobs") ?? 4), look: flag(a, "no-look") !== "true",
         temperature: flag(a, "temperature") ? Number(flag(a, "temperature")) : undefined,
-        samples: Number(flag(a, "samples") ?? 0), shots: flag(a, "shots"), app: flag(a, "app"), log,
+        samples: Number(flag(a, "samples") ?? 0), shots: flag(a, "shots"), log,
       });
       print(r.text, { outcomes: r.outcomes, check: r.check });
       return r.ok ? 0 : 1;
     }
 
     case "adopt": {
-      const app = flag(a, "app");
-      if (!app) throw new Error("usage: ail adopt --app <url of the running app> [Node…]");
-      const r = adopt(p, app, nodesOrDie(p, rest));
-      print(formatAdopt(app, r), r);
+      const r = await adopt(p, { app: flag(a, "app"), names: nodesOrDie(p, rest), log });
+      print(formatAdopt(r), r);
       return r.ok ? 0 : 1;
     }
 

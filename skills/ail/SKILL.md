@@ -103,7 +103,9 @@ Don't review generated code. If it's wrong, the spec is missing something.
 one slice at a time: the why from tickets and the people who own it, the what
 from driving the running app, the how from its code, each node with
 `sources`. Trace real values into examples. When nobody can confirm a reason,
-write `because "unknown, confirm with the owner"`; never invent one. Each flow
-gets an end-to-end check in `checks/e2e/`, and `ail_adopt` with the app's URL
-proves the spec describes the app. Later, the same checks prove the rebuilt app
-behaves the same.
+write `because "unknown, confirm with the owner"`; never invent one. Find out
+yourself how the app starts, whatever its platform, and record it in
+`ail.config.json` under `run.legacy`. Each flow gets an end-to-end check in
+`checks/e2e/` that drives the app with what suits it (a browser, a simulator,
+a process), and `ail_adopt` proves the spec describes the app. Later, with
+`run.app` recorded, every build runs the same checks against the rebuilt app.

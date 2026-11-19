@@ -33,7 +33,7 @@ and one command does the rest:
 | | |
 |---|---|
 | `/ail:build` | compile whatever changed (each node sees only its own slice of the spec), then check everything |
-| `/ail:adopt <url>` | bring an existing app under AIL: see below |
+| `/ail:adopt` | bring an existing app under AIL: see below |
 
 To look at the spec, just ask: "show me the tree", "the stakeholder view",
 "what changed?".
@@ -53,7 +53,7 @@ Then, anywhere inside a project (any folder with an `ail.config.json`):
 | | |
 |---|---|
 | `ail build` | Compile whatever changed, then check everything: the spec is sound, the code is built from it, every check passes, and each screen matches its `look`. With nothing to compile it only checks, without a model, so CI runs it too. It uses Claude Code's login unless `ANTHROPIC_API_KEY` is set; `--model` picks another provider. |
-| `ail adopt --app <url>` | Does the app running there behave as the spec says? Runs each flow's end-to-end check in a browser. |
+| `ail adopt` | Does the existing app behave as its spec says? Starts it as `ail.config.json`'s `run` says, runs each flow's end-to-end check, and stops it. |
 | `ail show [what]` | The tree, a node, an audience's view (`stakeholder`, `design`, `engineer`, `specialist`), or `changes`. Add `--shots <dir>` for screenshots of the proofs |
 
 That's the whole tool. Change detection, deriving tests from scenarios,
@@ -73,16 +73,18 @@ time:
    error path, quirks included.
 3. **How**, from its code: data shapes, rules, edge cases and real values as
    examples.
-4. **Proof.** Each flow gets an end-to-end check that plays its scenarios in a
-   browser. `ail adopt --app <url>` runs them against the old app, which proves
-   the spec describes it.
+4. **Proof.** Each flow gets an end-to-end check that plays its scenarios with
+   whatever drives the app: a browser, a simulator, a process. The agent finds
+   out how to start the app and records it under `run` in `ail.config.json`.
+   `ail adopt` starts the old app, runs the checks and stops it, which proves
+   the spec describes the old app.
 
-Then change the `target` to the new technology and run `ail build`. Run
-`ail adopt --app <url>` against the new app, and the same checks prove that it
-behaves like the old one. Each node's `sources` section records where its
+Then change the `target` to the new technology and run `ail build`. Once
+`run.app` says how the new app starts, every build runs the same checks
+against it, which proves it behaves like the old one. Each node's `sources` section records where its
 claims came from, for review.
 
-In Claude Code, `/ail:adopt <url>` does all of this, one slice at a time. The
+In Claude Code, `/ail:adopt` does all of this, one slice at a time. The
 demo has an example check at
 [`examples/tictactoe/checks/e2e/`](examples/tictactoe/checks/e2e).
 

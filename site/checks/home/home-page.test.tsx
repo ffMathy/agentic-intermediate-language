@@ -1,4 +1,4 @@
-// ail-derived-from: HomePage@7e298e623e8c0dbf
+// ail-derived-from: HomePage@6b7ad6621639a65a
 import { afterEach, expect, test } from "bun:test";
 import { cleanup, render, screen } from "@testing-library/react";
 import { HomePage } from "../../src/gen/home/home-page";
@@ -7,16 +7,19 @@ afterEach(() => {
   cleanup();
 });
 
+const text = (el: Element): string =>
+  (el.textContent ?? "").replace(/\s+/g, " ").trim();
+
 test("one story, in order", () => {
   render(<HomePage />);
+
   const h1s = screen.getAllByRole("heading", { level: 1 });
-  expect(h1s.length).toBe(1);
-  expect((h1s[0].textContent ?? "").trim()).toBe(
+  expect(h1s).toHaveLength(1);
+  expect(text(h1s[0])).toBe(
     "Write one sentence. Watch it become working software.",
   );
-  const h2s = screen
-    .getAllByRole("heading", { level: 2 })
-    .map((h) => (h.textContent ?? "").trim());
+
+  const h2s = screen.getAllByRole("heading", { level: 2 }).map(text);
   expect(h2s).toEqual([
     "Between a prompt and the code, there is nothing to review.",
     "A tree of tasks, the same all the way down",
@@ -29,8 +32,9 @@ test("one story, in order", () => {
 });
 
 test("every top bar link has a place to land", () => {
-  const { container } = render(<HomePage />);
+  render(<HomePage />);
+
   for (const id of ["tree", "journey", "readers", "loop", "specs", "start"]) {
-    expect(container.querySelector(`[id="${id}"]`)).not.toBeNull();
+    expect(document.getElementById(id)).not.toBeNull();
   }
 });

@@ -35,7 +35,7 @@ test("a reason nobody could confirm stays visible as a warning", () => {
   expect(d[0]!.severity).toBe("warning");
 });
 
-test("a check pinned to an older spec is reported stale, and flows without a check are listed", () => {
+test("a check pinned to an older spec is reported stale, and flows without a check are listed", async () => {
   const dir = tempProject("areas");
   writeFileSync(join(dir, "a", "checkout.ail.md"), "```ail\nnode Checkout : flow   level: experience\n  why   People pay for what they picked.   <- AreaA\n  what\n    Scenario: paying\n      Given a full basket\n      When the person pays\n      Then the receipt is shown\n```\n\n```ail\nnode Browse : flow   level: experience\n  why   People find things.   <- AreaA\n  what\n    Scenario: looking\n      Given the shop is open\n      Then the products are listed\n```\n");
   const p = load(dir);
@@ -43,18 +43,45 @@ test("a check pinned to an older spec is reported stale, and flows without a che
   const file = e2eCheckPath(p, flow);
   mkdirSync(join(file, ".."), { recursive: true });
   writeFileSync(file, `// ail-derived-from: ${flow.name}@0000000000000000\nimport { test } from "bun:test";\ntest("x", () => {});\n`);
-  const r = adopt(p, "http://localhost:1");
+  const r = await adopt(p);
   expect(r.results.find((x) => x.node === flow.name)!.status).toBe("stale");
   expect(r.results.find((x) => x.node === "Browse")!.status).toBe("missing");
   expect(r.ok).toBe(false);
 });
 
+test("without a run entry, adopt says to find out how to start the app", async () => {
+  const dir = tempProject("areas");
+  writeFileSync(join(dir, "a", "checkout.ail.md"), "```ail\nnode Checkout : flow   level: experience\n  why   People pay.   <- AreaA\n  what\n    Scenario: paying\n      Then the receipt is shown\n```\n");
+  const p = load(dir);
+  const file = e2eCheckPath(p, p.nodes.get("Checkout")!);
+  mkdirSync(join(file, ".."), { recursive: true });
+  writeFileSync(file, `import { test } from "bun:test";\ntest("paying", () => {});\n`);
+  const r = await adopt(p);
+  expect(r.ok).toBe(false);
+  expect(r.error).toContain("find out how");
+});
+
+test("the app is started as run says, checked, and stopped; any platform, here a plain process", async () => {
+  const dir = tempProject("areas");
+  writeFileSync(join(dir, "a", "checkout.ail.md"), "```ail\nnode Checkout : flow   level: experience\n  why   People pay.   <- AreaA\n  what\n    Scenario: paying\n      Then the receipt is shown\n```\n");
+  const port = 32000 + Math.floor(Math.random() * 1000);
+  writeFileSync(join(dir, "server.ts"), `Bun.serve({ port: ${port}, fetch: () => new Response("receipt") });`);
+  const cfg = { run: { legacy: { start: "bun server.ts", ready: `http://localhost:${port}`, env: { AIL_APP_URL: `http://localhost:${port}` } } } };
+  writeFileSync(join(dir, "ail.config.json"), JSON.stringify(cfg));
+  const p = load(dir);
+  const file = e2eCheckPath(p, p.nodes.get("Checkout")!);
+  mkdirSync(join(file, ".."), { recursive: true });
+  writeFileSync(file, `import { expect, test } from "bun:test";\ntest("paying", async () => { expect(await (await fetch(process.env.AIL_APP_URL!)).text()).toBe("receipt"); });\n`);
+  const r = await adopt(p);
+  expect(r.app).toBe("run.legacy");
+  expect(r.results).toEqual([expect.objectContaining({ node: "Checkout", status: "pass" })]);
+  // stopped afterwards
+  await Bun.sleep(300);
+  expect(await fetch(`http://localhost:${port}`).then(() => "up", () => "down")).toBe("down");
+}, 60_000);
+
 test.skipIf(!installed || !chromium)("the kata's play flow behaves as its spec says, in a real browser", async () => {
-  const port = 31000 + Math.floor(Math.random() * 1000);
-  const server = Bun.spawn(["bun", `--port=${port}`, "./index.html"], { cwd: KATA, stdout: "pipe", stderr: "pipe" });
-  try {
-    for (let i = 0; i < 50; i++) { try { if ((await fetch(`http://localhost:${port}/`)).ok) break; } catch { /* starting */ } await Bun.sleep(200); }
-    const r = adopt(loadProject(KATA), `http://localhost:${port}`, ["PlayAGame"]);
-    expect(r.results).toEqual([expect.objectContaining({ node: "PlayAGame", status: "pass" })]);
-  } finally { server.kill(); }
-}, 90_000);
+  const r = await adopt(loadProject(KATA), { names: ["PlayAGame"] });
+  expect(r.error).toBeUndefined();
+  expect(r.results).toEqual([expect.objectContaining({ node: "PlayAGame", status: "pass" })]);
+}, 120_000);

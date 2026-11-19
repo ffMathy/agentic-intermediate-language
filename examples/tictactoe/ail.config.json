@@ -1,4 +1,13 @@
 {
   "specRoot": "ail",
-  "checksDir": "checks"
+  "checksDir": "checks",
+  "run": {
+    "app": {
+      "start": "bun --port=4173 ./index.html",
+      "ready": "http://localhost:4173",
+      "env": {
+        "AIL_APP_URL": "http://localhost:4173"
+      }
+    }
+  }
 }

@@ -1,5 +1,5 @@
 import { useId } from "react";
-import type { CSSProperties } from "react";
+import type { CSSProperties, ReactNode } from "react";
 import { Section } from "../../parts/section";
 import { SectionHeading } from "../../parts/section-heading";
 import { Stack } from "../../parts/stack";
@@ -43,6 +43,7 @@ const textStyle: CSSProperties = {
 const tableStyle: CSSProperties = {
   width: "100%",
   borderCollapse: "collapse",
+  fontSize: "var(--font-small)",
 };
 
 const rowStyle: CSSProperties = {
@@ -57,7 +58,9 @@ const cellStyle: CSSProperties = {
 };
 
 const commandCellStyle: CSSProperties = {
-  ...cellStyle,
+  padding: "var(--space-2) var(--space-2) var(--space-2) 0",
+  verticalAlign: "top",
+  textAlign: "left",
   fontFamily: "var(--font-mono)",
   fontSize: "var(--font-code)",
   fontWeight: 600,
@@ -92,7 +95,7 @@ const repoStyle: CSSProperties = {
   textDecoration: "none",
 };
 
-const toolRows: { command: string; does: string }[] = [
+const toolRows: ReadonlyArray<{ command: string; does: string }> = [
   {
     command: "ail build",
     does: "Compile whatever changed, then check everything: the spec, the code, every test, and each screen against its look.",
@@ -102,15 +105,27 @@ const toolRows: { command: string; does: string }[] = [
     does: "The tree, a node, one reader's view, or what changed.",
   },
   {
-    command: "ail adopt --app <url>",
-    does: "Does the app running there behave as the spec says? For bringing an existing app under AIL, and proving a rebuilt one behaves the same.",
+    command: "ail adopt",
+    does: "Does an existing app behave as its spec says? For bringing an app under AIL, and proving a rebuilt one behaves the same.",
   },
 ];
 
-/** Turn interest into a first try, from wherever the visitor already works: Claude Code or a terminal. */
+function Card(props: { title: string; children: ReactNode }) {
+  const titleId = useId();
+  return (
+    <div role="region" aria-labelledby={titleId} style={cardStyle}>
+      <Stack dir="v" gap="space.3" align="stretch">
+        <h3 id={titleId} style={titleStyle}>
+          {props.title}
+        </h3>
+        {props.children}
+      </Stack>
+    </div>
+  );
+}
+
+/** "two cards, "In Claude Code" and "In a terminal", side by side when there is room" */
 export function GetStarted() {
-  const claudeTitleId = useId();
-  const cliTitleId = useId();
   return (
     <Section id="start" tone="plain">
       <Stack dir="v" gap="space.6" align="stretch">
@@ -119,52 +134,42 @@ export function GetStarted() {
           lead="Install it, then describe a feature in plain words. You get a spec you can review, and code that is checked against it."
         />
         <div style={cardsStyle}>
-          <div role="region" aria-labelledby={claudeTitleId} style={cardStyle}>
-            <Stack dir="v" gap="space.3" align="stretch">
-              <h3 id={claudeTitleId} style={titleStyle}>
-                In Claude Code
-              </h3>
-              <p style={subtitleStyle}>No API key. It runs on your Claude subscription.</p>
-              <CopyCommand command="/plugin marketplace add ffMathy/agentic-intermediate-language" />
-              <CopyCommand command="/plugin install ail@agentic-intermediate-language" />
-              <p style={textStyle}>
-                Then ask for features in plain words. Claude changes the spec, and /ail:build compiles whatever changed.
-              </p>
-            </Stack>
-          </div>
-          <div role="region" aria-labelledby={cliTitleId} style={cardStyle}>
-            <Stack dir="v" gap="space.3" align="stretch">
-              <h3 id={cliTitleId} style={titleStyle}>
-                In a terminal
-              </h3>
-              <p style={subtitleStyle}>Needs Bun 1.2 or later.</p>
-              <CopyCommand command="bun add -g github:ffMathy/agentic-intermediate-language" />
-              <table style={tableStyle}>
-                <thead>
-                  <tr style={rowStyle}>
-                    <th style={cellStyle}>Command</th>
-                    <th style={cellStyle}>What it does</th>
+          <Card title="In Claude Code">
+            <p style={subtitleStyle}>No API key. It runs on your Claude subscription.</p>
+            <CopyCommand command="/plugin marketplace add ffMathy/agentic-intermediate-language" />
+            <CopyCommand command="/plugin install ail@agentic-intermediate-language" />
+            <p style={textStyle}>
+              Then ask for features in plain words. Claude changes the spec, and /ail:build compiles whatever changed.
+            </p>
+          </Card>
+          <Card title="In a terminal">
+            <p style={subtitleStyle}>Needs Bun 1.2 or later.</p>
+            <CopyCommand command="bun add -g github:ffMathy/agentic-intermediate-language" />
+            <table style={tableStyle}>
+              <thead>
+                <tr style={rowStyle}>
+                  <th style={cellStyle}>Command</th>
+                  <th style={cellStyle}>What it does</th>
+                </tr>
+              </thead>
+              <tbody>
+                {toolRows.map((row) => (
+                  <tr key={row.command} style={rowStyle}>
+                    <td style={commandCellStyle}>{row.command}</td>
+                    <td style={cellStyle}>{row.does}</td>
                   </tr>
-                </thead>
-                <tbody>
-                  {toolRows.map((row) => (
-                    <tr key={row.command} style={rowStyle}>
-                      <td style={commandCellStyle}>{row.command}</td>
-                      <td style={cellStyle}>{row.does}</td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-              <p style={closingStyle}>That's the whole tool: three commands.</p>
-              <p style={textStyle}>
-                Run these inside a project, meaning any folder with an ail.config.json. To try the tic-tac-toe demo from this page:
-              </p>
-              <CopyCommand command="git clone https://github.com/ffMathy/agentic-intermediate-language && cd agentic-intermediate-language" />
-              <CopyCommand command="bun install && bun link" />
-              <CopyCommand command="cd examples/tictactoe && bun install && ail build" />
-              <CopyCommand command="ail show stakeholder" />
-            </Stack>
-          </div>
+                ))}
+              </tbody>
+            </table>
+            <p style={closingStyle}>That's the whole tool: three commands.</p>
+            <p style={textStyle}>
+              Run these inside a project, meaning any folder with an ail.config.json. To try the tic-tac-toe demo from this page:
+            </p>
+            <CopyCommand command="git clone https://github.com/ffMathy/agentic-intermediate-language && cd agentic-intermediate-language" />
+            <CopyCommand command="bun install && bun link" />
+            <CopyCommand command="cd examples/tictactoe && bun install && ail build" />
+            <CopyCommand command="ail show stakeholder" />
+          </Card>
         </div>
         <Stack dir="h" gap="space.3" align="center" wrap={true}>
           <a

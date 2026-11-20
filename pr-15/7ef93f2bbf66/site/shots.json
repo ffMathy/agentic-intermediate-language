@@ -1,0 +1,232 @@
+[
+  {
+    "node": "HomePage",
+    "test": "one story, in order",
+    "file": "home/home-page/01-one-story-in-order.png"
+  },
+  {
+    "node": "HomePage",
+    "test": "every top bar link has a place to land",
+    "file": "home/home-page/02-every-top-bar-link-has-a-place-to-land.png"
+  },
+  {
+    "node": "Hero",
+    "test": "the links go to the right places",
+    "file": "home/hero/hero/01-the-links-go-to-the-right-places.png"
+  },
+  {
+    "node": "HeroFigure",
+    "test": "the picture is described",
+    "file": "home/hero/hero-figure/01-the-picture-is-described.png"
+  },
+  {
+    "node": "GapStrip",
+    "test": "three cards",
+    "file": "home/sections/gap-strip/01-three-cards.png"
+  },
+  {
+    "node": "TreeSection",
+    "test": "the tree is explained",
+    "file": "home/tree/tree-section/01-the-tree-is-explained.png"
+  },
+  {
+    "node": "Journey",
+    "test": "eight stops in order",
+    "file": "home/journey/journey/01-eight-stops-in-order.png"
+  },
+  {
+    "node": "Journey",
+    "test": "the thread is explained",
+    "file": "home/journey/journey/02-the-thread-is-explained.png"
+  },
+  {
+    "node": "JourneyStop",
+    "test": "a stop",
+    "file": "home/journey/journey-stop/01-a-stop.png"
+  },
+  {
+    "node": "JourneyStop",
+    "test": "a stop with a file to browse",
+    "file": "home/journey/journey-stop/02-a-stop-with-a-file-to-browse.png"
+  },
+  {
+    "node": "StopIdea",
+    "test": "the idea",
+    "file": "home/journey/stops/stop-idea/01-the-idea.png"
+  },
+  {
+    "node": "StopProduct",
+    "test": "the product level",
+    "file": "home/journey/stops/stop-product/01-the-product-level.png"
+  },
+  {
+    "node": "StopExperience",
+    "test": "the experience level",
+    "file": "home/journey/stops/stop-experience/01-the-experience-level.png"
+  },
+  {
+    "node": "ExperienceFigure",
+    "test": "the picture",
+    "file": "home/journey/stops/experience-figure/01-the-picture.png"
+  },
+  {
+    "node": "StopSystem",
+    "test": "the system level",
+    "file": "home/journey/stops/stop-system/01-the-system-level.png"
+  },
+  {
+    "node": "SystemFigure",
+    "test": "the picture",
+    "file": "home/journey/stops/system-figure/01-the-picture.png"
+  },
+  {
+    "node": "StopSpecialist",
+    "test": "the specialist level",
+    "file": "home/journey/stops/stop-specialist/01-the-specialist-level.png"
+  },
+  {
+    "node": "SpecialistFigure",
+    "test": "the picture",
+    "file": "home/journey/stops/specialist-figure/01-the-picture.png"
+  },
+  {
+    "node": "StopBuild",
+    "test": "the build",
+    "file": "home/journey/stops/stop-build/01-the-build.png"
+  },
+  {
+    "node": "StopProof",
+    "test": "the proof",
+    "file": "home/journey/stops/stop-proof/01-the-proof.png"
+  },
+  {
+    "node": "StopResult",
+    "test": "the result",
+    "file": "home/journey/stops/stop-result/01-the-result.png"
+  },
+  {
+    "node": "Readers",
+    "test": "the first reader",
+    "file": "home/readers/readers/01-the-first-reader.png"
+  },
+  {
+    "node": "Readers",
+    "test": "picking another reader",
+    "file": "home/readers/readers/02-picking-another-reader.png"
+  },
+  {
+    "node": "Readers",
+    "test": "arrow keys",
+    "file": "home/readers/readers/03-arrow-keys.png"
+  },
+  {
+    "node": "AdoptSection",
+    "test": "adopting is explained",
+    "file": "home/adopt/adopt-section/01-adopting-is-explained.png"
+  },
+  {
+    "node": "SpecBrowser",
+    "test": "the demo's spec is shown first",
+    "file": "home/sections/spec-browser/01-the-demo-s-spec-is-shown-first.png"
+  },
+  {
+    "node": "SpecBrowser",
+    "test": "picking another file",
+    "file": "home/sections/spec-browser/02-picking-another-file.png"
+  },
+  {
+    "node": "SpecBrowser",
+    "test": "showing this website's spec",
+    "file": "home/sections/spec-browser/03-showing-this-website-s-spec.png"
+  },
+  {
+    "node": "SpecBrowser",
+    "test": "opened from a link",
+    "file": "home/sections/spec-browser/04-opened-from-a-link.png"
+  },
+  {
+    "node": "SpecBrowser",
+    "test": "following the same link twice",
+    "file": "home/sections/spec-browser/05-following-the-same-link-twice.png"
+  },
+  {
+    "node": "GetStarted",
+    "test": "in Claude Code",
+    "file": "home/sections/get-started/01-in-claude-code.png"
+  },
+  {
+    "node": "GetStarted",
+    "test": "in a terminal",
+    "file": "home/sections/get-started/02-in-a-terminal.png"
+  },
+  {
+    "node": "GetStarted",
+    "test": "what to do next",
+    "file": "home/sections/get-started/03-what-to-do-next.png"
+  },
+  {
+    "node": "ReviewNote",
+    "test": "generated code stays out of review",
+    "file": "home/sections/review-note/01-generated-code-stays-out-of-review.png"
+  },
+  {
+    "node": "Footer",
+    "test": "the links",
+    "file": "home/sections/footer/01-the-links.png"
+  },
+  {
+    "node": "Section",
+    "test": "an anchored band",
+    "file": "parts/section/01-an-anchored-band.png"
+  },
+  {
+    "node": "SectionHeading",
+    "test": "a full heading",
+    "file": "parts/section-heading/01-a-full-heading.png"
+  },
+  {
+    "node": "SectionHeading",
+    "test": "just a heading",
+    "file": "parts/section-heading/02-just-a-heading.png"
+  },
+  {
+    "node": "CodeBlock",
+    "test": "shown exactly",
+    "file": "parts/code-block/01-shown-exactly.png"
+  },
+  {
+    "node": "CodeBlock",
+    "test": "the thread is marked",
+    "file": "parts/code-block/02-the-thread-is-marked.png"
+  },
+  {
+    "node": "CodeBlock",
+    "test": "a caption",
+    "file": "parts/code-block/03-a-caption.png"
+  },
+  {
+    "node": "CodeBlock",
+    "test": "a long line wraps under itself",
+    "file": "parts/code-block/04-a-long-line-wraps-under-itself.png"
+  },
+  {
+    "node": "CopyCommand",
+    "test": "copying",
+    "file": "parts/copy-command/01-copying.png"
+  },
+  {
+    "node": "MiniBoard",
+    "test": "marks",
+    "file": "parts/mini-board/01-marks.png"
+  },
+  {
+    "node": "MiniBoard",
+    "test": "numbers in empty squares",
+    "file": "parts/mini-board/02-numbers-in-empty-squares.png"
+  },
+  {
+    "node": "SpecEditor",
+    "test": "readable before the editor loads",
+    "file": "parts/spec-editor/01-readable-before-the-editor-loads.png"
+  }
+]

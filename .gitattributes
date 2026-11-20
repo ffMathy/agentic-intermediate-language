@@ -1,14 +1,14 @@
 * text=auto eol=lf
 *.png binary
 
-# Everything ail build writes is committed, but collapsed in pull request
-# diffs, so a pull request here is reviewed as AIL: only the .ail.md spec
-# shows. That covers the generated code, the lock file, the derived checks and
-# the proof screenshots. The checks and screenshots are still one click away
-# ("Load diff"), and the review comment on each pull request shows the
-# screenshots of what changed.
+# What ail build writes is committed, but collapsed in pull request diffs, so
+# a pull request here is reviewed as AIL: the .ail.md spec, and the proof.
+# Collapsed: the generated code, the lock file and the derived checks (one
+# click away, "Load diff"). Not collapsed: the proof screenshots, so every
+# changed screen shows in the diff, old and new side by side.
 examples/tictactoe/src/gen/** linguist-generated=true
 examples/tictactoe/checks/** linguist-generated=true
 site/src/gen/** linguist-generated=true
 site/checks/** linguist-generated=true
 **/ail.lock.json linguist-generated=true
+**/checks/shots/** -linguist-generated

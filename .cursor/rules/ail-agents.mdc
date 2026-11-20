@@ -1,0 +1,22 @@
+---
+description: Hard rules for AIL projects and this toolchain repo
+alwaysApply: true
+---
+
+# Agent instructions
+
+Follow [AGENTS.md](AGENTS.md) at the repo root. Summary:
+
+## In any AIL project (a folder with `ail.config.json`)
+
+- `*.ail.md` is the source of truth. Never edit generated code (target `generated` globs, e.g. `src/gen/**`) by hand.
+- To change behaviour, change the spec, then build: MCP `ail_build`, `/ail:build` in Claude Code, or `ail build` in a terminal.
+- If the spec leaves something open and it isn't in `free`, stop and ask for a spec change. Never guess in code.
+- Before finishing, `ail build` (or MCP `ail_build` / `/ail:build`) must pass.
+
+## In this repository (the toolchain)
+
+- Use Bun: `bun install && bun link`, then `bun test` and `bun run typecheck`.
+- `examples/tictactoe` needs `bun install` in that folder before e2e tests.
+- `site/` is an AIL project: change `site/ail/`, run `ail build`; never edit `site/src/gen` by hand. After editing the kata's spec, also `ail build` in `site/`.
+- Prompt or context-format changes alter compile hashes: rebuild `examples/tictactoe` and `site`.

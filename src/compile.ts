@@ -410,8 +410,12 @@ export async function derive(p: Project, n: AilNode, provider: Provider): Promis
 
 /** Nodes whose derived check is missing or was derived from an older spec. */
 export function checksToDerive(p: Project, nodes: AilNode[]): AilNode[] {
+  const lock = readLock(p);
   return nodes.filter((n) => {
     if (!needsDerivedCheck(n)) return false;
+    // An adopted node has no generated module to test: its end-to-end checks prove it.
+    const e = lock.nodes[n.name];
+    if (e?.adopted && e.hash === compileHash(p, n)) return false;
     const { file, pinned } = derivedCheckFile(p, n);
     return !file || pinned !== oracleHash(p, n).slice(0, 16);
   });

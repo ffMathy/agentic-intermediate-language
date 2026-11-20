@@ -3,6 +3,7 @@
 // against the running app at AIL_APP_URL. It knows nothing of the code, only
 // what a player can see and do, so it runs against any build of the app.
 import { afterAll, beforeAll, beforeEach, expect, test } from "bun:test";
+import { join } from "node:path";
 import { chromium, type Browser, type Page } from "playwright";
 
 const APP = process.env.AIL_APP_URL ?? "http://localhost:3000";
@@ -21,14 +22,22 @@ const square = (i: number) => page.getByRole("button", { name: new RegExp(`^Row 
 const pick = async (...squares: number[]) => { for (const i of squares) await square(i).click(); };
 const status = (text: string) => page.getByText(text, { exact: true });
 
+/** Visual proof: the screen a scenario ends on, saved where ail collects it (AIL_SHOTS_DIR), named after the test. */
+const proof = async (test: string) => {
+  const dir = process.env.AIL_SHOTS_DIR;
+  if (dir) await page.screenshot({ path: join(dir, `${test.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "").slice(0, 60) || "test"}.png`) });
+};
+
 test("X always starts", async () => {
   await expect(status("X's turn").isVisible()).resolves.toBe(true);
+  await proof("X always starts");
 });
 
 test("taking turns", async () => {
   await pick(4);
   await expect(square(4).getAttribute("aria-label")).resolves.toBe("Row 2, column 2, X");
   await expect(status("O's turn").isVisible()).resolves.toBe(true);
+  await proof("taking turns");
 });
 
 test("a taken square can't be picked", async () => {
@@ -36,6 +45,7 @@ test("a taken square can't be picked", async () => {
   await square(4).click({ force: true }); // a taken square is disabled: clicking it does nothing
   await expect(square(4).getAttribute("aria-label")).resolves.toBe("Row 2, column 2, X");
   await expect(status("O's turn").isVisible()).resolves.toBe(true);
+  await proof("a taken square can't be picked");
 });
 
 test("winning", async () => {
@@ -45,11 +55,13 @@ test("winning", async () => {
   const top = await Promise.all([0, 1, 2].map(background));
   expect(new Set(top).size).toBe(1);
   expect(await background(5)).not.toBe(top[0]);
+  await proof("winning");
 });
 
 test("draw", async () => {
   await pick(0, 1, 2, 4, 3, 5, 7, 6, 8);
   await expect(status("It's a draw").isVisible()).resolves.toBe(true);
+  await proof("draw");
 });
 
 test("new game", async () => {
@@ -57,6 +69,7 @@ test("new game", async () => {
   await page.getByRole("button", { name: "New game" }).click();
   for (let i = 0; i < 9; i++) expect(await square(i).getAttribute("aria-label")).toEndWith(", empty");
   await expect(status("X's turn").isVisible()).resolves.toBe(true);
+  await proof("new game");
 });
 
 test("the computer answers", async () => {
@@ -65,4 +78,5 @@ test("the computer answers", async () => {
   await page.getByText("X's turn", { exact: true }).waitFor({ timeout: 3000 });
   const labels = await Promise.all(Array.from({ length: 9 }, (_, i) => square(i).getAttribute("aria-label")));
   expect(labels.filter((l) => l?.endsWith(", O")).length).toBe(1);
+  await proof("the computer answers");
 }, 10_000);

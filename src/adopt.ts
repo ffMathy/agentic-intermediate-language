@@ -7,14 +7,17 @@
 // browser, a simulator, a process). `ail adopt` starts the app as the config's
 // `run` says and runs them: against the legacy app, to prove the spec is right,
 // and against the one `ail build` made, to prove it behaves the same.
-import { existsSync, readFileSync, writeFileSync } from "node:fs";
+import { existsSync, mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from "node:fs";
 import { spawn } from "node:child_process";
 import { tmpdir } from "node:os";
 import { join, relative, resolve } from "node:path";
-import { oracleHash } from "./hash.ts";
+import { compileHash, oracleHash } from "./hash.ts";
+import { hasLook, judgeShots, type LookResult } from "./look.ts";
+import type { Provider } from "./providers/index.ts";
+import { junitTests, shotsDir, slugOf, type Shot } from "./shots.ts";
 import type { AilNode } from "./parse.ts";
-import { kebab, type Project, type RunSpec } from "./project.ts";
-import { lockPath } from "./lock.ts";
+import { isCompilable, kebab, type Project, type RunSpec } from "./project.ts";
+import { lockPath, readLock, writeLock } from "./lock.ts";
 import { checkHeader, checksDir, errorExcerpt, runBunTest } from "./verify.ts";
 
 /** Where a node's end-to-end check lives: checks/e2e/<dir>/<kebab>.e2e.ts (not picked up by a plain `bun test`). */
@@ -23,7 +26,24 @@ export const e2eCheckPath = (p: Project, n: AilNode) => join(checksDir(p), "e2e"
 /** Nodes whose scenarios a person could play through in the app: its flows and the root. */
 export const observable = (n: AilNode) => n.scenarios.length > 0 && (n.kind === "flow" || n.kind === "system");
 
-export interface AdoptResult { node: string; file: string | null; status: "pass" | "fail" | "stale" | "missing"; detail: string }
+export interface AdoptResult { node: string; file: string | null; status: "pass" | "fail" | "stale" | "missing"; detail: string; shots?: Shot[] }
+
+/** Where a flow's end-to-end screenshots go: checks/shots/e2e/<dir>/<kebab>/, handed to its check as AIL_SHOTS_DIR. */
+export const e2eShotsDir = (p: Project, n: AilNode) => join(shotsDir(p), "e2e", n.dir, kebab(n.name));
+
+/** The file name a check saves a scenario's screenshot under: the test's name as a slug, plus ".png". */
+export const shotFileName = (test: string) => `${slugOf(test)}.png`;
+
+/** Pair the screenshots a check saved with its tests (in run order), and write the folder's index. */
+export function collectShots(dir: string, node: string, tests: string[]): { shots: Shot[]; missing: string[] } {
+  const shots: Shot[] = [], missing: string[] = [];
+  for (const t of tests) {
+    const f = join(dir, shotFileName(t));
+    if (existsSync(f)) shots.push({ node, test: t, file: f }); else missing.push(t);
+  }
+  if (shots.length) writeFileSync(join(dir, "shots.json"), JSON.stringify({ node, shots: shots.map((s) => ({ test: s.test, file: relative(dir, s.file) })) }, null, 2) + "\n");
+  return { shots, missing };
+}
 
 /** Which app to run: the given name, else "legacy" while adopting, else "app". */
 export function runSpecName(p: Project, name?: string): string | null {
@@ -66,7 +86,26 @@ export async function startApp(p: Project, spec: RunSpec, log: (s: string) => vo
   return { stop };
 }
 
-export interface AdoptReport { ok: boolean; app: string; results: AdoptResult[]; error?: string; review?: { file: string; missing: string[] } }
+export interface AdoptReport { ok: boolean; app: string; results: AdoptResult[]; error?: string; review?: { file: string; missing: string[] }; looks?: LookResult[]; recorded?: string[] }
+
+/**
+ * Record each compilable node that isn't built yet (or was adopted from an
+ * older spec) as built by the existing app, at its current compile hash.
+ */
+export function recordAdopted(p: Project): string[] {
+  const lock = readLock(p);
+  const done: string[] = [];
+  for (const n of p.ordered.filter((x) => isCompilable(p, x))) {
+    const e = lock.nodes[n.name];
+    const hash = compileHash(p, n);
+    if (e && !e.adopted) continue; // built by ail: leave it
+    if (e?.hash === hash) continue;
+    lock.nodes[n.name] = { hash, files: {}, by: "adopted", adopted: true };
+    done.push(n.name);
+  }
+  if (done.length) writeLock(p, lock);
+  return done;
+}
 
 /**
  * Start the app named in run (or the one already running), run every
@@ -74,7 +113,13 @@ export interface AdoptReport { ok: boolean; app: string; results: AdoptResult[];
  * without a pin is pinned to the node's current spec on its first run; one
  * pinned to an older spec is reported stale and not run.
  */
-export async function adopt(p: Project, opts: { app?: string; names?: string[]; log?: (s: string) => void; suggestReview?: boolean } = {}): Promise<AdoptReport> {
+export async function adopt(p: Project, opts: {
+  app?: string; names?: string[]; log?: (s: string) => void; suggestReview?: boolean;
+  /** A model that compares each flow's screenshots with its look (skipped without one). */
+  judge?: Provider;
+  /** Record every node as built by this (legacy) app once its spec is proven: `ail adopt` does. */
+  record?: boolean;
+} = {}): Promise<AdoptReport> {
   // Adopting is the moment to set up review: suggest keeping generated code out of PR diffs.
   const review = opts.suggestReview ? reviewAttributes(p) : undefined;
   const name = runSpecName(p, opts.app);
@@ -106,14 +151,34 @@ export async function adopt(p: Project, opts: { app?: string; names?: string[]; 
   catch (e) { return { ok: false, app: label, results, review, error: (e as Error).message }; }
   try {
     for (const { n, abs, file } of toRun) {
+      // A fresh folder for the screenshots the check takes as proof, however its platform takes them.
+      const shotsAt = e2eShotsDir(p, n);
+      rmSync(shotsAt, { recursive: true, force: true });
+      mkdirSync(shotsAt, { recursive: true });
+      const report = join(mkdtempSync(join(tmpdir(), "ail-e2e-")), "report.xml");
       // Run from outside the project, so its test setup (a simulated DOM) stays out of a real app's way.
-      const r = runBunTest(tmpdir(), [abs], spec.env ?? {});
+      const r = runBunTest(tmpdir(), [abs], { ...(spec.env ?? {}), AIL_SHOTS_DIR: shotsAt }, ["--reporter=junit", `--reporter-outfile=${report}`]);
+      const tests = existsSync(report) ? junitTests(readFileSync(report, "utf8")) : [];
+      const { shots, missing: unpictured } = collectShots(shotsAt, n.name, tests);
+      if (!shots.length) rmSync(shotsAt, { recursive: true, force: true });
+      const pictured = !tests.length ? "" : !shots.length ? "; no screenshots saved (the check should save one per scenario into AIL_SHOTS_DIR)" : unpictured.length ? `; no screenshot for: ${unpictured.join(", ")}` : `, each with a screenshot`;
       results.push(r.ok
-        ? { node: n.name, file, status: "pass", detail: `${r.passes} scenario(s) behave as specified` }
-        : { node: n.name, file, status: "fail", detail: `${r.failures.length ? r.failures.join("; ") : "the check did not run"}\n${errorExcerpt(r.output, 20)}` });
+        ? { node: n.name, file, status: "pass", detail: `${r.passes} scenario(s) behave as specified${pictured}`, shots }
+        : { node: n.name, file, status: "fail", detail: `${r.failures.length ? r.failures.join("; ") : "the check did not run"}\n${errorExcerpt(r.output, 20)}`, shots });
     }
   } finally { app.stop(); }
-  return { ok: results.every((r) => r.status === "pass" || r.status === "missing"), app: label, results, review };
+  // The screenshots are proof of the look too: a model compares them with it.
+  const looks: LookResult[] = [];
+  if (opts.judge) for (const r of results) {
+    const n = p.nodes.get(r.node)!;
+    if (r.status !== "pass" || !r.shots?.length || !hasLook(n)) continue;
+    opts.log?.(`${n.name}: comparing its screenshots with its look`);
+    looks.push(await judgeShots(p, n, r.shots, opts.judge, () => {}, true).catch((e) => ({ node: n.name, ok: true, problems: [], shots: [], skipped: (e as Error).message })));
+  }
+  const ok = results.every((r) => r.status === "pass" || r.status === "missing") && looks.every((l) => l.ok);
+  // Proven on the existing app: record every node as built by it, so the first ail build has nothing to redo.
+  const recorded = ok && opts.record ? recordAdopted(p) : [];
+  return { ok, app: label, results, review, looks, recorded };
 }
 
 /**
@@ -154,6 +219,8 @@ export function formatAdopt(r: AdoptReport): string {
     : [`${r.ok ? "✓" : "✗"} app      ${ran.filter((x) => x.status === "pass").length} of ${ran.length} flow(s) behave as their spec says (${app})`];
   for (const x of ran.filter((y) => y.status !== "pass")) lines.push(`    ${icon[x.status]} ${x.node} ${x.status}: ${x.detail.split("\n").join("\n      ")}`);
   if (missing.length) lines.push(`    · ${missing.length} node(s) with scenarios have no end-to-end check yet: ${missing.map((x) => x.node).join(", ")}`);
+  for (const l of r.looks ?? []) lines.push(l.skipped ? `    · ${l.node}: screenshots not compared with its look (${l.skipped})` : l.ok ? `    ✓ ${l.node}: ${l.shots.length} screenshot(s) match its look` : `    ✗ ${l.node}: its screenshots don't match its look\n${l.problems.map((x) => `        - ${x}`).join("\n")}`);
+  if (r.recorded?.length) lines.push(`    ✓ recorded ${r.recorded.length} node(s) as built by the existing app in the lock file, so ail build only builds what changes from now on`);
   if (r.review) { const tip = formatReview(r.review); if (tip) lines.push(tip); }
   return lines.join("\n");
 }

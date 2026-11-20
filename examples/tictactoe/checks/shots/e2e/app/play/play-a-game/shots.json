@@ -1,0 +1,33 @@
+{
+  "node": "PlayAGame",
+  "shots": [
+    {
+      "test": "X always starts",
+      "file": "x-always-starts.png"
+    },
+    {
+      "test": "taking turns",
+      "file": "taking-turns.png"
+    },
+    {
+      "test": "a taken square can't be picked",
+      "file": "a-taken-square-can-t-be-picked.png"
+    },
+    {
+      "test": "winning",
+      "file": "winning.png"
+    },
+    {
+      "test": "draw",
+      "file": "draw.png"
+    },
+    {
+      "test": "new game",
+      "file": "new-game.png"
+    },
+    {
+      "test": "the computer answers",
+      "file": "the-computer-answers.png"
+    }
+  ]
+}

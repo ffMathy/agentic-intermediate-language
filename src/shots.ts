@@ -79,7 +79,9 @@ export function shotPage(styles: string, screen: { html: string; head: string })
   return `<!doctype html><html><head><meta charset="utf-8">${styles}\n${screen.head}</head><body><div id="ail-shot" style="padding:24px">${inlineImages(screen.html)}</div></body></html>`;
 }
 
-const slug = (s: string) => s.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "").slice(0, 60) || "test";
+/** A test name as a file name: lower case, each run of other characters one "-", at most 60 characters. */
+export const slugOf = (s: string) => s.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "").slice(0, 60) || "test";
+const slug = slugOf;
 
 /**
  * Screenshots of every visual node's proofs (or of `names` only), written to
@@ -153,6 +155,8 @@ export function orphanShots(p: Project): string[] {
   const root = shotsDir(p);
   if (!existsSync(root)) return [];
   const keep = new Set(visualNodes(p).map((n) => nodeShotsDir(p, n)));
+  // A flow's end-to-end screenshots stay while it has an end-to-end check.
+  for (const n of p.ordered) if (existsSync(join(checksDir(p), "e2e", n.dir, `${kebab(n.name)}.e2e.ts`))) keep.add(join(root, "e2e", n.dir, kebab(n.name)));
   return [...new Bun.Glob("**/shots.json").scanSync({ cwd: root })].map((f) => join(root, dirname(f))).filter((d) => !keep.has(d));
 }
 

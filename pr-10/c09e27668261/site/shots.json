@@ -1,0 +1,22 @@
+[
+  {
+    "node": "HomePage",
+    "test": "one story, in order",
+    "file": "home/home-page/01-one-story-in-order.png"
+  },
+  {
+    "node": "HomePage",
+    "test": "every top bar link has a place to land",
+    "file": "home/home-page/02-every-top-bar-link-has-a-place-to-land.png"
+  },
+  {
+    "node": "TreeSection",
+    "test": "the tree is explained",
+    "file": "home/tree/tree-section/01-the-tree-is-explained.png"
+  },
+  {
+    "node": "TreeFigure",
+    "test": "the picture",
+    "file": "home/tree/tree-figure/01-the-picture.png"
+  }
+]

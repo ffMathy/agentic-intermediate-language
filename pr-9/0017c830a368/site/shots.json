@@ -1,0 +1,52 @@
+[
+  {
+    "node": "HomePage",
+    "test": "one story, in order",
+    "file": "home/home-page/01-one-story-in-order.png"
+  },
+  {
+    "node": "HomePage",
+    "test": "every top bar link has a place to land",
+    "file": "home/home-page/02-every-top-bar-link-has-a-place-to-land.png"
+  },
+  {
+    "node": "Journey",
+    "test": "eight stops in order",
+    "file": "home/journey/journey/01-eight-stops-in-order.png"
+  },
+  {
+    "node": "Journey",
+    "test": "the thread is explained",
+    "file": "home/journey/journey/02-the-thread-is-explained.png"
+  },
+  {
+    "node": "StopProof",
+    "test": "the proof",
+    "file": "home/journey/stops/stop-proof/01-the-proof.png"
+  },
+  {
+    "node": "ProofScreens",
+    "test": "the screens",
+    "file": "home/journey/stops/proof-screens/01-the-screens.png"
+  },
+  {
+    "node": "GetStarted",
+    "test": "in Claude Code",
+    "file": "home/sections/get-started/01-in-claude-code.png"
+  },
+  {
+    "node": "GetStarted",
+    "test": "in a terminal",
+    "file": "home/sections/get-started/02-in-a-terminal.png"
+  },
+  {
+    "node": "GetStarted",
+    "test": "what to do next",
+    "file": "home/sections/get-started/03-what-to-do-next.png"
+  },
+  {
+    "node": "ReviewNote",
+    "test": "generated code stays out of review",
+    "file": "home/sections/review-note/01-generated-code-stays-out-of-review.png"
+  }
+]

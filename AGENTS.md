@@ -5,12 +5,12 @@
 - The `*.ail.md` files are the source of truth. Generated code (the target's
   `generated` globs, e.g. `src/gen/**`) is never edited by hand: hooks block
   it, and `ail build` reports it.
-- To change behaviour, change the spec, then build: `/ail:build` in Claude
-  Code, or `ail build` in a terminal.
+- To change behaviour, change the spec, then build: MCP `ail_build` in Cursor,
+  `/ail:build` in Claude Code, or `ail build` in a terminal.
 - If the spec leaves something open and it isn't in `free`, stop and ask for a
   spec change. Never guess in code.
-- Before finishing, `ail build` (or `/ail:build`) must pass: it compiles what
-  changed and then checks everything.
+- Before finishing, `ail build` (or MCP `ail_build` / `/ail:build`) must pass:
+  it compiles what changed and then checks everything.
 
 ## In this repository (the toolchain)
 
@@ -18,7 +18,8 @@
   `bun test` and `bun run typecheck`. Example projects depend on the linked
   `ail`.
 - `bun test` includes end-to-end checks of `examples/tictactoe`, which needs
-  `bun install` in that folder first.
+  `bun install` in that folder first. `examples/connect4` is a second kata;
+  install there the same way when working on it.
 - `site/` is the website, and it is an AIL project. Change its pages through
   its spec in `site/ail/` and `ail build`, never by editing `site/src/gen`.
   Its spec browser (a read-only Monaco editor) shows `site/src/gen/spec.ts`,

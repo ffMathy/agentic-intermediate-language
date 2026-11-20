@@ -9,6 +9,11 @@ means every node that changed). It can take minutes. Then report, briefly:
   never answer it in code
 - the result of the check
 
+If the result suggests `.gitattributes` lines (it does on a project's first
+build), ask the user whether to add them. They keep the generated code out of
+pull request diffs while it stays committed, so reviewers read the spec. If the
+user agrees, add the lines to the `.gitattributes` at the repository's root.
+
 If the result says the end-to-end checks were not run because there is no
 `run.app`, find out how the app this project builds is started. Look at the
 target, its package scripts and its build files. Then record it in

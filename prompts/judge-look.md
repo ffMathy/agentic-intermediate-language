@@ -18,6 +18,9 @@ everyone would agree on. Don't report:
 - small differences in font rendering or anti-aliasing
 - content that comes from outside the node (for example a dependency's own
   inner look), unless the node's spec says how it must look here
+- text you can't read clearly: a tall screenshot is drawn small, and the exact
+  words are already checked by the node's tests. Report a text mismatch only
+  when you can read the text clearly and it clearly differs from the spec
 
 Reply with exactly one of:
 

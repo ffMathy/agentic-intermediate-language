@@ -65,7 +65,11 @@ Follow the `ail` skill for how nodes are written. On top of it:
    A failing check means the spec, or the check, is wrong about the app: fix
    that, never the app. When the checks pass, the spec describes the app.
 6. **Report.** Report the nodes written, what `ail_adopt` says, and every
-   open question, each with who could answer it.
+   open question, each with who could answer it. If `ail_adopt` suggests
+   `.gitattributes` lines, ask the user whether to add them. They keep the
+   generated code out of pull request diffs while it stays committed, so
+   review is of the spec. If the user agrees, add them to the `.gitattributes`
+   at the repository's root.
 
 To move to another technology afterwards:
 1. Change the root's `target` and run `/ail:build`.

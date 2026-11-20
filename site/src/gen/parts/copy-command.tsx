@@ -9,16 +9,16 @@ export function CopyCommand({ command }: { command: string }) {
     if (!copied) {
       return;
     }
-    const timer = setTimeout(() => {
+    const id = setTimeout(() => {
       setCopied(false);
     }, 1500);
     return () => {
-      clearTimeout(timer);
+      clearTimeout(id);
     };
   }, [copied]);
 
   const press = () => {
-    if (!navigator.clipboard) {
+    if (typeof navigator === "undefined" || !navigator.clipboard) {
       return;
     }
     navigator.clipboard.writeText(command).then(

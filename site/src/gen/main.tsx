@@ -1,5 +1,8 @@
 import { createRoot } from "react-dom/client";
-import "./tokens.css";
 import { HomePage } from "./home/home-page";
 
-createRoot(document.getElementById("root")!).render(<HomePage />);
+const root = document.getElementById("root");
+
+if (root !== null) {
+  createRoot(root).render(<HomePage />);
+}

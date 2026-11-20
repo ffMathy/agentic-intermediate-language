@@ -27,9 +27,7 @@ const HELP = `ail — write the spec, let agents build the code.
                         run says (run.legacy while you write the spec of an existing app,
                         else run.app), runs each flow's end-to-end check, and stops it.
                         --app NAME    another entry of run
-  ail show [what]       The tree (default), a <Node>, an audience
-                        (stakeholder | design | engineer | specialist [tag]),
-                        or changes [--since <ref>]
+  ail show [what]       The tree (default), a <Node>, or changes [--since <ref>]
                         --shots DIR   add screenshots of the node shown, or for changes,
                                       of the changed nodes and the nodes that use them
 
@@ -92,7 +90,7 @@ async function main(argv: string[]): Promise<number> {
     }
 
     case "adopt": {
-      const r = await adopt(p, { app: flag(a, "app"), names: nodesOrDie(p, rest), log });
+      const r = await adopt(p, { app: flag(a, "app"), names: nodesOrDie(p, rest), log, suggestReview: true });
       print(formatAdopt(r), r);
       return r.ok ? 0 : 1;
     }
@@ -100,7 +98,7 @@ async function main(argv: string[]): Promise<number> {
     case "show": {
       const target = rest[0] ?? "";
       const since = flag(a, "since") ?? defaultBase(p);
-      let text = show(p, target, { tag: rest[1], since });
+      let text = show(p, target, { since });
       const dir = flag(a, "shots");
       if (dir) {
         const names = target === "changes" ? (() => { const c = changedNodes(p, since); return changedScreens(p, [...c.changed, ...c.added]); })()

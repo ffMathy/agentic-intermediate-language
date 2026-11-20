@@ -2,7 +2,8 @@ import type { ReactNode } from "react";
 import { Stack } from "../../parts/stack";
 import { CodeBlock } from "../../parts/code-block";
 
-type JourneyStopProps = {
+/** "props    number: number, color: token name, depth: string, chip: string, reader: string, headline: string, explanation: string, lines: string[], label: string, file: string, highlight: string[], turnsInto: string, figure: React node, last?: boolean, browse?: string (the link's target)" */
+export type JourneyStopProps = {
   number: number;
   color: string;
   depth: string;
@@ -20,9 +21,7 @@ type JourneyStopProps = {
   browse?: string;
 };
 
-const tokenVar = (token: string): string => `var(--${token.replace(/\./g, "-")})`;
-
-/** "in this order: the level chip, who reads this level, a level 3 heading, an explanation and a figure, the spec excerpt with the thread highlighted, and what this level turns into" */
+/** "Every stop has the same anatomy, so the visitor compares levels instead of learning a new layout each time." */
 export function JourneyStop({
   number,
   color,
@@ -40,7 +39,7 @@ export function JourneyStop({
   last,
   browse,
 }: JourneyStopProps) {
-  const stopColor = tokenVar(color);
+  const stopColor = "var(--" + color.replace(/\./g, "-") + ")";
   return (
     <article
       id={`stop-${number}`}
@@ -79,7 +78,8 @@ export function JourneyStop({
           aria-hidden="true"
           style={{
             position: "relative",
-            marginLeft: "calc((clamp(32px, 9vw, 56px) - clamp(28px, 7vw, 36px)) / 2)",
+            marginLeft:
+              "calc((clamp(32px, 9vw, 56px) - clamp(28px, 7vw, 36px)) / 2)",
             width: "clamp(28px, 7vw, 36px)",
             height: "clamp(28px, 7vw, 36px)",
             boxSizing: "border-box",
@@ -194,7 +194,7 @@ export function JourneyStop({
           highlight={highlight}
           edge={color}
         />
-        {browse !== undefined && (
+        {browse !== undefined ? (
           <a
             href={browse}
             style={{
@@ -207,7 +207,7 @@ export function JourneyStop({
           >
             Open the whole file in the spec browser ↓
           </a>
-        )}
+        ) : null}
         <p
           style={{
             maxWidth: "var(--width-prose)",
@@ -220,7 +220,9 @@ export function JourneyStop({
             margin: 0,
           }}
         >
-          <span style={{ fontWeight: 700, color: "var(--color-accent)" }}>Turns into:</span>{" "}
+          <span style={{ fontWeight: 700, color: "var(--color-accent)" }}>
+            Turns into:
+          </span>{" "}
           {turnsInto}
         </p>
       </Stack>

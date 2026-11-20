@@ -13,6 +13,7 @@ export function TopBar() {
   return (
     <header
       style={{
+        width: "100%",
         background: "var(--color-surface)",
         borderBottom: "1px solid var(--color-border)",
         boxSizing: "border-box",
@@ -25,10 +26,7 @@ export function TopBar() {
         align="center"
         justify="between"
         wrap={true}
-        style={{
-          maxWidth: "var(--width-content)",
-          margin: "0 auto",
-        }}
+        style={{ maxWidth: "var(--width-content)", margin: "0 auto" }}
       >
         <Stack dir="h" gap="space.2" align="center" wrap={true}>
           <svg

@@ -20,8 +20,8 @@ const groupLabelStyle: CSSProperties = {
   color: "var(--color-text-muted)",
 };
 
-function pillStyle(color: string): CSSProperties {
-  return {
+function Pill({ n, label, color }: { n: number; label: string; color: string }) {
+  const style: CSSProperties = {
     display: "inline-flex",
     alignItems: "center",
     minHeight: "44px",
@@ -34,40 +34,35 @@ function pillStyle(color: string): CSSProperties {
     fontWeight: 600,
     textDecoration: "none",
   };
-}
-
-function Pill({ n }: { n: number }) {
-  const stop = stops[n - 1];
   return (
-    <a href={`#stop-${stop.n}`} style={pillStyle(stop.color)}>
-      {stop.label}
+    <a href={`#stop-${n}`} style={style}>
+      {label}
     </a>
   );
 }
 
 function Group({ label, from, to }: { label: string; from: number; to: number }) {
-  const pills: number[] = [];
-  for (let n = from; n <= to; n++) {
-    pills.push(n);
-  }
   return (
     <Stack dir="v" gap="space.1" align="start">
       <span style={groupLabelStyle}>{label}</span>
       <Stack dir="h" gap="space.2" align="center" wrap={true}>
-        {pills.map((n) => (
-          <Pill key={n} n={n} />
-        ))}
+        {stops
+          .filter((stop) => stop.n >= from && stop.n <= to)
+          .map((stop) => (
+            <Pill key={stop.n} n={stop.n} label={stop.label} color={stop.color} />
+          ))}
       </Stack>
     </Stack>
   );
 }
 
-/** "eight pills, one per stop, each in its stop's color, with no lines between them, in three groups" */
+/** eight pills, one per stop, each in its stop's color, with no lines between them, in three groups */
 export function JumpGauge() {
+  const first = stops[0];
   return (
     <nav aria-label="Journey stops">
       <Stack dir="h" gap="space.4" align="end" wrap={true}>
-        <Pill n={1} />
+        <Pill n={first.n} label={first.label} color={first.color} />
         <Group label="The spec: four levels" from={2} to={5} />
         <Group label="What it becomes" from={6} to={8} />
       </Stack>

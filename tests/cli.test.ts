@@ -21,11 +21,11 @@ test("ail build only checks when nothing changed, and passes on the kata", async
   expect(out).toMatch(/✓ behavior \d+ test\(s\) passed, typecheck ok/);
 }, 60_000);
 
-test("ail show covers the tree, nodes, audiences and changes", () => {
+test("ail show covers the tree, a node and changes, and nothing else", () => {
   const p = loadProject(KATA);
   expect(show(p)).toContain("BoardView : view · experience · board [fresh] (used by 2)");
   expect(show(p, "ComputerPlayer")).toContain("used by:  PlayAGame (app/play/), WatchADemo (app/demo/)");
-  expect(show(p, "stakeholder")).toContain("# Stakeholder lens");
+  expect(() => show(p, "stakeholder")).toThrow('nothing called "stakeholder"');
   expect(() => show(p, "nonsense")).toThrow('nothing called "nonsense"');
 });
 

@@ -35,7 +35,7 @@ and one command does the rest:
 | `/ail:build` | compile whatever changed (each node sees only its own slice of the spec), then check everything |
 | `/ail:adopt` | bring an existing app under AIL: see below |
 
-To look at the spec, just ask: "show me the tree", "the stakeholder view",
+To look at the spec, just ask: "show me the tree", "show me ComputerPlayer",
 "what changed?".
 
 See **[docs/claude-code.md](docs/claude-code.md)** for the full guide.
@@ -54,7 +54,7 @@ Then, anywhere inside a project (any folder with an `ail.config.json`):
 |---|---|
 | `ail build` | Compile whatever changed, then check everything: the spec is sound, the code is built from it, every check passes, and each screen matches its `look`. With nothing to compile it only checks, without a model, so CI runs it too. It uses Claude Code's login unless `ANTHROPIC_API_KEY` is set; `--model` picks another provider. |
 | `ail adopt` | Does the existing app behave as its spec says? Starts it as `ail.config.json`'s `run` says, runs each flow's end-to-end check, and stops it. |
-| `ail show [what]` | The tree, a node, an audience's view (`stakeholder`, `design`, `engineer`, `specialist`), or `changes`. Add `--shots <dir>` for screenshots of the proofs |
+| `ail show [what]` | The tree, one node (who uses it, and what a change to it reaches), or `changes`: what changed in meaning since a git ref, as reviewed in pull requests. Add `--shots <dir>` for screenshots of the proofs |
 
 That's the whole tool. Change detection, deriving tests from scenarios,
 writing the token CSS, taking the proof screenshots and cleaning up after
@@ -108,7 +108,7 @@ ail build
 ```
 
 ```bash
-ail show stakeholder
+ail show
 ```
 
 ```bash
@@ -131,7 +131,8 @@ Use your target's `generated` paths, prefixed with the project's folder if it
 isn't the repository root. GitHub then collapses those files in every pull
 request diff, so reviewers see the spec, the derived checks and the proof
 screenshots, while the generated code stays committed. A reviewer can still
-expand a collapsed file with "Load diff".
+expand a collapsed file with "Load diff". A project's first `ail build`, and
+`ail adopt`, suggest exactly these lines when they're missing.
 
 ## In CI
 

@@ -17,8 +17,8 @@ export const TOOLS: Tool[] = [
   {
     name: "ail_show",
     description: 'Look at the AIL spec. target: "" for the tree with each node\'s build status, a node name for its source and who uses it, "stakeholder" | "design" | "engineer" | "specialist" (with optional tag) for an audience\'s view, or "changes" (optional since: git ref) for a review of what changed.',
-    inputSchema: obj({ target: str, tag: str, since: str }),
-    run: (p, a) => ({ text: show(p, (a.target as string) ?? "", { tag: a.tag as string | undefined, since: a.since as string | undefined }) }),
+    inputSchema: obj({ target: str, since: str }),
+    run: (p, a) => ({ text: show(p, (a.target as string) ?? "", { since: a.since as string | undefined }) }),
   },
   {
     name: "ail_build",
@@ -33,7 +33,7 @@ export const TOOLS: Tool[] = [
     name: "ail_adopt",
     description: "Does the app behave as the spec says? Starts the app as ail.config.json's `run` says (`app`: which entry; default run.legacy while adopting an existing app, else run.app), runs each flow's end-to-end check (checks/e2e/<folder>/<node>.e2e.ts, which drives the app however suits it: a browser, a simulator, a process) and stops it. Use it while bringing an existing app under AIL, to prove the spec describes it, and after building, to prove the new app behaves the same. Lists the flows that have no end-to-end check yet.",
     inputSchema: obj({ app: str, nodes: { type: "array", items: str } }),
-    run: async (p, a, progress) => { const r = await adopt(p, { app: a.app as string | undefined, names: (a.nodes as string[]) ?? [], log: progress }); return { text: formatAdopt(r), isError: !r.ok }; },
+    run: async (p, a, progress) => { const r = await adopt(p, { app: a.app as string | undefined, names: (a.nodes as string[]) ?? [], log: progress, suggestReview: true }); return { text: formatAdopt(r), isError: !r.ok }; },
   },
 ];
 

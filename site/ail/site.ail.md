@@ -60,7 +60,7 @@ glossary
   term spec      plain "the description people write and review"                    formal the *.ail.md files
   term node      plain "one part of the spec, with its why, what and how"           formal an AIL node
   term level     plain "how detailed a part of the spec is, and who it is for"      formal product, experience, system or specialist
-  term reader    plain "the kind of person a level is written for"                  formal a lens of ail show
+  term reader    plain "the kind of person a level is written for"                  formal a level of the spec
   term build     plain "turning the spec into working code"                         formal ail build
   term check     plain "proving the code still does what the spec says"             formal the check that ends every ail build
   term thread    plain "the one promise this page follows down the spec"            formal "The computer never loses." in examples/tictactoe

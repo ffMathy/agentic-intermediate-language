@@ -1,4 +1,4 @@
-// ail-derived-from: Hero@2f96c4fd3928b54e
+// ail-derived-from: Hero@1d9c90c31196a946
 import { afterEach, expect, test } from "bun:test";
 import { cleanup, render, screen } from "@testing-library/react";
 import { Hero } from "../../../src/gen/home/hero/hero";

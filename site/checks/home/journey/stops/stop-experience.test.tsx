@@ -1,4 +1,4 @@
-// ail-derived-from: StopExperience@354454e4dc899001
+// ail-derived-from: StopExperience@6dd8485b9baf7fcc
 import { afterEach, expect, test } from "bun:test";
 import { cleanup, render, within } from "@testing-library/react";
 import { StopExperience } from "../../../../src/gen/home/journey/stops/stop-experience";
@@ -24,22 +24,19 @@ const lines = [
 test("the experience level", () => {
   const { container } = render(<StopExperience />);
 
-  const article = container.querySelector("#stop-3");
+  const article = container.querySelector("article#stop-3");
   expect(article).not.toBeNull();
-  expect(article?.tagName.toLowerCase()).toBe("article");
   const scope = within(article as HTMLElement);
 
-  expect(
-    scope.getByRole("heading", {
-      level: 3,
-      name: "Experience level: what the player sees, as scenarios anyone can test.",
-    }),
-  ).toBeTruthy();
+  const heading = scope.getByRole("heading", { level: 3 });
+  expect(heading.textContent).toBe(
+    "Experience level: what the player sees, as scenarios anyone can test.",
+  );
 
   const region = scope.getByRole("region", { name: "Experience-level spec excerpt" });
   const regionText = region.textContent ?? "";
   for (const line of lines) {
-    expect(regionText).toContain(line.trim());
+    expect(regionText).toContain(line);
   }
 
   const highlighted = Array.from(region.querySelectorAll("*")).filter(

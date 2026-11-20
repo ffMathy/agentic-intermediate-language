@@ -1,4 +1,4 @@
-// ail-derived-from: HomePage@53685d7bbf836829
+// ail-derived-from: HomePage@9a7c79606fbce16a
 import { afterEach, expect, test } from "bun:test";
 import { cleanup, render, screen } from "@testing-library/react";
 import { HomePage } from "../../src/gen/home/home-page";
@@ -9,11 +9,13 @@ afterEach(() => {
 
 test("one story, in order", () => {
   render(<HomePage />);
+
   const h1s = screen.getAllByRole("heading", { level: 1 });
   expect(h1s.length).toBe(1);
-  expect((h1s[0].textContent ?? "").trim()).toBe(
+  expect(h1s[0].textContent?.trim()).toBe(
     "Write one sentence. Watch it become working software.",
   );
+
   const h2s = screen
     .getAllByRole("heading", { level: 2 })
     .map((h) => (h.textContent ?? "").trim());
@@ -31,6 +33,7 @@ test("one story, in order", () => {
 
 test("every top bar link has a place to land", () => {
   render(<HomePage />);
+
   for (const id of ["tree", "journey", "readers", "loop", "adopt", "specs", "start"]) {
     expect(document.getElementById(id)).not.toBeNull();
   }

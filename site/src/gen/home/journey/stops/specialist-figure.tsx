@@ -1,23 +1,18 @@
 import { MiniBoard } from "../../../parts/mini-board";
 
-const children = [
+const childXs = [46, 130, 214];
+const childBoards = [
   { x: 34, marks: "X_X_O____" },
   { x: 118, marks: "XX__O____" },
   { x: 202, marks: "X___O___X" },
 ];
-
-const childCenters = [46, 130, 214];
-
 const leafXs = [22, 46, 70, 106, 130, 154, 190, 214, 238];
-
 const passLeaves = [1, 3, 7];
-
 const edgeStyle = {
   stroke: "var(--color-level-specialist)",
   strokeWidth: 1,
   opacity: 0.5,
 };
-
 const legendTextStyle = {
   fontFamily: "var(--font-sans)",
   fontSize: 12,
@@ -38,37 +33,17 @@ export function SpecialistFigure() {
         display: "block",
       }}
     >
-      {childCenters.map((cx) => (
-        <line
-          key={`root-${cx}`}
-          x1={130}
-          y1={44}
-          x2={cx}
-          y2={80}
-          style={edgeStyle}
-        />
+      {childXs.map((cx) => (
+        <line key={`root-${cx}`} x1={130} y1={44} x2={cx} y2={80} style={edgeStyle} />
       ))}
-      {childCenters.map((cx) =>
+      {childXs.map((cx) =>
         [cx - 24, cx, cx + 24].map((lx) => (
-          <line
-            key={`child-${cx}-${lx}`}
-            x1={cx}
-            y1={104}
-            x2={lx}
-            y2={145}
-            style={edgeStyle}
-          />
+          <line key={`leaf-${cx}-${lx}`} x1={cx} y1={104} x2={lx} y2={145} style={edgeStyle} />
         )),
       )}
       <MiniBoard x={112} y={8} cell={12} marks="X___O____" />
-      {children.map((child) => (
-        <MiniBoard
-          key={child.x}
-          x={child.x}
-          y={80}
-          cell={8}
-          marks={child.marks}
-        />
+      {childBoards.map((board) => (
+        <MiniBoard key={board.x} x={board.x} y={80} cell={8} marks={board.marks} />
       ))}
       {leafXs.map((lx, i) => (
         <circle
@@ -77,25 +52,13 @@ export function SpecialistFigure() {
           cy={150}
           r={5}
           style={{
-            fill: passLeaves.includes(i)
-              ? "var(--color-pass)"
-              : "var(--color-code-muted)",
+            fill: passLeaves.includes(i) ? "var(--color-pass)" : "var(--color-code-muted)",
           }}
         />
       ))}
       <circle cx={270} cy={40} r={5} style={{ fill: "var(--color-pass)" }} />
-      <circle
-        cx={270}
-        cy={64}
-        r={5}
-        style={{ fill: "var(--color-code-muted)" }}
-      />
-      <circle
-        cx={270}
-        cy={88}
-        r={5}
-        style={{ fill: "var(--color-player-x)" }}
-      />
+      <circle cx={270} cy={64} r={5} style={{ fill: "var(--color-code-muted)" }} />
+      <circle cx={270} cy={88} r={5} style={{ fill: "var(--color-player-x)" }} />
       <line
         x1={262}
         y1={88}

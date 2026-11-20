@@ -1,4 +1,4 @@
-// ail-derived-from: Journey@f7e74da5e25f8385
+// ail-derived-from: Journey@2d9e1475f49c1516
 import { afterEach, expect, test } from "bun:test";
 import { cleanup, render, screen, within } from "@testing-library/react";
 import { Journey } from "../../../src/gen/home/journey/journey";
@@ -14,9 +14,8 @@ test("eight stops in order", () => {
   const band = section as HTMLElement;
   const headings = within(band).getAllByRole("heading", { level: 3 });
   expect(headings.length).toBe(8);
-  expect((headings[0].textContent ?? "").trim()).toBe("It starts with what the product owner wants.");
-  expect((headings[7].textContent ?? "").trim()).toBe("The result: try to beat it.");
-
+  expect(headings[0].textContent).toBe("It starts with what the product owner wants.");
+  expect(headings[7].textContent).toBe("The result: try to beat it.");
   const stops: HTMLElement[] = [];
   for (let n = 1; n <= 8; n++) {
     const stop = document.getElementById(`stop-${n}`);
@@ -32,6 +31,10 @@ test("eight stops in order", () => {
 
 test("the thread is explained", () => {
   render(<Journey />);
-  const legend = screen.getByText("the thread we are following");
-  expect((legend.textContent ?? "").trim()).toBe("the thread we are following");
+  const section = document.getElementById("journey") as HTMLElement;
+  expect(section).not.toBeNull();
+  expect(within(section).getByText("the thread we are following")).toBeTruthy();
+  expect(screen.getByText("the thread we are following").textContent).toBe(
+    "the thread we are following",
+  );
 });

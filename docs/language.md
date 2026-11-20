@@ -197,7 +197,7 @@ compiled for that target agrees on them.
 | `public`, `private`, `static`, `readonly` | nothing: what is in `what` is public |
 | `items.Select(a => a.Id)`, `.map(…)` | `the ids of items, in order` |
 | `a == b`, `&&`, `\|\|`, `!` | `a is b`, `and`, `or`, `not` |
-| `useState(false)`, `React node`, `new Settings()` | `state copied: boolean, starting at false`, `a view`, `defaultSettings()` |
+| `useState(false)`, `React node`, `new Settings()` | `state copied: boolean, starting at false`, `a rendered view`, `defaultSettings()` |
 | `const x = …`, `import …` | `X: Type = value`; dependencies go under `uses` |
 
 Platform concepts are not language syntax. A web view's `binds` may say
@@ -216,7 +216,7 @@ events   click sets reader; ArrowRight picks the next reader, wrapping
 ```
 `props` are a view's inputs, `state` is what a flow keeps between events
 (with its starting value), and `events` are what the user does and what it
-changes. A prop that holds other views is typed `a view` (or, for
+changes. A prop that holds other views is typed `a rendered view` (or, for
 what sits inside a view, `children`). Other keys name a hook
 into the platform (`svg`, `hash`, `tablist`) and say what it does in words.
 

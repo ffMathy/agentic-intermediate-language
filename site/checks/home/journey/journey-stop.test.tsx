@@ -1,4 +1,4 @@
-// ail-derived-from: JourneyStop@fc713e6627156855
+// ail-derived-from: JourneyStop@05445e74ecbd3144
 import { afterEach, expect, test } from "bun:test";
 import { cleanup, render, screen, within } from "@testing-library/react";
 import { JourneyStop } from "../../../src/gen/home/journey/journey-stop";
@@ -7,44 +7,66 @@ afterEach(() => {
   cleanup();
 });
 
-const norm = (s: string | null): string => (s ?? "").replace(/\s+/g, " ").trim();
-
-const hasElementWithText = (root: HTMLElement, text: string): boolean =>
-  Array.from(root.querySelectorAll("*")).some((el) => norm(el.textContent) === text);
-
-const baseProps = {
-  number: 4,
-  color: "color.level.system",
-  depth: "Deep",
-  chip: "SYSTEM",
-  reader: "engineers",
-  headline: "System level",
-  explanation: "An explanation of this level.",
-  lines: ["4. The computer never loses."],
-  label: "Spec excerpt",
-  file: "examples/tictactoe/tictactoe.ail.md",
-  highlight: ["never loses"],
-  turnsInto: "Tests.",
-  figure: <div>Figure</div>,
-};
+function hasElementWithText(root: HTMLElement, matcher: (text: string) => boolean): boolean {
+  return Array.from(root.querySelectorAll("*")).some((el) => matcher(el.textContent ?? ""));
+}
 
 test("a stop", () => {
-  const { container } = render(<JourneyStop {...baseProps} />);
-  const article = container.querySelector("article#stop-4") as HTMLElement | null;
-  expect(article).not.toBeNull();
-  if (!article) return;
-  expect(hasElementWithText(article, "4")).toBe(true);
-  expect(hasElementWithText(article, "SYSTEM")).toBe(true);
-  expect(hasElementWithText(article, "Who reads this: engineers")).toBe(true);
-  const heading = within(article).getByRole("heading", { level: 3, name: "System level" });
-  expect(heading).toBeTruthy();
-  const region = within(article).getByRole("region", { name: "Spec excerpt" });
-  expect(region).toBeTruthy();
-  expect(hasElementWithText(article, "Turns into: Tests.")).toBe(true);
+  render(
+    <JourneyStop
+      number={4}
+      color="color.level.system"
+      depth="depth 3"
+      chip="SYSTEM"
+      reader="engineers"
+      headline="System level"
+      explanation="How the parts fit together."
+      lines={["node Game : flow"]}
+      label="Spec excerpt"
+      file="examples/tictactoe/game.ail.md"
+      highlight={[]}
+      turnsInto="Tests."
+      figure={<div>Figure</div>}
+    />,
+  );
+
+  const article = screen.getByRole("article");
+  expect(article.id).toBe("stop-4");
+
+  const view = within(article);
+  expect(hasElementWithText(article, (text) => text.trim() === "4")).toBe(true);
+  expect(hasElementWithText(article, (text) => text.trim() === "SYSTEM")).toBe(true);
+  expect(
+    hasElementWithText(article, (text) => text.trim() === "Who reads this: engineers"),
+  ).toBe(true);
+  expect(view.getByRole("heading", { level: 3, name: "System level" })).toBeTruthy();
+
+  expect(view.getByRole("region", { name: "Spec excerpt" })).toBeTruthy();
+  expect(
+    hasElementWithText(article, (text) => /^\s*Turns into:\s+Tests\.\s*$/.test(text)),
+  ).toBe(true);
 });
 
 test("a stop with a file to browse", () => {
-  render(<JourneyStop {...baseProps} browse="#spec/tictactoe/ail-file.ail.md" />);
+  render(
+    <JourneyStop
+      number={2}
+      color="color.level.product"
+      depth="depth 1"
+      chip="PRODUCT"
+      reader="everyone"
+      headline="Product level"
+      explanation="What the product promises."
+      lines={["The computer never loses."]}
+      label="Spec excerpt"
+      file="examples/tictactoe/ail-file.ail.md"
+      highlight={["never loses"]}
+      turnsInto="Experience nodes."
+      figure={<div>Figure</div>}
+      browse="#spec/tictactoe/ail-file.ail.md"
+    />,
+  );
+
   const link = screen.getByRole("link", { name: "Open the whole file in the spec browser ↓" });
   expect(link.getAttribute("href")).toBe("#spec/tictactoe/ail-file.ail.md");
 });

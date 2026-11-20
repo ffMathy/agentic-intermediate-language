@@ -1,5 +1,5 @@
 import { useId } from "react";
-import type { CSSProperties, ReactNode } from "react";
+import type { CSSProperties } from "react";
 import { Section } from "../../parts/section";
 import { SectionHeading } from "../../parts/section-heading";
 import { Stack } from "../../parts/stack";
@@ -93,7 +93,7 @@ const repoStyle: CSSProperties = {
   textDecoration: "none",
 };
 
-const toolRows: ReadonlyArray<{ command: string; does: string }> = [
+const toolRows: { command: string; does: string }[] = [
   {
     command: "ail build",
     does: "Compile whatever changed, then check everything: the spec, the code, every test, and each screen against its look.",
@@ -108,22 +108,10 @@ const toolRows: ReadonlyArray<{ command: string; does: string }> = [
   },
 ];
 
-function Card({ title, children }: { title: string; children: ReactNode }) {
-  const titleId = useId();
-  return (
-    <section aria-labelledby={titleId} style={cardStyle}>
-      <Stack dir="v" gap="space.3" align="stretch">
-        <h3 id={titleId} style={titleStyle}>
-          {title}
-        </h3>
-        {children}
-      </Stack>
-    </section>
-  );
-}
-
 /** "two cards, "In Claude Code" and "In a terminal", side by side when there is room" */
 export function GetStarted() {
+  const claudeId = useId();
+  const cliId = useId();
   return (
     <Section id="start" tone="plain">
       <Stack dir="v" gap="space.6" align="stretch">
@@ -132,42 +120,56 @@ export function GetStarted() {
           lead="Install it, then describe a feature in plain words. You get a spec you can review, and code that is checked against it."
         />
         <div style={cardsStyle}>
-          <Card title="In Claude Code">
-            <p style={subtitleStyle}>No API key. It runs on your Claude subscription.</p>
-            <CopyCommand command="/plugin marketplace add ffMathy/agentic-intermediate-language" />
-            <CopyCommand command="/plugin install ail@agentic-intermediate-language" />
-            <p style={textStyle}>
-              Then ask for features in plain words. Claude changes the spec, and /ail:build compiles whatever changed.
-            </p>
-          </Card>
-          <Card title="In a terminal">
-            <p style={subtitleStyle}>Needs Bun 1.2 or later.</p>
-            <CopyCommand command="bun add -g github:ffMathy/agentic-intermediate-language" />
-            <table style={tableStyle}>
-              <thead>
-                <tr style={rowStyle}>
-                  <th style={cellStyle}>Command</th>
-                  <th style={cellStyle}>What it does</th>
-                </tr>
-              </thead>
-              <tbody>
-                {toolRows.map((row) => (
-                  <tr key={row.command} style={rowStyle}>
-                    <td style={commandCellStyle}>{row.command}</td>
-                    <td style={cellStyle}>{row.does}</td>
+          <section aria-labelledby={claudeId} style={cardStyle}>
+            <Stack dir="v" gap="space.3" align="stretch">
+              <h3 id={claudeId} style={titleStyle}>
+                In Claude Code
+              </h3>
+              <p style={subtitleStyle}>
+                No API key. It runs on your Claude subscription.
+              </p>
+              <CopyCommand command="/plugin marketplace add ffMathy/agentic-intermediate-language" />
+              <CopyCommand command="/plugin install ail@agentic-intermediate-language" />
+              <p style={textStyle}>
+                Then ask for features in plain words. Claude changes the spec,
+                and /ail:build compiles whatever changed.
+              </p>
+            </Stack>
+          </section>
+          <section aria-labelledby={cliId} style={cardStyle}>
+            <Stack dir="v" gap="space.3" align="stretch">
+              <h3 id={cliId} style={titleStyle}>
+                In a terminal
+              </h3>
+              <p style={subtitleStyle}>Needs Bun 1.2 or later.</p>
+              <CopyCommand command="bun add -g github:ffMathy/agentic-intermediate-language" />
+              <table style={tableStyle}>
+                <thead>
+                  <tr style={rowStyle}>
+                    <th style={cellStyle}>Command</th>
+                    <th style={cellStyle}>What it does</th>
                   </tr>
-                ))}
-              </tbody>
-            </table>
-            <p style={closingStyle}>That's the whole tool: three commands.</p>
-            <p style={textStyle}>
-              Run these inside a project, meaning any folder with an ail.config.json. To try the tic-tac-toe demo from this page:
-            </p>
-            <CopyCommand command="git clone https://github.com/ffMathy/agentic-intermediate-language && cd agentic-intermediate-language" />
-            <CopyCommand command="bun install && bun link" />
-            <CopyCommand command="cd examples/tictactoe && bun install && ail build" />
-            <CopyCommand command="ail show" />
-          </Card>
+                </thead>
+                <tbody>
+                  {toolRows.map((row) => (
+                    <tr key={row.command} style={rowStyle}>
+                      <td style={commandCellStyle}>{row.command}</td>
+                      <td style={cellStyle}>{row.does}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+              <p style={closingStyle}>That's the whole tool: three commands.</p>
+              <p style={textStyle}>
+                Run these inside a project, meaning any folder with an
+                ail.config.json. To try the tic-tac-toe demo from this page:
+              </p>
+              <CopyCommand command="git clone https://github.com/ffMathy/agentic-intermediate-language && cd agentic-intermediate-language" />
+              <CopyCommand command="bun install && bun link" />
+              <CopyCommand command="cd examples/tictactoe && bun install && ail build" />
+              <CopyCommand command="ail show" />
+            </Stack>
+          </section>
         </div>
         <ReviewNote />
         <Stack dir="h" gap="space.3" align="center" wrap={true}>
@@ -177,7 +179,10 @@ export function GetStarted() {
           >
             Read the Tic-Tac-Toe spec
           </a>
-          <a href="https://github.com/ffMathy/agentic-intermediate-language" style={repoStyle}>
+          <a
+            href="https://github.com/ffMathy/agentic-intermediate-language"
+            style={repoStyle}
+          >
             View on GitHub ↗
           </a>
         </Stack>

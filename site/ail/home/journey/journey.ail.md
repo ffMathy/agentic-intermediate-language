@@ -86,8 +86,9 @@ node JourneyStop : view   level: experience
     when the stop names a spec file to browse, a link under the excerpt opens that whole file in the spec browser
     on a 390px-wide screen each figure's drawing is at least 300px wide, so a 360-unit figure draws at no less than 0.83 scale
     the last stop's rail ends at its marker
+    the depth label is a short word of at most 7 characters (such as "depth 3" or "result"), so it fits its 56px box
     Scenario: a stop
-      Given the number 4, the color "color.level.system", the chip "SYSTEM", the reader "engineers", the headline "System level", the excerpt label "Spec excerpt" and the turns-into text "Tests."
+      Given the number 4, the color "color.level.system", the depth "depth 3", the chip "SYSTEM", the reader "engineers", the headline "System level", the excerpt label "Spec excerpt" and the turns-into text "Tests."
       Then an article with the id "stop-4" shows the marker "4", "SYSTEM", "Who reads this: engineers" and a level 3 heading "System level"
       And it holds the region named "Spec excerpt" and the text "Turns into:" followed by "Tests."
     Scenario: a stop with a file to browse
@@ -116,6 +117,6 @@ node JourneyStop : view   level: experience
     stop.browse  "Open the whole file in the spec browser ↓"
   binds
     color    the color prop is a token name such as "color.level.system", used as the CSS variable var(--color-level-system)
-    props    number: integer, color: token name, depth: text, chip: text, reader: text, headline: text, explanation: text, lines: list of text, label: text, file: text, highlight: list of text, turnsInto: text, figure: a view, last?: boolean, browse?: text (the link's target)
+    props    number: integer, color: token name, depth: text, chip: text, reader: text, headline: text, explanation: text, lines: list of text, label: text, file: text, highlight: list of text, turnsInto: text, figure: a rendered view (an instance that the stop shows as it is, not the view to render), last?: boolean, browse?: text (the link's target)
   uses  Stack, CodeBlock
 ```

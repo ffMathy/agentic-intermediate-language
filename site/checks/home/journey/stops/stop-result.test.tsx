@@ -1,6 +1,6 @@
-// ail-derived-from: StopResult@708882b3937f76ff
+// ail-derived-from: StopResult@5b6f9b38116e60a7
 import { afterEach, expect, test } from "bun:test";
-import { cleanup, render, within } from "@testing-library/react";
+import { cleanup, render, screen, within } from "@testing-library/react";
 import { StopResult } from "../../../../src/gen/home/journey/stops/stop-result";
 
 afterEach(() => {
@@ -8,17 +8,19 @@ afterEach(() => {
 });
 
 test("the result", () => {
-  const { container } = render(<StopResult />);
+  render(<StopResult />);
 
-  const article = container.querySelector("article#stop-8");
-  expect(article).not.toBeNull();
+  const article = screen
+    .getAllByRole("article")
+    .find((el) => el.id === "stop-8");
+  expect(article).toBeDefined();
   const stop = article as HTMLElement;
 
   const heading = within(stop).getByRole("heading", {
     level: 3,
     name: "The result: try to beat it.",
   });
-  expect(heading).toBeTruthy();
+  expect(heading).toBeDefined();
 
   const region = within(stop).getByRole("region", {
     name: "The promise, one last time",
@@ -26,7 +28,7 @@ test("the result", () => {
   expect(region.textContent ?? "").toContain("    4. The computer never loses.");
 
   const highlighted = Array.from(region.querySelectorAll("*")).filter(
-    (el) => (el.textContent ?? "") === "The computer never loses.",
+    (el) => el.textContent === "The computer never loses.",
   );
   expect(highlighted.length).toBeGreaterThan(0);
 

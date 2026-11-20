@@ -2,8 +2,7 @@ import type { ReactNode } from "react";
 import { Stack } from "../../parts/stack";
 import { CodeBlock } from "../../parts/code-block";
 
-/** "props    number: number, color: token name, depth: string, chip: string, reader: string, headline: string, explanation: string, lines: string[], label: string, file: string, highlight: string[], turnsInto: string, figure: React node, last?: boolean, browse?: string (the link's target)" */
-export type JourneyStopProps = {
+type JourneyStopProps = {
   number: number;
   color: string;
   depth: string;
@@ -21,7 +20,7 @@ export type JourneyStopProps = {
   browse?: string;
 };
 
-/** "Every stop has the same anatomy, so the visitor compares levels instead of learning a new layout each time." */
+/** "a numbered marker on a vertical rail in the stop's color, with a short depth label under the marker" */
 export function JourneyStop({
   number,
   color,
@@ -39,7 +38,7 @@ export function JourneyStop({
   last,
   browse,
 }: JourneyStopProps) {
-  const stopColor = "var(--" + color.replace(/\./g, "-") + ")";
+  const stopColor = `var(--${color.split(".").join("-")})`;
   return (
     <article
       id={`stop-${number}`}
@@ -78,8 +77,7 @@ export function JourneyStop({
           aria-hidden="true"
           style={{
             position: "relative",
-            marginLeft:
-              "calc((clamp(32px, 9vw, 56px) - clamp(28px, 7vw, 36px)) / 2)",
+            marginLeft: "calc((clamp(32px, 9vw, 56px) - clamp(28px, 7vw, 36px)) / 2)",
             width: "clamp(28px, 7vw, 36px)",
             height: "clamp(28px, 7vw, 36px)",
             boxSizing: "border-box",
@@ -220,9 +218,8 @@ export function JourneyStop({
             margin: 0,
           }}
         >
-          <span style={{ fontWeight: 700, color: "var(--color-accent)" }}>
-            Turns into:
-          </span>{" "}
+          <span style={{ fontWeight: 700, color: "var(--color-accent)" }}>Turns into:</span>
+          {" "}
           {turnsInto}
         </p>
       </Stack>

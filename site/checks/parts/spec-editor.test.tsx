@@ -1,4 +1,4 @@
-// ail-derived-from: SpecEditor@74cf657a51d43dbd
+// ail-derived-from: SpecEditor@f445e73b420b1c7f
 import { afterEach, expect, mock, test } from "bun:test";
 import { cleanup, render, screen } from "@testing-library/react";
 import type { ReactNode } from "react";
@@ -12,6 +12,7 @@ mock.module("@monaco-editor/react", () => {
       config: () => {},
       init: () => new Promise(() => {}),
     },
+    useMonaco: () => null,
   };
 });
 

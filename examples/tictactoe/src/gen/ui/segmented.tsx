@@ -1,15 +1,15 @@
 import type { CSSProperties } from "react";
 
-export type SegmentedOption<T> = {
-  value: T;
+export type SegmentedOption<V extends string> = {
+  value: V;
   label: string;
 };
 
-export type SegmentedProps<T> = {
+export type SegmentedProps<V extends string> = {
   label: string;
-  options: SegmentedOption<T>[];
-  value: T;
-  onChange: (value: T) => void;
+  options: SegmentedOption<V>[];
+  value: V;
+  onChange: (value: V) => void;
 };
 
 const groupStyle: CSSProperties = {
@@ -29,8 +29,7 @@ const optionStyle: CSSProperties = {
   borderRadius: "var(--radius-md)",
   border: "none",
   cursor: "pointer",
-  fontFamily: "inherit",
-  fontSize: "inherit",
+  font: "inherit",
 };
 
 const pickedStyle: CSSProperties = {
@@ -48,14 +47,19 @@ const otherStyle: CSSProperties = {
 };
 
 /** "a group of options with exactly one picked, named with its label" */
-export function Segmented<T>({ label, options, value, onChange }: SegmentedProps<T>) {
+export function Segmented<V extends string>({
+  label,
+  options,
+  value,
+  onChange,
+}: SegmentedProps<V>) {
   return (
     <div role="radiogroup" aria-label={label} style={groupStyle}>
-      {options.map((option, index) => {
+      {options.map((option) => {
         const picked = option.value === value;
         return (
           <button
-            key={index}
+            key={option.value}
             type="button"
             role="radio"
             aria-checked={picked}

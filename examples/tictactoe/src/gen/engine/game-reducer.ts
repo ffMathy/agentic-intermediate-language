@@ -6,13 +6,18 @@ import { evaluate } from "./rules";
 export function reduce(game: Game, action: Action): Game {
   switch (action.type) {
     case "place": {
-      if (game.status.kind !== "playing" || game.board[action.index] !== null) {
+      const cell = game.board[action.index];
+      if (game.status.kind !== "playing" || cell === "X" || cell === "O") {
         return game;
       }
-      const board = game.board.map((cell, i) => (i === action.index ? game.next : cell));
+      const board = game.board.map((c, i) => (i === action.index ? game.next : c));
       const status = evaluate(board);
-      const next = status.kind === "playing" ? other(game.next) : game.next;
-      return { ...game, board, status, next };
+      return {
+        board,
+        next: status.kind === "playing" ? other(game.next) : game.next,
+        status,
+        opponent: game.opponent,
+      };
     }
     case "newGame":
       return initial(game.opponent);
@@ -21,7 +26,7 @@ export function reduce(game: Game, action: Action): Game {
   }
 }
 
-/** play(indices: number[], opponent: Opponent = "friend") -> Game — reduce place(i) for each index in order, starting from initial(opponent) */
+/** play(indices: list of integer, opponent: Opponent = "friend") -> Game — reduce place(i) for each index in order, starting from initial(opponent) */
 export function play(indices: number[], opponent: Opponent = "friend"): Game {
   return indices.reduce<Game>(
     (game, index) => reduce(game, { type: "place", index }),

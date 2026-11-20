@@ -1,35 +1,56 @@
-// ail-derived-from: ComputerPlayer@0c990bfbddc62e20
+// ail-derived-from: ComputerPlayer@882d0c5467192c53
 import { expect, test } from "bun:test";
 import { choose } from "../../../src/gen/engine/computer-player/computer-player";
-import type { Board } from "../../../src/gen/engine/game-state";
+import { boardFrom } from "../../../src/gen/engine/game-state";
+import type { Board, Mark } from "../../../src/gen/engine/game-state";
 import { evaluate } from "../../../src/gen/engine/rules";
 
+function isEmpty(board: Board, index: number): boolean {
+  const cell = board[index];
+  return cell !== "X" && cell !== "O";
+}
+
+function place(board: Board, index: number, mark: Mark): Board {
+  return board.map((cell, i) => (i === index ? mark : cell));
+}
+
 test("never loses", () => {
-  let games = 0;
+  let gamesPlayed = 0;
   let xWins = 0;
-  const explore = (board: Board, turn: "X" | "O") => {
+  let illegalMoves = 0;
+
+  const play = (board: Board, next: Mark): void => {
     const status = evaluate(board);
-    if (status.kind !== "playing") {
-      games++;
-      if (status.kind === "won" && status.mark === "X") xWins++;
+    if (status.kind === "won") {
+      gamesPlayed += 1;
+      if (status.mark === "X") {
+        xWins += 1;
+      }
       return;
     }
-    if (turn === "X") {
-      board.forEach((cell, i) => {
-        if (cell !== null) return;
-        const next = board.slice();
-        next[i] = "X";
-        explore(next, "O");
-      });
-    } else {
-      const i = choose(board);
-      expect(board[i]).toBeNull();
-      const next = board.slice();
-      next[i] = "O";
-      explore(next, "X");
+    if (status.kind === "draw") {
+      gamesPlayed += 1;
+      return;
     }
+    if (next === "X") {
+      for (let index = 0; index < 9; index += 1) {
+        if (isEmpty(board, index)) {
+          play(place(board, index, "X"), "O");
+        }
+      }
+      return;
+    }
+    const index = choose(board, "O");
+    if (!Number.isInteger(index) || index < 0 || index > 8 || !isEmpty(board, index)) {
+      illegalMoves += 1;
+      return;
+    }
+    play(place(board, index, "O"), "X");
   };
-  explore(Array(9).fill(null), "X");
-  expect(games).toBeGreaterThan(0);
+
+  play(boardFrom("___/___/___"), "X");
+
+  expect(illegalMoves).toBe(0);
+  expect(gamesPlayed).toBeGreaterThan(0);
   expect(xWins).toBe(0);
 });

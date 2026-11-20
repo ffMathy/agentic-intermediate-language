@@ -85,7 +85,7 @@ node ChooseOpponent : view   level: experience
       When the player chooses "Computer"
       Then the computer is asked for as the new opponent
   look
-    control  Segmented, fills the width
+    control  Segmented, which fills the width by itself (no wrapper)
   copy
     opponent.label     "Opponent"
     opponent.friend    "Friend"

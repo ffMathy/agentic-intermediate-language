@@ -1,4 +1,5 @@
-import type { Board, Status } from "../engine/game-state";
+import type { CSSProperties } from "react";
+import type { Board, Cell, Status } from "../engine/game-state";
 import { Text } from "../ui/text";
 
 type BoardViewProps = {
@@ -8,46 +9,53 @@ type BoardViewProps = {
   onPlace: (index: number) => void;
 };
 
-/** shows 9 squares in 3 rows of 3; each square is empty, X or O */
+const gridStyle: CSSProperties = {
+  display: "grid",
+  gridTemplateColumns: "repeat(3, 1fr)",
+  gridTemplateRows: "repeat(3, 1fr)",
+  gap: "var(--space-1)",
+  background: "var(--color-surface)",
+  width: "100%",
+};
+
+function squareContent(cell: Cell): string {
+  return cell === undefined || cell === null ? "empty" : cell;
+}
+
+/** picking: pressing an empty square while the game is not over asks to place the current mark there */
 export function BoardView({ board, status, locked, onPlace }: BoardViewProps) {
+  const winningLine: number[] = status.kind === "won" ? status.line : [];
+  const gameOver = status.kind !== "playing";
   return (
-    <div
-      role="grid"
-      aria-label="Board"
-      style={{
-        display: "grid",
-        gridTemplateColumns: "repeat(3, 1fr)",
-        gap: "var(--space-1)",
-        background: "var(--color-surface)",
-        width: "100%",
-      }}
-    >
+    <div role="grid" aria-label="Board" style={gridStyle}>
       {board.map((cell, index) => {
-        const canPick = !locked && status.kind === "playing" && cell === null;
-        const winning = status.kind === "won" && status.line.includes(index);
+        const empty = cell === undefined || cell === null;
+        const pickable = empty && !gameOver && !locked;
         const row = Math.floor(index / 3) + 1;
         const column = (index % 3) + 1;
-        const content = cell === null ? "empty" : cell;
+        const style: CSSProperties = {
+          aspectRatio: "1",
+          borderRadius: "var(--radius-md)",
+          border: "none",
+          background: winningLine.includes(index)
+            ? "var(--color-highlight)"
+            : "var(--color-surface-raised)",
+          cursor: pickable ? "pointer" : "default",
+        };
         return (
           <button
             key={index}
             type="button"
-            disabled={!canPick}
-            aria-label={`Row ${row}, column ${column}, ${content}`}
+            aria-label={`Row ${row}, column ${column}, ${squareContent(cell)}`}
+            disabled={!pickable}
+            style={style}
             onClick={() => {
-              if (canPick) {
+              if (pickable) {
                 onPlace(index);
               }
             }}
-            style={{
-              aspectRatio: "1",
-              borderRadius: "var(--radius-md)",
-              background: winning ? "var(--color-highlight)" : "var(--color-surface-raised)",
-              border: "none",
-              cursor: canPick ? "pointer" : "default",
-            }}
           >
-            {cell === null ? null : (
+            {empty ? null : (
               <Text
                 variant="mark"
                 align="center"

@@ -1,10 +1,15 @@
-import { other, type Board, type Mark } from "../game-state";
+import { other } from "../game-state";
+import type { Board, Cell, Mark } from "../game-state";
 import { evaluate } from "../rules";
 
 const memo = new Map<string, number>();
 
-function keyOf(board: Board, toMove: Mark, me: Mark): string {
-  return board.map((cell) => cell ?? "_").join("") + toMove + me;
+function isEmpty(cell: Cell): boolean {
+  return cell !== "X" && cell !== "O";
+}
+
+function keyOf(board: Board, me: Mark, mover: Mark): string {
+  return board.map((cell) => (isEmpty(cell) ? "_" : cell)).join("") + me + mover;
 }
 
 function shift(score: number): number {
@@ -17,49 +22,48 @@ function shift(score: number): number {
   return 0;
 }
 
-function value(board: Board, toMove: Mark, me: Mark): number {
-  const key = keyOf(board, toMove, me);
+function place(board: Board, index: number, mark: Mark): Board {
+  const next: Cell[] = [...board];
+  next[index] = mark;
+  return next;
+}
+
+function value(board: Board, me: Mark, mover: Mark): number {
+  const status = evaluate(board);
+  if (status.kind === "won") {
+    return status.mark === me ? 10 : -10;
+  }
+  if (status.kind === "draw") {
+    return 0;
+  }
+  const key = keyOf(board, me, mover);
   const cached = memo.get(key);
   if (cached !== undefined) {
     return cached;
   }
-  const status = evaluate(board);
-  let result: number;
-  if (status.kind === "won") {
-    result = status.mark === me ? 10 : -10;
-  } else if (status.kind === "draw") {
-    result = 0;
-  } else {
-    const maximizing = toMove === me;
-    let best = maximizing ? -Infinity : Infinity;
-    for (let i = 0; i < board.length; i++) {
-      if (board[i] !== null) {
-        continue;
-      }
-      const child = board.slice();
-      child[i] = toMove;
-      const score = shift(value(child, other(toMove), me));
-      if (maximizing ? score > best : score < best) {
-        best = score;
-      }
+  let best = mover === me ? -Infinity : Infinity;
+  for (let i = 0; i < 9; i++) {
+    if (!isEmpty(board[i])) {
+      continue;
     }
-    result = best;
+    const score = shift(value(place(board, i, mover), me, other(mover)));
+    if (mover === me ? score > best : score < best) {
+      best = score;
+    }
   }
-  memo.set(key, result);
-  return result;
+  memo.set(key, best);
+  return best;
 }
 
-/** choose(board: Board, me: Mark = "O") -> number — full minimax over the remaining game tree, memoized by board; among equally scored moves, the lowest index */
+/** choose(board: Board, me: Mark = "O") -> number — full minimax, scored 10 − d / d − 10 / 0 from me's point of view, lowest index on ties */
 export function choose(board: Board, me: Mark = "O"): number {
   let bestIndex = -1;
   let bestScore = -Infinity;
-  for (let i = 0; i < board.length; i++) {
-    if (board[i] !== null) {
+  for (let i = 0; i < 9; i++) {
+    if (!isEmpty(board[i])) {
       continue;
     }
-    const child = board.slice();
-    child[i] = me;
-    const score = shift(value(child, other(me), me));
+    const score = shift(value(place(board, i, me), me, other(me)));
     if (score > bestScore) {
       bestScore = score;
       bestIndex = i;

@@ -1,4 +1,4 @@
-// ail-derived-from: PlayAGame@618142f73d1810c8
+// ail-derived-from: PlayAGame@5445e0669a18e44c
 import { afterEach, expect, test } from "bun:test";
 import { cleanup, fireEvent, render, screen, waitFor, within } from "@testing-library/react";
 import { PlayAGame } from "../../../src/gen/app/play/play-a-game";
@@ -7,68 +7,77 @@ afterEach(() => {
   cleanup();
 });
 
-function squares(): HTMLElement[] {
-  const cells = within(screen.getByRole("grid")).getAllByRole("button");
-  expect(cells.length).toBe(9);
-  return cells;
+function squares(): HTMLButtonElement[] {
+  const grid = screen.getByRole("grid");
+  const buttons = within(grid).getAllByRole("button") as HTMLButtonElement[];
+  expect(buttons.length).toBe(9);
+  return buttons;
+}
+
+function statusText(): string {
+  const el = document.querySelector("[aria-live]");
+  expect(el).not.toBeNull();
+  return (el?.textContent ?? "").trim();
 }
 
 function pick(index: number): void {
   fireEvent.click(squares()[index]);
 }
 
-function markOf(square: HTMLElement): string {
-  return (square.textContent ?? "").trim();
+function hasMark(el: HTMLElement, mark: "X" | "O"): boolean {
+  return new RegExp(`\\b${mark}\\b`).test(el.textContent ?? "");
 }
 
-function statusSays(text: string): HTMLElement {
-  return screen.getByText((_content, element) => {
-    if (!element || element.textContent !== text) return false;
-    return Array.from(element.children).every((child) => child.textContent !== text);
-  });
-}
-
-function chooseOpponent(name: string): void {
-  for (const role of ["radio", "button", "tab", "menuitemradio"]) {
-    const el = screen.queryByRole(role, { name });
+function chooseComputer(): void {
+  const roles = ["radio", "button", "tab", "menuitemradio", "switch", "option"] as const;
+  for (const role of roles) {
+    const el = screen.queryByRole(role, { name: "Computer" });
     if (el) {
-      fireEvent.click(el);
+      if (role === "option") {
+        const select = el.closest("select");
+        expect(select).not.toBeNull();
+        fireEvent.change(select as HTMLSelectElement, {
+          target: { value: (el as HTMLOptionElement).value },
+        });
+      } else {
+        fireEvent.click(el);
+      }
       return;
     }
   }
-  const option = screen.queryByRole("option", { name }) as HTMLOptionElement | null;
-  if (option) {
-    const select = option.closest("select");
-    if (select) {
-      fireEvent.change(select, { target: { value: option.value } });
-      return;
-    }
-    fireEvent.click(option);
-    return;
-  }
-  throw new Error(`no control named "${name}"`);
+  throw new Error('No control named "Computer" found');
 }
 
 test("X always starts", () => {
   render(<PlayAGame />);
-  expect(statusSays("X's turn")).toBeTruthy();
+  expect(statusText()).toBe("X's turn");
 });
 
 test("taking turns", () => {
   render(<PlayAGame />);
+  const emptyText = squares()[4].textContent;
   pick(4);
-  expect(markOf(squares()[4])).toBe("X");
-  expect(statusSays("O's turn")).toBeTruthy();
+  const center = squares()[4];
+  expect(center.textContent).not.toBe(emptyText);
+  expect(hasMark(center, "X")).toBe(true);
+  expect(hasMark(center, "O")).toBe(false);
+  expect(statusText()).toBe("O's turn");
 });
 
 test("a taken square can't be picked", () => {
   render(<PlayAGame />);
+  const emptyText = squares()[0].textContent;
   pick(4);
-  const before = squares().map(markOf);
+  const before = squares().map((s) => s.textContent);
   pick(4);
-  expect(squares().map(markOf)).toEqual(before);
-  expect(markOf(squares()[4])).toBe("X");
-  expect(statusSays("O's turn")).toBeTruthy();
+  const after = squares().map((s) => s.textContent);
+  expect(after).toEqual(before);
+  expect(hasMark(squares()[4], "X")).toBe(true);
+  expect(hasMark(squares()[4], "O")).toBe(false);
+  squares().forEach((s, i) => {
+    if (i !== 4) expect(s.textContent).toBe(emptyText);
+  });
+  expect(statusText()).toBe("O's turn");
 });
 
 test("winning", () => {
@@ -77,65 +86,55 @@ test("winning", () => {
   pick(4);
   pick(1);
   pick(6);
-  expect(statusSays("X's turn")).toBeTruthy();
-  const topLeftBefore = squares()[0].outerHTML;
-  const topMiddleBefore = squares()[1].outerHTML;
-  const centerBefore = squares()[4].outerHTML;
-  const bottomLeftBefore = squares()[6].outerHTML;
-
+  expect(statusText()).toBe("X's turn");
   pick(2);
-
-  expect(statusSays("X wins!")).toBeTruthy();
-  const after = squares();
-  expect(markOf(after[2])).toBe("X");
-  expect(after[0].outerHTML).not.toBe(topLeftBefore);
-  expect(after[1].outerHTML).not.toBe(topMiddleBefore);
-  expect(after[4].outerHTML).toBe(centerBefore);
-  expect(after[6].outerHTML).toBe(bottomLeftBefore);
-
-  for (const square of after) {
-    expect((square as HTMLButtonElement).disabled).toBe(true);
-  }
-  const marks = after.map(markOf);
-  pick(3);
-  pick(8);
-  expect(squares().map(markOf)).toEqual(marks);
-  expect(statusSays("X wins!")).toBeTruthy();
+  expect(statusText()).toBe("X wins!");
+  const all = squares();
+  all.forEach((s, i) => {
+    const style = s.getAttribute("style") ?? "";
+    if (i <= 2) {
+      expect(style).toContain("var(--color-highlight)");
+    } else {
+      expect(style).not.toContain("var(--color-highlight)");
+    }
+  });
+  all.forEach((s) => {
+    expect(s.disabled).toBe(true);
+  });
 });
 
 test("draw", () => {
   render(<PlayAGame />);
-  for (const index of [0, 1, 2, 4, 3, 5, 7, 6]) {
-    pick(index);
-  }
+  for (const i of [0, 1, 2, 4, 3, 5, 7, 6]) pick(i);
   pick(8);
-  expect(statusSays("It's a draw")).toBeTruthy();
+  expect(statusText()).toBe("It's a draw");
 });
 
 test("new game", () => {
   render(<PlayAGame />);
-  for (const index of [0, 3, 1, 4, 2]) {
-    pick(index);
-  }
-  expect(statusSays("X wins!")).toBeTruthy();
+  const emptyText = squares()[0].textContent;
+  for (const i of [0, 3, 1, 4, 2]) pick(i);
+  expect(statusText()).toBe("X wins!");
   fireEvent.click(screen.getByRole("button", { name: "New game" }));
-  for (const square of squares()) {
-    expect(["X", "O"]).not.toContain(markOf(square));
-  }
-  expect(statusSays("X's turn")).toBeTruthy();
+  squares().forEach((s) => {
+    expect(s.textContent).toBe(emptyText);
+  });
+  expect(statusText()).toBe("X's turn");
 });
 
 test("the computer answers", async () => {
   render(<PlayAGame />);
-  chooseOpponent("Computer");
+  chooseComputer();
   pick(4);
-  expect(markOf(squares()[4])).toBe("X");
   await waitFor(
     () => {
-      expect(squares().map(markOf).filter((m) => m === "O").length).toBe(1);
+      const os = squares().filter((s) => hasMark(s, "O") && !hasMark(s, "X"));
+      expect(os.length).toBe(1);
     },
     { timeout: 2000 },
   );
-  expect(squares().map(markOf).filter((m) => m === "X").length).toBe(1);
-  expect(statusSays("X's turn")).toBeTruthy();
+  const xs = squares().filter((s) => hasMark(s, "X") && !hasMark(s, "O"));
+  expect(xs.length).toBe(1);
+  expect(hasMark(squares()[4], "X")).toBe(true);
+  expect(statusText()).toBe("X's turn");
 });

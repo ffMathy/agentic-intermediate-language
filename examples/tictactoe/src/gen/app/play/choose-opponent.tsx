@@ -9,15 +9,16 @@ export function ChooseOpponent({
   opponent: Opponent;
   onChange: (opponent: Opponent) => void;
 }) {
+  const options: { value: Opponent; label: string }[] = [
+    { value: "friend", label: "Friend" },
+    { value: "computer", label: "Computer" },
+  ];
   return (
     <Segmented
       label="Opponent"
-      options={[
-        { value: "friend", label: "Friend" },
-        { value: "computer", label: "Computer" },
-      ]}
+      options={options}
       value={opponent}
-      onChange={(value: Opponent) => onChange(value)}
+      onChange={onChange}
     />
   );
 }

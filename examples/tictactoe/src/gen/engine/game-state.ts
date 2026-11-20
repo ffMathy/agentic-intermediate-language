@@ -1,13 +1,13 @@
 /** type Mark = "X" | "O" */
 export type Mark = "X" | "O";
 
-/** type Cell = Mark | null */
+/** type Cell = Mark | nothing */
 export type Cell = Mark | null;
 
-/** type Board = Cell[] — always 9 cells, row by row: index = row × 3 + column */
+/** type Board = list of Cell — always 9 cells, row by row: index = row × 3 + column */
 export type Board = Cell[];
 
-/** type Status = { kind: "playing" } | { kind: "won", mark: Mark, line: number[] } | { kind: "draw" } */
+/** type Status = { kind: "playing" } | { kind: "won", mark: Mark, line: list of integer } | { kind: "draw" } */
 export type Status =
   | { kind: "playing" }
   | { kind: "won"; mark: Mark; line: number[] }
@@ -24,7 +24,7 @@ export type Game = {
   opponent: Opponent;
 };
 
-/** type Action = { type: "place", index: number } | { type: "newGame" } | { type: "setOpponent", opponent: Opponent } */
+/** type Action = { type: "place", index: integer } | { type: "newGame" } | { type: "setOpponent", opponent: Opponent } */
 export type Action =
   | { type: "place"; index: number }
   | { type: "newGame" }
@@ -45,10 +45,10 @@ export function other(mark: Mark): Mark {
   return mark === "X" ? "O" : "X";
 }
 
-/** boardFrom(text: string) -> Board — "X", "O" or "_" per cell, row by row; "/" and spaces are ignored */
+/** boardFrom(text: text) -> Board — "X", "O" or "_" per cell, row by row; "/" and spaces are ignored */
 export function boardFrom(text: string): Board {
   return text
     .split("")
-    .filter((ch) => ch !== "/" && ch !== " ")
-    .map((ch): Cell => (ch === "X" ? "X" : ch === "O" ? "O" : null));
+    .filter((char) => char !== "/" && char !== " ")
+    .map((char): Cell => (char === "X" || char === "O" ? char : null));
 }

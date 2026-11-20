@@ -1,59 +1,75 @@
-// ail-derived-from: App@c7469df37fdb9d33
+// ail-derived-from: App@77999248f6cdb439
 import { afterEach, expect, test } from "bun:test";
-import { cleanup, fireEvent, render, screen, within } from "@testing-library/react";
+import { cleanup, fireEvent, render, screen } from "@testing-library/react";
 import { App } from "../../src/gen/app/app";
 
 afterEach(() => {
   cleanup();
 });
 
-function modeOption(name: "Play" | "Watch"): HTMLElement {
-  const group = screen.getByRole("radiogroup", { name: "Mode" });
-  return within(group).getByRole("radio", { name });
+function statusText(container: HTMLElement): string {
+  const live = container.querySelector("[aria-live]");
+  expect(live).not.toBeNull();
+  return (live?.textContent ?? "").replace(/\s+/g, " ").trim();
 }
 
-const status = () => document.querySelector('[aria-live="polite"]')!.textContent;
+function squares(): HTMLElement[] {
+  return screen
+    .queryAllByRole("button")
+    .filter((b) => {
+      const name = (b.getAttribute("aria-label") ?? b.textContent ?? "").trim();
+      return name !== "New game" && name !== "Watch again";
+    });
+}
 
-function pickables(): HTMLElement[] {
-  return [
-    ...screen.queryAllByRole("button"),
-    ...screen.queryAllByRole("gridcell"),
-  ];
+function boardSnapshot(): string[] {
+  return squares().map(
+    (s) => `${s.getAttribute("aria-label") ?? ""}|${s.textContent ?? ""}`,
+  );
 }
 
 test("switching to the demo", () => {
-  render(<App />);
-  expect(modeOption("Play").getAttribute("aria-checked")).toBe("true");
+  const { container } = render(<App />);
+  expect(screen.getByRole("radiogroup", { name: "Mode" })).toBeTruthy();
+  expect(
+    screen.getByRole("radio", { name: "Play" }).getAttribute("aria-checked"),
+  ).toBe("true");
 
-  fireEvent.click(modeOption("Watch"));
+  fireEvent.click(screen.getByRole("radio", { name: "Watch" }));
 
-  expect(modeOption("Watch").getAttribute("aria-checked")).toBe("true");
-  expect(status()).toBe("X's turn");
+  expect(
+    screen.getByRole("radio", { name: "Watch" }).getAttribute("aria-checked"),
+  ).toBe("true");
+  expect(screen.queryByRole("button", { name: "New game" })).toBeNull();
+  expect(statusText(container)).toBe("X's turn");
 
-  for (const el of pickables()) {
+  const before = boardSnapshot();
+  const pickable = [
+    ...screen.queryAllByRole("button"),
+    ...screen.queryAllByRole("gridcell"),
+  ];
+  for (const el of pickable) {
     fireEvent.click(el);
   }
-
-  expect(status()).toBe("X's turn");
-  expect(status()).not.toBe("O's turn");
-  expect(screen.queryAllByRole("button", { name: /^Row \d, column \d, [XO]$/ }).length).toBe(0);
+  expect(boardSnapshot()).toEqual(before);
+  expect(statusText(container)).toBe("X's turn");
 });
 
 test("switching back starts a new game", () => {
-  render(<App />);
-  expect(status()).toBe("X's turn");
+  const { container } = render(<App />);
+  const emptyBoard = boardSnapshot();
+  expect(squares().length).toBe(9);
 
-  for (const el of pickables()) {
-    fireEvent.click(el);
-    if (status() === "O's turn") break;
-  }
-  expect(status()).toBe("O's turn");
+  fireEvent.click(squares()[4]);
+  expect(statusText(container)).toBe("O's turn");
+  expect(boardSnapshot()).not.toEqual(emptyBoard);
 
-  fireEvent.click(modeOption("Watch"));
-  fireEvent.click(modeOption("Play"));
+  fireEvent.click(screen.getByRole("radio", { name: "Watch" }));
+  fireEvent.click(screen.getByRole("radio", { name: "Play" }));
 
-  expect(modeOption("Play").getAttribute("aria-checked")).toBe("true");
-  expect(status()).toBe("X's turn");
-  expect(status()).not.toBe("O's turn");
-  expect(screen.queryAllByRole("button", { name: /^Row \d, column \d, [XO]$/ }).length).toBe(0);
+  expect(
+    screen.getByRole("radio", { name: "Play" }).getAttribute("aria-checked"),
+  ).toBe("true");
+  expect(boardSnapshot()).toEqual(emptyBoard);
+  expect(statusText(container)).toBe("X's turn");
 });

@@ -110,8 +110,9 @@ depths:
   level deeper.
 - A **glossary** gives each domain word a plain meaning and a formal one, so
   upper levels stay readable without becoming ambiguous.
-- **Lenses** render the same source for each audience: `stakeholder`,
-  `design`, `engineer`, and `specialist --tag <x>`.
+- Each reader reads down to the level written for them and stops there; the
+  levels themselves are the views, so no separate rendering per audience is
+  needed.
 
 ## 4. How the output becomes deterministic
 
@@ -134,7 +135,7 @@ The surface is deliberately small:
 |---|---|
 | `ail build` | Compile what changed, then check: is the spec sound (lint), is everything built from it (plan), does it pass (verify), and does each screen match its look? With nothing to compile it needs no model. `--samples N` adds divergence sampling. |
 | `ail build` | Write the token CSS, prune what was removed, derive tests from scenarios, then compile every node that changed (independent nodes in parallel). |
-| `ail show` | The tree, a node, a view for one audience, or the changes (a semantic diff against a git ref). |
+| `ail show` | The tree, a node, or the changes (a semantic diff against a git ref). |
 | MCP server | two tools: `ail_show`, and `ail_build` (the same build as the CLI) |
 | Plugin | the `ail` skill, the `/ail:build` command, the MCP server, and hooks that block edits to generated files and lint every `.ail.md` edit |
 | GitHub Action | `ail build`, plus the spec changes in the job summary |

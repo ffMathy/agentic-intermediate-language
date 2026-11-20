@@ -1,6 +1,7 @@
+import type { CSSProperties } from "react";
 import { Stack } from "../../parts/stack";
 
-type Reader = "stakeholder" | "design" | "engineer" | "specialist";
+export type Reader = "stakeholder" | "design" | "engineer" | "specialist";
 
 type TreeNode = {
   name: string;
@@ -8,7 +9,7 @@ type TreeNode = {
   y: number;
 };
 
-const WIDE_NODES: TreeNode[] = [
+const wideNodes: TreeNode[] = [
   { name: "TicTacToe", x: 272, y: 8 },
   { name: "App", x: 60, y: 56 },
   { name: "BoardKit", x: 172, y: 56 },
@@ -24,7 +25,22 @@ const WIDE_NODES: TreeNode[] = [
   { name: "ChooseOpponent", x: 112, y: 168 },
 ];
 
-const OUTLINE_ORDER: string[] = [
+const edges: [string, string][] = [
+  ["TicTacToe", "App"],
+  ["TicTacToe", "BoardKit"],
+  ["TicTacToe", "Engine"],
+  ["TicTacToe", "UiKit"],
+  ["App", "PlayAGame"],
+  ["App", "WatchADemo"],
+  ["Engine", "GameState"],
+  ["Engine", "Rules"],
+  ["Engine", "GameReducer"],
+  ["Engine", "ComputerPlayer"],
+  ["PlayAGame", "NewGameButton"],
+  ["PlayAGame", "ChooseOpponent"],
+];
+
+const outlineOrder: string[] = [
   "TicTacToe",
   "App",
   "PlayAGame",
@@ -40,7 +56,7 @@ const OUTLINE_ORDER: string[] = [
   "UiKit",
 ];
 
-const OUTLINE_X: Record<string, number> = {
+const outlineX: Record<string, number> = {
   TicTacToe: 4,
   App: 28,
   BoardKit: 28,
@@ -56,61 +72,36 @@ const OUTLINE_X: Record<string, number> = {
   ChooseOpponent: 76,
 };
 
-const OUTLINE_NODES: TreeNode[] = OUTLINE_ORDER.map((name, i) => ({
-  name,
-  x: OUTLINE_X[name],
-  y: 4 + 28 * i,
-}));
-
-const EDGES: [string, string][] = [
-  ["TicTacToe", "App"],
-  ["TicTacToe", "BoardKit"],
-  ["TicTacToe", "Engine"],
-  ["TicTacToe", "UiKit"],
-  ["App", "PlayAGame"],
-  ["App", "WatchADemo"],
-  ["Engine", "GameState"],
-  ["Engine", "Rules"],
-  ["Engine", "GameReducer"],
-  ["Engine", "ComputerPlayer"],
-  ["PlayAGame", "NewGameButton"],
-  ["PlayAGame", "ChooseOpponent"],
-];
-
-const LIT: Record<Reader, { color: string; names: string[] }> = {
-  stakeholder: {
-    color: "var(--color-level-product)",
-    names: ["TicTacToe"],
-  },
-  design: {
-    color: "var(--color-level-experience)",
-    names: [
-      "App",
-      "BoardKit",
-      "UiKit",
-      "PlayAGame",
-      "WatchADemo",
-      "NewGameButton",
-      "ChooseOpponent",
-    ],
-  },
-  engineer: {
-    color: "var(--color-level-system)",
-    names: ["Engine", "GameState", "Rules", "GameReducer"],
-  },
-  specialist: {
-    color: "var(--color-level-specialist)",
-    names: ["ComputerPlayer"],
-  },
+const readerNodes: Record<Reader, string[]> = {
+  stakeholder: ["TicTacToe"],
+  design: [
+    "App",
+    "BoardKit",
+    "UiKit",
+    "PlayAGame",
+    "WatchADemo",
+    "NewGameButton",
+    "ChooseOpponent",
+  ],
+  engineer: ["Engine", "GameState", "Rules", "GameReducer"],
+  specialist: ["ComputerPlayer"],
 };
 
-function findNode(nodes: TreeNode[], name: string): TreeNode {
-  return nodes.find((n) => n.name === name) as TreeNode;
-}
+const readerColor: Record<Reader, string> = {
+  stakeholder: "var(--color-level-product)",
+  design: "var(--color-level-experience)",
+  engineer: "var(--color-level-system)",
+  specialist: "var(--color-level-specialist)",
+};
 
-function rectStyle(lit: boolean, color: string): React.CSSProperties {
+const edgeStyle: CSSProperties = {
+  stroke: "var(--color-border)",
+  strokeWidth: 1,
+};
+
+function rectStyle(lit: boolean, reader: Reader): CSSProperties {
   return lit
-    ? { fill: color }
+    ? { fill: readerColor[reader], stroke: "none" }
     : {
         fill: "var(--color-surface-raised)",
         stroke: "var(--color-border)",
@@ -119,24 +110,22 @@ function rectStyle(lit: boolean, color: string): React.CSSProperties {
       };
 }
 
-function textStyle(lit: boolean): React.CSSProperties {
+function textStyle(lit: boolean, fontSize: number): CSSProperties {
   return {
     fontFamily: "var(--font-mono)",
+    fontSize,
     fill: lit ? "var(--color-on-accent)" : "var(--color-text-muted)",
     fontWeight: lit ? 700 : 400,
   };
 }
 
-const LINE_STYLE: React.CSSProperties = {
-  stroke: "var(--color-border)",
-  strokeWidth: 1,
-};
-
 /** "a simplified Tic-Tac-Toe tree with thirteen of its nineteen nodes, and a note under it saying which parts are left out; the nodes written at the given reader's level are filled with their level's color, and the rest fade back" */
 export function ReadersTree({ reader }: { reader: Reader }) {
   const label = `The Tic-Tac-Toe spec tree, with the level written for the ${reader} highlighted`;
-  const { color, names } = LIT[reader];
-  const isLit = (name: string): boolean => names.includes(name);
+  const litNames = readerNodes[reader];
+  const wideByName = new Map(wideNodes.map((n) => [n.name, n]));
+  const rowOf = new Map(outlineOrder.map((name, i) => [name, i]));
+  const rowY = (name: string) => 4 + 28 * (rowOf.get(name) ?? 0);
 
   return (
     <Stack dir="v" gap="space.2" align="stretch">
@@ -147,9 +136,9 @@ export function ReadersTree({ reader }: { reader: Reader }) {
         viewBox="0 0 640 200"
         style={{ width: "100%", height: "auto" }}
       >
-        {EDGES.map(([from, to]) => {
-          const p = findNode(WIDE_NODES, from);
-          const c = findNode(WIDE_NODES, to);
+        {edges.map(([from, to]) => {
+          const p = wideByName.get(from) as TreeNode;
+          const c = wideByName.get(to) as TreeNode;
           return (
             <line
               key={`${from}-${to}`}
@@ -157,12 +146,12 @@ export function ReadersTree({ reader }: { reader: Reader }) {
               y1={p.y + 24}
               x2={c.x + 48}
               y2={c.y}
-              style={LINE_STYLE}
+              style={edgeStyle}
             />
           );
         })}
-        {WIDE_NODES.map((n) => {
-          const lit = isLit(n.name);
+        {wideNodes.map((n) => {
+          const lit = litNames.includes(n.name);
           return (
             <g key={n.name} data-lit={lit ? "true" : "false"}>
               <rect
@@ -171,15 +160,14 @@ export function ReadersTree({ reader }: { reader: Reader }) {
                 width={96}
                 height={24}
                 rx={6}
-                style={rectStyle(lit, color)}
+                style={rectStyle(lit, reader)}
               />
               <text
                 x={n.x + 48}
                 y={n.y + 12}
                 textAnchor="middle"
                 dominantBaseline="central"
-                fontSize={11}
-                style={textStyle(lit)}
+                style={textStyle(lit, 11)}
               >
                 {n.name}
               </text>
@@ -194,45 +182,45 @@ export function ReadersTree({ reader }: { reader: Reader }) {
         viewBox="0 0 300 372"
         style={{ width: "100%", maxWidth: "320px", height: "auto" }}
       >
-        {EDGES.map(([from, to]) => {
-          const p = findNode(OUTLINE_NODES, from);
-          const c = findNode(OUTLINE_NODES, to);
-          const cx = p.x + 10;
-          const cy = c.y + 11;
+        {edges.map(([from, to]) => {
+          const px = outlineX[from] + 10;
+          const pBottom = rowY(from) + 22;
+          const cMid = rowY(to) + 11;
           return (
             <g key={`${from}-${to}`}>
+              <line x1={px} y1={pBottom} x2={px} y2={cMid} style={edgeStyle} />
               <line
-                x1={cx}
-                y1={p.y + 22}
-                x2={cx}
-                y2={cy}
-                style={LINE_STYLE}
+                x1={px}
+                y1={cMid}
+                x2={outlineX[to]}
+                y2={cMid}
+                style={edgeStyle}
               />
-              <line x1={cx} y1={cy} x2={c.x} y2={cy} style={LINE_STYLE} />
             </g>
           );
         })}
-        {OUTLINE_NODES.map((n) => {
-          const lit = isLit(n.name);
+        {outlineOrder.map((name) => {
+          const lit = litNames.includes(name);
+          const x = outlineX[name];
+          const y = rowY(name);
           return (
-            <g key={n.name} data-lit={lit ? "true" : "false"}>
+            <g key={name} data-lit={lit ? "true" : "false"}>
               <rect
-                x={n.x}
-                y={n.y}
+                x={x}
+                y={y}
                 width={180}
                 height={22}
                 rx={6}
-                style={rectStyle(lit, color)}
+                style={rectStyle(lit, reader)}
               />
               <text
-                x={n.x + 10}
-                y={n.y + 11}
+                x={x + 10}
+                y={y + 11}
                 textAnchor="start"
                 dominantBaseline="central"
-                fontSize={13}
-                style={textStyle(lit)}
+                style={textStyle(lit, 13)}
               >
-                {n.name}
+                {name}
               </text>
             </g>
           );

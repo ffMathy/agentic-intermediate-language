@@ -1,9 +1,17 @@
+import { useId } from "react";
 import type { CSSProperties, ReactNode } from "react";
 import { Section } from "../../parts/section";
 import { SectionHeading } from "../../parts/section-heading";
 import { Stack } from "../../parts/stack";
 import { CopyCommand } from "../../parts/copy-command";
 import { ReviewNote } from "./review-note";
+
+const cardsStyle: CSSProperties = {
+  display: "grid",
+  gridTemplateColumns: "repeat(auto-fit, minmax(min(320px, 100%), 1fr))",
+  gap: "var(--space-6)",
+  alignItems: "start",
+};
 
 const cardStyle: CSSProperties = {
   background: "var(--color-surface)",
@@ -65,13 +73,6 @@ const closingStyle: CSSProperties = {
   margin: 0,
 };
 
-const cardsStyle: CSSProperties = {
-  display: "grid",
-  gridTemplateColumns: "repeat(auto-fit, minmax(min(320px, 100%), 1fr))",
-  gap: "var(--space-6)",
-  alignItems: "start",
-};
-
 const exampleStyle: CSSProperties = {
   background: "var(--color-accent)",
   color: "var(--color-on-accent)",
@@ -92,14 +93,14 @@ const repoStyle: CSSProperties = {
   textDecoration: "none",
 };
 
-const toolRows: { command: string; does: string }[] = [
+const toolRows: ReadonlyArray<{ command: string; does: string }> = [
   {
     command: "ail build",
     does: "Compile whatever changed, then check everything: the spec, the code, every test, and each screen against its look.",
   },
   {
     command: "ail show [what]",
-    does: "The tree, a node, one reader's view, or what changed.",
+    does: "The tree, one node, or what changed since a git ref.",
   },
   {
     command: "ail adopt",
@@ -108,13 +109,16 @@ const toolRows: { command: string; does: string }[] = [
 ];
 
 function Card({ title, children }: { title: string; children: ReactNode }) {
+  const titleId = useId();
   return (
-    <div role="region" aria-label={title} style={cardStyle}>
+    <section aria-labelledby={titleId} style={cardStyle}>
       <Stack dir="v" gap="space.3" align="stretch">
-        <h3 style={titleStyle}>{title}</h3>
+        <h3 id={titleId} style={titleStyle}>
+          {title}
+        </h3>
         {children}
       </Stack>
-    </div>
+    </section>
   );
 }
 
@@ -162,7 +166,7 @@ export function GetStarted() {
             <CopyCommand command="git clone https://github.com/ffMathy/agentic-intermediate-language && cd agentic-intermediate-language" />
             <CopyCommand command="bun install && bun link" />
             <CopyCommand command="cd examples/tictactoe && bun install && ail build" />
-            <CopyCommand command="ail show stakeholder" />
+            <CopyCommand command="ail show" />
           </Card>
         </div>
         <ReviewNote />

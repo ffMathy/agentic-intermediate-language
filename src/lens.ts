@@ -1,11 +1,9 @@
-// `ail lens` and `ail review`: one source, projections per audience.
+// `ail show`'s views of the spec: the tree, one node, and a review of what
+// changed since a git ref.
 import { canonicalNode } from "./hash.ts";
 import { parseFile, type AilNode, LEVELS } from "./parse.ts";
 import { ancestors, dependants, type Project } from "./project.ts";
 import { contractOf } from "./hash.ts";
-
-export const LENSES = ["stakeholder", "design", "engineer", "specialist"] as const;
-export type Lens = (typeof LENSES)[number];
 
 const AUDIENCE: Record<string, string> = {
   product: "stakeholders / product",
@@ -21,67 +19,7 @@ function block(n: AilNode, keys: string[] | "all"): string {
   return "```ail\n" + lines.join("\n") + "\n```";
 }
 
-const heading = (p: Project, n: AilNode) => "#".repeat(Math.min(6, ancestors(p, n.name).length + 2));
-
 const where = (n: AilNode) => (n.dir ? `${n.dir}/` : "./");
-
-/** "Used by" line for nodes that more than one other node depends on. */
-export function usedBy(p: Project, n: AilNode): string | null {
-  const users = p.ordered.filter((u) => u.uses.includes(n.name));
-  if (users.length < 2) return null;
-  return `_Used by ${users.map((u) => `${u.name} (${where(u)})`).join(", ")}._`;
-}
-
-function plainSummary(n: AilNode): string[] {
-  const out: string[] = [];
-  if (n.why) out.push(`*Why:* ${n.why.text.replace(/<-\s*\S+/g, "").trim()}`);
-  if (n.level === "product" && n.claims.length) out.push(...n.claims.map((c) => `- ${c.text.replace(/^\d+\.\s*/, "")}`));
-  for (const s of n.scenarios) out.push(`- **${s.title}** — ${s.steps.join(" ")}`);
-  return out;
-}
-
-export function renderLens(p: Project, lens: Lens, opts: { tag?: string; only?: Set<string> } = {}): string {
-  const out: string[] = [`# ${lens[0]!.toUpperCase() + lens.slice(1)} lens`];
-  const pick = (n: AilNode) => !opts.only || opts.only.has(n.name);
-  let hidden = 0;
-
-  if (lens === "specialist") {
-    const targets = p.ordered.filter((n) => (opts.tag ? n.tags.includes(opts.tag) : n.level === "specialist") && pick(n));
-    for (const n of targets) {
-      out.push(`\n## ${n.name}`);
-      const chain = ancestors(p, n.name);
-      if (chain.length) out.push("Why chain:\n" + chain.map((a) => `- **${a.name}**: ${a.why?.text ?? ""}`).join("\n"));
-      out.push(block(n, "all"));
-    }
-    if (!targets.length) out.push(`\n_No nodes ${opts.tag ? "tagged @" + opts.tag : "at the specialist level"}._`);
-    return out.join("\n") + "\n";
-  }
-
-  for (const n of p.ordered) {
-    if (!pick(n)) continue;
-    const lvl = LEVELS.indexOf(n.level ?? "system");
-    if (lens === "stakeholder") {
-      if (lvl > 1) { hidden++; continue; }
-      out.push(`\n${heading(p, n)} ${n.name}`);
-      out.push(plainSummary(n).join("\n"));
-    } else if (lens === "design") {
-      if (lvl > 1) { hidden++; continue; }
-      out.push(`\n${heading(p, n)} ${n.name} · ${n.level} · ${where(n)}`);
-      const shared = usedBy(p, n);
-      if (shared) out.push(shared);
-      out.push(block(n, "all"));
-    } else {
-      out.push(`\n${heading(p, n)} ${n.name} · ${n.level} · ${where(n)}`);
-      const shared = usedBy(p, n);
-      if (shared) out.push(shared);
-      out.push(lvl === 3 ? block(n, ["why", "what"]) + "\n_(how collapsed — see the specialist lens)_" : block(n, "all"));
-    }
-  }
-  if (hidden) out.push(`\n_${hidden} more detailed node(s) hidden in this lens._`);
-  if ((lens === "stakeholder" || lens === "design") && p.glossary.length)
-    out.push(`\n## Glossary\n` + p.glossary.map((t) => `- **${t.term}** — ${t.plain}`).join("\n"));
-  return out.join("\n") + "\n";
-}
 
 /** Nodes whose meaning changed relative to a git ref (cosmetic edits ignored). */
 export function changedNodes(p: Project, ref: string): { changed: string[]; added: string[]; removed: string[]; before: Map<string, AilNode> } {

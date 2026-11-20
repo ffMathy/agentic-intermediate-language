@@ -25,11 +25,11 @@ Restart Claude Code so the plugin's tools load.
 | Command | `/ail:build [Node…]` | Compile everything that changed, then check everything |
 | Command | `/ail:adopt` | Bring an existing app under AIL: its spec from its tickets, its people, the running app and its code, then proof that the spec describes it |
 | Skill | `ail` | Loaded automatically when you work on `*.ail.md` files: how to write, split, share and review nodes |
-| MCP tools | `ail_show`, `ail_build`, `ail_adopt` | Look at the spec (the tree, a node, an audience's view, or what changed), build it, and check a running app against it |
+| MCP tools | `ail_show`, `ail_build`, `ail_adopt` | Look at the spec (the tree, a node, or what changed), build it, and check a running app against it |
 | Hooks | — | Block edits to generated files, and lint the spec after every `.ail.md` edit |
 
 That's the whole surface: two commands for you, the rest for Claude. To look
-at the spec, ask in plain words ("show me the stakeholder view", "what
+at the spec, ask in plain words ("show me the tree", "what
 changed?"), and Claude calls `ail_show`.
 
 ## A typical session
@@ -42,8 +42,9 @@ changed?"), and Claude calls `ail_show`.
    in plain-language levels, missing refinements, and unknown design tokens.
 2. **Review the spec, not the code.** Ask what changed: you get the nodes
    whose meaning changed, grouped by level, each with its why chain and every
-   area a shared contract change reaches. Ask for the stakeholder view for
-   plain language.
+   area a shared contract change reaches. Each reader stops at the level
+   written for them: a stakeholder reads the product level, an engineer goes
+   down to the contracts.
 3. **Build.** Run `/ail:build`. It runs the same build as `ail build` in a
    terminal: every node that isn't up to date is compiled by `claude -p` with
    your login, with no tools, in an empty folder, so it sees only that node's

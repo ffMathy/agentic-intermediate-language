@@ -14,6 +14,7 @@ import { join, relative, resolve } from "node:path";
 import { oracleHash } from "./hash.ts";
 import type { AilNode } from "./parse.ts";
 import { kebab, type Project, type RunSpec } from "./project.ts";
+import { lockPath } from "./lock.ts";
 import { checkHeader, checksDir, errorExcerpt, runBunTest } from "./verify.ts";
 
 /** Where a node's end-to-end check lives: checks/e2e/<dir>/<kebab>.e2e.ts (not picked up by a plain `bun test`). */
@@ -65,7 +66,7 @@ export async function startApp(p: Project, spec: RunSpec, log: (s: string) => vo
   return { stop };
 }
 
-export interface AdoptReport { ok: boolean; app: string; results: AdoptResult[]; error?: string }
+export interface AdoptReport { ok: boolean; app: string; results: AdoptResult[]; error?: string; review?: { file: string; missing: string[] } }
 
 /**
  * Start the app named in run (or the one already running), run every
@@ -73,7 +74,9 @@ export interface AdoptReport { ok: boolean; app: string; results: AdoptResult[];
  * without a pin is pinned to the node's current spec on its first run; one
  * pinned to an older spec is reported stale and not run.
  */
-export async function adopt(p: Project, opts: { app?: string; names?: string[]; log?: (s: string) => void } = {}): Promise<AdoptReport> {
+export async function adopt(p: Project, opts: { app?: string; names?: string[]; log?: (s: string) => void; suggestReview?: boolean } = {}): Promise<AdoptReport> {
+  // Adopting is the moment to set up review: suggest keeping generated code out of PR diffs.
+  const review = opts.suggestReview ? reviewAttributes(p) : undefined;
   const name = runSpecName(p, opts.app);
   const spec = name ? p.config.run![name]! : null;
   const label = name ? `run.${name}` : "no app";
@@ -96,11 +99,11 @@ export async function adopt(p: Project, opts: { app?: string; names?: string[]; 
     }
     toRun.push({ n, abs, file });
   }
-  if (!toRun.length) return { ok: results.every((r) => r.status === "missing"), app: label, results };
-  if (!spec) return { ok: false, app: label, results, error: "there is no run.legacy or run.app in ail.config.json saying how to start the app; find out how (its README, scripts, CI config, build files) and add it" };
+  if (!toRun.length) return { ok: results.every((r) => r.status === "missing"), app: label, results, review };
+  if (!spec) return { ok: false, app: label, results, review, error: "there is no run.legacy or run.app in ail.config.json saying how to start the app; find out how (its README, scripts, CI config, build files) and add it" };
   let app: { stop: () => void };
   try { app = await startApp(p, spec, opts.log); }
-  catch (e) { return { ok: false, app: label, results, error: (e as Error).message }; }
+  catch (e) { return { ok: false, app: label, results, review, error: (e as Error).message }; }
   try {
     for (const { n, abs, file } of toRun) {
       // Run from outside the project, so its test setup (a simulated DOM) stays out of a real app's way.
@@ -110,7 +113,35 @@ export async function adopt(p: Project, opts: { app?: string; names?: string[]; 
         : { node: n.name, file, status: "fail", detail: `${r.failures.length ? r.failures.join("; ") : "the check did not run"}\n${errorExcerpt(r.output, 20)}` });
     }
   } finally { app.stop(); }
-  return { ok: results.every((r) => r.status === "pass" || r.status === "missing"), app: label, results };
+  return { ok: results.every((r) => r.status === "pass" || r.status === "missing"), app: label, results, review };
+}
+
+/**
+ * The .gitattributes lines that keep this project's generated code out of
+ * pull request diffs (it stays committed; GitHub collapses it), minus those
+ * the repository already has. Paths are relative to the repository's root.
+ */
+export function reviewAttributes(p: Project): { file: string; missing: string[] } {
+  const top = Bun.spawnSync(["git", "rev-parse", "--show-toplevel"], { cwd: p.root, stdout: "pipe", stderr: "pipe" });
+  const root = top.exitCode === 0 ? top.stdout.toString().trim() : p.root;
+  const prefix = relative(root, p.root).split("\\").join("/");
+  const at = (rel: string) => (prefix ? `${prefix}/${rel}` : rel);
+  const globs = (p.target?.settings["generated"] ?? "").split(/[\s,]+/).filter(Boolean);
+  const wanted = [...globs, relative(p.root, lockPath(p)).split("\\").join("/")].map((g) => `${at(g)} linguist-generated=true`);
+  const file = join(root, ".gitattributes");
+  // Ask git whether a path each pattern covers is marked already: any pattern that covers it counts.
+  const marked = (line: string) => {
+    const sample = line.split(" ")[0]!.replace(/\*\*/g, "a/b").replace(/\*/g, "x");
+    const r = Bun.spawnSync(["git", "check-attr", "linguist-generated", "--", sample], { cwd: root, stdout: "pipe", stderr: "pipe" });
+    return r.exitCode === 0 && /: linguist-generated: (true|set)\s*$/.test(r.stdout.toString());
+  };
+  return { file, missing: wanted.filter((w) => !marked(w)) };
+}
+
+/** The suggestion, when lines are missing; empty otherwise. */
+export function formatReview(review: { file: string; missing: string[] }): string {
+  if (!review.missing.length) return "";
+  return `    · to keep generated code out of pull request diffs (it stays committed, and GitHub collapses it), add to ${review.file}:\n${review.missing.map((l) => `        ${l}`).join("\n")}`;
 }
 
 export function formatAdopt(r: AdoptReport): string {
@@ -123,5 +154,6 @@ export function formatAdopt(r: AdoptReport): string {
     : [`${r.ok ? "✓" : "✗"} app      ${ran.filter((x) => x.status === "pass").length} of ${ran.length} flow(s) behave as their spec says (${app})`];
   for (const x of ran.filter((y) => y.status !== "pass")) lines.push(`    ${icon[x.status]} ${x.node} ${x.status}: ${x.detail.split("\n").join("\n      ")}`);
   if (missing.length) lines.push(`    · ${missing.length} node(s) with scenarios have no end-to-end check yet: ${missing.map((x) => x.node).join(", ")}`);
+  if (r.review) { const tip = formatReview(r.review); if (tip) lines.push(tip); }
   return lines.join("\n");
 }

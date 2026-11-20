@@ -85,3 +85,15 @@ test.skipIf(!installed || !chromium)("the kata's play flow behaves as its spec s
   expect(r.error).toBeUndefined();
   expect(r.results).toEqual([expect.objectContaining({ node: "PlayAGame", status: "pass" })]);
 }, 120_000);
+
+test("adopting suggests the .gitattributes lines that keep generated code out of PR diffs, until they are there", async () => {
+  const { reviewAttributes } = await import("../src/adopt.ts");
+  const dir = tempProject("areas");
+  Bun.spawnSync(["git", "init", "-q"], { cwd: dir });
+  const p = load(dir);
+  expect(reviewAttributes(p).missing).toEqual(["src/gen/** linguist-generated=true", "ail.lock.json linguist-generated=true"]);
+  writeFileSync(join(dir, ".gitattributes"), "src/gen/** linguist-generated=true\nail.lock.json   linguist-generated=true\n");
+  expect(reviewAttributes(load(dir)).missing).toEqual([]);
+  const r = await adopt(load(dir), { suggestReview: true });
+  expect(r.review?.missing).toEqual([]);
+});

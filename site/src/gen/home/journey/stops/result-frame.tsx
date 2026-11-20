@@ -1,12 +1,12 @@
 import { Stack } from "../../../parts/stack";
 
-const traceLines: { seen: string; source: string }[] = [
-  { seen: "“X's turn”", source: "StatusLine copy" },
-  { seen: "the O after 300 ms", source: "PlayAGame decision" },
-  { seen: "the square the O picks", source: "ComputerPlayer" },
+const trace = [
+  { key: "1", seen: "“X's turn”", source: "StatusLine copy" },
+  { key: "2", seen: "the O after 300 ms", source: "PlayAGame decision" },
+  { key: "3", seen: "the square the O picks", source: "ComputerPlayer" },
 ];
 
-/** a hint to pick the computer, the live game in a dark frame, a link to open it on its own, and three lines that trace what is on screen back to the spec */
+/** "a hint to pick the computer, the live game in a dark frame, a link to open it on its own, and three lines that trace what is on screen back to the spec" */
 export function ResultFrame() {
   return (
     <Stack dir="v" gap="space.3" align="center" style={{ width: "100%" }}>
@@ -72,15 +72,15 @@ export function ResultFrame() {
           alignItems: "stretch",
         }}
       >
-        {traceLines.map((line) => (
+        {trace.map((item) => (
           <li
-            key={line.source}
+            key={item.key}
             style={{
               fontSize: "var(--font-small)",
               color: "var(--color-text)",
             }}
           >
-            {line.seen}
+            {item.seen}
             {" ← "}
             <span
               style={{
@@ -88,7 +88,7 @@ export function ResultFrame() {
                 color: "var(--color-text-muted)",
               }}
             >
-              {line.source}
+              {item.source}
             </span>
           </li>
         ))}

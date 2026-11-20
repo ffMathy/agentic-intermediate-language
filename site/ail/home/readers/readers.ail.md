@@ -9,17 +9,17 @@ node Readers : flow   level: experience
   what
     the section has the id "readers", so the page can link to it
     four tabs, "Stakeholder", "Design", "Engineer" and "Specialist", named together as "Readers"; "Stakeholder" is picked first
-    the panel under the tabs says what that reader reads, shows the command that renders their view, and lights up the level written for them in the tree
+    the panel under the tabs names the level written for that reader, says what they read there, and lights up that level in the tree
     the left and right arrow keys move between tabs, wrapping around, and move focus with them
     Scenario: the first reader
       Given the page is open
       Then the tab "Stakeholder" is selected
-      And the panel shows "ail show stakeholder"
+      And the panel shows "PRODUCT LEVEL"
     Scenario: picking another reader
       Given the page is open
       When the visitor picks the tab "Specialist"
       Then the tab "Specialist" is selected and "Stakeholder" is not
-      And the panel shows "ail show specialist ai"
+      And the panel shows "SPECIALIST LEVEL"
     Scenario: arrow keys
       Given the tab "Stakeholder" has focus
       When the visitor presses the left arrow key
@@ -32,13 +32,12 @@ node Readers : flow   level: experience
     picked    background the reader's color, a 1px solid border in the same color, color color.on.accent
     other     background color.surface, a 1px solid color.border border, color color.text
     colors    stakeholder color.level.product, design color.level.experience, engineer color.level.system, specialist color.level.specialist
-    panel     a div with role tabpanel: background color.surface, a 1px solid color.border border, radius.lg, pad space.6; stack(v, gap: space.4, align: stretch) [ level, text, command, ReadersTree ]
+    panel     a div with role tabpanel: background color.surface, a 1px solid color.border border, radius.lg, pad space.6; stack(v, gap: space.4, align: stretch) [ level, text, ReadersTree ]
     level     font.micro, weight 700, letter-spacing 0.08em, the reader's color
     text      a p: font.lead, line-height 1.6, color.text, max-width width.prose, margin 0
-    command   a code element, align-self flex-start: background color.code, color color.code.text, font.mono at font.code, radius.sm, pad space.1 space.2
   copy
     readers.heading       "One spec, four readers"
-    readers.lead          "Each level of the tree is written for one kind of reader. Pick a reader to see which level is theirs, and the ail show command that renders their view: it starts at the top and goes as deep as that reader needs."
+    readers.lead          "Each level of the tree is written for one kind of reader. Pick a reader to see which level is theirs: they start at the top and stop where the detail stops mattering to them."
     readers.label         "Readers"
     readers.stakeholder   "Stakeholder"
     readers.design        "Design"
@@ -52,10 +51,6 @@ node Readers : flow   level: experience
     readers.design.text        "Reads the scenarios, the layout in design tokens, and every word on screen, such as “X's turn”, “X wins!” and “New game”."
     readers.engineer.text      "Reads everything down to the contracts, with the specialists' how folded away: the types, and the examples that run as tests, such as evaluate(boardFrom("XOX/XOO/OXX")) => ({ kind: "draw" })."
     readers.specialist.text    "Reads the algorithm, its invariant and how it is proved: full minimax, memoized by board, checked against every possible game."
-    readers.stakeholder.cmd    "ail show stakeholder"
-    readers.design.cmd         "ail show design"
-    readers.engineer.cmd       "ail show engineer"
-    readers.specialist.cmd     "ail show specialist ai"
   binds
     state     useState("stakeholder") for reader: "stakeholder" | "design" | "engineer" | "specialist"
     tablist   aria-label from readers.label

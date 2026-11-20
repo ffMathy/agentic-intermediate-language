@@ -12,7 +12,8 @@ import { orphanShots, refreshNodeShots, staleShots, takeShots } from "./shots.ts
 import { rmSync } from "node:fs";
 import { existsSync } from "node:fs";
 import { join } from "node:path";
-import { adopt, formatAdopt } from "./adopt.ts";
+import { adopt, formatAdopt, formatReview, reviewAttributes } from "./adopt.ts";
+import { readLock } from "./lock.ts";
 import { checksDir } from "./verify.ts";
 
 export interface BuildOptions {
@@ -41,6 +42,8 @@ export async function build(p: Project, o: BuildOptions = {}): Promise<BuildResu
   if (errors.length) return { ok: false, text: formatDiagnostics(errors) + "\n\nfix the spec before building", outcomes: [], check: null, stopped: false };
   const jobs = o.jobs ?? 4;
   if (!Number.isInteger(jobs) || jobs < 1) throw new Error(`--jobs must be a whole number of at least 1, got "${jobs}"`);
+  // A project's first build is the moment to set up review of what it generates.
+  const firstBuild = Object.keys(readLock(p).nodes).length === 0;
   const specs = resolveModels(o.models ?? [], p.config.models);
   const noModel = modelUnavailable(specs[0]!);
   const targets = p.ordered.filter((n) => isCompilable(p, n) && (!names.length || names.includes(n.name)));
@@ -96,6 +99,7 @@ export async function build(p: Project, o: BuildOptions = {}): Promise<BuildResu
     } else sections.push("! app      end-to-end checks not run: ail.config.json has no run.app saying how to start the app this project builds");
   }
   if (o.shots) sections.push(`📷 ${(await takeShots(p, o.shots, names.length ? names : undefined, log)).length} screenshot(s) in ${o.shots}`);
+  if (firstBuild) { const tip = formatReview(reviewAttributes(p)); if (tip) sections.push(tip.trimStart()); }
   const stopped = out.some((x) => x.status === "stopped");
   if (stopped) sections.push("The spec doesn't decide the questions above. Answer them in the .ail.md files, then build again.");
   return { ok, text: sections.filter(Boolean).join("\n\n"), outcomes: out, check: report, stopped };

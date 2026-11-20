@@ -1,14 +1,13 @@
-import type { ReactElement } from "react";
 import { Stack } from "./stack";
 
-export type SectionHeadingProps = {
+type SectionHeadingProps = {
   text: string;
   eyebrow?: string;
   lead?: string;
 };
 
 /** shows the eyebrow when given, the text as a level 2 heading, and the lead when given, in that order */
-export function SectionHeading({ text, eyebrow, lead }: SectionHeadingProps): ReactElement {
+export function SectionHeading({ text, eyebrow, lead }: SectionHeadingProps) {
   return (
     <Stack dir="v" gap="space.3" align="start">
       {eyebrow !== undefined ? (

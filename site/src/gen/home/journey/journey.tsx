@@ -11,7 +11,7 @@ import { StopBuild } from "./stops/stop-build";
 import { StopProof } from "./stops/stop-proof";
 import { StopResult } from "./stops/stop-result";
 
-/** "a heading, an introduction, a legend for the yellow thread, a map of the stops, then eight stops in order" */
+/** a heading, an introduction, a legend for the yellow thread, a map of the stops, then eight stops in order */
 export function Journey() {
   return (
     <Section id="journey" tone="plain">

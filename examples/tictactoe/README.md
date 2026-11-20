@@ -32,8 +32,8 @@ bun run dev
 Things to try:
 
 - `ail show` prints the tree, with each node's status and how many nodes use it.
-- `ail show stakeholder` gives the plain-language view;
-  `ail show specialist ai` shows the computer player with its why chain.
+- `ail show ComputerPlayer` shows one node: where it sits, what it uses, who
+  uses it, and what a change to it would reach.
 - Change the 300 ms in `PlayAGame` and run `ail show`. Only `PlayAGame` is
   stale.
 - Change the `how` of `ComputerPlayer`. Only `ComputerPlayer` needs

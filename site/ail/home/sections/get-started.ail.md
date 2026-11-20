@@ -19,7 +19,7 @@ node GetStarted : view   level: experience
       Then the card "In a terminal" shows the command "bun add -g github:ffMathy/agentic-intermediate-language"
       And a table lists "ail build", "ail show [what]" and "ail adopt", in that order, each with what it does
       And after the table it says the commands run inside a folder with an ail.config.json
-      And it shows the commands "git clone https://github.com/ffMathy/agentic-intermediate-language && cd agentic-intermediate-language", "bun install && bun link", "cd examples/tictactoe && bun install && ail build" and "ail show stakeholder", in that order
+      And it shows the commands "git clone https://github.com/ffMathy/agentic-intermediate-language && cd agentic-intermediate-language", "bun install && bun link", "cd examples/tictactoe && bun install && ail build" and "ail show", in that order
     Scenario: what to do next
       Given the page is open
       Then the heading "Start in two minutes" is followed by the lead "Install it, then describe a feature in plain words. You get a spec you can review, and code that is checked against it."
@@ -56,7 +56,7 @@ node GetStarted : view   level: experience
     start.cli.build        "ail build"
     start.cli.build.does   "Compile whatever changed, then check everything: the spec, the code, every test, and each screen against its look."
     start.cli.show         "ail show [what]"
-    start.cli.show.does    "The tree, a node, one reader's view, or what changed."
+    start.cli.show.does    "The tree, one node, or what changed since a git ref."
     start.cli.adopt        "ail adopt"
     start.cli.adopt.does   "Does an existing app behave as its spec says? For bringing an app under AIL, and proving a rebuilt one behaves the same."
     start.cli.closing      "That's the whole tool: three commands."
@@ -64,7 +64,7 @@ node GetStarted : view   level: experience
     start.cli.2            "git clone https://github.com/ffMathy/agentic-intermediate-language && cd agentic-intermediate-language"
     start.cli.3            "bun install && bun link"
     start.cli.4            "cd examples/tictactoe && bun install && ail build"
-    start.cli.5            "ail show stakeholder"
+    start.cli.5            "ail show"
     start.example          "Read the Tic-Tac-Toe spec"
     start.repo             "View on GitHub ↗"
   binds

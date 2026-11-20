@@ -13,9 +13,8 @@ export function AdoptFigure() {
         width={240}
         height={120}
         rx={12}
-        fill="var(--color-surface)"
-        stroke="var(--color-border)"
         strokeWidth={2}
+        style={{ fill: "var(--color-surface)", stroke: "var(--color-border)" }}
       />
       <rect
         x={360}
@@ -23,7 +22,7 @@ export function AdoptFigure() {
         width={240}
         height={120}
         rx={12}
-        fill="var(--color-code)"
+        style={{ fill: "var(--color-code)" }}
       />
       <rect
         x={700}
@@ -31,9 +30,8 @@ export function AdoptFigure() {
         width={240}
         height={120}
         rx={12}
-        fill="var(--color-surface)"
-        stroke="var(--color-border)"
         strokeWidth={2}
+        style={{ fill: "var(--color-surface)", stroke: "var(--color-border)" }}
       />
       <text
         x={140}
@@ -41,8 +39,7 @@ export function AdoptFigure() {
         textAnchor="middle"
         fontSize={20}
         fontWeight={700}
-        fontFamily="var(--font-sans)"
-        fill="var(--color-text)"
+        style={{ fill: "var(--color-text)", fontFamily: "var(--font-sans)" }}
       >
         Your app today
       </text>
@@ -52,8 +49,7 @@ export function AdoptFigure() {
         textAnchor="middle"
         fontSize={20}
         fontWeight={700}
-        fontFamily="var(--font-display)"
-        fill="var(--color-thread)"
+        style={{ fill: "var(--color-thread)", fontFamily: "var(--font-display)" }}
       >
         AIL spec
       </text>
@@ -63,8 +59,7 @@ export function AdoptFigure() {
         textAnchor="middle"
         fontSize={20}
         fontWeight={700}
-        fontFamily="var(--font-sans)"
-        fill="var(--color-text)"
+        style={{ fill: "var(--color-text)", fontFamily: "var(--font-sans)" }}
       >
         Your app, rebuilt
       </text>
@@ -73,8 +68,7 @@ export function AdoptFigure() {
         y={122}
         textAnchor="middle"
         fontSize={14}
-        fontFamily="var(--font-sans)"
-        fill="var(--color-text-muted)"
+        style={{ fill: "var(--color-text-muted)", fontFamily: "var(--font-sans)" }}
       >
         any stack
       </text>
@@ -83,8 +77,7 @@ export function AdoptFigure() {
         y={122}
         textAnchor="middle"
         fontSize={14}
-        fontFamily="var(--font-sans)"
-        fill="var(--color-code-text)"
+        style={{ fill: "var(--color-code-text)", fontFamily: "var(--font-sans)" }}
       >
         why · what · how
       </text>
@@ -93,8 +86,7 @@ export function AdoptFigure() {
         y={122}
         textAnchor="middle"
         fontSize={14}
-        fontFamily="var(--font-sans)"
-        fill="var(--color-text-muted)"
+        style={{ fill: "var(--color-text-muted)", fontFamily: "var(--font-sans)" }}
       >
         any stack
       </text>
@@ -103,27 +95,26 @@ export function AdoptFigure() {
         y1={100}
         x2={350}
         y2={100}
-        stroke="var(--color-accent)"
         strokeWidth={3}
+        style={{ stroke: "var(--color-accent)" }}
       />
-      <path d="M340 92 L354 100 L340 108 Z" fill="var(--color-accent)" />
+      <path d="M340 92 L354 100 L340 108 Z" style={{ fill: "var(--color-accent)" }} />
       <line
         x1={608}
         y1={100}
         x2={690}
         y2={100}
-        stroke="var(--color-accent)"
         strokeWidth={3}
+        style={{ stroke: "var(--color-accent)" }}
       />
-      <path d="M680 92 L694 100 L680 108 Z" fill="var(--color-accent)" />
+      <path d="M680 92 L694 100 L680 108 Z" style={{ fill: "var(--color-accent)" }} />
       <text
         x={309}
         y={84}
         textAnchor="middle"
         fontSize={13}
         fontWeight={600}
-        fontFamily="var(--font-sans)"
-        fill="var(--color-accent)"
+        style={{ fill: "var(--color-accent)", fontFamily: "var(--font-sans)" }}
       >
         adopt
       </text>
@@ -133,17 +124,16 @@ export function AdoptFigure() {
         textAnchor="middle"
         fontSize={13}
         fontWeight={600}
-        fontFamily="var(--font-sans)"
-        fill="var(--color-accent)"
+        style={{ fill: "var(--color-accent)", fontFamily: "var(--font-sans)" }}
       >
         build
       </text>
       <path
         d="M140 160 V196 H820 V160"
         fill="none"
-        stroke="var(--color-pass)"
         strokeWidth={2}
         strokeDasharray="6 6"
+        style={{ stroke: "var(--color-pass)" }}
       />
       <rect
         x={330}
@@ -151,7 +141,7 @@ export function AdoptFigure() {
         width={300}
         height={30}
         rx={15}
-        fill="var(--color-pass)"
+        style={{ fill: "var(--color-pass)" }}
       />
       <text
         x={480}
@@ -159,8 +149,7 @@ export function AdoptFigure() {
         textAnchor="middle"
         fontSize={14}
         fontWeight={700}
-        fontFamily="var(--font-sans)"
-        fill="var(--color-on-accent)"
+        style={{ fill: "var(--color-on-accent)", fontFamily: "var(--font-sans)" }}
       >
         ✓ the same checks pass on both
       </text>

@@ -6,7 +6,7 @@ const linkStyle = {
   textDecoration: "underline",
 };
 
-/** a strip of the four level colors, one sentence on where this page and the game came from, and four links */
+/** "a strip of the four level colors, one sentence on where this page and the game came from, and four links" */
 export function Footer() {
   return (
     <footer
@@ -40,7 +40,7 @@ export function Footer() {
             margin: 0,
           }}
         >
-          {"Brewed in AIL. This page was compiled from the spec in site/ail/, and the game from the spec in examples/tictactoe/ail/. Apart from the spec and a short index.html, nothing in either was written by hand."}
+          Brewed in AIL. This page was compiled from the spec in site/ail/, and the game from the spec in examples/tictactoe/ail/. Apart from the spec and a short index.html, nothing in either was written by hand.
         </p>
         <nav aria-label="More about AIL">
           <Stack dir="h" gap="space.4" align="center" wrap={true}>
@@ -48,25 +48,25 @@ export function Footer() {
               href="https://github.com/ffMathy/agentic-intermediate-language"
               style={linkStyle}
             >
-              {"GitHub"}
+              GitHub
             </a>
             <a
               href="https://github.com/ffMathy/agentic-intermediate-language/blob/main/docs/proposal.md"
               style={linkStyle}
             >
-              {"Design proposal"}
+              Design proposal
             </a>
             <a
               href="https://github.com/ffMathy/agentic-intermediate-language/blob/main/docs/claude-code.md"
               style={linkStyle}
             >
-              {"Claude Code guide"}
+              Claude Code guide
             </a>
             <a
               href="https://github.com/ffMathy/agentic-intermediate-language/tree/main/site"
               style={linkStyle}
             >
-              {"This site's spec"}
+              This site's spec
             </a>
           </Stack>
         </nav>

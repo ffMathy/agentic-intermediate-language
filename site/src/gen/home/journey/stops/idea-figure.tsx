@@ -26,10 +26,7 @@ export function IdeaFigure() {
       />
       <path
         d="M48 121 L40 148 L74 121 Z"
-        style={{
-          fill: "var(--color-surface)",
-          stroke: "none",
-        }}
+        style={{ fill: "var(--color-surface)", stroke: "none" }}
       />
       <path
         d="M48 124 L40 148 L74 124"

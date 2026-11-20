@@ -53,4 +53,6 @@ test("without a model, ail build reports what is out of date instead of calling 
   }
   expect(out).toContain("need building, but there is no model here: OPENAI_API_KEY is not set");
   expect(out).toContain("✗ build");
+  // the project's first build suggests keeping its generated code out of PR diffs
+  expect(out).toContain("src/gen/** linguist-generated=true");
 });

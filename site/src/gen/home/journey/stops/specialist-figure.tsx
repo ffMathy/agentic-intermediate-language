@@ -1,7 +1,15 @@
 import { MiniBoard } from "../../../parts/mini-board";
 
-const childXs = [46, 130, 214];
+const children = [
+  { x: 34, marks: "X_X_O____" },
+  { x: 118, marks: "XX__O____" },
+  { x: 202, marks: "X___O___X" },
+];
+
+const childCenters = [46, 130, 214];
+
 const leafXs = [22, 46, 70, 106, 130, 154, 190, 214, 238];
+
 const passLeaves = [1, 3, 7];
 
 const edgeStyle = {
@@ -30,10 +38,17 @@ export function SpecialistFigure() {
         display: "block",
       }}
     >
-      {childXs.map((cx) => (
-        <line key={`root-${cx}`} x1={130} y1={44} x2={cx} y2={80} style={edgeStyle} />
+      {childCenters.map((cx) => (
+        <line
+          key={`root-${cx}`}
+          x1={130}
+          y1={44}
+          x2={cx}
+          y2={80}
+          style={edgeStyle}
+        />
       ))}
-      {childXs.flatMap((cx) =>
+      {childCenters.map((cx) =>
         [cx - 24, cx, cx + 24].map((lx) => (
           <line
             key={`child-${cx}-${lx}`}
@@ -46,12 +61,18 @@ export function SpecialistFigure() {
         )),
       )}
       <MiniBoard x={112} y={8} cell={12} marks="X___O____" />
-      <MiniBoard x={34} y={80} cell={8} marks="X_X_O____" />
-      <MiniBoard x={118} y={80} cell={8} marks="XX__O____" />
-      <MiniBoard x={202} y={80} cell={8} marks="X___O___X" />
+      {children.map((child) => (
+        <MiniBoard
+          key={child.x}
+          x={child.x}
+          y={80}
+          cell={8}
+          marks={child.marks}
+        />
+      ))}
       {leafXs.map((lx, i) => (
         <circle
-          key={`leaf-${i}`}
+          key={lx}
           cx={lx}
           cy={150}
           r={5}
@@ -63,8 +84,18 @@ export function SpecialistFigure() {
         />
       ))}
       <circle cx={270} cy={40} r={5} style={{ fill: "var(--color-pass)" }} />
-      <circle cx={270} cy={64} r={5} style={{ fill: "var(--color-code-muted)" }} />
-      <circle cx={270} cy={88} r={5} style={{ fill: "var(--color-player-x)" }} />
+      <circle
+        cx={270}
+        cy={64}
+        r={5}
+        style={{ fill: "var(--color-code-muted)" }}
+      />
+      <circle
+        cx={270}
+        cy={88}
+        r={5}
+        style={{ fill: "var(--color-player-x)" }}
+      />
       <line
         x1={262}
         y1={88}

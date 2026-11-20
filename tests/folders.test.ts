@@ -3,7 +3,7 @@ import { existsSync, mkdirSync, readFileSync, renameSync, rmSync, writeFileSync 
 import { join } from "node:path";
 import { compile, prune } from "../src/compile.ts";
 import { buildContext } from "../src/context.ts";
-import { renderLens, renderReview } from "../src/lens.ts";
+import { renderNode, renderReview } from "../src/lens.ts";
 import { lint } from "../src/lint.ts";
 import { plan } from "../src/plan.ts";
 import { modulePath } from "../src/project.ts";
@@ -34,7 +34,7 @@ test("generated paths and imports mirror the spec's folders", () => {
 test("a shared node has one owner and many users, and lints clean", () => {
   const p = load(tempProject("areas"));
   expect(lint(p).filter((d) => d.severity === "error")).toEqual([]);
-  expect(renderLens(p, "engineer")).toContain("_Used by AreaA (a/), AreaB (b/)._");
+  expect(renderNode(p, p.nodes.get("Price")!)).toContain("used by:  AreaA (a/), AreaB (b/)");
 });
 
 test("a claim may be refined by a shared node that a descendant uses — and not otherwise", () => {

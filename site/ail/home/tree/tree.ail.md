@@ -9,7 +9,7 @@ node TreeSection : view   level: experience
   why   Make plain that a spec is one recursive shape: a tree of tasks that are all alike, built one node at a time.   <- HomePage
   what
     the section has the id "tree", so the page can link to it
-    a heading, the real Tic-Tac-Toe spec drawn as a tree, three points on what the tree shape gives, and where the idea comes from, with a link to the paper
+    a heading, the real Tic-Tac-Toe spec drawn as a tree with every node, three points on what the tree shape gives, and where the idea comes from, with a link to the paper
     Scenario: the tree is explained
       Given the page is open
       Then the section with the id "tree" has the level 2 heading "A tree of tasks, the same all the way down"
@@ -51,24 +51,31 @@ node TreeSection : view   level: experience
 
 ```ail
 node TreeFigure : view   level: experience
-  why   Show the tree itself: the real nodes of the Tic-Tac-Toe spec, and the path the page follows down to the computer player.   <- TreeSection
+  why   Show the tree itself: every node of the Tic-Tac-Toe spec, and the path the page follows down to the computer player.   <- TreeSection
   what
-    the root, its four children, the children of Engine, and the names of the other children, joined by lines; the path from the root through Engine to ComputerPlayer is drawn as the yellow thread
+    every node of the spec as a box colored by its level: the root on top, its four children in a row under it, and under each of those its own children stacked in a column; the two children of PlayAGame sit one step further in, under PlayAGame
+    lines join each node to its parent; the path from the root through Engine to ComputerPlayer is drawn as the yellow thread
     Scenario: the picture
       Given the section is shown
-      Then an image named "The Tic-Tac-Toe spec as a tree: TicTacToe, its four children, and the four children of Engine, with the path down to ComputerPlayer highlighted" is shown
-      And it contains the texts "TicTacToe", "Engine" and "ComputerPlayer"
+      Then an image named "The Tic-Tac-Toe spec as a tree: every node, with the path from TicTacToe through Engine down to ComputerPlayer highlighted" is shown
+      And it contains the texts "TicTacToe", "App", "PlayAGame", "NewGameButton", "ChooseOpponent", "WatchADemo", "BoardKit", "BoardView", "StatusLine", "Engine", "GameState", "Rules", "GameReducer", "ComputerPlayer", "UiKit", "Stack", "Text", "Button" and "Segmented"
   look
-    svg       viewBox 0 0 960 310, width 100%, height auto, display block
-    lines     drawn first, stroke color.border, stroke-width 2: from 480,54 to 120,120; to 360,120; to 600,120; to 840,120; and from 600,164 to 375,250; to 540,250; to 705,250; to 870,250
-    thread    drawn over the lines, stroke color.thread, stroke-width 5, stroke-linecap round: from 480,54 to 600,120, and from 600,164 to 870,250
-    boxes     rects with rx 10 and height 44; the name inside at the box's center x, y + 28, text-anchor middle, font-size 15, weight 700, fill color.on.accent
-    root      box x 400 y 10 width 160, fill color.level.product: TicTacToe
-    row.2     boxes y 120 width 160: x 40 App, x 280 BoardKit and x 760 UiKit, fill color.level.experience; x 520 Engine, fill color.level.system
-    row.3     boxes y 250 width 150: x 300 GameState, x 465 Rules and x 630 GameReducer, fill color.level.system; x 795 ComputerPlayer, fill color.level.specialist
-    others    text at y 192, text-anchor middle, font-size 13, fill color.text.muted: at x 120 "PlayAGame · WatchADemo", at x 360 "BoardView · StatusLine", at x 840 "Stack · Text · Button · Segmented"
+    svg       viewBox 0 0 960 360, width 100%, height auto, display block
+    lines     drawn first, stroke color.border, stroke-width 2, fill none
+    thread    drawn over the lines, stroke color.thread, stroke-width 5, stroke-linecap round, fill none
+    box       a rect with rx 10; its name centered in it (text-anchor middle, at the box's center x and its y + 24 for a 38 high box, + 28 for a 44 high one), weight 700, fill color.on.accent
+    root      box x 380 y 10 width 200 height 44, fill color.level.product, font-size 16: TicTacToe
+    columns   four boxes y 100 width 220 height 44, font-size 15: x 10 App, x 250 BoardKit and x 730 UiKit, fill color.level.experience; x 490 Engine, fill color.level.system
+    to.columns  lines from 480,54 to 120,100; to 360,100; to 600,100; and to 840,100 (that last one to Engine is the thread instead: 480,54 to 600,100)
+    rows      children are boxes of height 38, font-size 13, at y 166, 214, 262, 310 for the first to fourth child in a column
+    spine     each column has a line from its spine x, 144 down to the center y (box y + 19) of its last child, and from the spine x to each child's left edge at that child's center y; the spine x is the column's x + 16, and children start at the column's x + 32 with width 188
+    app       under App: PlayAGame at y 166, WatchADemo at y 310, fill color.level.experience; App's spine reaches PlayAGame and WatchADemo only
+    play      under PlayAGame, one step in: NewGameButton at y 214 and ChooseOpponent at y 262, at x 74 width 156, fill color.level.experience; their own spine at x 58, from 204 down to 281, with lines from 58 to 74 at each child's center y
+    board     under BoardKit: BoardView at y 166 and StatusLine at y 214, fill color.level.experience
+    engine    under Engine: GameState, Rules and GameReducer at y 166, 214 and 262, fill color.level.system; ComputerPlayer at y 310, fill color.level.specialist; Engine's spine and the line to ComputerPlayer are the thread instead
+    ui        under UiKit: boxes named "Stack", "Text", "Button" and "Segmented" at y 166, 214, 262 and 310, fill color.level.experience
   copy
-    tree.figure.label  "The Tic-Tac-Toe spec as a tree: TicTacToe, its four children, and the four children of Engine, with the path down to ComputerPlayer highlighted"
+    tree.figure.label  "The Tic-Tac-Toe spec as a tree: every node, with the path from TicTacToe through Engine down to ComputerPlayer highlighted"
   binds
     svg       role img with aria-label from tree.figure.label
 ```

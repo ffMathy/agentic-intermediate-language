@@ -39,7 +39,7 @@ node WatchADemo : flow   level: experience
   copy
     demo.again  "Watch again"
   binds
-    state       useReducer(reduce, initial())
+    state       game: Game, starting at initial(); "dispatch a" sets it to reduce(game, a)
     autoplay    while status is playing: after 600 ms dispatch place(choose(board, next)); clear the timer if the game changes first
     StatusLine  status = game.status, next = game.next
     BoardView   board = game.board, status = game.status, locked = true, onPlace(i) = nothing

@@ -18,7 +18,7 @@ node App : flow   level: experience
       Then every square is empty and the status says "X's turn"
   look
     layout       stack(v, gap: space.4, align: stretch, pad: space.6) [ mode, area ]
-    mode         Segmented, fills the width
+    mode         Segmented, which fills the width by itself (no wrapper)
     width        at most 360px, centered horizontally on the page
     background   color.surface
   copy
@@ -26,7 +26,7 @@ node App : flow   level: experience
     mode.play   "Play"
     mode.watch  "Watch"
   binds
-    state   useState("play")
+    state   area: "play" | "watch", starting at "play"
     mode    value = area, onChange(a) = set area
     area    PlayAGame when "play", WatchADemo when "watch"
   uses      PlayAGame, WatchADemo, Stack, Segmented

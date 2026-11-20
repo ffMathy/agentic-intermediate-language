@@ -4,9 +4,16 @@ import { WatchADemo } from "./demo/watch-a-demo";
 import { Stack } from "../ui/stack";
 import { Segmented } from "../ui/segmented";
 
+type Area = "play" | "watch";
+
+const options: { value: Area; label: string }[] = [
+  { value: "play", label: "Play" },
+  { value: "watch", label: "Watch" },
+];
+
 /** two areas, "Play" and "Watch", picked with one control named "Mode"; "Play" is shown first */
 export function App() {
-  const [area, setArea] = useState("play");
+  const [area, setArea] = useState<Area>("play");
   return (
     <Stack
       dir="v"
@@ -22,12 +29,9 @@ export function App() {
     >
       <Segmented
         label="Mode"
-        options={[
-          { value: "play", label: "Play" },
-          { value: "watch", label: "Watch" },
-        ]}
+        options={options}
         value={area}
-        onChange={(a) => setArea(a)}
+        onChange={(a: Area) => setArea(a)}
       />
       {area === "play" ? <PlayAGame /> : <WatchADemo />}
     </Stack>

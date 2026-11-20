@@ -34,7 +34,7 @@ node CodeBlock : view   level: experience
     mark     a mark element: background color.thread.soft, color color.thread, a 1px solid color.thread bottom border, pad 0 2px, radius 2px
     caption  font.mono at font.tiny, color.text.muted, overflow-wrap anywhere
   binds
-    props    lines: string[], label: string, edge?: token name, highlight?: string[], caption?: string
+    props    lines: list of text, label: text, edge?: token name, highlight?: list of text, caption?: text
     element  the pre has role region and aria-label set to label; each line is its own block span inside it (see look.line), with no line-break characters between the spans
     marked   each marked occurrence is a mark element whose text is exactly the highlight phrase, so a reader, a screen reader or a check can find it
   uses  Stack
@@ -65,8 +65,8 @@ node CopyCommand : flow   level: experience
     copy.done   "Copied"
     copy.name   "Copy {command}"
   binds
-    props    command: string
-    state    useState(false) for copied
+    props    command: text
+    state    copied: boolean, starting at false
     press    navigator.clipboard.writeText(command); when it resolves, set copied to true; when it rejects or navigator.clipboard is missing, do nothing
     timer    while copied is true: after 1500 ms set copied to false; clear the timer in the effect's cleanup
     button   a native button with type "button" and aria-label from copy.name; its text is copy.done while copied, copy.idle otherwise

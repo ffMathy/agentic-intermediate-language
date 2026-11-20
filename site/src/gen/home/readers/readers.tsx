@@ -1,5 +1,5 @@
 import { useRef, useState } from "react";
-import type { CSSProperties, KeyboardEvent } from "react";
+import type { KeyboardEvent } from "react";
 import { Section } from "../../parts/section";
 import { SectionHeading } from "../../parts/section-heading";
 import { Stack } from "../../parts/stack";
@@ -41,54 +41,24 @@ const colors: Record<Reader, string> = {
   specialist: "var(--color-level-specialist)",
 };
 
-const tabBase: CSSProperties = {
-  height: "40px",
-  padding: "0 var(--space-4)",
-  borderRadius: "var(--radius-md)",
-  fontFamily: "var(--font-sans)",
-  fontSize: "var(--font-small)",
-  fontWeight: 600,
-  cursor: "pointer",
-};
-
-const otherStyle: CSSProperties = {
-  background: "var(--color-surface)",
-  border: "1px solid var(--color-border)",
-  color: "var(--color-text)",
-};
-
-const panelStyle: CSSProperties = {
-  background: "var(--color-surface)",
-  border: "1px solid var(--color-border)",
-  borderRadius: "var(--radius-lg)",
-  padding: "var(--space-6)",
-};
-
-const textStyle: CSSProperties = {
-  fontSize: "var(--font-lead)",
-  lineHeight: 1.6,
-  color: "var(--color-text)",
-  maxWidth: "var(--width-prose)",
-  margin: 0,
-};
-
-/** Each level of the tree is written for one kind of reader, and each reader's view goes only as deep as they need. */
+/** "four tabs, "Stakeholder", "Design", "Engineer" and "Specialist", named together as "Readers"; "Stakeholder" is picked first" */
 export function Readers() {
   const [reader, setReader] = useState<Reader>("stakeholder");
-  const tabRefs = useRef<(HTMLButtonElement | null)[]>([]);
+  const tabRefs = useRef<Record<Reader, HTMLButtonElement | null>>({
+    stakeholder: null,
+    design: null,
+    engineer: null,
+    specialist: null,
+  });
 
-  const onKeyDown = (event: KeyboardEvent<HTMLButtonElement>, index: number) => {
-    let next = -1;
-    if (event.key === "ArrowRight") {
-      next = (index + 1) % readers.length;
-    } else if (event.key === "ArrowLeft") {
-      next = (index - 1 + readers.length) % readers.length;
-    }
-    if (next < 0) {
+  const onKeyDown = (event: KeyboardEvent<HTMLButtonElement>) => {
+    if (event.key !== "ArrowRight" && event.key !== "ArrowLeft") {
       return;
     }
-    event.preventDefault();
-    setReader(readers[next]);
+    const index = readers.indexOf(reader);
+    const step = event.key === "ArrowRight" ? 1 : -1;
+    const next = readers[(index + step + readers.length) % readers.length];
+    setReader(next);
     tabRefs.current[next]?.focus();
   };
 
@@ -100,21 +70,13 @@ export function Readers() {
       />
       <div role="tablist" aria-label="Readers">
         <Stack dir="h" gap="space.2" align="center" wrap={true}>
-          {readers.map((key, index) => {
+          {readers.map((key) => {
             const picked = key === reader;
-            const style: CSSProperties = picked
-              ? {
-                  ...tabBase,
-                  background: colors[key],
-                  border: `1px solid ${colors[key]}`,
-                  color: "var(--color-on-accent)",
-                }
-              : { ...tabBase, ...otherStyle };
             return (
               <button
                 key={key}
-                ref={(el) => {
-                  tabRefs.current[index] = el;
+                ref={(element) => {
+                  tabRefs.current[key] = element;
                 }}
                 type="button"
                 role="tab"
@@ -122,9 +84,22 @@ export function Readers() {
                 aria-selected={picked}
                 aria-controls="reader-panel"
                 tabIndex={picked ? 0 : -1}
-                style={style}
                 onClick={() => setReader(key)}
-                onKeyDown={(event) => onKeyDown(event, index)}
+                onKeyDown={onKeyDown}
+                style={{
+                  height: "40px",
+                  padding: "0 var(--space-4)",
+                  borderRadius: "var(--radius-md)",
+                  fontFamily: "var(--font-sans)",
+                  fontSize: "var(--font-small)",
+                  fontWeight: 600,
+                  cursor: "pointer",
+                  background: picked ? colors[key] : "var(--color-surface)",
+                  border: picked
+                    ? `1px solid ${colors[key]}`
+                    : "1px solid var(--color-border)",
+                  color: picked ? "var(--color-on-accent)" : "var(--color-text)",
+                }}
               >
                 {names[key]}
               </button>
@@ -136,7 +111,12 @@ export function Readers() {
         role="tabpanel"
         id="reader-panel"
         aria-labelledby={`reader-tab-${reader}`}
-        style={panelStyle}
+        style={{
+          background: "var(--color-surface)",
+          border: "1px solid var(--color-border)",
+          borderRadius: "var(--radius-lg)",
+          padding: "var(--space-6)",
+        }}
       >
         <Stack dir="v" gap="space.4" align="stretch">
           <div
@@ -149,7 +129,17 @@ export function Readers() {
           >
             {levels[reader]}
           </div>
-          <p style={textStyle}>{texts[reader]}</p>
+          <p
+            style={{
+              fontSize: "var(--font-lead)",
+              lineHeight: 1.6,
+              color: "var(--color-text)",
+              maxWidth: "var(--width-prose)",
+              margin: 0,
+            }}
+          >
+            {texts[reader]}
+          </p>
           <ReadersTree reader={reader} />
         </Stack>
       </div>

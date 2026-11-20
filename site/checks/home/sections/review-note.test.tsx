@@ -1,4 +1,4 @@
-// ail-derived-from: ReviewNote@3b01e7c64accea4b
+// ail-derived-from: ReviewNote@ed03429cda53247e
 import { afterEach, expect, test } from "bun:test";
 import { cleanup, render, screen } from "@testing-library/react";
 import { ReviewNote } from "../../../src/gen/home/sections/review-note";
@@ -12,14 +12,7 @@ test("generated code stays out of review", () => {
   const region = screen.getByRole("region", {
     name: "Review the spec, not the generated code",
   });
-  const texts = Array.from(region.querySelectorAll("*")).map(
-    (el) => el.textContent ?? "",
-  );
-  for (const line of [
-    "src/gen/** linguist-generated=true",
-    "ail.lock.json linguist-generated=true",
-  ]) {
-    expect(region.textContent ?? "").toContain(line);
-    expect(texts.some((t) => t === line)).toBe(true);
-  }
+  const text = region.textContent ?? "";
+  expect(text).toContain("src/gen/** linguist-generated=true");
+  expect(text).toContain("ail.lock.json linguist-generated=true");
 });

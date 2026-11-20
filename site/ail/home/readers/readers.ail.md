@@ -52,7 +52,7 @@ node Readers : flow   level: experience
     readers.engineer.text      "Reads everything down to the contracts, with the specialists' how folded away: the types, and the examples that run as tests, such as evaluate(boardFrom("XOX/XOO/OXX")) => ({ kind: "draw" })."
     readers.specialist.text    "Reads the algorithm, its invariant and how it is proved: full minimax, memoized by board, checked against every possible game."
   binds
-    state     useState("stakeholder") for reader: "stakeholder" | "design" | "engineer" | "specialist"
+    state     reader: "stakeholder" | "design" | "engineer" | "specialist", starting at "stakeholder"
     tablist   aria-label from readers.label
     tab       role tab, id "reader-tab-{key}", aria-selected, aria-controls "reader-panel", tabIndex 0 when picked and -1 otherwise; click sets reader; ArrowRight and ArrowLeft set the next or previous reader in tab order, wrapping, and focus its tab
     panel     id "reader-panel", aria-labelledby the picked tab's id

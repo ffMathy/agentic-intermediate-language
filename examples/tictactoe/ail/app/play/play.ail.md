@@ -47,7 +47,7 @@ node PlayAGame : flow   level: experience
     layout       stack(v, gap: space.4, align: center) [ ChooseOpponent, StatusLine, BoardView, NewGameButton ]
     width        fills its container
   binds
-    state           useReducer(reduce, initial())
+    state           game: Game, starting at initial(); "dispatch a" sets it to reduce(game, a)
     computer        when opponent is "computer", next is "O" and status is playing:
                     after 300 ms dispatch place(choose(board)); clear the timer if the game changes first
     ChooseOpponent  opponent = game.opponent, onChange(o) = dispatch setOpponent(o)
@@ -85,7 +85,7 @@ node ChooseOpponent : view   level: experience
       When the player chooses "Computer"
       Then the computer is asked for as the new opponent
   look
-    control  Segmented, fills the width
+    control  Segmented, which fills the width by itself (no wrapper)
   copy
     opponent.label     "Opponent"
     opponent.friend    "Friend"

@@ -1,4 +1,4 @@
-// ail-derived-from: PlayAGame@618142f73d1810c8
+// ail-derived-from: PlayAGame@5445e0669a18e44c
 // End-to-end check for PlayAGame: its scenarios, played in a real browser
 // against the running app at AIL_APP_URL. It knows nothing of the code, only
 // what a player can see and do, so it runs against any build of the app.

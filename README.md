@@ -68,6 +68,18 @@ each check for nodes with a `look`, in `checks/shots/`, next to the checks.
 A model has compared each one with the spec's look, so a reviewer sees
 exactly what was proven.
 
+## One language, for every target
+
+A spec is written in AIL's own small notation, never in a programming
+language's: `list of Cell`, not `Cell[]`; `later boolean`, not `Task<bool>`;
+`nothing`, not `null`; `state copied: boolean, starting at false`, not
+`useState(false)`. The target is named once, in the spec's `target` block, and
+each compiler translates the notation into that target's own types, naming and
+idioms. So the same spec compiles to TypeScript today and to Swift or C#
+tomorrow. `ail build` rejects target-language syntax, unknown sections and
+unknown labels. The full definition is in
+[docs/language.md](docs/language.md).
+
 ## Adopt an existing app
 
 AIL also works in reverse. To bring an existing app under AIL, or to move it to
@@ -194,7 +206,8 @@ each by a fresh call that sees only its own slice. The idea is inspired by
 and Khattab, MIT CSAIL), where a model calls itself on just the parts of a long
 input it needs.
 
-The full design is in [docs/proposal.md](docs/proposal.md).
+The full design is in [docs/proposal.md](docs/proposal.md), and the language
+itself is defined in [docs/language.md](docs/language.md).
 
 ## Repository layout
 

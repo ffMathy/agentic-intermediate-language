@@ -42,6 +42,11 @@ node Name : kind   level: product|experience|system|specialist   @tags
   verify    properties needing a derived check
 ```
 
+The sections, the contents of `what` and the notation for types, signatures
+and values are defined in [language.md](language.md). The notation belongs to
+no programming language: the target is named once, and every compiler
+translates the spec into that target's conventions.
+
 Two graphs live in one file:
 
 - **children** form the *review tree*. A parent's claims are refined by its

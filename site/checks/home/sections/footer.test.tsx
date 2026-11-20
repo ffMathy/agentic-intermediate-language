@@ -1,4 +1,4 @@
-// ail-derived-from: Footer@0b547c03aff7f827
+// ail-derived-from: Footer@a7709adb9c15810f
 import { afterEach, expect, test } from "bun:test";
 import { cleanup, render, screen } from "@testing-library/react";
 import { Footer } from "../../../src/gen/home/sections/footer";
@@ -10,16 +10,28 @@ afterEach(() => {
 test("the links", () => {
   render(<Footer />);
 
-  expect(screen.getByRole("link", { name: "GitHub" }).getAttribute("href")).toBe(
-    "https://github.com/ffMathy/agentic-intermediate-language",
-  );
-  expect(screen.getByRole("link", { name: "Design proposal" }).getAttribute("href")).toBe(
-    "https://github.com/ffMathy/agentic-intermediate-language/blob/main/docs/proposal.md",
-  );
-  expect(screen.getByRole("link", { name: "Claude Code guide" }).getAttribute("href")).toBe(
-    "https://github.com/ffMathy/agentic-intermediate-language/blob/main/docs/claude-code.md",
-  );
-  expect(screen.getByRole("link", { name: "This site's spec" }).getAttribute("href")).toBe(
-    "https://github.com/ffMathy/agentic-intermediate-language/tree/main/site",
-  );
+  const expected: Array<[string, string]> = [
+    ["GitHub", "https://github.com/ffMathy/agentic-intermediate-language"],
+    [
+      "Design proposal",
+      "https://github.com/ffMathy/agentic-intermediate-language/blob/main/docs/proposal.md",
+    ],
+    [
+      "Language definition",
+      "https://github.com/ffMathy/agentic-intermediate-language/blob/main/docs/language.md",
+    ],
+    [
+      "Claude Code guide",
+      "https://github.com/ffMathy/agentic-intermediate-language/blob/main/docs/claude-code.md",
+    ],
+    [
+      "This site's spec",
+      "https://github.com/ffMathy/agentic-intermediate-language/tree/main/site",
+    ],
+  ];
+
+  for (const [name, href] of expected) {
+    const link = screen.getByRole("link", { name });
+    expect(link.getAttribute("href")).toBe(href);
+  }
 });

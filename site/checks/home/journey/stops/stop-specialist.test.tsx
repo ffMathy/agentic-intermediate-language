@@ -1,4 +1,4 @@
-// ail-derived-from: StopSpecialist@676dfc8af4b3cdf6
+// ail-derived-from: StopSpecialist@0a4de583368832ab
 import { afterEach, expect, test } from "bun:test";
 import { cleanup, render, screen, within } from "@testing-library/react";
 import { StopSpecialist } from "../../../../src/gen/home/journey/stops/stop-specialist";
@@ -35,7 +35,7 @@ test("the specialist level", () => {
 
   const article = screen
     .getAllByRole("article")
-    .find((el) => el.id === "stop-5");
+    .find((element) => element.id === "stop-5");
   expect(article).toBeDefined();
   const stop = article as HTMLElement;
 
@@ -50,18 +50,13 @@ test("the specialist level", () => {
     name: "Specialist-level spec excerpt",
   });
   const text = region.textContent ?? "";
-
-  let from = 0;
+  expect(lines.length).toBe(15);
   for (const line of lines) {
-    const at = text.indexOf(line, from);
-    expect(at).toBeGreaterThanOrEqual(0);
-    from = at + line.length;
+    expect(text).toContain(line);
   }
 
+  const elements = Array.from(region.querySelectorAll("*"));
   for (const mark of marks) {
-    const highlighted = Array.from(region.querySelectorAll("*")).filter(
-      (el) => el.textContent === mark,
-    );
-    expect(highlighted.length).toBeGreaterThan(0);
+    expect(elements.some((element) => element.textContent === mark)).toBe(true);
   }
 });

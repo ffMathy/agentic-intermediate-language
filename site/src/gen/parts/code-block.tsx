@@ -1,6 +1,7 @@
 import type { CSSProperties, ReactNode } from "react";
 import { Stack } from "./stack";
 
+/** props: lines: list of text, label: text, edge?: token name, highlight?: list of text, caption?: text */
 export type CodeBlockProps = {
   lines: string[];
   label: string;
@@ -9,9 +10,7 @@ export type CodeBlockProps = {
   caption?: string;
 };
 
-function tokenVar(name: string): string {
-  return `var(--${name.replace(/\./g, "-")})`;
-}
+const tokenVar = (token: string): string => `var(--${token.split(".").join("-")})`;
 
 const markStyle: CSSProperties = {
   background: "var(--color-thread-soft)",
@@ -21,7 +20,14 @@ const markStyle: CSSProperties = {
   borderRadius: "2px",
 };
 
-function markLine(line: string, phrases: string[]): ReactNode[] {
+const captionStyle: CSSProperties = {
+  fontFamily: "var(--font-mono)",
+  fontSize: "var(--font-tiny)",
+  color: "var(--color-text-muted)",
+  overflowWrap: "anywhere",
+};
+
+const markLine = (line: string, phrases: string[]): ReactNode[] => {
   const parts: ReactNode[] = [];
   let plain = "";
   let i = 0;
@@ -47,12 +53,12 @@ function markLine(line: string, phrases: string[]): ReactNode[] {
     parts.push(plain);
   }
   return parts;
-}
+};
 
-/** "shows the given lines exactly, one per line, keeping every space; an empty line stays an empty line" */
+/** shows the given lines exactly, one per line, keeping every space; an empty line stays an empty line */
 export function CodeBlock({ lines, label, edge, highlight, caption }: CodeBlockProps) {
   const phrases = (highlight ?? []).filter((p) => p !== "");
-  const preStyle: CSSProperties = {
+  const blockStyle: CSSProperties = {
     background: "var(--color-code)",
     color: "var(--color-code-text)",
     fontFamily: "var(--font-mono)",
@@ -67,7 +73,7 @@ export function CodeBlock({ lines, label, edge, highlight, caption }: CodeBlockP
   };
   return (
     <Stack dir="v" gap="space.2" align="stretch">
-      <pre role="region" aria-label={label} style={preStyle}>
+      <pre role="region" aria-label={label} style={blockStyle}>
         {lines.map((line, index) => {
           const n = line.length - line.trimStart().length;
           const lineStyle: CSSProperties = {
@@ -82,18 +88,7 @@ export function CodeBlock({ lines, label, edge, highlight, caption }: CodeBlockP
           );
         })}
       </pre>
-      {caption !== undefined ? (
-        <div
-          style={{
-            fontFamily: "var(--font-mono)",
-            fontSize: "var(--font-tiny)",
-            color: "var(--color-text-muted)",
-            overflowWrap: "anywhere",
-          }}
-        >
-          {caption}
-        </div>
-      ) : null}
+      {caption !== undefined ? <div style={captionStyle}>{caption}</div> : null}
     </Stack>
   );
 }

@@ -37,7 +37,7 @@ node Add : fn   level: system
 node Pick : fn   level: system
   why   Choose the biggest item.   <- Calc
   what
-    pick(xs: number[]) -> number    — the index of the largest value
+    pick(xs: list of number) -> integer — the index of the largest value
     examples
       pick([1, 5, 2]) => 1
     probes

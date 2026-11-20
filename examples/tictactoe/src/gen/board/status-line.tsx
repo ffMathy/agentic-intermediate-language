@@ -6,11 +6,11 @@ export function StatusLine({ status, next }: { status: Status; next: Mark }) {
   if (status.kind === "draw") {
     return (
       <Text variant="status" align="center" live="polite">
-        It's a draw
+        {"It's a draw"}
       </Text>
     );
   }
-  const player = status.kind === "won" ? status.mark : next;
+  const player: Mark = status.kind === "won" ? status.mark : next;
   const playerPart = (
     <span
       style={{

@@ -1,4 +1,4 @@
-// ail-derived-from: StopProof@1090b5e6fb1f1cf4
+// ail-derived-from: StopProof@dc0ecf4f6caee128
 import { afterEach, expect, test } from "bun:test";
 import { cleanup, render, screen, within } from "@testing-library/react";
 import { StopProof } from "../../../../src/gen/home/journey/stops/stop-proof";
@@ -18,26 +18,34 @@ const lines = [
 ];
 
 test("the proof", () => {
-  const { container } = render(<StopProof />);
+  render(<StopProof />);
 
-  const article = container.querySelector("article#stop-7");
-  expect(article).not.toBeNull();
-  const art = article as HTMLElement;
+  const article = screen
+    .getAllByRole("article")
+    .find((el) => el.id === "stop-7");
+  expect(article).toBeDefined();
+  if (!article) return;
 
-  const heading = within(art).getByRole("heading", {
-    level: 3,
-    name: "Proof: the verify line becomes a test that plays every game.",
+  expect(
+    within(article).getByRole("heading", {
+      level: 3,
+      name: "Proof: the verify line becomes a test that plays every game.",
+    }),
+  ).toBeTruthy();
+
+  const region = within(article).getByRole("region", {
+    name: "Derived check excerpt",
   });
-  expect(heading).toBeTruthy();
-
-  const region = within(art).getByRole("region", { name: "Derived check excerpt" });
   const text = region.textContent ?? "";
+  let from = 0;
   for (const line of lines) {
-    expect(text).toContain(line.trim());
+    const at = text.indexOf(line, from);
+    expect(at).toBeGreaterThanOrEqual(0);
+    from = at + line.length;
   }
 
   const highlighted = Array.from(region.querySelectorAll("*")).filter(
-    (el) => (el.textContent ?? "") === "never loses",
+    (el) => el.textContent === "never loses",
   );
   expect(highlighted.length).toBeGreaterThan(0);
 });

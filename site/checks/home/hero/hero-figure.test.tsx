@@ -1,4 +1,4 @@
-// ail-derived-from: HeroFigure@4ff32fd5130d0f8f
+// ail-derived-from: HeroFigure@e848238df1d67e0d
 import { afterEach, expect, test } from "bun:test";
 import { cleanup, render, screen } from "@testing-library/react";
 import { HeroFigure } from "../../../src/gen/home/hero/hero-figure";
@@ -9,11 +9,13 @@ afterEach(() => {
 
 test("the picture is described", () => {
   render(<HeroFigure />);
-  const image = screen.getByRole("img", {
+  const picture = screen.getByRole("img", {
     name: "One sentence sinks through four levels of spec and comes out as code and a game board",
   });
-  expect(image).toBeTruthy();
-  const text = image.textContent ?? "";
+  expect(picture).toBeTruthy();
+  const texts = Array.from(picture.querySelectorAll("text")).map((el) =>
+    (el.textContent ?? "").trim(),
+  );
   for (const expected of [
     "Tic-Tac-Toe.",
     "The computer never loses.",
@@ -22,6 +24,6 @@ test("the picture is described", () => {
     "System",
     "Specialist",
   ]) {
-    expect(text).toContain(expected);
+    expect(texts).toContain(expected);
   }
 });

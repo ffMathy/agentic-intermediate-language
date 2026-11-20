@@ -10,7 +10,7 @@ import { SpecBrowser } from "./sections/spec-browser";
 import { GetStarted } from "./sections/get-started";
 import { Footer } from "./sections/footer";
 
-/** "the parts appear in this order: TopBar, Hero, GapStrip, TreeSection, Journey, Readers, BuildLoop, AdoptSection, SpecBrowser, GetStarted, Footer" */
+/** the parts appear in this order: TopBar, Hero, GapStrip, TreeSection, Journey, Readers, BuildLoop, AdoptSection, SpecBrowser, GetStarted, Footer */
 export function HomePage() {
   return (
     <div

@@ -1,4 +1,4 @@
-// ail-derived-from: StopSystem@55bf1d18390e9553
+// ail-derived-from: StopSystem@c3d888d6ea672b23
 import { afterEach, expect, test } from "bun:test";
 import { cleanup, render, screen, within } from "@testing-library/react";
 import { StopSystem } from "../../../../src/gen/home/journey/stops/stop-system";
@@ -7,7 +7,7 @@ afterEach(() => {
   cleanup();
 });
 
-const lines = [
+const lines: string[] = [
   "node Engine : library   level: system",
   "  why   One set of rules for every part of the game, so playing and watching can never disagree.   <- TicTacToe",
   "  children  GameState, Rules, GameReducer, ComputerPlayer",
@@ -28,29 +28,28 @@ const lines = [
 test("the system level", () => {
   render(<StopSystem />);
 
-  const article = screen
-    .getAllByRole("article")
-    .find((el) => el.id === "stop-4");
-  expect(article).toBeDefined();
-  if (!article) return;
+  const article = document.getElementById("stop-4");
+  expect(article).not.toBeNull();
+  if (article === null) {
+    return;
+  }
+  expect(article.tagName).toBe("ARTICLE");
+  expect(
+    within(article).getByRole("heading", {
+      level: 3,
+      name: "System level: one exact shape, one exact rule, examples that run.",
+    }),
+  ).toBeTruthy();
 
-  const heading = within(article).getByRole("heading", {
-    level: 3,
-    name: "System level: one exact shape, one exact rule, examples that run.",
-  });
-  expect(heading).toBeTruthy();
-
-  const region = within(article).getByRole("region", {
-    name: "System-level spec excerpt",
-  });
+  const region = screen.getByRole("region", { name: "System-level spec excerpt" });
   const text = region.textContent ?? "";
   expect(lines.length).toBe(15);
+  let position = 0;
   for (const line of lines) {
-    expect(text).toContain(line.trim());
+    const found = text.indexOf(line, position);
+    expect(found).toBeGreaterThanOrEqual(0);
+    position = found + line.length;
   }
 
-  const highlighted = Array.from(region.querySelectorAll("*")).filter(
-    (el) => el.textContent === "ComputerPlayer",
-  );
-  expect(highlighted.length).toBeGreaterThan(0);
+  expect(within(region).getAllByText("ComputerPlayer").length).toBeGreaterThan(0);
 });

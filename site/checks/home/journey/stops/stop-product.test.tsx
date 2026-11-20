@@ -1,13 +1,13 @@
-// ail-derived-from: StopProduct@47afee876beb37a0
+// ail-derived-from: StopProduct@33246c92786c2d83
 import { afterEach, expect, test } from "bun:test";
-import { cleanup, render, within } from "@testing-library/react";
+import { cleanup, render, screen, within } from "@testing-library/react";
 import { StopProduct } from "../../../../src/gen/home/journey/stops/stop-product";
 
 afterEach(() => {
   cleanup();
 });
 
-const lines = [
+const lines: string[] = [
   "node TicTacToe : system   level: product",
   "  …",
   "  what",
@@ -21,32 +21,36 @@ const lines = [
   "  children  App, BoardKit, Engine, UiKit",
 ];
 
-const marks = ["4. The computer never loses.", "refined-by: ComputerPlayer"];
-
 test("the product level", () => {
-  const { container } = render(<StopProduct />);
-  const article = container.querySelector("#stop-2");
-  expect(article).not.toBeNull();
-  const el = article as HTMLElement;
-  const isArticle =
-    el.tagName.toLowerCase() === "article" || el.getAttribute("role") === "article";
-  expect(isArticle).toBe(true);
+  render(<StopProduct />);
 
-  within(el).getByRole("heading", {
+  const article = screen
+    .getAllByRole("article")
+    .find((element) => element.id === "stop-2");
+  expect(article).toBeDefined();
+  if (!article) return;
+
+  const heading = within(article).getByRole("heading", {
     level: 3,
     name: "Product level: each requirement becomes a promise with an owner.",
   });
+  expect(heading).toBeTruthy();
 
-  const region = within(el).getByRole("region", { name: "Product-level spec excerpt" });
-  const text = region.textContent ?? "";
+  const region = screen.getByRole("region", {
+    name: "Product-level spec excerpt",
+  });
+  const regionText = region.textContent ?? "";
   for (const line of lines) {
-    expect(text).toContain(line);
+    expect(regionText).toContain(line);
   }
 
-  for (const mark of marks) {
-    const highlighted = Array.from(region.querySelectorAll("*")).filter(
-      (node) => (node.textContent ?? "").trim() === mark,
-    );
-    expect(highlighted.length).toBeGreaterThan(0);
-  }
+  const elements = Array.from(region.querySelectorAll("*"));
+  const claim = elements.filter(
+    (element) => element.textContent === "4. The computer never loses.",
+  );
+  const owner = elements.filter(
+    (element) => element.textContent === "refined-by: ComputerPlayer",
+  );
+  expect(claim.length).toBeGreaterThan(0);
+  expect(owner.length).toBeGreaterThan(0);
 });

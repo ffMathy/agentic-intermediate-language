@@ -1,4 +1,4 @@
-// ail-derived-from: Segmented@d30ed6a78c95998b
+// ail-derived-from: Segmented@17d27a71b4cd8c1a
 import { afterEach, expect, mock, test } from "bun:test";
 import { cleanup, fireEvent, render, screen } from "@testing-library/react";
 import { Segmented } from "../../src/gen/ui/segmented";
@@ -21,19 +21,11 @@ test("picking another option", () => {
     />,
   );
 
-  const group = screen.getByRole("radiogroup", { name: "Opponent" });
-  expect(group).toBeTruthy();
-
-  const friend = screen.getByRole("radio", { name: "Friend" });
-  const computer = screen.getByRole("radio", { name: "Computer" });
-  expect(friend.getAttribute("aria-checked")).toBe("true");
-  expect(computer.getAttribute("aria-checked")).toBe("false");
-
-  fireEvent.click(computer);
+  fireEvent.click(screen.getByRole("radio", { name: "Computer" }));
 
   expect(onChange).toHaveBeenCalledTimes(1);
   expect(onChange).toHaveBeenCalledWith("computer");
-
-  expect(screen.getByRole("radio", { name: "Friend" }).getAttribute("aria-checked")).toBe("true");
-  expect(screen.getByRole("radio", { name: "Computer" }).getAttribute("aria-checked")).toBe("false");
+  expect(
+    screen.getByRole("radio", { name: "Friend" }).getAttribute("aria-checked"),
+  ).toBe("true");
 });

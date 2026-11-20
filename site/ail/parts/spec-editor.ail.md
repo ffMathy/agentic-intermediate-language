@@ -19,7 +19,7 @@ node SpecEditor : view   level: experience
     editor    the Monaco editor filling the box, theme "ail-dark"
     fallback  CodeBlock with the text's lines and the label, inside a div with height 100% and overflow-y auto
   binds
-    props     text: string, path: string, label: string
+    props     text: text, path: text, label: text
     lines     the text split on line breaks, without a trailing empty line
     editor    the default export Editor of @monaco-editor/react with value = text, path = "ail:" + path, language "ail", theme "ail-dark", height "100%", loading = the fallback, and options: readOnly true, domReadOnly true, minimap enabled false, wordWrap "on", lineNumbers "on", scrollBeyondLastLine false, fontSize 13, fontFamily "Inconsolata, ui-monospace, monospace", renderLineHighlight "none", automaticLayout true, padding top 12 and bottom 12, ariaLabel = label
     language  in beforeMount, only if no registered language has the id "ail": register the language "ail" and set its Monarch tokenizer to one root state with these rules, in this order:

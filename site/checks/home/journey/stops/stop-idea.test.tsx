@@ -1,4 +1,4 @@
-// ail-derived-from: StopIdea@31d2ba75f380b2dd
+// ail-derived-from: StopIdea@59b60f24fe521df0
 import { afterEach, expect, test } from "bun:test";
 import { cleanup, render, screen, within } from "@testing-library/react";
 import { StopIdea } from "../../../../src/gen/home/journey/stops/stop-idea";
@@ -18,36 +18,54 @@ const lines = [
   "6. You can watch the computer play itself, move by move.",
 ];
 
+const highlight = "4. The computer never loses.";
+
+function deepestWithText(root: HTMLElement, text: string): Element | undefined {
+  const matches = Array.from(root.querySelectorAll("*")).filter(
+    (el) => (el.textContent ?? "").trim() === text,
+  );
+  return matches[matches.length - 1];
+}
+
+function signature(el: Element): string {
+  return `${el.tagName}|${el.getAttribute("style") ?? ""}`;
+}
+
 test("the idea", () => {
   render(<StopIdea />);
 
-  const article = document.getElementById("stop-1");
-  expect(article).not.toBeNull();
-  expect(article?.tagName).toBe("ARTICLE");
-  const scope = within(article as HTMLElement);
+  const article = screen
+    .getAllByRole("article")
+    .find((el) => el.id === "stop-1");
+  expect(article).toBeDefined();
+  const stop = article as HTMLElement;
 
-  expect(
-    scope.getByRole("heading", {
-      level: 3,
-      name: "It starts with what the product owner wants.",
-    }),
-  ).toBeTruthy();
+  within(stop).getByRole("heading", {
+    level: 3,
+    name: "It starts with what the product owner wants.",
+  });
 
-  const region = screen.getByRole("region", {
+  const region = within(stop).getByRole("region", {
     name: "What the product owner asked for",
   });
   const text = region.textContent ?? "";
 
-  let last = -1;
+  let from = 0;
   for (const line of lines) {
-    const at = text.indexOf(line, last + 1);
-    expect(at).toBeGreaterThan(last);
-    last = at;
+    const at = text.indexOf(line, from);
+    expect(at).toBeGreaterThanOrEqual(0);
+    from = at + line.length;
   }
 
-  const highlight = "4. The computer never loses.";
-  const holders = Array.from(region.querySelectorAll("*")).filter(
-    (el) => (el.textContent ?? "").trim() === highlight,
-  );
-  expect(holders.length).toBeGreaterThan(0);
+  const elements = lines.map((line) => deepestWithText(region, line));
+  for (const el of elements) {
+    expect(el).toBeDefined();
+  }
+  const highlighted = elements[lines.indexOf(highlight)] as Element;
+  const highlightSig = signature(highlighted);
+  elements.forEach((el, i) => {
+    if (lines[i] !== highlight) {
+      expect(signature(el as Element)).not.toBe(highlightSig);
+    }
+  });
 });

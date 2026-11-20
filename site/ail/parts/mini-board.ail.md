@@ -24,6 +24,6 @@ node MiniBoard : view   level: experience
     mark     a text element at the square's center, text-anchor middle, dominant-baseline central, font.sans weight 800, font-size cell × 0.62; X in color.player.x, O in color.player.o
     number   a text element at the square's center, text-anchor middle, dominant-baseline central, font.mono, font-size cell × 0.36, fill color.text.muted
   binds
-    props    x: number, y: number, cell: number, marks: string, highlight?: number[], numbers?: boolean
+    props    x: number, y: number, cell: number, marks: text, highlight?: list of integer, numbers?: boolean
     marks    9 characters, one per square, row by row: "X", "O" or "_" for empty
 ```

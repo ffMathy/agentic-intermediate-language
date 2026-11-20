@@ -5,6 +5,7 @@
 //   drift      the file matches what the lock says was generated
 //   imports    the module imports only what its `uses` allow (encapsulation)
 //   examples   `expr => expected` lines run as tests, translated mechanically
+//              from AIL notation (ailToJs)
 //   derived    tests derived once from scenarios/verify, pinned by oracle hash
 //   typecheck  tsc over the project, when TypeScript is installed
 import { existsSync, mkdirSync, readFileSync, readdirSync, writeFileSync } from "node:fs";
@@ -86,6 +87,30 @@ export function checkImports(p: Project, n: AilNode, source: string): Check {
     : pass("imports");
 }
 
+/**
+ * An AIL expression (docs/language.md, "Values") as JavaScript, for the
+ * example runner: `nothing` is null, `is`/`is not` are identity, `and`, `or`,
+ * `not` and `×` are operators. Quoted text is left alone.
+ */
+export function ailToJs(src: string): string {
+  return src.split(/("(?:[^"\\]|\\.)*")/).map((part, i) => i % 2 ? part : part
+    .replace(/\bnothing\b/g, "null")
+    .replace(/\bis not\b/g, "!==").replace(/\bis\b/g, "===")
+    .replace(/\band\b/g, "&&").replace(/\bor\b/g, "||").replace(/\bnot\s+/g, "!")
+    .replace(/×/g, "*").replace(/≤/g, "<=").replace(/≥/g, ">=")).join("");
+}
+
+/**
+ * An example as two JavaScript expressions. `where name = value` after the
+ * expected value names a value both sides use (any number of `where`s).
+ */
+export function exampleJs(expr: string, expected: string): { actual: string; expected: string } {
+  const parts = expected.split(/\s+where\s+/);
+  const binds = parts.slice(1).map((b) => /^([A-Za-z_]\w*)\s*=\s*(.+)$/.exec(b.trim())).filter((m): m is RegExpExecArray => !!m);
+  const wrap = (body: string) => binds.reduceRight((inner, [, name, value]) => `((${name}) => ${inner})(${ailToJs(value!)})`, `(${ailToJs(body)})`);
+  return { actual: wrap(expr), expected: wrap(parts[0]!.trim()) };
+}
+
 export function examplesTestSource(p: Project, n: AilNode): string {
   const abs = (rel: string) => resolve(p.root, rel);
   const deps = n.uses.map((u) => p.nodes.get(u)).filter((d): d is AilNode => !!d && !!modulePath(p, d));
@@ -99,7 +124,8 @@ export function examplesTestSource(p: Project, n: AilNode): string {
   ];
   n.examples.forEach((e, i) => {
     lines.push(`test(${JSON.stringify(`${n.name} example ${i + 1}: ${e.expr} => ${e.expected}`)}, () => {`);
-    lines.push(`  expect(__eval(${JSON.stringify(e.expr)})).toEqual(__eval(${JSON.stringify(e.expected)}));`);
+    const js = exampleJs(e.expr, e.expected);
+    lines.push(`  expect(__eval(${JSON.stringify(js.actual)})).toEqual(__eval(${JSON.stringify(js.expected)}));`);
     lines.push(`});`);
   });
   return lines.join("\n") + "\n";

@@ -31,7 +31,7 @@ export interface Config {
   /** Where `ail build` writes spec files as data, for pages that show them: a
    * path (this project's spec), or a path plus the projects to include, each
    * with a key, a display name and its spec folder (relative to this project). */
-  specModule?: string | { path: string; projects: { key: string; name: string; dir: string }[] };
+  specModule?: string | { path: string; projects: { key: string; name: string; dir: string; shots?: boolean }[] };
   checksDir?: string;
   /** How to run apps for the end-to-end checks, found out by the agent that adopts or builds the project:
    * "legacy" is the existing app a spec is written from, "app" the one `ail build` makes. */

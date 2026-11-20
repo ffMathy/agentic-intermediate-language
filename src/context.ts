@@ -55,7 +55,7 @@ export function buildContext(p: Project, n: AilNode): string {
   const sm = specModulePath(p);
   if (sm && path) {
     out.push(`\n## Spec files, as data`);
-    out.push(`"${importSpecifier(path, sm)}" exports specProjects: one entry per project ({ key, name, nodeCount, files }), where files is every spec file ({ path, text }), paths relative to that project's spec folder, in explorer order (within each folder, its own files first, then its subfolders, each by name). Import it only if this node's spec shows spec files.`);
+    out.push(`"${importSpecifier(path, sm)}" exports specProjects: one entry per project ({ key, name, nodeCount, files, shots }), where files is every spec file ({ path, text }), paths relative to that project's spec folder, in explorer order (within each folder, its own files first, then its subfolders, each by name), and shots is the project's committed proof screenshots ({ node, test, src }: the node, the name of the test whose final screen it shows, and an image URL for an img src), empty unless the project includes them. Import it only if this node's spec shows spec files or screenshots.`);
   }
   if (p.glossary.length) {
     out.push(`\n## Glossary`);

@@ -1,0 +1,17 @@
+{
+  "node": "BoardView",
+  "shots": [
+    {
+      "test": "picking an empty square",
+      "file": "01-picking-an-empty-square.png"
+    },
+    {
+      "test": "a taken square does nothing",
+      "file": "02-a-taken-square-does-nothing.png"
+    },
+    {
+      "test": "the winning line stands out",
+      "file": "03-the-winning-line-stands-out.png"
+    }
+  ]
+}

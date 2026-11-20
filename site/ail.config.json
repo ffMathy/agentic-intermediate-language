@@ -3,8 +3,17 @@
   "specModule": {
     "path": "src/gen/spec.ts",
     "projects": [
-      { "key": "tictactoe", "name": "Tic-Tac-Toe demo", "dir": "../examples/tictactoe/ail" },
-      { "key": "site", "name": "This website", "dir": "ail" }
+      {
+        "key": "tictactoe",
+        "name": "Tic-Tac-Toe demo",
+        "dir": "../examples/tictactoe/ail",
+        "shots": true
+      },
+      {
+        "key": "site",
+        "name": "This website",
+        "dir": "ail"
+      }
     ]
   }
 }

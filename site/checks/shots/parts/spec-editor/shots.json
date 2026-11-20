@@ -1,0 +1,9 @@
+{
+  "node": "SpecEditor",
+  "shots": [
+    {
+      "test": "readable before the editor loads",
+      "file": "01-readable-before-the-editor-loads.png"
+    }
+  ]
+}

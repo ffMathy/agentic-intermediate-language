@@ -1,0 +1,25 @@
+{
+  "node": "SpecBrowser",
+  "shots": [
+    {
+      "test": "the demo's spec is shown first",
+      "file": "01-the-demo-s-spec-is-shown-first.png"
+    },
+    {
+      "test": "picking another file",
+      "file": "02-picking-another-file.png"
+    },
+    {
+      "test": "showing this website's spec",
+      "file": "03-showing-this-website-s-spec.png"
+    },
+    {
+      "test": "opened from a link",
+      "file": "04-opened-from-a-link.png"
+    },
+    {
+      "test": "following the same link twice",
+      "file": "05-following-the-same-link-twice.png"
+    }
+  ]
+}

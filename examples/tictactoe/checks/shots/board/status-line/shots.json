@@ -1,0 +1,17 @@
+{
+  "node": "StatusLine",
+  "shots": [
+    {
+      "test": "whose turn",
+      "file": "01-whose-turn.png"
+    },
+    {
+      "test": "a win",
+      "file": "02-a-win.png"
+    },
+    {
+      "test": "a draw",
+      "file": "03-a-draw.png"
+    }
+  ]
+}

@@ -1,0 +1,9 @@
+{
+  "node": "GapStrip",
+  "shots": [
+    {
+      "test": "three cards",
+      "file": "01-three-cards.png"
+    }
+  ]
+}

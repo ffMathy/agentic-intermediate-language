@@ -2,13 +2,14 @@
 // changed (when a model is available), then check everything. With nothing to
 // compile it only checks, without a model.
 import { formatCheck, runCheck, type CheckReport } from "./check.ts";
-import { checksToDerive, compile, derive, mapLimit, type CompileOutcome } from "./compile.ts";
+import { checksToDerive, compile, derive, mapLimit, writeGlue, type CompileOutcome } from "./compile.ts";
 import { diverge, formatDiverge } from "./diverge.ts";
 import { formatDiagnostics, lint } from "./lint.ts";
 import { plan } from "./plan.ts";
 import { isCompilable, type Project } from "./project.ts";
 import { getProvider, modelUnavailable, resolveModels } from "./providers/index.ts";
-import { takeShots } from "./shots.ts";
+import { orphanShots, refreshNodeShots, staleShots, takeShots } from "./shots.ts";
+import { rmSync } from "node:fs";
 import { existsSync } from "node:fs";
 import { join } from "node:path";
 import { adopt, formatAdopt } from "./adopt.ts";
@@ -68,6 +69,8 @@ export async function build(p: Project, o: BuildOptions = {}): Promise<BuildResu
     });
     for (const [node, q] of stopped) out.push({ node, status: "stopped", attempts: 0, detail: q });
     for (const [node, why] of failed) out.push({ node, status: "failed", attempts: 0, detail: why });
+    // The proof screenshots of every node built since they were last taken, then the glue that shows them.
+    if (await refreshShots(p, log)) writeGlue(p);
   }
 
   // Then the check: spec, build, behaviour, and anything asked for on top.
@@ -96,4 +99,21 @@ export async function build(p: Project, o: BuildOptions = {}): Promise<BuildResu
   const stopped = out.some((x) => x.status === "stopped");
   if (stopped) sections.push("The spec doesn't decide the questions above. Answer them in the .ail.md files, then build again.");
   return { ok, text: sections.filter(Boolean).join("\n\n"), outcomes: out, check: report, stopped };
+}
+
+/** Retake the committed screenshots that are out of date and remove orphaned ones. True when anything changed. */
+async function refreshShots(p: Project, log: (s: string) => void): Promise<boolean> {
+  let changed = false;
+  for (const dir of orphanShots(p)) { rmSync(dir, { recursive: true, force: true }); changed = true; }
+  for (const n of staleShots(p)) {
+    try {
+      await refreshNodeShots(p, n);
+      log(`${n.name}: proof screenshots taken`);
+      changed = true;
+    } catch (e) {
+      log(`proof screenshots not taken: ${(e as Error).message}`);
+      break;
+    }
+  }
+  return changed;
 }

@@ -1,0 +1,17 @@
+{
+  "node": "GetStarted",
+  "shots": [
+    {
+      "test": "in Claude Code",
+      "file": "01-in-claude-code.png"
+    },
+    {
+      "test": "in a terminal",
+      "file": "02-in-a-terminal.png"
+    },
+    {
+      "test": "what to do next",
+      "file": "03-what-to-do-next.png"
+    }
+  ]
+}

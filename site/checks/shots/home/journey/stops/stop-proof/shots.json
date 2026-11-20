@@ -1,0 +1,9 @@
+{
+  "node": "StopProof",
+  "shots": [
+    {
+      "test": "the proof",
+      "file": "01-the-proof.png"
+    }
+  ]
+}

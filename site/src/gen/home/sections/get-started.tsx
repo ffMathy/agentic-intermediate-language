@@ -1,16 +1,9 @@
-import { useId } from "react";
 import type { CSSProperties, ReactNode } from "react";
 import { Section } from "../../parts/section";
 import { SectionHeading } from "../../parts/section-heading";
 import { Stack } from "../../parts/stack";
 import { CopyCommand } from "../../parts/copy-command";
-
-const cardsStyle: CSSProperties = {
-  display: "grid",
-  gridTemplateColumns: "repeat(auto-fit, minmax(min(320px, 100%), 1fr))",
-  gap: "var(--space-6)",
-  alignItems: "start",
-};
+import { ReviewNote } from "./review-note";
 
 const cardStyle: CSSProperties = {
   background: "var(--color-surface)",
@@ -43,7 +36,6 @@ const textStyle: CSSProperties = {
 const tableStyle: CSSProperties = {
   width: "100%",
   borderCollapse: "collapse",
-  fontSize: "var(--font-small)",
 };
 
 const rowStyle: CSSProperties = {
@@ -58,9 +50,7 @@ const cellStyle: CSSProperties = {
 };
 
 const commandCellStyle: CSSProperties = {
-  padding: "var(--space-2) var(--space-2) var(--space-2) 0",
-  verticalAlign: "top",
-  textAlign: "left",
+  ...cellStyle,
   fontFamily: "var(--font-mono)",
   fontSize: "var(--font-code)",
   fontWeight: 600,
@@ -73,6 +63,13 @@ const closingStyle: CSSProperties = {
   fontWeight: 600,
   color: "var(--color-text)",
   margin: 0,
+};
+
+const cardsStyle: CSSProperties = {
+  display: "grid",
+  gridTemplateColumns: "repeat(auto-fit, minmax(min(320px, 100%), 1fr))",
+  gap: "var(--space-6)",
+  alignItems: "start",
 };
 
 const exampleStyle: CSSProperties = {
@@ -95,7 +92,7 @@ const repoStyle: CSSProperties = {
   textDecoration: "none",
 };
 
-const toolRows: ReadonlyArray<{ command: string; does: string }> = [
+const toolRows: { command: string; does: string }[] = [
   {
     command: "ail build",
     does: "Compile whatever changed, then check everything: the spec, the code, every test, and each screen against its look.",
@@ -110,15 +107,12 @@ const toolRows: ReadonlyArray<{ command: string; does: string }> = [
   },
 ];
 
-function Card(props: { title: string; children: ReactNode }) {
-  const titleId = useId();
+function Card({ title, children }: { title: string; children: ReactNode }) {
   return (
-    <div role="region" aria-labelledby={titleId} style={cardStyle}>
+    <div role="region" aria-label={title} style={cardStyle}>
       <Stack dir="v" gap="space.3" align="stretch">
-        <h3 id={titleId} style={titleStyle}>
-          {props.title}
-        </h3>
-        {props.children}
+        <h3 style={titleStyle}>{title}</h3>
+        {children}
       </Stack>
     </div>
   );
@@ -171,6 +165,7 @@ export function GetStarted() {
             <CopyCommand command="ail show stakeholder" />
           </Card>
         </div>
+        <ReviewNote />
         <Stack dir="h" gap="space.3" align="center" wrap={true}>
           <a
             href="https://github.com/ffMathy/agentic-intermediate-language/tree/main/examples/tictactoe"

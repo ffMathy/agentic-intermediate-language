@@ -1,0 +1,9 @@
+{
+  "node": "NewGameButton",
+  "shots": [
+    {
+      "test": "pressing it",
+      "file": "01-pressing-it.png"
+    }
+  ]
+}

@@ -1,7 +1,9 @@
 // The check that ends every `ail build`: is the spec
 // sound, is the code built from it, and does the code do what it says?
 // Read-only, and never calls a model.
+import { relative } from "node:path";
 import { staleGlue } from "./compile.ts";
+import { nodeShotsDir, orphanShots, staleShots } from "./shots.ts";
 import { lint, type Diagnostic } from "./lint.ts";
 import { unjudged } from "./look.ts";
 import { plan, type PlanEntry } from "./plan.ts";
@@ -23,7 +25,12 @@ export function runCheck(p: Project, nodes: string[] = []): CheckReport {
   const l = lint(p);
   const pl = plan(p);
   const v = verifyProject(p, nodes);
-  const glue = staleGlue(p);
+  // Model-free outputs: the glue, and the committed proof screenshots.
+  const glue = [
+    ...staleGlue(p),
+    ...staleShots(p).filter((n) => !nodes.length || nodes.includes(n.name)).map((n) => relative(p.root, nodeShotsDir(p, n))),
+    ...orphanShots(p).map((d) => relative(p.root, d)),
+  ];
   const ok = !l.some((d) => d.severity === "error") && pl.every((e) => e.status === "fresh") && !glue.length && v.ok;
   const looks = unjudged(p).filter((n) => !nodes.length || nodes.includes(n));
   return { ok, glue, unjudged: looks, lint: l, plan: pl, verify: v };
@@ -39,7 +46,7 @@ export function formatCheck(r: CheckReport): string {
   const todo = r.plan.filter((e) => e.status !== "fresh");
   out.push(todo.length || r.glue.length ? `✗ build    ${todo.length + r.glue.length} output(s) not built from the current spec — run \`ail build\`` : `✓ build    ${r.plan.length} node(s) up to date`);
   for (const e of todo) out.push(`    ${e.node} ${e.status}${e.reason ? ` (${e.reason})` : ""}`);
-  for (const g of r.glue) out.push(`    ${g} out of date (written by ail build without a model)`);
+  for (const g of r.glue) out.push(`    ${g} out of date (written by ail build${g.includes("shots") ? ", which takes the proof screenshots" : " without a model"})`);
 
   const failed = r.verify.results.filter((x) => !x.ok);
   const tests = r.verify.results.flatMap((x) => x.checks).filter((c) => c.kind === "tests" && c.ok).reduce((n, c) => n + (Number(/\d+/.exec(c.detail)?.[0]) || 0), 0);

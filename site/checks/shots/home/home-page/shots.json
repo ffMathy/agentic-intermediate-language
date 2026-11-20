@@ -1,0 +1,13 @@
+{
+  "node": "HomePage",
+  "shots": [
+    {
+      "test": "one story, in order",
+      "file": "01-one-story-in-order.png"
+    },
+    {
+      "test": "every top bar link has a place to land",
+      "file": "02-every-top-bar-link-has-a-place-to-land.png"
+    }
+  ]
+}

@@ -1,0 +1,9 @@
+{
+  "node": "Button",
+  "shots": [
+    {
+      "test": "pressing",
+      "file": "01-pressing.png"
+    }
+  ]
+}

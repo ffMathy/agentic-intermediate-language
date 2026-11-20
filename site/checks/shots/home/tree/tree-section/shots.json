@@ -1,0 +1,9 @@
+{
+  "node": "TreeSection",
+  "shots": [
+    {
+      "test": "the tree is explained",
+      "file": "01-the-tree-is-explained.png"
+    }
+  ]
+}

@@ -1,0 +1,9 @@
+{
+  "node": "StopIdea",
+  "shots": [
+    {
+      "test": "the idea",
+      "file": "01-the-idea.png"
+    }
+  ]
+}

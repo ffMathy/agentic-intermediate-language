@@ -1,0 +1,9 @@
+{
+  "node": "ProofScreens",
+  "shots": [
+    {
+      "test": "the screens",
+      "file": "01-the-screens.png"
+    }
+  ]
+}

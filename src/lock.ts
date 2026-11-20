@@ -11,6 +11,8 @@ export interface LockEntry {
   by?: string;
   /** The build (compile hash) whose screens a model found to match the node's look. */
   look?: string;
+  /** The build (compile hash) whose proof screenshots are committed in checks/shots/. */
+  shots?: string;
 }
 export interface Lock { version: 1; nodes: Record<string, LockEntry>; glue: Record<string, string> }
 

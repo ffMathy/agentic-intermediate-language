@@ -1,0 +1,9 @@
+{
+  "node": "StopProduct",
+  "shots": [
+    {
+      "test": "the product level",
+      "file": "01-the-product-level.png"
+    }
+  ]
+}

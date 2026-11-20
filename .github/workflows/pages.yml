@@ -32,6 +32,8 @@ jobs:
         run: |
           (cd site && bun install --frozen-lockfile)
           (cd examples/tictactoe && bun install --frozen-lockfile)
+      - name: Install Chromium (the demo's end-to-end checks and screenshots)
+        run: bunx playwright install --with-deps chromium
       - name: The site is built from its spec and passes its checks
         working-directory: site
         run: bun run build

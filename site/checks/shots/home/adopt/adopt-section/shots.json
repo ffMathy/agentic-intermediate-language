@@ -1,0 +1,9 @@
+{
+  "node": "AdoptSection",
+  "shots": [
+    {
+      "test": "adopting is explained",
+      "file": "01-adopting-is-explained.png"
+    }
+  ]
+}

@@ -1,0 +1,13 @@
+{
+  "node": "JumpGauge",
+  "shots": [
+    {
+      "test": "every pill leads to its stop",
+      "file": "01-every-pill-leads-to-its-stop.png"
+    },
+    {
+      "test": "the gauge shows which stops are the spec",
+      "file": "02-the-gauge-shows-which-stops-are-the-spec.png"
+    }
+  ]
+}

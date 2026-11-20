@@ -9,7 +9,8 @@ node GetStarted : view   level: experience
     every command has its own copy button
     the terminal card lists the three commands that make up the whole tool
     the terminal card says the commands run inside a project, meaning a folder with an ail.config.json, and ends with copyable steps to try the tic-tac-toe demo from this page
-    under the cards, two links point to what to read or try next: the Tic-Tac-Toe spec and the repository
+    under the cards, a note on keeping generated code out of pull request diffs while it stays committed, with the lines to copy
+    under the note, two links point to what to read or try next: the Tic-Tac-Toe spec and the repository
     Scenario: in Claude Code
       Given the page is open
       Then the card "In Claude Code" shows the commands "/plugin marketplace add ffMathy/agentic-intermediate-language" and "/plugin install ail@agentic-intermediate-language", in that order
@@ -25,7 +26,7 @@ node GetStarted : view   level: experience
       And under the cards, the link "Read the Tic-Tac-Toe spec" leads to the example's spec folder and the link "View on GitHub ↗" leads to the repository, in that order
   look
     band      Section with id "start", tone plain
-    layout    stack(v, gap: space.6, align: stretch) [ head, cards, next ]
+    layout    stack(v, gap: space.6, align: stretch) [ head, cards, ReviewNote, next ]
     head      SectionHeading with text from start.heading, lead from start.lead
     cards     a div: display grid, grid-template-columns repeat(auto-fit, minmax(min(320px, 100%), 1fr)), gap space.6, align-items start
     card      background color.surface, a 1px solid color.border border, radius.lg, pad space.6, min-width 0; stack(v, gap: space.3, align: stretch)
@@ -72,5 +73,29 @@ node GetStarted : view   level: experience
     example  a link to "https://github.com/ffMathy/agentic-intermediate-language/tree/main/examples/tictactoe"
     repo     a link to "https://github.com/ffMathy/agentic-intermediate-language"
     cards    each card is a region named by its h3
-  uses  Section, SectionHeading, Stack, CopyCommand
+  uses  Section, SectionHeading, Stack, CopyCommand, ReviewNote
+  children  ReviewNote
+```
+
+```ail
+node ReviewNote : view   level: experience
+  why   Generated code is committed but not reviewed: show how to keep it out of pull request diffs.   <- GetStarted
+  what
+    a heading, why generated code is committed but collapsed in review, and the .gitattributes lines that do it
+    Scenario: generated code stays out of review
+      Given the note is shown
+      Then the region named "Review the spec, not the generated code" shows the lines "src/gen/** linguist-generated=true" and "ail.lock.json linguist-generated=true"
+  look
+    note      a section element named by its h3 (aria-labelledby): background color.surface.raised, radius.lg, pad space.6, min-width 0; stack(v, gap: space.3, align: stretch) [ title, text, code ]
+    title     an h3: font.lead, weight 700, color.text, margin 0
+    text      a p: font.body, line-height 1.6, color.text.muted, max-width width.prose, margin 0
+    code      CodeBlock with lines review.line.1 to review.line.3, label review.label
+  copy
+    review.title   "Review the spec, not the generated code"
+    review.text    "Commit what ail build generates, so the app runs straight from the repository and CI can prove it was built from the spec. Then mark it as generated, and GitHub collapses it in every pull request diff: reviewers read the spec, the checks and the proof screenshots instead."
+    review.label   ".gitattributes"
+    review.line.1  "# .gitattributes, at the root of the repository"
+    review.line.2  "src/gen/** linguist-generated=true"
+    review.line.3  "ail.lock.json linguist-generated=true"
+  uses  Stack, CodeBlock
 ```

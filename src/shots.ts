@@ -7,7 +7,8 @@ import { tmpdir } from "node:os";
 import { dirname, join, relative, resolve } from "node:path";
 import type { AilNode } from "./parse.ts";
 import { AIL_HOME, kebab, type Project } from "./project.ts";
-import { derivedCheckFile } from "./verify.ts";
+import { readLock, writeLock } from "./lock.ts";
+import { checksDir, derivedCheckFile } from "./verify.ts";
 
 export interface Shot { node: string; test: string; file: string }
 
@@ -66,8 +67,16 @@ export function pageStyles(p: Project): string {
   return parts.join("\n");
 }
 
+const MEDIA: Record<string, string> = { png: "image/png", jpg: "image/jpeg", jpeg: "image/jpeg", gif: "image/gif", webp: "image/webp", svg: "image/svg+xml" };
+
+/** In tests, an imported image is a path on disk, which a page cannot load: inline it. */
+export function inlineImages(html: string): string {
+  return html.replace(/(src=")(\/[^"]+\.(png|jpe?g|gif|webp|svg))"/gi, (m, pre: string, path: string, ext: string) =>
+    existsSync(path) ? `${pre}data:${MEDIA[ext.toLowerCase()]};base64,${readFileSync(path).toString("base64")}"` : m);
+}
+
 export function shotPage(styles: string, screen: { html: string; head: string }): string {
-  return `<!doctype html><html><head><meta charset="utf-8">${styles}\n${screen.head}</head><body><div id="ail-shot" style="padding:24px">${screen.html}</div></body></html>`;
+  return `<!doctype html><html><head><meta charset="utf-8">${styles}\n${screen.head}</head><body><div id="ail-shot" style="padding:24px">${inlineImages(screen.html)}</div></body></html>`;
 }
 
 const slug = (s: string) => s.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "").slice(0, 60) || "test";
@@ -76,7 +85,7 @@ const slug = (s: string) => s.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(
  * Screenshots of every visual node's proofs (or of `names` only), written to
  * `<outDir>/<node folder>/<node>/<nn>-<test>.png`.
  */
-export async function takeShots(p: Project, outDir: string, names?: string[], log: (s: string) => void = () => {}): Promise<Shot[]> {
+export async function takeShots(p: Project, outDir: string, names?: string[], log: (s: string) => void = () => {}, opts: { scale?: number; manifest?: boolean } = {}): Promise<Shot[]> {
   const nodes = visualNodes(p, names);
   if (!nodes.length) return [];
   let chromium: typeof import("playwright").chromium;
@@ -89,7 +98,7 @@ export async function takeShots(p: Project, outDir: string, names?: string[], lo
   const styles = pageStyles(p);
   const shots: Shot[] = [];
   try {
-    const page = await browser.newPage({ viewport: { width: 1024, height: 640 }, deviceScaleFactor: 2 });
+    const page = await browser.newPage({ viewport: { width: 1024, height: 640 }, deviceScaleFactor: opts.scale ?? 2 });
     for (const n of nodes) {
       const screens = captureScreens(p, derivedCheckFile(p, n).file!);
       log(`· ${n.name}: ${screens.length} screen(s)`);
@@ -105,8 +114,54 @@ export async function takeShots(p: Project, outDir: string, names?: string[], lo
   } finally {
     await browser.close();
   }
-  writeFileSync(join(outDir, "shots.json"), JSON.stringify(shots.map((s) => ({ ...s, file: relative(outDir, s.file) })), null, 2));
+  if (opts.manifest !== false) writeFileSync(join(outDir, "shots.json"), JSON.stringify(shots.map((s) => ({ ...s, file: relative(outDir, s.file) })), null, 2));
   return shots;
+}
+
+// --- the committed proof screenshots ------------------------------------------
+//
+// Every node with a look keeps the screenshots of its proofs next to its
+// checks, in checks/shots/<folder>/<node>/, with a shots.json index. They are
+// part of what a build produces, like the generated code: reviewed in pull
+// requests, shown on pages through the spec module, and judged against the
+// look. A build retakes them when it builds the node; the lock records which
+// build they were taken from, so a check can tell when they are out of date.
+
+export const shotsDir = (p: Project) => join(checksDir(p), "shots");
+export const nodeShotsDir = (p: Project, n: AilNode) => join(shotsDir(p), n.dir, kebab(n.name));
+
+/** Retake a node's committed proof screenshots, and record the build they belong to. */
+export async function refreshNodeShots(p: Project, n: AilNode, log: (s: string) => void = () => {}): Promise<Shot[]> {
+  const dir = nodeShotsDir(p, n);
+  rmSync(dir, { recursive: true, force: true });
+  const shots = await takeShots(p, shotsDir(p), [n.name], log, { scale: 1, manifest: false });
+  if (shots.length) writeFileSync(join(dir, "shots.json"), JSON.stringify({ node: n.name, shots: shots.map((s) => ({ test: s.test, file: relative(dir, s.file) })) }, null, 2) + "\n");
+  const lock = readLock(p);
+  const entry = lock.nodes[n.name];
+  if (entry) { entry.shots = entry.hash; writeLock(p, lock); }
+  return shots;
+}
+
+/** Built nodes with a look whose committed screenshots are missing or from an older build. */
+export function staleShots(p: Project): AilNode[] {
+  const lock = readLock(p);
+  return visualNodes(p).filter((n) => { const e = lock.nodes[n.name]; return e && e.shots !== e.hash; });
+}
+
+/** Screenshot folders of nodes that no longer exist, or no longer have a look: removed by a build. */
+export function orphanShots(p: Project): string[] {
+  const root = shotsDir(p);
+  if (!existsSync(root)) return [];
+  const keep = new Set(visualNodes(p).map((n) => nodeShotsDir(p, n)));
+  return [...new Bun.Glob("**/shots.json").scanSync({ cwd: root })].map((f) => join(root, dirname(f))).filter((d) => !keep.has(d));
+}
+
+/** A folder's committed screenshots: the index a build wrote, with absolute files. */
+export function readShotsIndex(dir: string): { node: string; shots: { test: string; file: string }[] } | null {
+  const f = join(dir, "shots.json");
+  if (!existsSync(f)) return null;
+  const idx = JSON.parse(readFileSync(f, "utf8")) as { node: string; shots: { test: string; file: string }[] };
+  return { node: idx.node, shots: idx.shots.map((s) => ({ test: s.test, file: join(dir, s.file) })) };
 }
 
 /** Nodes a change can make look different: the changed ones, and the nodes that use them directly (the change in context). */

@@ -1,0 +1,9 @@
+{
+  "node": "HeroFigure",
+  "shots": [
+    {
+      "test": "the picture is described",
+      "file": "01-the-picture-is-described.png"
+    }
+  ]
+}

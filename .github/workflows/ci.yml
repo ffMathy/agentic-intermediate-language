@@ -51,6 +51,9 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - uses: oven-sh/setup-bun@v2
+      - run: bun install --frozen-lockfile
+      - name: Go to Definition and Find All References, in a real VS Code
+        run: xvfb-run -a node editors/vscode/test/run.js
       - name: Package the VS Code extension
         working-directory: editors/vscode
         run: bunx @vscode/vsce@3.6.2 package --skip-license -o ail.vsix

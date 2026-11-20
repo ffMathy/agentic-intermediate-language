@@ -1,8 +1,8 @@
 {
   "name": "ail",
   "displayName": "AIL: Agentic Intermediate Language",
-  "description": "Syntax highlighting for AIL specs: .ail.md files and ```ail blocks in Markdown.",
-  "version": "0.1.0",
+  "description": "AIL specs in VS Code: highlighting, Go to Definition and Find All References for nodes, in .ail.md files and ```ail blocks.",
+  "version": "0.2.0",
   "publisher": "ffMathy",
   "icon": "icon.png",
   "repository": {
@@ -17,6 +17,11 @@
   "categories": [
     "Programming Languages"
   ],
+  "activationEvents": [
+    "workspaceContains:**/*.ail.md",
+    "onLanguage:ail"
+  ],
+  "main": "./extension.js",
   "keywords": [
     "ail",
     "specification",

@@ -84,7 +84,9 @@ unknown labels. The full definition is in
 
 The VS Code extension in [`editors/vscode`](editors/vscode) colors AIL in
 `.ail.md` files and in every ```` ```ail ```` block in Markdown, in VS Code,
-Cursor and github.dev. Get `ail.vsix` from the latest `vscode-v…`
+Cursor and github.dev. Go to Definition (F12) and Find All References work on
+node names across files: `<- Parent`, `uses`, `children`, `refined-by:` and
+components in a `look`. Get `ail.vsix` from the latest `vscode-v…`
 [release](https://github.com/ffMathy/agentic-intermediate-language/releases)
 and install it with **Extensions: Install from VSIX…**. GitHub itself only
 colors languages it has registered in Linguist; its grammar is this one.
@@ -225,7 +227,7 @@ src/                 the ail CLI and MCP server (Bun, TypeScript)
 prompts/             instructions given to the compiling model
 skills/ commands/ hooks/ .claude-plugin/    the Claude Code plugin
 examples/tictactoe/  the demo: spec in ail/, generated code, derived checks, lock file
-editors/vscode/      the VS Code extension: AIL syntax highlighting, in .ail.md files and ```ail blocks
+editors/vscode/      the VS Code extension: highlighting, Go to Definition and references for AIL
 site/                the website, written in AIL (spec in site/ail/); its spec browser shows both example specs in a read-only Monaco editor
 tests/               toolchain tests
 ```

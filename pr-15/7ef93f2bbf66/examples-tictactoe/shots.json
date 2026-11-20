@@ -1,0 +1,107 @@
+[
+  {
+    "node": "App",
+    "test": "switching to the demo",
+    "file": "app/app/01-switching-to-the-demo.png"
+  },
+  {
+    "node": "App",
+    "test": "switching back starts a new game",
+    "file": "app/app/02-switching-back-starts-a-new-game.png"
+  },
+  {
+    "node": "PlayAGame",
+    "test": "X always starts",
+    "file": "app/play/play-a-game/01-x-always-starts.png"
+  },
+  {
+    "node": "PlayAGame",
+    "test": "taking turns",
+    "file": "app/play/play-a-game/02-taking-turns.png"
+  },
+  {
+    "node": "PlayAGame",
+    "test": "a taken square can't be picked",
+    "file": "app/play/play-a-game/03-a-taken-square-can-t-be-picked.png"
+  },
+  {
+    "node": "PlayAGame",
+    "test": "winning",
+    "file": "app/play/play-a-game/04-winning.png"
+  },
+  {
+    "node": "PlayAGame",
+    "test": "draw",
+    "file": "app/play/play-a-game/05-draw.png"
+  },
+  {
+    "node": "PlayAGame",
+    "test": "new game",
+    "file": "app/play/play-a-game/06-new-game.png"
+  },
+  {
+    "node": "PlayAGame",
+    "test": "the computer answers",
+    "file": "app/play/play-a-game/07-the-computer-answers.png"
+  },
+  {
+    "node": "ChooseOpponent",
+    "test": "switching to the computer",
+    "file": "app/play/choose-opponent/01-switching-to-the-computer.png"
+  },
+  {
+    "node": "WatchADemo",
+    "test": "the demo starts on its own",
+    "file": "app/demo/watch-a-demo/01-the-demo-starts-on-its-own.png"
+  },
+  {
+    "node": "WatchADemo",
+    "test": "the computer plays both sides",
+    "file": "app/demo/watch-a-demo/02-the-computer-plays-both-sides.png"
+  },
+  {
+    "node": "WatchADemo",
+    "test": "perfect play ends in a draw",
+    "file": "app/demo/watch-a-demo/03-perfect-play-ends-in-a-draw.png"
+  },
+  {
+    "node": "WatchADemo",
+    "test": "watch again",
+    "file": "app/demo/watch-a-demo/04-watch-again.png"
+  },
+  {
+    "node": "BoardView",
+    "test": "picking an empty square",
+    "file": "board/board-view/01-picking-an-empty-square.png"
+  },
+  {
+    "node": "BoardView",
+    "test": "a taken square does nothing",
+    "file": "board/board-view/02-a-taken-square-does-nothing.png"
+  },
+  {
+    "node": "BoardView",
+    "test": "the winning line stands out",
+    "file": "board/board-view/03-the-winning-line-stands-out.png"
+  },
+  {
+    "node": "StatusLine",
+    "test": "whose turn",
+    "file": "board/status-line/01-whose-turn.png"
+  },
+  {
+    "node": "StatusLine",
+    "test": "a win",
+    "file": "board/status-line/02-a-win.png"
+  },
+  {
+    "node": "StatusLine",
+    "test": "a draw",
+    "file": "board/status-line/03-a-draw.png"
+  },
+  {
+    "node": "Segmented",
+    "test": "picking another option",
+    "file": "ui/segmented/01-picking-another-option.png"
+  }
+]

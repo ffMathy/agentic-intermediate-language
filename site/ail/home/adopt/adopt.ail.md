@@ -42,7 +42,7 @@ node AdoptSection : view   level: experience
     adopt.1.title     "Why, from people and tickets"
     adopt.1.text      "The reasons come from the task tracker (Asana, Jira, Linear) and from interviewing the people who own the app. A reason nobody can confirm is written down as unknown, and every build lists it until someone answers."
     adopt.2.title     "What, from the running app"
-    adopt.2.text      "An agent finds out how to start the app, whatever it is: a website, a mobile app on a simulator, a command-line tool. Then it drives every screen and error path, and writes down what it sees, quirks included."
+    adopt.2.text      "An agent finds out how to start the app, whatever it is (a website, a mobile app on a simulator, a command-line tool), along with the backend or database it needs. Each scenario's test data is created through the app's own API, never straight into its database. Then it drives every screen and error path, and writes down what it sees, quirks included."
     adopt.3.title     "How, from the code"
     adopt.3.text      "The code tells what the screen can't: data shapes, rules, edge cases and timing. Real inputs and outputs become examples, and every claim records where it came from."
     adopt.4.title     "Proof, on the old app"

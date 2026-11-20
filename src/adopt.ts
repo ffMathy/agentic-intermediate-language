@@ -61,30 +61,60 @@ async function isReady(ready: string, cwd: string): Promise<boolean> {
   return Bun.spawnSync(["sh", "-c", ready], { cwd, stdout: "ignore", stderr: "ignore" }).exitCode === 0;
 }
 
-/** Start the app as `spec` says and wait until it is ready. The returned stop() ends it and everything it started. */
-export async function startApp(p: Project, spec: RunSpec, log: (s: string) => void = () => {}): Promise<{ stop: () => void }> {
+/** Start one process as `spec` says and wait until it is ready. stop() ends it and everything it started. */
+async function startOne(p: Project, what: string, spec: RunSpec, env: Record<string, string>, log: (s: string) => void): Promise<() => void> {
   const cwd = resolve(p.root, spec.cwd ?? ".");
   let child: ReturnType<typeof spawn> | null = null;
   let output = "";
   if (spec.start) {
-    log(`starting the app: ${spec.start}`);
+    log(`starting ${what}: ${spec.start}`);
     // Its own process group, so stopping it also stops what it started (a dev server, a simulator bridge).
-    child = spawn("sh", ["-c", spec.start], { cwd, detached: true, stdio: ["ignore", "pipe", "pipe"] });
+    child = spawn("sh", ["-c", spec.start], { cwd, detached: true, stdio: ["ignore", "pipe", "pipe"], env: { ...process.env, ...env } });
     const keep = (d: Buffer) => { output = (output + d.toString()).slice(-4000); };
     child.stdout?.on("data", keep);
     child.stderr?.on("data", keep);
   }
   const stop = () => { if (child?.pid) try { process.kill(-child.pid, "SIGTERM"); } catch { /* already gone */ } };
+  const tail = () => (output ? `:\n${output.trim().split("\n").slice(-10).join("\n")}` : "");
   if (spec.ready) {
     const until = Date.now() + (spec.timeout ?? 120) * 1000;
     while (!(await isReady(spec.ready, cwd))) {
-      if (child && child.exitCode !== null) { stop(); throw new Error(`the app exited (${child.exitCode}) before it was ready:\n${output.trim().split("\n").slice(-10).join("\n")}`); }
-      if (Date.now() > until) { stop(); throw new Error(`the app was not ready after ${spec.timeout ?? 120}s (waiting for ${spec.ready})${output ? `:\n${output.trim().split("\n").slice(-10).join("\n")}` : ""}`); }
+      if (child && child.exitCode !== null) { stop(); throw new Error(`${what} exited (${child.exitCode}) before it was ready${tail()}`); }
+      if (Date.now() > until) { stop(); throw new Error(`${what} was not ready after ${spec.timeout ?? 120}s (waiting for ${spec.ready})${tail()}`); }
       await sleep(500);
     }
   }
-  return { stop };
+  return stop;
 }
+
+/**
+ * Start what the app needs (its services, in order), then the app, wait until
+ * each is ready, and create the seed data through the app's own interface.
+ * stop() ends them all, the app first.
+ */
+export async function startApp(p: Project, spec: RunSpec, log: (s: string) => void = () => {}): Promise<{ stop: () => void }> {
+  const stops: (() => void)[] = [];
+  const stopAll = () => { for (const s of [...stops].reverse()) s(); };
+  // Every service's env reaches the app, the seed and the checks (e.g. where the backend listens).
+  const env = { ...Object.assign({}, ...Object.values(spec.services ?? {}).map((s) => s.env ?? {})), ...(spec.env ?? {}) } as Record<string, string>;
+  try {
+    for (const [name, service] of Object.entries(spec.services ?? {})) stops.push(await startOne(p, `the service ${name}`, service, env, log));
+    stops.push(await startOne(p, "the app", spec, env, log));
+    if (spec.seed) {
+      log(`seeding through the app: ${spec.seed}`);
+      const r = Bun.spawnSync(["sh", "-c", spec.seed], { cwd: resolve(p.root, spec.cwd ?? "."), env: { ...process.env, ...env }, stdout: "pipe", stderr: "pipe", timeout: (spec.seedTimeout ?? 120) * 1000 });
+      if (r.exitCode !== 0) throw new Error(`seeding the app failed (${r.exitCode ?? "timed out"}):\n${(r.stdout.toString() + r.stderr.toString()).trim().split("\n").slice(-10).join("\n")}`);
+    }
+  } catch (e) {
+    stopAll();
+    throw e;
+  }
+  return { stop: stopAll };
+}
+
+/** The env the end-to-end checks get: every service's, then the app's own. */
+export const runEnv = (spec: RunSpec): Record<string, string> =>
+  ({ ...Object.assign({}, ...Object.values(spec.services ?? {}).map((s) => s.env ?? {})), ...(spec.env ?? {}) });
 
 export interface AdoptReport { ok: boolean; app: string; results: AdoptResult[]; error?: string; review?: { file: string; missing: string[] }; looks?: LookResult[]; recorded?: string[] }
 
@@ -157,7 +187,7 @@ export async function adopt(p: Project, opts: {
       mkdirSync(shotsAt, { recursive: true });
       const report = join(mkdtempSync(join(tmpdir(), "ail-e2e-")), "report.xml");
       // Run from outside the project, so its test setup (a simulated DOM) stays out of a real app's way.
-      const r = runBunTest(tmpdir(), [abs], { ...(spec.env ?? {}), AIL_SHOTS_DIR: shotsAt }, ["--reporter=junit", `--reporter-outfile=${report}`]);
+      const r = runBunTest(tmpdir(), [abs], { ...runEnv(spec), AIL_SHOTS_DIR: shotsAt }, ["--reporter=junit", `--reporter-outfile=${report}`]);
       const tests = existsSync(report) ? junitTests(readFileSync(report, "utf8")) : [];
       const { shots, missing: unpictured } = collectShots(shotsAt, n.name, tests);
       if (!shots.length) rmSync(shotsAt, { recursive: true, force: true });

@@ -40,3 +40,11 @@ test("the MCP surface is three tools", async () => {
   const list = await handle({ jsonrpc: "2.0", id: 1, method: "tools/list" }, KATA) as any;
   expect(list.result.tools.map((t: { name: string }) => t.name)).toEqual(["ail_show", "ail_build", "ail_adopt"]);
 });
+
+test("the plugin pins no version, so every commit to main reaches users as an update", async () => {
+  const root = join(import.meta.dir, "..");
+  const plugin = JSON.parse(await Bun.file(join(root, ".claude-plugin/plugin.json")).text());
+  const market = JSON.parse(await Bun.file(join(root, ".claude-plugin/marketplace.json")).text());
+  expect(plugin.version).toBeUndefined();
+  expect(market.plugins.map((p: { version?: string }) => p.version)).toEqual([undefined]);
+});

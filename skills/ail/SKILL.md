@@ -69,6 +69,11 @@ or `binds`, or move it one level down. Define domain words once in the
 - Examples are the cheapest pin: `evaluate(boardFrom("XXX/OO_/___")) => { kind: "won", mark: "X", line: [0, 1, 2] }`.
 - Name every export, with its signature, that a dependant or a test will use.
 - Whenever more than one answer is correct, state the tie-break.
+- When a scenario's outcome depends on its data, put the values in its Given
+  ("Given a basket with a 199 kr lamp and a 499 kr rug, Then the total reads
+  698 kr"). When the outcome doesn't depend on them ("Given a full basket"),
+  leave them out: the test chooses. Test data has no section of its own; the
+  scenarios are its one source of truth.
 - `free` is a whitelist. List suspected gaps under `probes`.
 - Give every decision a `because`, and record the real alternatives as `rejected`.
 
@@ -103,8 +108,9 @@ one slice at a time: the why from tickets and the people who own it, the what
 from driving the running app, the how from its code, each node with
 `sources`. Trace real values into examples. When nobody can confirm a reason,
 write `because "unknown, confirm with the owner"`; never invent one. Find out
-yourself how the app starts, whatever its platform, and record it in
-`ail.config.json` under `run.legacy`. Each flow gets an end-to-end check in
+yourself how the app starts, whatever its platform, along with the services it
+needs, and record it in `ail.config.json` under `run.legacy`, with a `seed` that
+creates test data through the app's own API, never its database. Each flow gets an end-to-end check in
 `checks/e2e/` that drives the app with what suits it (a browser, a simulator,
 a process), and `ail_adopt` proves the spec describes the app. Later, with
 `run.app` recorded, every build runs the same checks against the rebuilt app.

@@ -38,6 +38,9 @@ and one command does the rest:
 To look at the spec, just ask: "show me the tree", "show me ComputerPlayer",
 "what changed?".
 
+Every merge to `main` is a new plugin version. Turn on auto-update for the
+marketplace in `/plugin`, or run `claude plugin update ail@agentic-intermediate-language`.
+
 See **[docs/claude-code.md](docs/claude-code.md)** for the full guide.
 
 ## Use it from a terminal
@@ -80,7 +83,14 @@ time:
    examples.
 4. **Proof.** Each flow gets an end-to-end check that plays its scenarios with
    whatever drives the app: a browser, a simulator, a process. The agent finds
-   out how to start the app and records it under `run` in `ail.config.json`.
+   out how to start the app and records it under `run` in `ail.config.json`,
+   along with the services it needs (a backend, a database), which are
+   started first. If something can't run locally, the agent adds what's
+   missing. Test data belongs to the use case, so the scenario states it: its
+   Given gives the values whenever the outcome depends on them ("a 199 kr lamp
+   and a 499 kr rug, Then the total reads 698 kr"). Each test creates its
+   own through the app's own API, never directly in its database, so it is
+   made the way users make it.
    `ail adopt` starts the old app, runs the checks and stops it, which proves
    the spec describes the old app. Each check also saves a screenshot of the
    screen every scenario ends on, however its platform takes one. `ail adopt`

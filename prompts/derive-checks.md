@@ -36,3 +36,8 @@ run.
     === FILE: checks/<kebab>.test.tsx ===
     <complete file>
     === END ===
+
+Each test sets up exactly the data its scenario's Given describes, with the
+values the Given states (choose any sensible values where it states none),
+and nothing more. Each test sets up its own data rather than sharing state
+with other tests.

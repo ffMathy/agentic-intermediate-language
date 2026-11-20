@@ -1,4 +1,4 @@
-// ail-derived-from: TreeSection@758e755905c2fc90
+// ail-derived-from: TreeSection@36d2ff31b7615f1a
 import { afterEach, expect, test } from "bun:test";
 import { cleanup, render, within } from "@testing-library/react";
 import { TreeSection } from "../../../src/gen/home/tree/tree-section";
@@ -28,11 +28,11 @@ test("the tree is explained", () => {
   for (const name of expected) {
     expect(scope.getByRole("heading", { level: 3, name })).toBeTruthy();
   }
-  const h3Texts = scope
+  const h3Names = scope
     .getAllByRole("heading", { level: 3 })
-    .map((h) => (h.textContent ?? "").trim())
-    .filter((t) => expected.includes(t));
-  expect(h3Texts).toEqual(expected);
+    .map((el) => (el.textContent ?? "").trim())
+    .filter((name) => expected.includes(name));
+  expect(h3Names).toEqual(expected);
 
   const link = scope.getByRole("link", {
     name: "Read the paper (arXiv:2512.24601) ↗",

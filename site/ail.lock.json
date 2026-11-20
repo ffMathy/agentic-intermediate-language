@@ -117,13 +117,13 @@
       "shots": "3bd0c4b2a4492125d044fe3eb7a0ab954a611398be36f2ebeeeab94200114a0b"
     },
     "HomePage": {
-      "hash": "7216aa710cafcd7f021cf400681fd752c04cc1e31ab2df2414f27cfc1ee9cbca",
+      "hash": "035406adfafcaa7a0cf2cd61acf326c6851f1ff6d24668f777af52e7a05c5e0f",
       "files": {
         "src/gen/home/home-page.tsx": "e0a2f3f03489c6e2aa4ec9b2102ef04cca7ba095fcff90b6f2b4370f8a5aea81"
       },
       "by": "claude-code",
-      "shots": "7216aa710cafcd7f021cf400681fd752c04cc1e31ab2df2414f27cfc1ee9cbca",
-      "look": "7216aa710cafcd7f021cf400681fd752c04cc1e31ab2df2414f27cfc1ee9cbca"
+      "shots": "035406adfafcaa7a0cf2cd61acf326c6851f1ff6d24668f777af52e7a05c5e0f",
+      "look": "035406adfafcaa7a0cf2cd61acf326c6851f1ff6d24668f777af52e7a05c5e0f"
     },
     "IdeaFigure": {
       "hash": "709c4696627f578c033cc7b48cfef758c70614c20739641dedde9021cf03b146",
@@ -369,27 +369,27 @@
       "shots": "6e6dcb8c0ae85447dff6c6c168aa7892fd1844443d1d4f1ab2096d9bb67ef1df"
     },
     "TreeFigure": {
-      "hash": "fe7b29cf7160eb025ff239eb847ffaa1214852e37ec9be5d48fa2b075a58fd58",
+      "hash": "247ba2d0698e93c8be3de8d494c2ac17f426f13938c0be74f1c05a1ef3f44734",
       "files": {
-        "src/gen/home/tree/tree-figure.tsx": "d1ce61a8a8ca9f6a9b9f0c42b4aa910427eb3090d7c757177ddb689cdaa31fa9"
+        "src/gen/home/tree/tree-figure.tsx": "cc9fac8c5f996bc2e9c5b33eee48126f95b74a5290bb52cebce1d89bd0ab0dfc"
       },
       "by": "claude-code",
-      "look": "fe7b29cf7160eb025ff239eb847ffaa1214852e37ec9be5d48fa2b075a58fd58",
-      "shots": "fe7b29cf7160eb025ff239eb847ffaa1214852e37ec9be5d48fa2b075a58fd58"
+      "shots": "247ba2d0698e93c8be3de8d494c2ac17f426f13938c0be74f1c05a1ef3f44734",
+      "look": "247ba2d0698e93c8be3de8d494c2ac17f426f13938c0be74f1c05a1ef3f44734"
     },
     "TreeSection": {
-      "hash": "a191e98e7f04f3935035af111ae96e0bd6fedd606c9d856cd055511905cf9b2d",
+      "hash": "d4d1d8dc0a03e6980eb0b42f59598229b97206f4acf8d7752d7da4095d45a4fb",
       "files": {
-        "src/gen/home/tree/tree-section.tsx": "35b5b69e289189bce31ac9aa5d04cc5a9fdb7b8a6cbd205b195f393d016f7fd4"
+        "src/gen/home/tree/tree-section.tsx": "7bec96328f0d717dc3b5eba89e18f4d481a24a106188c4873ac39a3e0aeac008"
       },
       "by": "claude-code",
-      "look": "a191e98e7f04f3935035af111ae96e0bd6fedd606c9d856cd055511905cf9b2d",
-      "shots": "a191e98e7f04f3935035af111ae96e0bd6fedd606c9d856cd055511905cf9b2d"
+      "shots": "d4d1d8dc0a03e6980eb0b42f59598229b97206f4acf8d7752d7da4095d45a4fb",
+      "look": "d4d1d8dc0a03e6980eb0b42f59598229b97206f4acf8d7752d7da4095d45a4fb"
     }
   },
   "glue": {
     "src/gen/assets.d.ts": "8b9044f3e94a4669ea033bbea49000ccc17e32622e282441d78862e4780ea0aa",
-    "src/gen/spec.ts": "8209cf43d3e8a691a3b1ba3135660c7a7ebc8fe73516851e8b52e8b442dfaeda",
+    "src/gen/spec.ts": "a4455782f02660a4051ac649624877c0e82d913d2009e7441a29796622b02d60",
     "src/gen/tokens.css": "7bbb97ebb74409b3ed971ac9b054588620ec3b1652e3b22ce61e0ae8ddbcff31"
   }
 }

@@ -18,7 +18,7 @@ const points = [
   },
 ];
 
-/** "a heading, the real Tic-Tac-Toe spec drawn as a tree, three points on what the tree shape gives, and where the idea comes from, with a link to the paper" */
+/** a heading, the real Tic-Tac-Toe spec drawn as a tree with every node, three points on what the tree shape gives, and where the idea comes from, with a link to the paper */
 export function TreeSection() {
   return (
     <Section id="tree" tone="plain">
@@ -51,11 +51,11 @@ export function TreeSection() {
               dir="v"
               gap="space.2"
               align="start"
+              pad="space.6"
               style={{
                 background: "var(--color-surface)",
                 border: "1px solid var(--color-border)",
                 borderRadius: "var(--radius-lg)",
-                padding: "var(--space-6)",
               }}
             >
               <h3
@@ -85,11 +85,11 @@ export function TreeSection() {
           dir="v"
           gap="space.2"
           align="start"
+          pad="space.6"
           style={{
             background: "var(--color-code)",
             color: "var(--color-code-text)",
             borderRadius: "var(--radius-lg)",
-            padding: "var(--space-6)",
           }}
         >
           <p

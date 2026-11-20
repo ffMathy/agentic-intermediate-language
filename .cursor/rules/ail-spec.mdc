@@ -1,0 +1,13 @@
+---
+description: AIL spec authoring — edit *.ail.md, never generated code
+globs: "**/*.ail.md"
+alwaysApply: false
+---
+
+# AIL spec files
+
+- Edit the spec (`*.ail.md`), never generated paths (`src/gen/**` and other target `generated` globs).
+- Change behaviour in the spec, then build with MCP `ail_build` or `ail build`.
+- For node shape, levels, workflows, and adopt guidance, read and follow [skills/ail/SKILL.md](skills/ail/SKILL.md).
+- Language definition: [docs/language.md](docs/language.md).
+- Tools: MCP `ail_show` (tree / node / changes), `ail_build`, `ail_adopt`.

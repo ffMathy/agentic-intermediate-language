@@ -215,8 +215,10 @@ itself is defined in [docs/language.md](docs/language.md).
 src/                 the ail CLI and MCP server (Bun, TypeScript)
 prompts/             instructions given to the compiling model
 skills/ commands/ hooks/ .claude-plugin/    the Claude Code plugin
+.cursor/             Cursor rules, project skill, and MCP wiring for this repo
 examples/tictactoe/  the demo: spec in ail/, generated code, derived checks, lock file
-site/                the website, written in AIL (spec in site/ail/); its spec browser shows both example specs in a read-only Monaco editor
+examples/connect4/   Connect 4 kata: 6×7 drop game, same layout as the demo
+site/                the website, written in AIL (spec in site/ail/); its spec browser shows the example specs in a read-only Monaco editor
 tests/               toolchain tests
 ```
 
@@ -233,3 +235,6 @@ bun test
 ```bash
 bun run typecheck
 ```
+
+Working on this toolchain in **Cursor**: enable the project MCP server, then see
+**[docs/cursor.md](docs/cursor.md)**.

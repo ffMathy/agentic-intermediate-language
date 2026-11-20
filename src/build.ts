@@ -93,7 +93,7 @@ export async function build(p: Project, o: BuildOptions = {}): Promise<BuildResu
   // The end-to-end checks, against the app this build made, started as run.app says.
   if (existsSync(join(checksDir(p), "e2e"))) {
     if (p.config.run?.app) {
-      const r = await adopt(p, { app: "app", names, log });
+      const r = await adopt(p, { app: "app", names, log, judge: noModel || o.look === false ? undefined : getProvider(specs[0]!) });
       ok &&= r.ok;
       sections.push(formatAdopt(r));
     } else sections.push("! app      end-to-end checks not run: ail.config.json has no run.app saying how to start the app this project builds");

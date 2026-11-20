@@ -97,3 +97,40 @@ test("adopting suggests the .gitattributes lines that keep generated code out of
   const r = await adopt(load(dir), { suggestReview: true });
   expect(r.review?.missing).toEqual([]);
 });
+
+test("adopting takes the checks' screenshots as proof and records the existing app as the build", async () => {
+  const { plan } = await import("../src/plan.ts");
+  const { verifyProject } = await import("../src/verify.ts");
+  const { e2eShotsDir } = await import("../src/adopt.ts");
+  const dir = tempProject("areas");
+  writeFileSync(join(dir, "a", "checkout.ail.md"), "```ail\nnode Checkout : flow   level: experience\n  why   People pay.   <- AreaA\n  what\n    Scenario: paying\n      Then the receipt is shown\n```\n");
+  const port = 33000 + Math.floor(Math.random() * 1000);
+  writeFileSync(join(dir, "server.ts"), `Bun.serve({ port: ${port}, fetch: () => new Response("receipt") });`);
+  writeFileSync(join(dir, "ail.config.json"), JSON.stringify({ run: { legacy: { start: "bun server.ts", ready: `http://localhost:${port}`, env: { AIL_APP_URL: `http://localhost:${port}` } } } }));
+  let p = load(dir);
+  const file = e2eCheckPath(p, p.nodes.get("Checkout")!);
+  mkdirSync(join(file, ".."), { recursive: true });
+  // Any platform: this "app" has no browser, so the check saves its own picture of what it saw.
+  writeFileSync(file, `import { expect, test } from "bun:test";
+import { join } from "node:path";
+test("paying", async () => {
+  const body = await (await fetch(process.env.AIL_APP_URL!)).text();
+  expect(body).toBe("receipt");
+  await Bun.write(join(process.env.AIL_SHOTS_DIR!, "paying.png"), body);
+});
+`);
+  expect(plan(p).some((e) => e.status !== "fresh")).toBe(true); // nothing built yet
+  const r = await adopt(p, { record: true });
+  expect(r.ok).toBe(true);
+  expect(r.results.find((x) => x.node === "Checkout")!.shots!.map((s) => s.test)).toEqual(["paying"]);
+  p = load(dir);
+  expect(JSON.parse(readFileSync(join(e2eShotsDir(p, p.nodes.get("Checkout")!), "shots.json"), "utf8")).shots).toEqual([{ test: "paying", file: "paying.png" }]);
+  expect(r.recorded!.length).toBeGreaterThan(0);
+  // the existing app is the build: nothing to rebuild, and nothing fails for lack of generated code
+  expect(plan(p).filter((e) => e.status !== "fresh")).toEqual([]);
+  expect(verifyProject(p).ok).toBe(true);
+  // a spec change after adopting makes that node, and the nodes using its contract, due for building
+  const f = join(dir, p.nodes.get("Price")!.file);
+  writeFileSync(f, readFileSync(f, "utf8").replace("price(1999) => 19", "price(1999) => 19\n      price(0) => 0"));
+  expect(plan(load(dir)).filter((e) => e.status !== "fresh").map((e) => e.node).sort()).toEqual(["AreaA", "AreaB", "Price"]);
+}, 60_000);

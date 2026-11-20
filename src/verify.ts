@@ -48,8 +48,8 @@ export function errorExcerpt(output: string, maxLines = 60): string {
   return out.slice(0, maxLines).join("\n");
 }
 
-export function runBunTest(cwd: string, files: string[], env: Record<string, string> = {}): { ok: boolean; failures: string[]; passes: number; output: string } {
-  const r = Bun.spawnSync(["bun", "test", ...files.map((f) => (f.startsWith("/") ? f : "./" + f))], {
+export function runBunTest(cwd: string, files: string[], env: Record<string, string> = {}, args: string[] = []): { ok: boolean; failures: string[]; passes: number; output: string } {
+  const r = Bun.spawnSync(["bun", "test", ...args, ...files.map((f) => (f.startsWith("/") ? f : "./" + f))], {
     cwd, env: { ...process.env, NO_COLOR: "1", FORCE_COLOR: "0", ...env }, stdout: "pipe", stderr: "pipe",
   });
   const output = r.stdout.toString() + r.stderr.toString();
@@ -126,6 +126,8 @@ export function verifyNode(p: Project, n: AilNode, opts: { checkDrift?: boolean 
   const path = modulePath(p, n);
   if (!path) return { node: n.name, ok: true, checks: [pass("exists", "not compilable; nothing to verify")] };
   const abs = join(p.root, path);
+  const adopted = readLock(p).nodes[n.name];
+  if (adopted?.adopted && !existsSync(abs)) return { node: n.name, ok: true, checks: [pass("exists", "built by the existing app (adopted); its end-to-end checks prove it")] };
   if (!existsSync(abs)) return { node: n.name, ok: false, checks: [fail("exists", `${path} does not exist; run \`ail build\``)] };
   checks.push(pass("exists", path));
 

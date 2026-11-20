@@ -15,6 +15,10 @@ export function plan(p: Project): PlanEntry[] {
     const hash = compileHash(p, n);
     const path = modulePath(p, n)!;
     const entry = lock.nodes[n.name];
+    // Adopted: the existing app is this node's build, until its spec changes; then ail builds it.
+    if (entry?.adopted) return entry.hash === hash
+      ? { node: n.name, status: "fresh" as const, hash, path, reason: "built by the existing app (adopted)" }
+      : { node: n.name, status: "stale" as const, hash, path, reason: "its spec changed since it was adopted; ail build compiles it" };
     const actual = fileHash(p, path);
     if (entry && !entry.files[path]) return { node: n.name, status: "stale" as const, hash, path, reason: `moved from ${Object.keys(entry.files).join(", ")}` };
     if (!entry || actual === null) return { node: n.name, status: "missing" as const, hash, path, reason: entry ? "file deleted" : "never compiled" };

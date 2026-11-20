@@ -60,10 +60,26 @@ Follow the `ail` skill for how nodes are written. On top of it:
    - it uses only what a user can see and do, never the old app's code or
      markup, so that it also works against the rebuilt app
 
+   - at the end of every test it saves visual proof: a screenshot of the screen
+     the scenario ends on, as a PNG in the folder `process.env.AIL_SHOTS_DIR`,
+     named after the test: the test's name in lower case, each run of other
+     characters turned into one `-`, trimmed of `-`, at most 60 characters, plus
+     `.png` ("X always starts" → `x-always-starts.png`). Work out how to take it
+     on this platform and make it work: `page.screenshot()` for the web, the X
+     display (`import -window root`, `xwd`) or the OS's screenshot tool for a
+     desktop app, `xcrun simctl io booted screenshot` or `adb exec-out
+     screencap -p` for mobile. For an app with no screen (a CLI, an API), save
+     an image of what the scenario ends with, such as its rendered output.
+
    Add any driver it needs to the project's dev dependencies. Call `ail_adopt`:
-   it starts the app as `run.legacy` says, runs the checks, and stops the app.
-   A failing check means the spec, or the check, is wrong about the app: fix
-   that, never the app. When the checks pass, the spec describes the app.
+   it starts the app as `run.legacy` says, runs the checks, collects their
+   screenshots into `checks/shots/e2e/` (committed, like the other proof), has
+   a model compare them with each node's `look`, and stops the app. A failing
+   check, or a screenshot that doesn't match its `look`, means the spec or the
+   check is wrong about the app: fix that, never the app. When everything
+   passes, the spec describes the app, and `ail_adopt` records every node in
+   the lock file as built by the existing app. A later `/ail:build` then only
+   builds what changes.
 6. **Report.** Report the nodes written, what `ail_adopt` says, and every
    open question, each with who could answer it. If `ail_adopt` suggests
    `.gitattributes` lines, ask the user whether to add them. They keep the

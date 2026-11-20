@@ -13,6 +13,8 @@ export interface LockEntry {
   look?: string;
   /** The build (compile hash) whose proof screenshots are committed in checks/shots/. */
   shots?: string;
+  /** Built by the existing app, not by ail: recorded by `ail adopt` once the spec was proven on it. No generated files. */
+  adopted?: boolean;
 }
 export interface Lock { version: 1; nodes: Record<string, LockEntry>; glue: Record<string, string> }
 

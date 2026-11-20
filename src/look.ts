@@ -20,7 +20,7 @@ export const MAX_SCREENS = 12;
 export const hasLook = (n: AilNode) => n.sections.some((s) => s.key === "look");
 
 /** The text the model judges the screens against: the node, its why, and the token values. */
-export function lookTask(p: Project, n: AilNode, shots: Shot[]): string {
+export function lookTask(p: Project, n: AilNode, shots: Shot[], wholeApp = false): string {
   const chain = ancestors(p, n.name).map((a) => `- ${a.name}: ${a.why?.text ?? ""}`).join("\n");
   const tokens = Object.entries(p.tokens).map(([k, v]) => (v ? `${k}=${v}` : k)).join("  ");
   return [
@@ -31,6 +31,7 @@ export function lookTask(p: Project, n: AilNode, shots: Shot[]): string {
     "",
     "## Screenshots",
     `${shots.length} screenshot(s) are attached above, in this order: ${shots.map((s) => `"${s.test}"`).join(", ")}.`,
+    ...(wholeApp ? ["They show the whole running app, taken by an end-to-end check, on whatever platform the app runs (a browser, a simulator, a desktop). This node is only part of each screen: judge that part, and ignore everything around it that belongs to its parents or to other nodes (navigation, frames, system bars)."] : []),
     "Do they match the spec?",
   ].join("\n");
 }
@@ -60,11 +61,16 @@ export async function lookCheck(p: Project, n: AilNode, provider: Provider, log:
     return { node: n.name, ok: true, problems: [], shots: [], skipped: (e as Error).message };
   }
   if (!shots.length) return { node: n.name, ok: true, problems: [], shots, skipped: "its tests left nothing on screen" };
+  return judgeShots(p, n, shots, provider, log);
+}
+
+/** Ask the model whether screenshots (from any platform) match a node's look. */
+export async function judgeShots(p: Project, n: AilNode, shots: Shot[], provider: Provider, log: (s: string) => void = () => {}, wholeApp = false): Promise<LookResult> {
   const judged = shots.slice(0, MAX_SCREENS);
   if (judged.length < shots.length) log(`${n.name}: judging the first ${MAX_SCREENS} of ${shots.length} screens`);
   const reply = await provider.complete({
     system: loadPrompt("judge-look"),
-    prompt: lookTask(p, n, judged),
+    prompt: lookTask(p, n, judged, wholeApp),
     images: judged.map((s, i) => ({ label: `Screenshot ${i + 1}: "${s.test}"`, mediaType: "image/png", data: readFileSync(s.file).toString("base64") })),
     meta: { node: n.name, purpose: "look" },
   });

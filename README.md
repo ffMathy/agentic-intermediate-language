@@ -82,7 +82,12 @@ time:
    whatever drives the app: a browser, a simulator, a process. The agent finds
    out how to start the app and records it under `run` in `ail.config.json`.
    `ail adopt` starts the old app, runs the checks and stops it, which proves
-   the spec describes the old app.
+   the spec describes the old app. Each check also saves a screenshot of the
+   screen every scenario ends on, however its platform takes one. `ail adopt`
+   commits them in `checks/shots/e2e/` and has a model compare them with the
+   spec's `look`. Once everything passes, it records every node in the lock
+   file as built by the existing app, so `ail build` only builds what changes
+   from then on.
 
 Then change the `target` to the new technology and run `ail build`. Once
 `run.app` says how the new app starts, every build runs the same checks

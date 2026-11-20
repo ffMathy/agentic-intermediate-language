@@ -11,13 +11,13 @@
       "look": "51bd72c09746806e07986b8ee6ec433c7d620330638a78b6551220539895eb02"
     },
     "AdoptSection": {
-      "hash": "29175afe410a519d27628fc9429356a97436e8ea2a7af937730da6c2f9a4b5a6",
+      "hash": "23cf034bc1114637b132b02a9e99d4827fab899a22291b9af702f4841133310f",
       "files": {
-        "src/gen/home/adopt/adopt-section.tsx": "a88811f74fe405fa0cb6af23d9a6db87f377e59b4cff9496501f1a6d7b80d4a9"
+        "src/gen/home/adopt/adopt-section.tsx": "b76088186529aac63caa027c8d6edd71a512c327612e4642bcbb5fcb49a9f66b"
       },
       "by": "claude-code",
-      "shots": "29175afe410a519d27628fc9429356a97436e8ea2a7af937730da6c2f9a4b5a6",
-      "look": "29175afe410a519d27628fc9429356a97436e8ea2a7af937730da6c2f9a4b5a6"
+      "shots": "23cf034bc1114637b132b02a9e99d4827fab899a22291b9af702f4841133310f",
+      "look": "23cf034bc1114637b132b02a9e99d4827fab899a22291b9af702f4841133310f"
     },
     "AIL": {
       "hash": "916a2e53945f2467cb9205f8fee140396a4c368874e27bfb6ad7be98b678e14c",
@@ -389,7 +389,7 @@
   },
   "glue": {
     "src/gen/assets.d.ts": "8b9044f3e94a4669ea033bbea49000ccc17e32622e282441d78862e4780ea0aa",
-    "src/gen/spec.ts": "53916a1c7db6cb1359a73ba28e9ea6696672bb0fccfa54f0139c430e77050dde",
+    "src/gen/spec.ts": "aafc08e8e249bb791d0400e54e35eeea56a3b115b0fcd3e6fc65f3ace56a23ff",
     "src/gen/tokens.css": "7bbb97ebb74409b3ed971ac9b054588620ec3b1652e3b22ce61e0ae8ddbcff31"
   }
 }

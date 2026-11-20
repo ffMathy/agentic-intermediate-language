@@ -32,6 +32,9 @@ claude plugin update ail@agentic-intermediate-language
 
 Then run `/reload-plugins`, or restart Claude Code.
 
+To get AIL colored in VS Code or Cursor as well, install the extension from
+[`editors/vscode`](../editors/vscode).
+
 ## What the plugin adds
 
 | | Name | What it's for |

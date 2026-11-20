@@ -36,3 +36,7 @@ run.
     === FILE: checks/<kebab>.test.tsx ===
     <complete file>
     === END ===
+
+When the node has a `data` section, each test sets up exactly the data its
+scenario's Given names, as that section describes it, and nothing more. Each
+test sets up its own data rather than sharing state with other tests.

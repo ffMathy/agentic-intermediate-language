@@ -38,6 +38,9 @@ and one command does the rest:
 To look at the spec, just ask: "show me the tree", "show me ComputerPlayer",
 "what changed?".
 
+Every merge to `main` is a new plugin version. Turn on auto-update for the
+marketplace in `/plugin`, or run `claude plugin update ail@agentic-intermediate-language`.
+
 See **[docs/claude-code.md](docs/claude-code.md)** for the full guide.
 
 ## Use it from a terminal
@@ -80,7 +83,13 @@ time:
    examples.
 4. **Proof.** Each flow gets an end-to-end check that plays its scenarios with
    whatever drives the app: a browser, a simulator, a process. The agent finds
-   out how to start the app and records it under `run` in `ail.config.json`.
+   out how to start the app and records it under `run` in `ail.config.json`,
+   along with the services it needs (a backend, a database), which are
+   started first. If something can't run locally, the agent adds what's
+   missing. Test data belongs to the use case, so it is part of the spec:
+   each node's `data` section names the data its scenarios need ("a full
+   basket: two items…"), and each test creates its own through the app's own
+   API, never directly in its database, so it is made the way users make it.
    `ail adopt` starts the old app, runs the checks and stops it, which proves
    the spec describes the old app. Each check also saves a screenshot of the
    screen every scenario ends on, however its platform takes one. `ail adopt`
@@ -165,7 +174,8 @@ ail show changes --shots .ail/shots
 
 - **A node** states its `why`, its observable `what` (claims, scenarios,
   executable examples), its `how` (decisions, plus the alternatives that were
-  rejected), and, for UI, its `look`, `copy` and `binds`.
+  rejected), and, for UI, its `look`, `copy` and `binds`. Its `data` names the
+  test data its scenarios need, so tests set up exactly what the spec says.
 - **Levels** (`product` → `experience` → `system` → `specialist`) keep the top
   readable by anyone and the bottom precise. Lint enforces the vocabulary at
   each level.

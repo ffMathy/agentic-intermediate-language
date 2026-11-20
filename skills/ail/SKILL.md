@@ -27,6 +27,9 @@ node Name : kind   level: product|experience|system|specialist   @tag
   uses      nodes whose contract this one depends on
   children  nodes that refine this one
   verify    properties that need a derived check
+  data      the test data its scenarios need, each named and described in plain words
+            (a full basket   two items: "Lamp" at 199 kr and "Rug" at 499 kr);
+            a scenario's Given refers to it by name
   sources   where the claims came from (tickets, interviews, screens, code); for review, never compiled
 ```
 Kinds: `system` (the root, with `entry`), `flow`, `view`, `data`, `fn`, and
@@ -103,8 +106,9 @@ one slice at a time: the why from tickets and the people who own it, the what
 from driving the running app, the how from its code, each node with
 `sources`. Trace real values into examples. When nobody can confirm a reason,
 write `because "unknown, confirm with the owner"`; never invent one. Find out
-yourself how the app starts, whatever its platform, and record it in
-`ail.config.json` under `run.legacy`. Each flow gets an end-to-end check in
+yourself how the app starts, whatever its platform, along with the services it
+needs, and record it in `ail.config.json` under `run.legacy`, with a `seed` that
+creates test data through the app's own API, never its database. Each flow gets an end-to-end check in
 `checks/e2e/` that drives the app with what suits it (a browser, a simulator,
 a process), and `ail_adopt` proves the spec describes the app. Later, with
 `run.app` recorded, every build runs the same checks against the rebuilt app.

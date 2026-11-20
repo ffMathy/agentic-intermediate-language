@@ -18,6 +18,20 @@ The CLI needs [Bun](https://bun.sh) 1.2 or later. Then, in Claude Code:
 
 Restart Claude Code so the plugin's tools load.
 
+## Updates
+
+The plugin has no pinned version, so every merge to `main` is a new version
+(Claude Code versions it by commit). Claude Code doesn't auto-update
+third-party marketplaces unless you turn it on: in `/plugin`, open
+Marketplaces, pick `agentic-intermediate-language` and enable auto-update. Or
+update by hand:
+
+```
+claude plugin update ail@agentic-intermediate-language
+```
+
+Then run `/reload-plugins`, or restart Claude Code.
+
 ## What the plugin adds
 
 | | Name | What it's for |

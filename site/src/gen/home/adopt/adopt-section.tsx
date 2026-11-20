@@ -5,46 +5,6 @@ import { Stack } from "../../parts/stack";
 import { CopyCommand } from "../../parts/copy-command";
 import { AdoptFigure } from "./adopt-figure";
 
-const steps: { n: string; title: string; text: string; color: string }[] = [
-  {
-    n: "1",
-    title: "Why, from people and tickets",
-    text: "The reasons come from the task tracker (Asana, Jira, Linear) and from interviewing the people who own the app. A reason nobody can confirm is written down as unknown, and every build lists it until someone answers.",
-    color: "var(--color-level-product)",
-  },
-  {
-    n: "2",
-    title: "What, from the running app",
-    text: "An agent finds out how to start the app, whatever it is: a website, a mobile app on a simulator, a command-line tool. Then it drives every screen and error path, and writes down what it sees, quirks included.",
-    color: "var(--color-level-experience)",
-  },
-  {
-    n: "3",
-    title: "How, from the code",
-    text: "The code tells what the screen can't: data shapes, rules, edge cases and timing. Real inputs and outputs become examples, and every claim records where it came from.",
-    color: "var(--color-level-system)",
-  },
-  {
-    n: "4",
-    title: "Proof, on the old app",
-    text: "Every flow gets an end-to-end check that plays its scenarios and screenshots the screen each one ends on, on any platform. ail adopt starts the old app, runs them, commits the screenshots, and records the app as built, so the first build only builds what changes.",
-    color: "var(--color-pass)",
-  },
-];
-
-const cards: { title: string; cmd: string; text: string }[] = [
-  {
-    title: "In Claude Code",
-    cmd: "/ail:adopt",
-    text: "Claude writes the spec one slice at a time: a screen, a flow or a rule. It asks you what only the owners know.",
-  },
-  {
-    title: "In a terminal",
-    cmd: "ail adopt",
-    text: "Starts the app as ail.config.json says, runs every end-to-end check against it, and stops it.",
-  },
-];
-
 const figureStyle: CSSProperties = {
   background: "var(--color-surface-raised)",
   borderRadius: "var(--radius-lg)",
@@ -107,6 +67,13 @@ const cardStyle: CSSProperties = {
   minWidth: 0,
 };
 
+const cardTitleStyle: CSSProperties = {
+  fontSize: "var(--font-lead)",
+  fontWeight: 700,
+  color: "var(--color-text)",
+  margin: 0,
+};
+
 const cardTextStyle: CSSProperties = {
   fontSize: "var(--font-small)",
   lineHeight: 1.6,
@@ -121,6 +88,46 @@ const noteStyle: CSSProperties = {
   maxWidth: "var(--width-prose)",
   margin: 0,
 };
+
+const steps = [
+  {
+    n: "1",
+    color: "var(--color-level-product)",
+    title: "Why, from people and tickets",
+    text: "The reasons come from the task tracker (Asana, Jira, Linear) and from interviewing the people who own the app. A reason nobody can confirm is written down as unknown, and every build lists it until someone answers.",
+  },
+  {
+    n: "2",
+    color: "var(--color-level-experience)",
+    title: "What, from the running app",
+    text: "An agent finds out how to start the app, whatever it is (a website, a mobile app on a simulator, a command-line tool), along with the backend or database it needs. Each use case's test data is written into the spec and created through the app's own API, never straight into its database. Then it drives every screen and error path, and writes down what it sees, quirks included.",
+  },
+  {
+    n: "3",
+    color: "var(--color-level-system)",
+    title: "How, from the code",
+    text: "The code tells what the screen can't: data shapes, rules, edge cases and timing. Real inputs and outputs become examples, and every claim records where it came from.",
+  },
+  {
+    n: "4",
+    color: "var(--color-pass)",
+    title: "Proof, on the old app",
+    text: "Every flow gets an end-to-end check that plays its scenarios and screenshots the screen each one ends on, on any platform. ail adopt starts the old app, runs them, commits the screenshots, and records the app as built, so the first build only builds what changes.",
+  },
+];
+
+const cards = [
+  {
+    title: "In Claude Code",
+    cmd: "/ail:adopt",
+    text: "Claude writes the spec one slice at a time: a screen, a flow or a rule. It asks you what only the owners know.",
+  },
+  {
+    title: "In a terminal",
+    cmd: "ail adopt",
+    text: "Starts the app as ail.config.json says, runs every end-to-end check against it, and stops it.",
+  },
+];
 
 /** "a heading, a picture of an old app and a new app checked against the same spec, four steps that write and prove the spec, and the two commands that do it" */
 export function AdoptSection() {
@@ -146,13 +153,13 @@ export function AdoptSection() {
         </ol>
         <div style={commandsStyle}>
           {cards.map((card) => (
-            <section key={card.cmd} aria-label={card.title} style={cardStyle}>
+            <div key={card.cmd} role="region" aria-label={card.title} style={cardStyle}>
               <Stack dir="v" gap="space.3" align="stretch">
-                <h3 style={titleStyle}>{card.title}</h3>
+                <h3 style={cardTitleStyle}>{card.title}</h3>
                 <CopyCommand command={card.cmd} />
                 <p style={cardTextStyle}>{card.text}</p>
               </Stack>
-            </section>
+            </div>
           ))}
         </div>
         <p style={noteStyle}>

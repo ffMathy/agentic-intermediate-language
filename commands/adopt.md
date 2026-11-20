@@ -22,8 +22,27 @@ Follow the `ail` skill for how nodes are written. On top of it:
    - `env`: what the checks need to reach the app, such as `AIL_APP_URL`, a
      device id or a binary's path
 
-   If it needs something this machine lacks, such as a simulator, a device, a
-   database or a secret, say exactly what, and ask.
+   Also start what it depends on: a backend, a database, a queue, another
+   service. Find each in its README, compose files, scripts and config, and
+   record it under `run.legacy.services` (each with `start`, `cwd`, `ready`
+   and `env`, started in order before the app). If something can't run
+   locally yet, make it possible: add what's missing, such as a compose file
+   for its database, a local config or a start script, as development tooling
+   next to the app. Ask only for what this machine truly lacks, such as a
+   simulator, a device or a secret, and say exactly what.
+
+   Test data belongs to the use case, so it goes in the spec. Each node's
+   `data` section names and describes, in plain words, the data its scenarios
+   need, such as `a full basket   two items: "Lamp" at 199 kr and "Rug" at
+   499 kr`. A scenario's Given refers to it by name. Each end-to-end test
+   creates its own scenario's data at its start, through the program's official
+   interface: its HTTP API, its CLI or its import feature. Use shared helpers
+   in the checks folder (for example `checks/e2e/data.ts`). Never write to the
+   database directly: data made the way users make it is valid, passes the
+   app's own rules, and keeps working when the storage changes. Only what every
+   scenario needs, such as a user to log in as, goes in `run.legacy.seed`, a
+   command that runs once the app is ready, through the same official
+   interface.
 1. **Why: from people and tickets.** Search the task tracker your connectors
    reach (Asana, Jira, Linear, GitHub issues), plus PR descriptions, commit
    messages and docs, for the reasons behind the slice. Then ask the user
@@ -72,7 +91,8 @@ Follow the `ail` skill for how nodes are written. On top of it:
      an image of what the scenario ends with, such as its rendered output.
 
    Add any driver it needs to the project's dev dependencies. Call `ail_adopt`:
-   it starts the app as `run.legacy` says, runs the checks, collects their
+   it starts the app's services and the app as `run.legacy` says, runs its
+   baseline seed, runs the checks, collects their
    screenshots into `checks/shots/e2e/` (committed, like the other proof), has
    a model compare them with each node's `look`, and stops the app. A failing
    check, or a screenshot that doesn't match its `look`, means the spec or the

@@ -76,7 +76,7 @@ export function oracleHash(p: Project, n: AilNode): string {
   const deps = n.uses.map((u) => p.nodes.get(u)).filter(Boolean) as AilNode[];
   return sha256([
     "ail-oracle-v1",
-    canonicalNode(n, ["what", "look", "copy", "binds", "verify"]),
+    canonicalNode(n, ["what", "look", "copy", "binds", "verify", "data"]),
     ...deps.map(contractOf).sort(),
   ].join("\n---\n"));
 }

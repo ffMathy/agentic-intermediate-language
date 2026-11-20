@@ -134,3 +134,72 @@ test("paying", async () => {
   writeFileSync(f, readFileSync(f, "utf8").replace("price(1999) => 19", "price(1999) => 19\n      price(0) => 0"));
   expect(plan(load(dir)).filter((e) => e.status !== "fresh").map((e) => e.node).sort()).toEqual(["AreaA", "AreaB", "Price"]);
 }, 60_000);
+
+test("the app's services start first, seed data goes in through the app's API, and everything stops afterwards", async () => {
+  const dir = tempProject("areas");
+  writeFileSync(join(dir, "a", "checkout.ail.md"), "```ail\nnode Checkout : flow   level: experience\n  why   People pay.   <- AreaA\n  what\n    Scenario: an order is listed\n      Then the seeded order is shown\n```\n");
+  const api = 34000 + Math.floor(Math.random() * 500), web = api + 500;
+  // A backend that keeps orders in memory, and an app that only talks to it.
+  writeFileSync(join(dir, "backend.ts"), `const orders: string[] = [];
+Bun.serve({ port: ${api}, async fetch(req) {
+  if (req.method === "POST") { orders.push(await req.text()); return new Response("ok"); }
+  return Response.json(orders);
+} });`);
+  writeFileSync(join(dir, "app.ts"), `Bun.serve({ port: ${web}, async fetch(req) {
+  const backend = process.env.BACKEND_URL!;
+  if (req.method === "POST") return fetch(backend, { method: "POST", body: await req.text() });
+  return new Response((await (await fetch(backend)).json()).join(","));
+} });`);
+  // Seed through the app's own API, never the backend's storage.
+  writeFileSync(join(dir, "seed.ts"), `await fetch(process.env.AIL_APP_URL!, { method: "POST", body: "order-1" });`);
+  writeFileSync(join(dir, "ail.config.json"), JSON.stringify({ run: { legacy: {
+    services: { backend: { start: "bun backend.ts", ready: `http://localhost:${api}`, env: { BACKEND_URL: `http://localhost:${api}` } } },
+    start: "bun app.ts", ready: `http://localhost:${web}`, env: { AIL_APP_URL: `http://localhost:${web}` },
+    seed: "bun seed.ts",
+  } } }));
+  const p = load(dir);
+  const file = e2eCheckPath(p, p.nodes.get("Checkout")!);
+  mkdirSync(join(file, ".."), { recursive: true });
+  writeFileSync(file, `import { expect, test } from "bun:test";
+test("an order is listed", async () => {
+  expect(await (await fetch(process.env.AIL_APP_URL!)).text()).toBe("order-1");
+  expect(process.env.BACKEND_URL).toBe("http://localhost:${api}");
+});
+`);
+  const r = await adopt(p);
+  expect(r.error).toBeUndefined();
+  expect(r.results.find((x) => x.node === "Checkout")!.status).toBe("pass");
+  await Bun.sleep(300);
+  const down = (port: number) => fetch(`http://localhost:${port}`).then(() => "up", () => "down");
+  expect([await down(web), await down(api)]).toEqual(["down", "down"]);
+}, 60_000);
+
+test("a failing seed stops everything and says why", async () => {
+  const dir = tempProject("areas");
+  writeFileSync(join(dir, "a", "checkout.ail.md"), "```ail\nnode Checkout : flow   level: experience\n  why   People pay.   <- AreaA\n  what\n    Scenario: paying\n      Then the receipt is shown\n```\n");
+  const port = 35000 + Math.floor(Math.random() * 1000);
+  writeFileSync(join(dir, "app.ts"), `Bun.serve({ port: ${port}, fetch: () => new Response("x") });`);
+  writeFileSync(join(dir, "ail.config.json"), JSON.stringify({ run: { legacy: { start: "bun app.ts", ready: `http://localhost:${port}`, seed: "echo 'POST /orders: 422 invalid' >&2; exit 3" } } }));
+  const p = load(dir);
+  const file = e2eCheckPath(p, p.nodes.get("Checkout")!);
+  mkdirSync(join(file, ".."), { recursive: true });
+  writeFileSync(file, `import { test } from "bun:test";\ntest("paying", () => {});\n`);
+  const r = await adopt(p);
+  expect(r.error).toContain("seeding the app failed (3)");
+  expect(r.error).toContain("422 invalid");
+  await Bun.sleep(300);
+  expect(await fetch(`http://localhost:${port}`).then(() => "up", () => "down")).toBe("down");
+}, 60_000);
+
+test("a node's test data is part of its spec: changing it makes its checks out of date", async () => {
+  const { oracleHash } = await import("../src/hash.ts");
+  const dir = tempProject("areas");
+  const f = join(dir, "a", "checkout.ail.md");
+  const spec = (basket: string) => "```ail\nnode Checkout : flow   level: experience\n  why   People pay.   <- AreaA\n  what\n    Scenario: paying\n      Given a full basket\n      Then the receipt is shown\n  data\n    a full basket   " + basket + "\n```\n";
+  writeFileSync(f, spec('two items: "Lamp" at 199 kr and "Rug" at 499 kr'));
+  const before = load(dir);
+  expect(lint(before).filter((d) => d.code === "unknown-section")).toEqual([]);
+  writeFileSync(f, spec('one item: "Lamp" at 199 kr'));
+  const after = load(dir);
+  expect(oracleHash(after, after.nodes.get("Checkout")!)).not.toBe(oracleHash(before, before.nodes.get("Checkout")!));
+});

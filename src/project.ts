@@ -16,8 +16,16 @@ export interface RunSpec {
   ready?: string;
   /** Seconds to wait for ready (default 120). */
   timeout?: number;
-  /** Passed to the end-to-end checks: how to reach the app (e.g. AIL_APP_URL, a device id). */
+  /** Passed to the app, its seed and the end-to-end checks: how to reach the app (e.g. AIL_APP_URL, a device id). */
   env?: Record<string, string>;
+  /** What the app needs running first, started in order and stopped after it: a backend, a database, a
+   * queue. Each is started and awaited the same way; its env is passed on to the app, the seed and the checks. */
+  services?: Record<string, RunSpec>;
+  /** Shell command, from `cwd`, run once the app is ready: creates the data the checks need through the
+   * program's official interface (its API, its CLI, its import), never by writing to its database. */
+  seed?: string;
+  /** Seconds the seed may take (default 120). */
+  seedTimeout?: number;
 }
 
 export interface Config {

@@ -68,7 +68,7 @@ export interface ParsedFile {
 }
 
 export const NODE_SECTIONS = new Set([
-  "why", "what", "how", "look", "copy", "binds", "free", "children", "uses", "verify", "entry", "sources", "data",
+  "why", "what", "how", "look", "copy", "binds", "free", "children", "uses", "verify", "entry", "sources",
 ]);
 
 /** Sections that record where the spec came from: kept for review, never part of a hash or a compile. */

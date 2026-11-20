@@ -1,4 +1,4 @@
-// ail-derived-from: AdoptSection@2c33a427ac92101c
+// ail-derived-from: AdoptSection@96e225b009a2064e
 import { afterEach, expect, test } from "bun:test";
 import { cleanup, render, within } from "@testing-library/react";
 import { AdoptSection } from "../../../src/gen/home/adopt/adopt-section";
@@ -9,12 +9,14 @@ afterEach(() => {
 
 test("adopting is explained", () => {
   const { container } = render(<AdoptSection />);
+
   const section = container.querySelector("#adopt");
   expect(section).not.toBeNull();
   const scope = within(section as HTMLElement);
 
-  const h2 = scope.getByRole("heading", { level: 2 });
-  expect(h2.textContent).toBe("Already have an app? Adopt it.");
+  expect(
+    scope.getByRole("heading", { level: 2, name: "Already have an app? Adopt it." }),
+  ).toBeTruthy();
 
   const expected = [
     "Why, from people and tickets",
@@ -22,12 +24,17 @@ test("adopting is explained", () => {
     "How, from the code",
     "Proof, on the old app",
   ];
-  const h3Texts = scope
+  const h3Names = scope
     .getAllByRole("heading", { level: 3 })
     .map((h) => (h.textContent ?? "").trim());
-  const stepTitles = h3Texts.filter((t) => expected.includes(t));
-  expect(stepTitles).toEqual(expected);
+  for (const name of expected) {
+    expect(h3Names).toContain(name);
+  }
+  const positions = expected.map((name) => h3Names.indexOf(name));
+  const sorted = [...positions].sort((a, b) => a - b);
+  expect(positions).toEqual(sorted);
 
-  expect(scope.getAllByText("/ail:adopt").length).toBeGreaterThan(0);
-  expect(scope.getAllByText("ail adopt").length).toBeGreaterThan(0);
+  const text = (section as HTMLElement).textContent ?? "";
+  expect(text).toContain("/ail:adopt");
+  expect(text).toContain("ail adopt");
 });

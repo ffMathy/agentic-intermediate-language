@@ -31,13 +31,14 @@ Follow the `ail` skill for how nodes are written. On top of it:
    next to the app. Ask only for what this machine truly lacks, such as a
    simulator, a device or a secret, and say exactly what.
 
-   Test data belongs to the use case, so it goes in the spec. Each node's
-   `data` section names and describes, in plain words, the data its scenarios
-   need, such as `a full basket   two items: "Lamp" at 199 kr and "Rug" at
-   499 kr`. A scenario's Given refers to it by name. Each end-to-end test
-   creates its own scenario's data at its start, through the program's official
-   interface: its HTTP API, its CLI or its import feature. Use shared helpers
-   in the checks folder (for example `checks/e2e/data.ts`). Never write to the
+   Test data belongs to the use case, and the scenario already says what it
+   is: its Given. When the outcome depends on the values, write them into the
+   Given ("Given a basket with a 199 kr lamp and a 499 kr rug, Then the total
+   reads 698 kr"). When it doesn't, leave them out and let the test choose.
+   Each end-to-end test creates its own scenario's data at its start, through
+   the program's official interface: its HTTP API, its CLI or its import
+   feature. Use shared helpers in the checks folder (for example
+   `checks/e2e/data.ts`). Never write to the
    database directly: data made the way users make it is valid, passes the
    app's own rules, and keeps working when the storage changes. Only what every
    scenario needs, such as a user to log in as, goes in `run.legacy.seed`, a

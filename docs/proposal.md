@@ -40,7 +40,6 @@ node Name : kind   level: product|experience|system|specialist   @tags
   uses      dependencies (only their `what` is visible)
   children  refinement (the review tree)
   verify    properties needing a derived check
-  data      the test data its scenarios need, named and described; a Given refers to it by name
 ```
 
 Two graphs live in one file:

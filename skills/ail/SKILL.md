@@ -27,9 +27,6 @@ node Name : kind   level: product|experience|system|specialist   @tag
   uses      nodes whose contract this one depends on
   children  nodes that refine this one
   verify    properties that need a derived check
-  data      the test data its scenarios need, each named and described in plain words
-            (a full basket   two items: "Lamp" at 199 kr and "Rug" at 499 kr);
-            a scenario's Given refers to it by name
   sources   where the claims came from (tickets, interviews, screens, code); for review, never compiled
 ```
 Kinds: `system` (the root, with `entry`), `flow`, `view`, `data`, `fn`, and
@@ -72,6 +69,11 @@ or `binds`, or move it one level down. Define domain words once in the
 - Examples are the cheapest pin: `evaluate(boardFrom("XXX/OO_/___")) => { kind: "won", mark: "X", line: [0, 1, 2] }`.
 - Name every export, with its signature, that a dependant or a test will use.
 - Whenever more than one answer is correct, state the tie-break.
+- When a scenario's outcome depends on its data, put the values in its Given
+  ("Given a basket with a 199 kr lamp and a 499 kr rug, Then the total reads
+  698 kr"). When the outcome doesn't depend on them ("Given a full basket"),
+  leave them out: the test chooses. Test data has no section of its own; the
+  scenarios are its one source of truth.
 - `free` is a whitelist. List suspected gaps under `probes`.
 - Give every decision a `because`, and record the real alternatives as `rejected`.
 

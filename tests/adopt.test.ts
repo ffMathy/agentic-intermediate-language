@@ -190,16 +190,3 @@ test("a failing seed stops everything and says why", async () => {
   await Bun.sleep(300);
   expect(await fetch(`http://localhost:${port}`).then(() => "up", () => "down")).toBe("down");
 }, 60_000);
-
-test("a node's test data is part of its spec: changing it makes its checks out of date", async () => {
-  const { oracleHash } = await import("../src/hash.ts");
-  const dir = tempProject("areas");
-  const f = join(dir, "a", "checkout.ail.md");
-  const spec = (basket: string) => "```ail\nnode Checkout : flow   level: experience\n  why   People pay.   <- AreaA\n  what\n    Scenario: paying\n      Given a full basket\n      Then the receipt is shown\n  data\n    a full basket   " + basket + "\n```\n";
-  writeFileSync(f, spec('two items: "Lamp" at 199 kr and "Rug" at 499 kr'));
-  const before = load(dir);
-  expect(lint(before).filter((d) => d.code === "unknown-section")).toEqual([]);
-  writeFileSync(f, spec('one item: "Lamp" at 199 kr'));
-  const after = load(dir);
-  expect(oracleHash(after, after.nodes.get("Checkout")!)).not.toBe(oracleHash(before, before.nodes.get("Checkout")!));
-});

@@ -11,13 +11,13 @@
       "look": "51bd72c09746806e07986b8ee6ec433c7d620330638a78b6551220539895eb02"
     },
     "AdoptSection": {
-      "hash": "cffa68a778079e76cce9702bdcb5314b9c960bf5375ae082b929be32fbd26248",
+      "hash": "27602b744690f23fb5c8365f3295b6038222ffab355e9030f72685372b61e1d9",
       "files": {
-        "src/gen/home/adopt/adopt-section.tsx": "15aec2f432cc8dcad84ea6d9ec5b810bd9ac43d0fb34c15e08213747d1081c61"
+        "src/gen/home/adopt/adopt-section.tsx": "3a02975c2946325d2cf2d1aec85767978f29dc668802b8a2e1696bde4db143a0"
       },
       "by": "claude-code",
-      "shots": "cffa68a778079e76cce9702bdcb5314b9c960bf5375ae082b929be32fbd26248",
-      "look": "cffa68a778079e76cce9702bdcb5314b9c960bf5375ae082b929be32fbd26248"
+      "shots": "27602b744690f23fb5c8365f3295b6038222ffab355e9030f72685372b61e1d9",
+      "look": "27602b744690f23fb5c8365f3295b6038222ffab355e9030f72685372b61e1d9"
     },
     "AIL": {
       "hash": "916a2e53945f2467cb9205f8fee140396a4c368874e27bfb6ad7be98b678e14c",
@@ -389,7 +389,7 @@
   },
   "glue": {
     "src/gen/assets.d.ts": "8b9044f3e94a4669ea033bbea49000ccc17e32622e282441d78862e4780ea0aa",
-    "src/gen/spec.ts": "a11702f0e350a2f4ac6e17f7777fa55c0a2ef500b4140cec6479849e353ecb4f",
+    "src/gen/spec.ts": "f77f71173b32482349bbce6ae38b14c00c6c5bd9683540acedc8271dce18eb4b",
     "src/gen/tokens.css": "7bbb97ebb74409b3ed971ac9b054588620ec3b1652e3b22ce61e0ae8ddbcff31"
   }
 }

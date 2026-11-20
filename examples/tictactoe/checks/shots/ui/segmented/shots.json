@@ -1,0 +1,9 @@
+{
+  "node": "Segmented",
+  "shots": [
+    {
+      "test": "picking another option",
+      "file": "01-picking-another-option.png"
+    }
+  ]
+}

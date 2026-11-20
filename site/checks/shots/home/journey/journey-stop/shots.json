@@ -1,0 +1,13 @@
+{
+  "node": "JourneyStop",
+  "shots": [
+    {
+      "test": "a stop",
+      "file": "01-a-stop.png"
+    },
+    {
+      "test": "a stop with a file to browse",
+      "file": "02-a-stop-with-a-file-to-browse.png"
+    }
+  ]
+}

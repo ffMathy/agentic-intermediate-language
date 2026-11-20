@@ -1,4 +1,4 @@
-// ail-derived-from: StopProof@f0dbe5179b8cfbe3
+// ail-derived-from: StopProof@1090b5e6fb1f1cf4
 import { afterEach, expect, test } from "bun:test";
 import { cleanup, render, screen, within } from "@testing-library/react";
 import { StopProof } from "../../../../src/gen/home/journey/stops/stop-proof";
@@ -22,24 +22,22 @@ test("the proof", () => {
 
   const article = container.querySelector("article#stop-7");
   expect(article).not.toBeNull();
-  const scope = within(article as HTMLElement);
+  const art = article as HTMLElement;
 
-  const heading = scope.getByRole("heading", {
+  const heading = within(art).getByRole("heading", {
     level: 3,
     name: "Proof: the verify line becomes a test that plays every game.",
   });
   expect(heading).toBeTruthy();
 
-  const region = scope.getByRole("region", { name: "Derived check excerpt" });
+  const region = within(art).getByRole("region", { name: "Derived check excerpt" });
   const text = region.textContent ?? "";
   for (const line of lines) {
-    expect(text).toContain(line);
+    expect(text).toContain(line.trim());
   }
 
   const highlighted = Array.from(region.querySelectorAll("*")).filter(
-    (el) => el.textContent === "never loses",
+    (el) => (el.textContent ?? "") === "never loses",
   );
   expect(highlighted.length).toBeGreaterThan(0);
-
-  expect(screen.getAllByRole("article").length).toBeGreaterThan(0);
 });

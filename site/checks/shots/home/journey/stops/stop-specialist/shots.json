@@ -1,0 +1,9 @@
+{
+  "node": "StopSpecialist",
+  "shots": [
+    {
+      "test": "the specialist level",
+      "file": "01-the-specialist-level.png"
+    }
+  ]
+}

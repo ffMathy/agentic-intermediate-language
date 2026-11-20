@@ -1,0 +1,9 @@
+{
+  "node": "ReviewNote",
+  "shots": [
+    {
+      "test": "generated code stays out of review",
+      "file": "01-generated-code-stays-out-of-review.png"
+    }
+  ]
+}

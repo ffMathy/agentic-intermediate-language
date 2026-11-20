@@ -9,7 +9,7 @@ import { readLock, writeLock } from "./lock.ts";
 import { specText, type AilNode } from "./parse.ts";
 import { ancestors, type Project } from "./project.ts";
 import type { Provider } from "./providers/index.ts";
-import { takeShots, visualNodes, type Shot } from "./shots.ts";
+import { refreshNodeShots, visualNodes, type Shot } from "./shots.ts";
 import { loadPrompt } from "./verify.ts";
 
 export interface LookResult { node: string; ok: boolean; problems: string[]; shots: Shot[]; skipped?: string }
@@ -48,17 +48,14 @@ export function parseVerdict(reply: string): { ok: boolean; problems: string[] }
 }
 
 /**
- * Screenshot a node's tests and ask the model whether they match its look.
- * Screens are kept in .ail/look/ so a person can see what was judged.
+ * Retake a node's proof screenshots (the committed ones, in checks/shots/)
+ * and ask the model whether they match its look.
  */
 export async function lookCheck(p: Project, n: AilNode, provider: Provider, log: (s: string) => void = () => {}): Promise<LookResult> {
   if (!visualNodes(p, [n.name]).length) return { node: n.name, ok: true, problems: [], shots: [], skipped: "no look, or no derived check to picture" };
-  const dir = join(p.root, ".ail", "look");
-  rmSync(join(dir, n.dir, n.name), { recursive: true, force: true });
-  mkdirSync(dir, { recursive: true });
   let shots: Shot[];
   try {
-    shots = await takeShots(p, dir, [n.name]);
+    shots = await refreshNodeShots(p, n);
   } catch (e) {
     return { node: n.name, ok: true, problems: [], shots: [], skipped: (e as Error).message };
   }

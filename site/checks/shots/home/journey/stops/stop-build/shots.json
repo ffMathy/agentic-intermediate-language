@@ -1,0 +1,9 @@
+{
+  "node": "StopBuild",
+  "shots": [
+    {
+      "test": "the build",
+      "file": "01-the-build.png"
+    }
+  ]
+}

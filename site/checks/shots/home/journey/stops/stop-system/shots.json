@@ -1,0 +1,9 @@
+{
+  "node": "StopSystem",
+  "shots": [
+    {
+      "test": "the system level",
+      "file": "01-the-system-level.png"
+    }
+  ]
+}

@@ -1,0 +1,9 @@
+{
+  "node": "StopExperience",
+  "shots": [
+    {
+      "test": "the experience level",
+      "file": "01-the-experience-level.png"
+    }
+  ]
+}

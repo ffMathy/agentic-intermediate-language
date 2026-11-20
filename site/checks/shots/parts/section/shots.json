@@ -1,0 +1,9 @@
+{
+  "node": "Section",
+  "shots": [
+    {
+      "test": "an anchored band",
+      "file": "01-an-anchored-band.png"
+    }
+  ]
+}

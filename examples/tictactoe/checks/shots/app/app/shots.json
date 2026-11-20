@@ -1,0 +1,13 @@
+{
+  "node": "App",
+  "shots": [
+    {
+      "test": "switching to the demo",
+      "file": "01-switching-to-the-demo.png"
+    },
+    {
+      "test": "switching back starts a new game",
+      "file": "02-switching-back-starts-a-new-game.png"
+    }
+  ]
+}

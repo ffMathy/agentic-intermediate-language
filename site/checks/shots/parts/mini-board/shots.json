@@ -1,0 +1,13 @@
+{
+  "node": "MiniBoard",
+  "shots": [
+    {
+      "test": "marks",
+      "file": "01-marks.png"
+    },
+    {
+      "test": "numbers in empty squares",
+      "file": "02-numbers-in-empty-squares.png"
+    }
+  ]
+}

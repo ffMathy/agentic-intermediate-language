@@ -1,0 +1,13 @@
+{
+  "node": "SectionHeading",
+  "shots": [
+    {
+      "test": "a full heading",
+      "file": "01-a-full-heading.png"
+    },
+    {
+      "test": "just a heading",
+      "file": "02-just-a-heading.png"
+    }
+  ]
+}

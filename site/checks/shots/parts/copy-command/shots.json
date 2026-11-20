@@ -1,0 +1,9 @@
+{
+  "node": "CopyCommand",
+  "shots": [
+    {
+      "test": "copying",
+      "file": "01-copying.png"
+    }
+  ]
+}

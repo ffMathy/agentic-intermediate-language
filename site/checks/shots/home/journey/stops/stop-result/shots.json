@@ -1,0 +1,9 @@
+{
+  "node": "StopResult",
+  "shots": [
+    {
+      "test": "the result",
+      "file": "01-the-result.png"
+    }
+  ]
+}

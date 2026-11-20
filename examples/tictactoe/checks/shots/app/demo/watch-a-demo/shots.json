@@ -1,0 +1,21 @@
+{
+  "node": "WatchADemo",
+  "shots": [
+    {
+      "test": "the demo starts on its own",
+      "file": "01-the-demo-starts-on-its-own.png"
+    },
+    {
+      "test": "the computer plays both sides",
+      "file": "02-the-computer-plays-both-sides.png"
+    },
+    {
+      "test": "perfect play ends in a draw",
+      "file": "03-perfect-play-ends-in-a-draw.png"
+    },
+    {
+      "test": "watch again",
+      "file": "04-watch-again.png"
+    }
+  ]
+}

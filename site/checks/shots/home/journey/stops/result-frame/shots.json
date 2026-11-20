@@ -1,0 +1,13 @@
+{
+  "node": "ResultFrame",
+  "shots": [
+    {
+      "test": "the game is embedded",
+      "file": "01-the-game-is-embedded.png"
+    },
+    {
+      "test": "the game fits a phone",
+      "file": "02-the-game-fits-a-phone.png"
+    }
+  ]
+}

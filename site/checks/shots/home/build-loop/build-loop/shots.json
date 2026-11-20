@@ -1,0 +1,9 @@
+{
+  "node": "BuildLoop",
+  "shots": [
+    {
+      "test": "four steps",
+      "file": "01-four-steps.png"
+    }
+  ]
+}

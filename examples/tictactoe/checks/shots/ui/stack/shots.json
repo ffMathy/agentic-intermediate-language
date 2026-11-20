@@ -1,0 +1,9 @@
+{
+  "node": "Stack",
+  "shots": [
+    {
+      "test": "children keep their order",
+      "file": "01-children-keep-their-order.png"
+    }
+  ]
+}

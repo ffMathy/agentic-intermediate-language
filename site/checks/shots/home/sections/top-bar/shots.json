@@ -1,0 +1,9 @@
+{
+  "node": "TopBar",
+  "shots": [
+    {
+      "test": "the links lead to the right places",
+      "file": "01-the-links-lead-to-the-right-places.png"
+    }
+  ]
+}

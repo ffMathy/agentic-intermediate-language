@@ -4,7 +4,7 @@ import { existsSync, mkdtempSync, readFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { loadProject } from "../src/project.ts";
-import { captureScreens, changedScreens, junitTests, renderShots, takeShots, visualNodes } from "../src/shots.ts";
+import { captureScreens, changedScreens, inlineImages, junitTests, renderShots, takeShots, visualNodes } from "../src/shots.ts";
 import { derivedCheckFile } from "../src/verify.ts";
 import { KATA } from "./helpers.ts";
 
@@ -63,4 +63,11 @@ test("leaves a link behind", () => {
     expect(screen!.html).toContain("<h2>Browser</h2>");
     expect(screen!.html).toContain("Open play");
   } finally { rmSync(file); }
+});
+
+test("images a test imported from disk are inlined, so the screenshot shows them", () => {
+  const png = join(KATA, "..", "..", "docs", "cover.png");
+  const html = inlineImages(`<img src="${png}" alt="a"><img src="/nope.png">`);
+  expect(html).toContain('src="data:image/png;base64,');
+  expect(html).toContain('src="/nope.png"');
 });

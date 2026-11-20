@@ -1,0 +1,9 @@
+{
+  "node": "SystemFigure",
+  "shots": [
+    {
+      "test": "the picture",
+      "file": "01-the-picture.png"
+    }
+  ]
+}

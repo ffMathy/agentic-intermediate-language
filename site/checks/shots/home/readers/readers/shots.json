@@ -1,0 +1,17 @@
+{
+  "node": "Readers",
+  "shots": [
+    {
+      "test": "the first reader",
+      "file": "01-the-first-reader.png"
+    },
+    {
+      "test": "picking another reader",
+      "file": "02-picking-another-reader.png"
+    },
+    {
+      "test": "arrow keys",
+      "file": "03-arrow-keys.png"
+    }
+  ]
+}

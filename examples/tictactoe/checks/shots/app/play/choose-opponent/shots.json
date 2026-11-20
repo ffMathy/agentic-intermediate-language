@@ -1,0 +1,9 @@
+{
+  "node": "ChooseOpponent",
+  "shots": [
+    {
+      "test": "switching to the computer",
+      "file": "01-switching-to-the-computer.png"
+    }
+  ]
+}

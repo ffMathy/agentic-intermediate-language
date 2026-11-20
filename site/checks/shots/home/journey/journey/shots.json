@@ -1,0 +1,13 @@
+{
+  "node": "Journey",
+  "shots": [
+    {
+      "test": "eight stops in order",
+      "file": "01-eight-stops-in-order.png"
+    },
+    {
+      "test": "the thread is explained",
+      "file": "02-the-thread-is-explained.png"
+    }
+  ]
+}

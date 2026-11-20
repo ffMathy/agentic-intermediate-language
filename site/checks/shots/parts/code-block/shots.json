@@ -1,0 +1,21 @@
+{
+  "node": "CodeBlock",
+  "shots": [
+    {
+      "test": "shown exactly",
+      "file": "01-shown-exactly.png"
+    },
+    {
+      "test": "the thread is marked",
+      "file": "02-the-thread-is-marked.png"
+    },
+    {
+      "test": "a caption",
+      "file": "03-a-caption.png"
+    },
+    {
+      "test": "a long line wraps under itself",
+      "file": "04-a-long-line-wraps-under-itself.png"
+    }
+  ]
+}

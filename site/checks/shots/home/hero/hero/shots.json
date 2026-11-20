@@ -1,0 +1,9 @@
+{
+  "node": "Hero",
+  "shots": [
+    {
+      "test": "the links go to the right places",
+      "file": "01-the-links-go-to-the-right-places.png"
+    }
+  ]
+}

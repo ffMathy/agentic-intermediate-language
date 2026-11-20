@@ -57,8 +57,13 @@ Then, anywhere inside a project (any folder with an `ail.config.json`):
 | `ail show [what]` | The tree, a node, an audience's view (`stakeholder`, `design`, `engineer`, `specialist`), or `changes`. Add `--shots <dir>` for screenshots of the proofs |
 
 That's the whole tool. Change detection, deriving tests from scenarios,
-writing the token CSS and cleaning up after moved or deleted nodes all happen
-inside `ail build`.
+writing the token CSS, taking the proof screenshots and cleaning up after
+moved or deleted nodes all happen inside `ail build`.
+
+Proof screenshots are committed too: every build keeps the final screen of
+each check for nodes with a `look`, in `checks/shots/`, next to the checks.
+A model has compared each one with the spec's look, so a reviewer sees
+exactly what was proven.
 
 ## Adopt an existing app
 
@@ -109,6 +114,24 @@ ail show stakeholder
 ```bash
 bun run dev
 ```
+
+## Keep generated code out of pull request diffs
+
+Commit what `ail build` generates, so the app runs straight from the
+repository and CI can prove it was built from the spec. But nobody needs to
+read it in review. Mark it as generated in `.gitattributes` at the root of the
+repository:
+
+```gitattributes
+src/gen/** linguist-generated=true
+ail.lock.json linguist-generated=true
+```
+
+Use your target's `generated` paths, prefixed with the project's folder if it
+isn't the repository root. GitHub then collapses those files in every pull
+request diff, so reviewers see the spec, the derived checks and the proof
+screenshots, while the generated code stays committed. A reviewer can still
+expand a collapsed file with "Load diff".
 
 ## In CI
 

@@ -1,0 +1,9 @@
+{
+  "node": "Text",
+  "shots": [
+    {
+      "test": "content is shown",
+      "file": "01-content-is-shown.png"
+    }
+  ]
+}

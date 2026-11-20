@@ -2,21 +2,22 @@
 
 ```ail
 node StopProof : view   level: experience
-  why   Show that the promise is not taken on trust: the verify line became a test that plays every game.   <- Journey
+  why   Show that the promise is not taken on trust: the verify line became a test that plays every game, and what the player sees is proven and pictured too.   <- Journey
   what
-    the seventh stop, in the build color, showing the derived check
+    the seventh stop, in the build color, showing the derived check, and screenshots of the screens the demo's checks end on
+    it says that every check's final screen is screenshotted, compared with the spec's look by a model, and committed next to the checks
     Scenario: the proof
       Given the page is open
       Then the article "stop-7" has the level 3 heading "Proof: the verify line becomes a test that plays every game."
       And the region named "Derived check excerpt" shows its seven lines, with "never loses" highlighted
   look
-    stop     JourneyStop with number 7, color color.level.build, figure ProofFigure
+    stop     JourneyStop with number 7, color color.level.build, figure ProofScreens
   copy
     proof.depth     "proof"
     proof.chip      "PROOF"
     proof.reader    "everyone: a green check means the sentence at the top is true"
     proof.headline  "Proof: the verify line becomes a test that plays every game."
-    proof.body      "The verify line from the specialist level was turned into a derived check, pinned to a hash of the node. It tries every possible sequence of X moves against the computer and asserts that X never wins. Every ail build runs it with every other example and scenario, on your machine and in CI."
+    proof.body      "The verify line from the specialist level became a derived check, pinned to a hash of the node: it plays every possible game against the computer and asserts that X never wins. What people see is proven too. The final screen of every check is screenshotted, a model compares it with the spec's look, and the screenshots are committed next to the checks, so a reviewer sees exactly what was proven. Every ail build runs it all, on your machine and in CI."
     proof.label     "Derived check excerpt"
     proof.file      "examples/tictactoe/checks/engine/computer-player/computer-player.test.ts"
     proof.line.1    "// ail-derived-from: ComputerPlayer@0c990bfbddc62e20"
@@ -28,35 +29,39 @@ node StopProof : view   level: experience
     proof.line.7    "});"
     proof.mark.1    "never loses"
     proof.mark.2    "expect(xWins).toBe(0);"
-    proof.turns     "A green ail build. If a change to the spec or the code ever let X win, the check would fail and the change would be rejected."
+    proof.turns     "A green ail build, and committed screenshots of what it proved. If a change to the spec or the code ever let X win, or changed how the game looks, the build would fail and the change would be rejected."
   binds
     stop     JourneyStop with depth proof.depth, chip proof.chip, reader proof.reader, headline proof.headline, explanation proof.body, lines proof.line.1 to proof.line.7, label proof.label, file proof.file, highlight [proof.mark.1, proof.mark.2], turnsInto proof.turns
-  uses      JourneyStop, ProofFigure
-  children  ProofFigure
+  uses      JourneyStop, ProofScreens
+  children  ProofScreens
 ```
 
 ```ail
-node ProofFigure : view   level: experience
-  why   Show that one unbroken thread runs from the promise at the top to the passing test at the bottom.   <- StopProof
+node ProofScreens : view   level: experience
+  why   Show that proof covers what people see, too: the screens the checks end on are pictured, judged against the look, and committed.   <- StopProof
   what
-    five stacked chips, one per level the promise passed through, joined by the yellow thread, ending in a green check
-    Scenario: the picture
+    two screenshots of the demo's play screen, taken at the end of its checks "winning" and "the computer answers", side by side when there is room, each with a check mark and the check's name under it
+    under them, a line says the screenshots are committed with the checks, and where
+    Scenario: the screens
       Given the stop is shown
-      Then an image named "The thread runs from the promise through the scenario, the rules and the invariant to a passing test" is shown
-      And it contains the texts "promise · product" and "test · never loses"
+      Then it shows the images named "Screenshot at the end of the check “winning”" and "Screenshot at the end of the check “the computer answers”", in that order
+      And it shows a line containing "examples/tictactoe/checks/shots/"
   look
-    svg      viewBox 0 0 300 280, width 100%, max-width 300px, height auto, display block
-    thread   line 30,27 to 30,251, stroke color.thread.strong, stroke-width 4, stroke-linecap round; and for each chip a line from 30, its center y, to 50, its center y, same stroke
-    chips    rects x 50 width 200 height 34 rx 17 at y 10, 66, 122, 178 and 234, filled color.level.product, color.level.experience, color.level.system, color.level.specialist and color.level.build
-    labels   texts at x 150, chip y + 22, text-anchor middle, font-size 12, weight 700, fill color.on.accent
-    tick     line 250,251 to 258,251, stroke color.thread.strong, stroke-width 4; circle cx 274 cy 251 r 16, fill color.pass; path "M266 251 L272 257 L283 245", stroke color.on.accent, stroke-width 3, fill none, stroke-linecap round, stroke-linejoin round
+    layout   stack(v, gap: space.3, align: stretch) [ grid, where ]
+    grid     a div: display grid, grid-template-columns repeat(auto-fit, minmax(min(160px, 100%), 1fr)), gap space.3, width 100%
+    shot     a figure element: margin 0, display flex, flex-direction column, gap space.1
+    frame    an img: display block, width 100%, height auto, box-sizing border-box, background color.surface, a 1px solid color.border border, radius.md
+    caption  a figcaption: font.tiny, color.text.muted, text-align center; the check mark in color.pass, weight 700, then one space, then the check's name in quotes
+    where    a p: font.tiny, color.text.muted, margin 0, text-align center, overflow-wrap anywhere; the path in font.mono
   copy
-    proof.figure.label  "The thread runs from the promise through the scenario, the rules and the invariant to a passing test"
-    proof.figure.1      "promise · product"
-    proof.figure.2      "scenario · experience"
-    proof.figure.3      "rules · system"
-    proof.figure.4      "invariant · specialist"
-    proof.figure.5      "test · never loses"
+    proof.shots.alt    "Screenshot at the end of the check “{test}”"
+    proof.shots.mark   "✓"
+    proof.shots.where  "Committed with the checks, in"
+    proof.shots.path   "examples/tictactoe/checks/shots/"
   binds
-    svg      role img with aria-label from proof.figure.label
+    data     specProjects from the spec module: of the project with key "tictactoe", the shots of node "PlayAGame" whose test is "winning", then the one whose test is "the computer answers"; a missing one is left out
+    img      src the shot's src; alt from proof.shots.alt with {test} filled in
+    caption  proof.shots.mark, one space, then “ + the shot's test + ”
+    where    proof.shots.where, one space, then the path in a code element
+  uses     Stack
 ```

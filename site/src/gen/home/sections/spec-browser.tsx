@@ -1,14 +1,17 @@
 import { useEffect, useState } from "react";
+import type { ReactNode } from "react";
 import { specProjects } from "../../spec";
 import { Section } from "../../parts/section";
 import { SectionHeading } from "../../parts/section-heading";
 import { SpecEditor } from "../../parts/spec-editor";
 import { Stack } from "../../parts/stack";
 
-const projectOrder = ["tictactoe", "site"];
-const projects = projectOrder.flatMap((key) =>
-  specProjects.filter((entry) => entry.key === key),
-);
+const languageHref =
+  "https://github.com/ffMathy/agentic-intermediate-language/blob/main/docs/language.md";
+
+function slashCount(path: string): number {
+  return path.split("/").length - 1;
+}
 
 function folderOf(path: string): string {
   const index = path.lastIndexOf("/");
@@ -19,17 +22,13 @@ function nameOf(path: string): string {
   return path.slice(path.lastIndexOf("/") + 1);
 }
 
-function slashes(path: string): number {
-  return path.split("/").length - 1;
-}
-
-/** Reading real specs is the fastest way to learn AIL, so both example specs can be browsed the way developers read code. */
+/** two projects can be browsed: the Tic-Tac-Toe demo and this website; the demo is shown first */
 export function SpecBrowser() {
   const [project, setProject] = useState<string>("tictactoe");
   const [file, setFile] = useState<string>("tictactoe.ail.md");
 
   useEffect(() => {
-    const open = (hash: string) => {
+    const open = (hash: string): void => {
       if (!hash.startsWith("#spec/")) {
         return;
       }
@@ -40,29 +39,35 @@ export function SpecBrowser() {
       }
       const key = rest.slice(0, index);
       const path = rest.slice(index + 1);
-      const target = projects.find((entry) => entry.key === key);
-      if (!target || !target.files.some((entry) => entry.path === path)) {
+      const entry = specProjects.find((p) => p.key === key);
+      if (entry === undefined || !entry.files.some((f) => f.path === path)) {
         return;
       }
       setProject(key);
       setFile(path);
-      document.getElementById("specs")?.scrollIntoView();
+      const element = document.getElementById("specs");
+      if (element !== null) {
+        element.scrollIntoView();
+      }
     };
-    const onHashChange = () => {
-      open(location.hash);
+    const onHashChange = (): void => {
+      open(window.location.hash);
     };
-    const onClick = (event: MouseEvent) => {
+    const onClick = (event: MouseEvent): void => {
       const target = event.target;
       if (!(target instanceof Element)) {
         return;
       }
       const anchor = target.closest("a");
-      const href = anchor?.getAttribute("href");
-      if (href && href.startsWith("#spec/")) {
+      if (anchor === null) {
+        return;
+      }
+      const href = anchor.getAttribute("href");
+      if (href !== null && href.startsWith("#spec/")) {
         open(href);
       }
     };
-    open(location.hash);
+    open(window.location.hash);
     window.addEventListener("hashchange", onHashChange);
     document.addEventListener("click", onClick);
     return () => {
@@ -71,42 +76,39 @@ export function SpecBrowser() {
     };
   }, []);
 
-  const shown = projects.find((entry) => entry.key === project);
-  const files = shown ? shown.files : [];
-  const nodeCount = shown ? shown.nodeCount : 0;
-  const picked = files.find((entry) => entry.path === file);
+  const shown = specProjects.find((p) => p.key === project) ?? specProjects[0];
+  const picked = shown.files.find((f) => f.path === file);
 
-  const rows: React.ReactNode[] = [];
-  let previous = "";
-  for (const entry of files) {
-    const folder = folderOf(entry.path);
-    if (folder !== previous && folder !== "") {
-      const depth = slashes(folder) + 1;
+  const rows: ReactNode[] = [];
+  let previousFolder = "";
+  shown.files.forEach((f, index) => {
+    const folder = folderOf(f.path);
+    if (folder !== previousFolder && folder !== "") {
       rows.push(
         <div
-          key={`folder:${folder}:${entry.path}`}
+          key={`folder-${index}`}
           style={{
             fontFamily: "var(--font-mono)",
             fontSize: "var(--font-tiny)",
             color: "var(--color-code-muted)",
-            padding: `var(--space-1) var(--space-3) var(--space-1) calc(var(--space-3) + ${12 * (depth - 1)}px)`,
+            padding: "var(--space-1) var(--space-3)",
+            paddingLeft: `calc(var(--space-3) + ${12 * slashCount(folder)}px)`,
           }}
         >
           {`${folder}/`}
         </div>,
       );
     }
-    previous = folder;
-    const isPicked = entry.path === file;
-    const depth = slashes(entry.path);
+    previousFolder = folder;
+    const isPicked = f.path === file;
     rows.push(
       <button
-        key={`file:${entry.path}`}
+        key={`file-${index}`}
         type="button"
-        aria-label={entry.path}
-        title={entry.path}
+        aria-label={f.path}
+        title={f.path}
         aria-pressed={isPicked}
-        onClick={() => setFile(entry.path)}
+        onClick={() => setFile(f.path)}
         style={{
           display: "block",
           width: "100%",
@@ -121,14 +123,15 @@ export function SpecBrowser() {
           borderLeft: isPicked
             ? "2px solid var(--color-accent)"
             : "2px solid transparent",
-          padding: `var(--space-1) var(--space-3) var(--space-1) calc(var(--space-3) + ${12 * depth}px)`,
+          padding: "var(--space-1) var(--space-3)",
+          paddingLeft: `calc(var(--space-3) + ${12 * slashCount(f.path)}px)`,
           cursor: "pointer",
         }}
       >
-        {nameOf(entry.path)}
+        {nameOf(f.path)}
       </button>,
     );
-  }
+  });
 
   return (
     <Section id="specs" tone="raised">
@@ -159,49 +162,38 @@ export function SpecBrowser() {
             }}
           >
             <div aria-hidden="true" style={{ display: "flex", gap: "6px" }}>
-              <span
-                style={{
-                  display: "block",
-                  width: "10px",
-                  height: "10px",
-                  borderRadius: "var(--radius-pill)",
-                  background: "var(--color-dot-red)",
-                }}
-              />
-              <span
-                style={{
-                  display: "block",
-                  width: "10px",
-                  height: "10px",
-                  borderRadius: "var(--radius-pill)",
-                  background: "var(--color-dot-amber)",
-                }}
-              />
-              <span
-                style={{
-                  display: "block",
-                  width: "10px",
-                  height: "10px",
-                  borderRadius: "var(--radius-pill)",
-                  background: "var(--color-dot-green)",
-                }}
-              />
+              {["var(--color-dot-red)", "var(--color-dot-amber)", "var(--color-dot-green)"].map(
+                (color) => (
+                  <span
+                    key={color}
+                    style={{
+                      display: "block",
+                      width: "10px",
+                      height: "10px",
+                      borderRadius: "var(--radius-pill)",
+                      background: color,
+                    }}
+                  />
+                ),
+              )}
             </div>
             <div
               role="group"
               aria-label="Projects"
               style={{ display: "flex", gap: "var(--space-1)" }}
             >
-              {projects.map((entry) => {
-                const isShown = entry.key === project;
+              {specProjects.map((p) => {
+                const isShown = p.key === shown.key;
                 return (
                   <button
-                    key={entry.key}
+                    key={p.key}
                     type="button"
                     aria-pressed={isShown}
                     onClick={() => {
-                      setProject(entry.key);
-                      setFile(entry.files[0]?.path ?? "");
+                      if (p.key !== shown.key) {
+                        setProject(p.key);
+                        setFile(p.files[0]?.path ?? "");
+                      }
                     }}
                     style={{
                       fontSize: "var(--font-small)",
@@ -209,16 +201,12 @@ export function SpecBrowser() {
                       padding: "var(--space-1) var(--space-3)",
                       borderRadius: "var(--radius-md)",
                       border: "none",
-                      background: isShown
-                        ? "var(--color-code-pick)"
-                        : "transparent",
-                      color: isShown
-                        ? "var(--color-code-text)"
-                        : "var(--color-code-muted)",
+                      background: isShown ? "var(--color-code-pick)" : "transparent",
+                      color: isShown ? "var(--color-code-text)" : "var(--color-code-muted)",
                       cursor: "pointer",
                     }}
                   >
-                    {entry.name}
+                    {p.name}
                   </button>
                 );
               })}
@@ -231,7 +219,7 @@ export function SpecBrowser() {
                 color: "var(--color-code-muted)",
               }}
             >
-              {`${nodeCount} nodes in ${files.length} files`}
+              {`${shown.nodeCount} nodes in ${shown.files.length} files`}
             </p>
           </div>
           <div style={{ display: "flex", flexWrap: "wrap" }}>
@@ -250,13 +238,35 @@ export function SpecBrowser() {
             </nav>
             <div style={{ flex: "999 1 420px", minWidth: 0, height: "560px" }}>
               <SpecEditor
-                text={picked ? picked.text : ""}
-                path={`${project}/${file}`}
+                text={picked?.text ?? ""}
+                path={`${shown.key}/${file}`}
                 label={`Source of ${file}`}
               />
             </div>
           </div>
         </div>
+        <p
+          style={{
+            margin: 0,
+            fontSize: "var(--font-body)",
+            lineHeight: 1.6,
+            color: "var(--color-text-muted)",
+            maxWidth: "var(--width-prose)",
+          }}
+        >
+          {"Every section, the notation for types and values, and the rules ail build enforces are in "}
+          <a
+            href={languageHref}
+            style={{
+              color: "var(--color-accent)",
+              fontWeight: 600,
+              textDecoration: "underline",
+            }}
+          >
+            the language definition
+          </a>
+          {". A spec never uses a programming language's syntax: each compiler translates it into its target's own conventions."}
+        </p>
       </Stack>
     </Section>
   );

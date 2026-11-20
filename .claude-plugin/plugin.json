@@ -1,6 +1,7 @@
 {
   "name": "ail",
   "description": "Agentic Intermediate Language: review a recursive why/what/how spec, and let agents compile it into verified code.",
+  "icon": "./assets/icon.png",
   "author": {
     "name": "ffMathy"
   },

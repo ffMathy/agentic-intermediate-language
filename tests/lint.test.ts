@@ -79,3 +79,42 @@ test("examples need an expected value", () => {
   edit(dir, "add(1, 2) => 3", "add(1, 2)");
   expect(codes(dir)).toContain("example-syntax");
 });
+
+test("a spec never uses a target language's syntax", () => {
+  const bad: [string, string][] = [
+    ["pick(xs: list of number) -> integer", "pick(xs: number[]) -> number"],
+    ["pick(xs: list of number) -> integer", "pick(xs: List<int>) -> int"],
+    ["pick(xs: list of number) -> integer", "pick(xs: list of number) -> Task<int>"],
+    ["pick(xs: list of number) -> integer", "interface IPicker { Pick(xs: list of number) -> integer }"],
+    ["pick([1, 5, 2]) => 1", "pick([1, 5, 2].map(x => x)) => 1"],
+    ["pick([1, 5, 2]) => 1", "pick([1, 5, 2]) == 1 && true => true"],
+    ["pick([1, 5, 2]) => 1", "pick([1, 5, 2]) => null"],
+  ];
+  for (const [from, to] of bad) {
+    const dir = tempProject();
+    edit(dir, from, to);
+    expect(codes(dir), to).toContain("target-syntax");
+  }
+});
+
+test("the notation's own words, examples and quoted text are not target syntax", async () => {
+  const { targetSyntax } = await import("../src/lint.ts");
+  for (const ok of [
+    "type Status = { kind: \"won\", mark: Mark, line: list of integer } | { kind: \"draw\" }",
+    "run(item: Item, context: Context) -> later nothing",
+    "RuntimeIdentifier(Windows, Arm64) => \"win-arm64\";  (MacOS, X64) => \"osx-x64\"",
+    "toggle-pin, pinned => History.SetPinned(id, false)",
+    "reduce(g, { type: \"place\", index: 4 }) is g => true   where g = play([4])",
+    "copy   \"Type string[] here\"",
+    "state   area: \"play\" | \"watch\", starting at \"play\"",
+  ]) expect(targetSyntax(ok), ok).toBeNull();
+});
+
+test("a node has only AIL's sections, and what has only its labels", () => {
+  const dir = tempProject();
+  edit(dir, "  uses  Add", "  exports  pick\n  uses  Add");
+  expect(codes(dir)).toContain("unknown-section");
+  const dir2 = tempProject();
+  edit(dir2, "    pick(xs: list of number) -> integer —", "    exports\n      pick(xs: list of number) -> integer —");
+  expect(codes(dir2)).toContain("unknown-label");
+});

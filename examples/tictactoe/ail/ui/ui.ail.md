@@ -83,6 +83,6 @@ node Segmented : view   level: experience
     picked   background color.surface, text color.text, weight 600
     other    a transparent background, text color.text.muted, weight 400
   binds
-    props    label: string, options: { value, label }[], value, onChange(value)
+    props    label: text, options: list of { value: text, label: text }, value: text, onChange(value: text)
     element  a div with role radiogroup named by label; each option a button with type "button", role radio and aria-checked
 ```

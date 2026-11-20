@@ -48,3 +48,13 @@ test("the plugin pins no version, so every commit to main reaches users as an up
   expect(plugin.version).toBeUndefined();
   expect(market.plugins.map((p: { version?: string }) => p.version)).toEqual([undefined]);
 });
+
+test("the plugin has an icon, in the plugin, and only in plugin.json", async () => {
+  const root = join(import.meta.dir, "..");
+  const plugin = JSON.parse(await Bun.file(join(root, ".claude-plugin/plugin.json")).text());
+  const market = JSON.parse(await Bun.file(join(root, ".claude-plugin/marketplace.json")).text());
+  expect(plugin.icon).toBe("./assets/icon.png");
+  const png = new Uint8Array(await Bun.file(join(root, plugin.icon)).arrayBuffer());
+  expect([...png.slice(1, 4)].map((c) => String.fromCharCode(c)).join("")).toBe("PNG");
+  expect(market.plugins.every((p: { icon?: string }) => p.icon === undefined)).toBe(true);
+});

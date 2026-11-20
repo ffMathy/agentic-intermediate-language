@@ -74,3 +74,15 @@ test("components: layout notation, variants, owners, quotes and file names", () 
   edit(dir, "a/a.ail.md", "'Shop' and “Shop” are copy", "sits inside Shop");
   expect(codes(dir)).not.toContain("missing-uses");
 });
+
+test("examples run from AIL notation: nothing, is, and where", async () => {
+  const { exampleJs } = await import("../src/verify.ts");
+  const run = (src: string, scope: Record<string, unknown>) => new Function(...Object.keys(scope), `return (${src});`)(...Object.values(scope));
+  const scope = { play: (xs: number[]) => ({ xs }), same: (g: unknown) => g, copy: (g: object) => ({ ...g }) };
+  const a = exampleJs("same(g) is g", "true   where g = play([4])");
+  expect(run(a.actual, scope)).toBe(run(a.expected, scope));
+  const b = exampleJs("copy(g) is not g and copy(g).xs[0] is 4", "true   where g = play([4])");
+  expect(run(b.actual, scope)).toBe(true);
+  const c = exampleJs("[nothing, \"nothing\"]", "x");
+  expect(run(c.actual, scope)).toEqual([null, "nothing"]);
+});

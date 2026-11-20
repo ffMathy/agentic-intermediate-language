@@ -45,7 +45,7 @@ node Section : view   level: experience
     column   a div with max-width width.content, margin 0 auto, width 100%; stack(v, gap: space.8, align: stretch) [ children ]
     anchor   scroll-margin-top space.4 on the band
   binds
-    props    id?: string, tone: "plain" | "raised", label?: string, children
+    props    id?: text, tone: "plain" | "raised", label?: text, children
     element  a section element with the given id and, when label is given, aria-label set to it
   uses  Stack
 ```
@@ -68,6 +68,6 @@ node SectionHeading : view   level: experience
     heading  an h2: font.display at font.heading, weight 700, line-height 1.1, letter-spacing -0.01em, color.text, margin 0
     lead     a p: font.lead, line-height 1.6, color.text.muted, max-width width.prose, margin 0
   binds
-    props    text: string, eyebrow?: string, lead?: string
+    props    text: text, eyebrow?: text, lead?: text
   uses  Stack
 ```

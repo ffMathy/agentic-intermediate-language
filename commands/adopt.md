@@ -67,7 +67,13 @@ Follow the `ail` skill for how nodes are written. On top of it:
 3. **How: from the code.** Read the code behind the slice for what the app
    doesn't show: data shapes, rules, edge cases, tie-breaks, timing. Turn real
    inputs and outputs into `expr => expected` examples, and the decisions worth
-   keeping into `how`.
+   keeping into `how`. Write it all in AIL notation
+   ([docs/language.md](../docs/language.md)), never in the old app's
+   language: its interfaces become `type Name = { … }` records, its types
+   become `text`, `integer`, `list of T`, `T or nothing` and `later T`, its
+   null becomes `nothing`, and its lambdas and query chains become words.
+   The spec must compile just as well to another language, which is the point
+   of a migration.
 4. **Sources.** Give each node a `sources` section listing where its claims
    came from: ticket links, interview answers (who, and when), screens, and
    code paths. It is kept for review and never compiled.

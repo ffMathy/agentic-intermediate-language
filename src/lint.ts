@@ -1,6 +1,6 @@
 // `ail lint`: structural, traceability and readability rules.
 import { specFilesIn, specModuleProjects } from "./compile.ts";
-import { LEVELS, NODE_SECTIONS, type AilNode, type Level } from "./parse.ts";
+import { itemsOf, LEVELS, NODE_SECTIONS, sectionLines, stripComment, type AilNode, type Level } from "./parse.ts";
 import { ancestors, dependencies, descendants, isCompilable, modulePath, type Project } from "./project.ts";
 
 export type Severity = "error" | "warning";
@@ -19,6 +19,46 @@ const NOTATION_SECTIONS = new Set(["look", "copy", "binds", "uses", "children", 
 function plainText(line: string): string {
   return line.replace(/"[^"]*"/g, " ").replace(/<-\s*[\w.\[\]]+/g, " ").replace(/refined-by:.*$/, " ");
 }
+
+/**
+ * Target-language syntax, which a spec never uses: AIL has its own notation
+ * (docs/language.md) and every compiler translates it into its target's
+ * conventions. Each entry is a pattern and the AIL way to say it instead.
+ */
+export const TARGET_SYNTAX: [RegExp, string, string][] = [
+  [/\b[A-Z]\w*<\s*[A-Za-z][\w\s,.<>\[\]?]*>/, "generic type", "write `list of T`, `map of K to V`, `T or nothing`, or name the type"],
+  [/\b\w+(\[\])+/, "array type", "write `list of T`"],
+  [/(?::|->|=>|\|)\s*(string|int|bool|double|float|long|short|char|byte|void|any|object|unknown|undefined|unit|Unit|i32|i64|u8|f64|usize|str|Guid|DateTime|TimeSpan|Uri)\b(?!\s*\()/, "language type", "use AIL's types: text, number, integer, boolean, nothing, list of T, map of K to V"],
+  [/\b(null|undefined|nil|None|NULL)\b/, "language null", "write `nothing`"],
+  [/\b(interface|class|struct|enum|trait|protocol|namespace)\s+[A-Z]\w*|\b(public|private|protected|internal|static|readonly|override|abstract)\s+(static\s+|readonly\s+|async\s+)*[A-Za-z]\w*\s+[A-Za-z]\w*\s*[({;=]/, "declaration", "declare a type as `type Name = { field: Type, action(input: Type) -> Type }`"],
+  [/\b(Task|Promise|Future|ValueTask|IAsyncEnumerable|IEnumerable|IList|IReadOnlyList|ICollection|List|Dictionary|HashMap|HashSet|ArrayList|Observable|Optional|Option|Result|Vec)\s*</, "platform type", "write `later T` for a result that arrives later, `list of T`, `map of K to V`, `T or nothing`"],
+  [/(?:->|=>|:)\s*(Task|Promise|Future|ValueTask|Observable)\b/, "platform type", "write `later T` for a result that arrives later, or `later nothing`"],
+  [/\(\s*(?:\w+|\(\s*\w+(?:\s*,\s*\w+)*\s*\))\s*=>/, "lambda", "say it in words, or give the function a name and an example"],
+  [/\.(Select|Where|SelectMany|OrderBy|OrderByDescending|ToList|ToArray|ToDictionary|FirstOrDefault|Any|All|Count|map|filter|reduce|forEach|flatMap|find|findIndex|some|every|includes|push|splice|collect|iter)\(/, "collection method", "say it in words (\"the ids of all actions\"), or name a function in the spec"],
+  [/===|!==|&&|\|\||(?<![=!<>])==(?!>)|!=(?!=)/, "operator", "write `is`, `is not`, `and`, `or`"],
+  [/^\s*(const|let|var|val|auto|final|import|export|using|package|#include|from\s+\S+\s+import)\s/, "declaration", "AIL has no statements: state a constant as `NAME: Type = value`"],
+  [/\buse(State|Effect|Ref|Memo|Callback|Context|Reducer|LayoutEffect)\b|\bReact\b|\bJSX\b|\bsetState\b|\bthis\.\w|\bself\.\w|\bnew\s+[A-Z]\w*\(/, "framework idiom", "say what is kept (`state  name: Type, starting at value`) and leave the framework to the target"],
+];
+
+/** Sections whose text is contract or decision, not visual description or provenance. */
+const NEUTRAL_SECTIONS = new Set(["what", "how", "binds", "verify"]);
+
+/** The first target-language construct in a spec line, if any (quoted text is ignored). */
+export function targetSyntax(line: string, names: Set<string> = new Set()): { what: string; match: string; instead: string } | null {
+  const text = line.replace(/"(?:[^"\\]|\\.)*"|“[^”]*”/g, '""');
+  for (const [re, what, instead] of TARGET_SYNTAX) {
+    const m = re.exec(text);
+    if (!m) continue;
+    // A type the spec itself defines as a node (say a `Task` in a to-do app) is the spec's own word.
+    const word = /[A-Za-z]\w*/.exec(m[0])?.[0];
+    if (what === "platform type" && word && names.has(word)) continue;
+    return { what, match: m[0].trim(), instead };
+  }
+  return null;
+}
+
+/** Bare words that may head a group of lines in `what`. */
+const WHAT_LABELS = new Set(["examples", "probes"]);
 
 const CODE_PATTERNS: [RegExp, string][] = [
   [/\b[a-z]+[A-Z]\w*\b/, "camelCase identifier"],
@@ -40,6 +80,7 @@ export function lint(p: Project): Diagnostic[] {
 
   if (!p.target && p.nodes.size) push("error", "no-target", null, "no `target` block: nothing says what to generate, so nothing can be built", 1, p.files[0]?.file);
 
+  const nodeNames = new Set(p.nodes.keys());
   const tokenFamilies = new Set(Object.keys(p.tokens).map((t) => t.split(".")[0]!));
   const multiParent = new Map<string, string[]>();
   for (const n of p.nodes.values()) for (const c of n.children) multiParent.set(c, [...(multiParent.get(c) ?? []), n.name]);
@@ -52,7 +93,20 @@ export function lint(p: Project): Diagnostic[] {
     if (!n.level) push("error", "missing-level", n, `node ${n.name} has no level (one of ${LEVELS.join(", ")})`);
     else if (!LEVELS.includes(n.level)) push("error", "bad-level", n, `unknown level "${n.level}"`);
 
-    for (const s of n.sections) if (!NODE_SECTIONS.has(s.key)) push("warning", "unknown-section", n, `unknown section "${s.key}"`, s.line);
+    for (const s of n.sections) if (!NODE_SECTIONS.has(s.key)) push("error", "unknown-section", n, `unknown section "${s.key}"; a node's sections are ${[...NODE_SECTIONS].join(", ")} (docs/language.md)`, s.line);
+
+    // --- one notation, whatever the target --------------------------------
+    for (const s of n.sections) {
+      if (!NEUTRAL_SECTIONS.has(s.key)) continue;
+      s.raw.forEach((raw, i) => {
+        const hit = targetSyntax(stripComment(i === 0 ? raw.trim().slice(s.key.length) : raw), nodeNames);
+        if (hit) push("error", "target-syntax", n, `${hit.what} "${hit.match}" in ${s.key}: a spec is written in AIL notation, never in a target language's; ${hit.instead} (docs/language.md)`, s.line + i);
+      });
+    }
+    const whatSec = n.sections.find((s) => s.key === "what");
+    if (whatSec) for (const it of itemsOf(sectionLines(whatSec), whatSec.line + 1))
+      if (/^[a-z]+$/.test(it.head) && it.children.length && !WHAT_LABELS.has(it.head))
+        push("error", "unknown-label", n, `"${it.head}" is not part of AIL: in \`what\`, signatures, types and constants stand on their own lines (they are the node's exports), and the only labels are ${[...WHAT_LABELS].join(" and ")} (docs/language.md)`, it.line);
 
     // --- tree shape -------------------------------------------------------
     for (const c of n.children) if (!p.nodes.has(c)) push("error", "unknown-node", n, `child "${c}" is not defined`);

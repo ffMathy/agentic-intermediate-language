@@ -116,6 +116,6 @@ node JourneyStop : view   level: experience
     stop.browse  "Open the whole file in the spec browser ↓"
   binds
     color    the color prop is a token name such as "color.level.system", used as the CSS variable var(--color-level-system)
-    props    number: number, color: token name, depth: string, chip: string, reader: string, headline: string, explanation: string, lines: string[], label: string, file: string, highlight: string[], turnsInto: string, figure: React node, last?: boolean, browse?: string (the link's target)
+    props    number: integer, color: token name, depth: text, chip: text, reader: text, headline: text, explanation: text, lines: list of text, label: text, file: text, highlight: list of text, turnsInto: text, figure: a view, last?: boolean, browse?: text (the link's target)
   uses  Stack, CodeBlock
 ```

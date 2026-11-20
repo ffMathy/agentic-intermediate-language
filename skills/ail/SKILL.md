@@ -16,7 +16,7 @@ calls it); `ail_adopt` checks a running app against the spec.
 ```ail
 node Name : kind   level: product|experience|system|specialist   @tag
   why       rationale   <- AncestorName
-  what      the observable contract: claims, Scenario: …, examples, probes
+  what      the observable contract: claims, types, signatures, constants, Scenario: …, examples, probes
   how       decide X
               because Y
               rejected Z because W
@@ -41,6 +41,25 @@ The project's root file also holds:
 
 Components (buttons, layout boxes, text styles) are ordinary nodes, usually
 in a `library`. A `look` that mentions one must list it under `uses`.
+
+## One notation, for every target
+A spec never uses a programming language's syntax or conventions: the same
+spec compiles to TypeScript, C#, Swift or Python, and each compiler translates
+AIL into its target's own types, naming and idioms. The full definition is
+[docs/language.md](../../docs/language.md); in short:
+- types: `text`, `number`, `integer`, `boolean`, `duration`, `time`, `bytes`,
+  `list of T`, `set of T`, `map of K to V`, `T or nothing` (`T?`),
+  `{ field: T }`, `"a" | "b"`, `(T) -> U`, and `later T` for a result that
+  arrives later
+- values: `nothing`, `[1, 2]`, `{ kind: "won" }`, `40 ms`; `is`, `and`, `or`, `not`
+- `binds`: `state reader: text, starting at "stakeholder"`, never a framework's
+  hook. The framework is named once, in `target`
+- never `string`, `int`, `null`, `T[]`, `List<T>`, `Task<T>`, `interface`,
+  `public`, lambdas, `.Select(…)` or `.map(…)`, `==` or `&&`
+
+A node's sections are only those above, and `what`'s only labels are
+`examples` and `probes`. `ail build` rejects anything else
+(`unknown-section`, `unknown-label`, `target-syntax`).
 
 ## Levels: who reads what
 | level | reader | language |
@@ -68,6 +87,9 @@ or `binds`, or move it one level down. Define domain words once in the
 ## Pinning behaviour, so every model writes the same thing
 - Examples are the cheapest pin: `evaluate(boardFrom("XXX/OO_/___")) => { kind: "won", mark: "X", line: [0, 1, 2] }`.
 - Name every export, with its signature, that a dependant or a test will use.
+  Write it straight into `what`, in AIL notation (there is no `exports`
+  label): `type Action = { id: text, order: integer, run(item: Item) -> later nothing }`,
+  `available(item: Item) -> list of Action`, `LINES: list of list of integer = […]`.
 - Whenever more than one answer is correct, state the tie-break.
 - When a scenario's outcome depends on its data, put the values in its Given
   ("Given a basket with a 199 kr lamp and a 499 kr rug, Then the total reads

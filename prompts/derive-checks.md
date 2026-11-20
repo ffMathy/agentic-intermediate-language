@@ -29,7 +29,11 @@ run.
    calc() from inline styles, so never assert on a style value that uses one.
    Assert on plain values (px, vw, %) or on structure and text instead.
 7. The first line is the `// ail-derived-from: Node@hash` header you were given.
-8. If a scenario can't be checked without guessing, reply with
+8. The spec is written in AIL notation (`text`, `list of T`, `nothing`,
+   `later T`, `is`, `and`). Write the test in the target's language and
+   conventions, and spell each name the way the target's naming convention
+   does, as the module under test does.
+9. If a scenario can't be checked without guessing, reply with
    `STOP: <question>`.
 
 ## Output

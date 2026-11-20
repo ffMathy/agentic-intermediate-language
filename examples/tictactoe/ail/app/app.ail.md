@@ -26,7 +26,7 @@ node App : flow   level: experience
     mode.play   "Play"
     mode.watch  "Watch"
   binds
-    state   useState("play")
+    state   area: "play" | "watch", starting at "play"
     mode    value = area, onChange(a) = set area
     area    PlayAGame when "play", WatchADemo when "watch"
   uses      PlayAGame, WatchADemo, Stack, Segmented

@@ -1,0 +1,42 @@
+[
+  {
+    "node": "HomePage",
+    "test": "one story, in order",
+    "file": "home/home-page/01-one-story-in-order.png"
+  },
+  {
+    "node": "HomePage",
+    "test": "every top bar link has a place to land",
+    "file": "home/home-page/02-every-top-bar-link-has-a-place-to-land.png"
+  },
+  {
+    "node": "SpecBrowser",
+    "test": "the demo's spec is shown first",
+    "file": "home/sections/spec-browser/01-the-demo-s-spec-is-shown-first.png"
+  },
+  {
+    "node": "SpecBrowser",
+    "test": "picking another file",
+    "file": "home/sections/spec-browser/02-picking-another-file.png"
+  },
+  {
+    "node": "SpecBrowser",
+    "test": "showing this website's spec",
+    "file": "home/sections/spec-browser/03-showing-this-website-s-spec.png"
+  },
+  {
+    "node": "SpecBrowser",
+    "test": "opened from a link",
+    "file": "home/sections/spec-browser/04-opened-from-a-link.png"
+  },
+  {
+    "node": "SpecBrowser",
+    "test": "the language is defined",
+    "file": "home/sections/spec-browser/05-the-language-is-defined.png"
+  },
+  {
+    "node": "SpecBrowser",
+    "test": "following the same link twice",
+    "file": "home/sections/spec-browser/06-following-the-same-link-twice.png"
+  }
+]

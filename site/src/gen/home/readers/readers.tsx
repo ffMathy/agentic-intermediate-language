@@ -44,39 +44,37 @@ const colors: Record<Reader, string> = {
 /** "four tabs, "Stakeholder", "Design", "Engineer" and "Specialist", named together as "Readers"; "Stakeholder" is picked first" */
 export function Readers() {
   const [reader, setReader] = useState<Reader>("stakeholder");
-  const tabRefs = useRef<Record<Reader, HTMLButtonElement | null>>({
-    stakeholder: null,
-    design: null,
-    engineer: null,
-    specialist: null,
-  });
+  const tabRefs = useRef<(HTMLButtonElement | null)[]>([]);
 
-  const onKeyDown = (event: KeyboardEvent<HTMLButtonElement>) => {
-    if (event.key !== "ArrowRight" && event.key !== "ArrowLeft") {
+  const onKeyDown = (event: KeyboardEvent<HTMLButtonElement>, index: number) => {
+    let next: number;
+    if (event.key === "ArrowRight") {
+      next = (index + 1) % readers.length;
+    } else if (event.key === "ArrowLeft") {
+      next = (index - 1 + readers.length) % readers.length;
+    } else {
       return;
     }
-    const index = readers.indexOf(reader);
-    const step = event.key === "ArrowRight" ? 1 : -1;
-    const next = readers[(index + step + readers.length) % readers.length];
-    setReader(next);
+    event.preventDefault();
+    setReader(readers[next]);
     tabRefs.current[next]?.focus();
   };
 
   return (
-    <Section id="readers" tone="raised">
+    <Section id="readers" tone="plain">
       <SectionHeading
         text="One spec, four readers"
         lead="Each level of the tree is written for one kind of reader. Pick a reader to see which level is theirs: they start at the top and stop where the detail stops mattering to them."
       />
       <div role="tablist" aria-label="Readers">
         <Stack dir="h" gap="space.2" align="center" wrap={true}>
-          {readers.map((key) => {
+          {readers.map((key, index) => {
             const picked = key === reader;
             return (
               <button
                 key={key}
                 ref={(element) => {
-                  tabRefs.current[key] = element;
+                  tabRefs.current[index] = element;
                 }}
                 type="button"
                 role="tab"
@@ -85,7 +83,7 @@ export function Readers() {
                 aria-controls="reader-panel"
                 tabIndex={picked ? 0 : -1}
                 onClick={() => setReader(key)}
-                onKeyDown={onKeyDown}
+                onKeyDown={(event) => onKeyDown(event, index)}
                 style={{
                   height: "40px",
                   padding: "0 var(--space-4)",

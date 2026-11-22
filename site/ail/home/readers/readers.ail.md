@@ -25,7 +25,7 @@ node Readers : flow   level: experience
       When the visitor presses the left arrow key
       Then the tab "Specialist" is selected and has focus
   look
-    band      Section with id "readers", tone raised
+    band      Section with id "readers", tone plain
     head      SectionHeading with text from readers.heading, lead from readers.lead
     tabs      a div with role tablist; stack(h, gap: space.2, align: center, wrap: true) [ tab × 4 ]
     tab       a native button: height 40px, pad 0 space.4, radius.md, font.sans at font.small, weight 600, cursor pointer

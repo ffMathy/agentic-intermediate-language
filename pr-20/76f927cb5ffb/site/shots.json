@@ -1,0 +1,52 @@
+[
+  {
+    "node": "HomePage",
+    "test": "one story, in order",
+    "file": "home/home-page/01-one-story-in-order.png"
+  },
+  {
+    "node": "HomePage",
+    "test": "every top bar link has a place to land",
+    "file": "home/home-page/02-every-top-bar-link-has-a-place-to-land.png"
+  },
+  {
+    "node": "BuildLoop",
+    "test": "four steps",
+    "file": "home/build-loop/build-loop/01-four-steps.png"
+  },
+  {
+    "node": "AdoptSection",
+    "test": "adopting is explained",
+    "file": "home/adopt/adopt-section/01-adopting-is-explained.png"
+  },
+  {
+    "node": "GetStarted",
+    "test": "in Claude Code",
+    "file": "home/sections/get-started/01-in-claude-code.png"
+  },
+  {
+    "node": "GetStarted",
+    "test": "in a terminal",
+    "file": "home/sections/get-started/02-in-a-terminal.png"
+  },
+  {
+    "node": "GetStarted",
+    "test": "what to do next",
+    "file": "home/sections/get-started/03-what-to-do-next.png"
+  },
+  {
+    "node": "AgentCards",
+    "test": "in Cursor",
+    "file": "home/sections/get-started/agent-cards/01-in-cursor.png"
+  },
+  {
+    "node": "AgentCards",
+    "test": "in GitHub Copilot",
+    "file": "home/sections/get-started/agent-cards/02-in-github-copilot.png"
+  },
+  {
+    "node": "Footer",
+    "test": "the links",
+    "file": "home/sections/footer/01-the-links.png"
+  }
+]

@@ -27,6 +27,9 @@
     "commands",
     "hooks",
     ".claude-plugin",
+    ".cursor-plugin",
+    ".github/plugin",
+    "assets",
     "README.md"
   ],
   "engines": {

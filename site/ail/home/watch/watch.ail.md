@@ -86,8 +86,8 @@ node WalkthroughPlayer : flow   level: experience
   look
     window    a div with role region named by watch.player: radius.lg, overflow hidden, a 1px solid color.code.border border, background color.code, box-shadow 0 12px 32px rgba(15, 23, 42, 0.18); holding [ WalkTitleBar, panel ]
     panel     a div with role tabpanel; holding [ stage, WalkCaption, WalkControls, timeline ]
-    stage     a div: position relative, display flex, flex-wrap wrap, overflow hidden, a 1px solid color.code.border bottom border; holding [ a div with flex 1 1 320px and min-width 0 holding WalkTerminal, a div with flex 1.4 1 400px, min-width 0 and box-shadow -1px 0 0 color.code.border, 0 -1px 0 color.code.border (a hairline on its left when side by side and on its top when stacked) holding WalkPicture, big ]
-    big       a native button with type "button" over the stage: position absolute, top 50%, left 50%, transform translate(-50%, -50%), max-width 90%, pad space.3 space.6, radius.pill, border none, background color.accent, color color.on.accent, font.sans at font.lead, weight 700, line-height 1.3, text-align center, box-shadow 0 8px 24px rgba(0, 0, 0, 0.4), cursor pointer
+    stage     a div: position relative, display flex, flex-wrap wrap, overflow hidden, a 1px solid color.code.border bottom border; holding [ a div with position relative, flex 1 1 320px and min-width 0 holding [ WalkTerminal, big ], a div with flex 1.4 1 400px, min-width 0 and box-shadow -1px 0 0 color.code.border, 0 -1px 0 color.code.border (a hairline on its left when side by side and on its top when stacked) holding WalkPicture ]
+    big       a native button with type "button" over the middle of the terminal pane (so it never covers the tree): position absolute, top 50%, left 50%, transform translate(-50%, -50%), max-width 90%, pad space.3 space.6, radius.pill, border none, background color.accent, color color.on.accent, font.sans at font.lead, weight 700, line-height 1.3, text-align center, box-shadow 0 8px 24px rgba(0, 0, 0, 0.4), cursor pointer
     timeline  a div with pad 0 space.4 space.4 holding WalkTimeline
   copy
     watch.player  "Walkthrough player"

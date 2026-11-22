@@ -103,7 +103,8 @@ node WalkPicture : view   level: experience
   what
     the walkthrough's picture title, then the 16 compiled Tic-Tac-Toe nodes as boxes: the app and its screens as a tree on top, then the three libraries as bands with their nodes inside
     each box shows the node's name and its state, by its outline and by a short word, so the state never depends on colour alone; a node with no spec yet has a dotted outline, a muted name and no word
-    under the boxes, a legend lists every state the walkthrough uses, each with its outline and what it means; beside or under the tree, the chapter's inset
+    under the tree, the chapter's inset, then a legend listing every state the walkthrough uses, each with its outline and what it means
+    the whole tree is always visible: it scales down with the space it has, and never scrolls or is cut off
     Scenario: a stale chapter
       Given the build walkthrough at its second chapter
       Then the image named "Tic-Tac-Toe spec · 16 nodes: TicTacToe: up to date; App: out of date; …" is shown, its name listing all 16 nodes in drawing order
@@ -115,8 +116,8 @@ node WalkPicture : view   level: experience
   look
     root     a div: display flex, flex-direction column, gap space.3, pad space.4, height 100%, box-sizing border-box, background color.code.side; holding [ title, row, legend ]
     title    a p: margin 0, font.sans at font.tiny, weight 700, letter-spacing 0.08em, text-transform uppercase, color color.code.muted
-    row      a div: display flex, flex-wrap wrap, gap space.4, align-items flex-start; holding [ tree, WalkInset in a div with flex 1 1 200px and min-width 0 ]
-    tree     a div with flex 1 1 300px, min-width 0 and overflow-x auto holding an svg: viewBox 0 0 480 436, width 100%, min-width 440px, max-width 480px, height auto, display block
+    row      a div: display flex, flex-direction column, gap space.4, align-items stretch; holding [ tree, WalkInset in a div with min-width 0 ]
+    tree     a div with min-width 0 holding an svg: viewBox 0 0 480 436, width 100%, max-width 480px, height auto, display block, margin 0 auto (it scales down to the width it has)
     edges    drawn first, lines with stroke color.code.muted, stroke-width 1.5: 240,40 to 240,60; 240,96 to 144,116; 240,96 to 336,116; 144,152 to 74,172; 144,152 to 222,172
     bands    rects x 0, width 480, height 64, rx 8, fill color.code.bar, stroke color.code.border, stroke-width 1, at y 224, 296 and 368; in each a mono text at x 10, y band + 15, font-size 10, fill color.code.muted: "UiKit · library", "BoardKit · library", "Engine · library"
     boxes    rects height 36, rx 6: "TicTacToe" x 170 y 4 w 140; "App" x 170 y 60 w 140; "PlayAGame" x 74 y 116 w 140; "WatchADemo" x 266 y 116 w 140; "ChooseOpponent" x 4 y 172 w 140; "NewGameButton" x 152 y 172 w 140; "Stack" x 10 y 246 w 108; "Text" x 126 y 246 w 108; "Button" x 242 y 246 w 108; "Segmented" x 358 y 246 w 112; "BoardView" x 10 y 318 w 140; "StatusLine" x 158 y 318 w 140; "GameState" x 10 y 390 w 108; "Rules" x 126 y 390 w 108; "GameReducer" x 242 y 390 w 108; "ComputerPlayer" x 358 y 390 w 112
@@ -172,7 +173,6 @@ node WalkPicture : view   level: experience
     words    a box's word is walk.word.{its state}, and none for "unwritten"; its meaning, in the aria-label and in the legend, is walk.mean.{its state}
     svg      the tree has role img and aria-label walk.tree.label, with picture = walkthrough.picture and nodes = walk.tree.node with name the node and meaning walk.mean.{its state}, for each of NODES in order, joined by "; "; each node is a g with data-node its name and data-state its state; bands and edges are inside an aria-hidden g
     legend   one li per state of statesIn(walkthrough), in that order
-    scroller the tree's div has tabIndex 0, so on a narrow screen it can be scrolled with the keys
     inset    WalkInset with inset = walkthrough.beats[chapter].inset
   uses      Walkthrough, WalkInset
   children  WalkInset
@@ -202,7 +202,7 @@ node WalkInset : view   level: experience
     shot     a figure: margin 0, display flex, flex-direction column, gap space.2, min-width 0; holding [ caption, image ]
     caption  a figcaption: display flex, flex-wrap wrap, align-items center, gap space.2; the label in font.sans at font.tiny, weight 700, color color.code.muted; then, when given, the verdict pill
     pill     a span: pad 2px space.2, radius.pill, background color.pass, color color.on.accent, font.micro, weight 700, letter-spacing 0.08em
-    image    an img: display block, width 100%, height auto, box-sizing border-box, background color.surface, a 1px solid color.code.border border, radius.md
+    image    an img: display block, width auto, height auto, max-width 100%, max-height 240px, align-self flex-start, object-fit contain, box-sizing border-box, background color.surface, a 1px solid color.code.border border, radius.md (at most 240px tall, so a screenshot never makes the player taller)
   copy
     walk.shot.alt  "Screenshot of the app at the end of the check “{test}”"
   binds

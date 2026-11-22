@@ -8,7 +8,7 @@ const linkStyle = {
   padding: "var(--space-1) 0",
 };
 
-/** the name of the project on the left, and seven links on the right */
+/** the name of the project on the left, and eight links on the right */
 export function TopBar() {
   return (
     <header
@@ -75,6 +75,9 @@ export function TopBar() {
           <Stack dir="h" gap="space.4" align="center" wrap={true}>
             <a href="#journey" style={linkStyle}>
               The journey
+            </a>
+            <a href="#watch" style={linkStyle}>
+              Watch it work
             </a>
             <a href="#readers" style={linkStyle}>
               Four readers

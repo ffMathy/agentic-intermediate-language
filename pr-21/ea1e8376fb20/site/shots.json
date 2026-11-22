@@ -1,0 +1,137 @@
+[
+  {
+    "node": "HomePage",
+    "test": "one story, in order",
+    "file": "home/home-page/01-one-story-in-order.png"
+  },
+  {
+    "node": "HomePage",
+    "test": "every top bar link has a place to land",
+    "file": "home/home-page/02-every-top-bar-link-has-a-place-to-land.png"
+  },
+  {
+    "node": "TopBar",
+    "test": "the links lead to the right places",
+    "file": "home/sections/top-bar/01-the-links-lead-to-the-right-places.png"
+  },
+  {
+    "node": "WatchSection",
+    "test": "the section",
+    "file": "home/watch/watch-section/01-the-section.png"
+  },
+  {
+    "node": "WalkthroughPlayer",
+    "test": "it opens paused",
+    "file": "home/watch/walkthrough-player/01-it-opens-paused.png"
+  },
+  {
+    "node": "WalkthroughPlayer",
+    "test": "the other walkthrough",
+    "file": "home/watch/walkthrough-player/02-the-other-walkthrough.png"
+  },
+  {
+    "node": "WalkthroughPlayer",
+    "test": "picking a chapter",
+    "file": "home/watch/walkthrough-player/03-picking-a-chapter.png"
+  },
+  {
+    "node": "WalkthroughPlayer",
+    "test": "next and previous",
+    "file": "home/watch/walkthrough-player/04-next-and-previous.png"
+  },
+  {
+    "node": "WalkthroughPlayer",
+    "test": "arrow keys",
+    "file": "home/watch/walkthrough-player/05-arrow-keys.png"
+  },
+  {
+    "node": "WalkthroughPlayer",
+    "test": "playing",
+    "file": "home/watch/walkthrough-player/06-playing.png"
+  },
+  {
+    "node": "WalkTitleBar",
+    "test": "the tabs",
+    "file": "home/watch/walk-title-bar/01-the-tabs.png"
+  },
+  {
+    "node": "WalkTitleBar",
+    "test": "arrow keys",
+    "file": "home/watch/walk-title-bar/02-arrow-keys.png"
+  },
+  {
+    "node": "WalkTerminal",
+    "test": "lines kept exactly",
+    "file": "home/watch/walk-terminal/01-lines-kept-exactly.png"
+  },
+  {
+    "node": "WalkTerminal",
+    "test": "the caret",
+    "file": "home/watch/walk-terminal/02-the-caret.png"
+  },
+  {
+    "node": "WalkTerminal",
+    "test": "nothing printed",
+    "file": "home/watch/walk-terminal/03-nothing-printed.png"
+  },
+  {
+    "node": "WalkPicture",
+    "test": "a stale chapter",
+    "file": "home/watch/walk-picture/01-a-stale-chapter.png"
+  },
+  {
+    "node": "WalkPicture",
+    "test": "nodes with no spec yet",
+    "file": "home/watch/walk-picture/02-nodes-with-no-spec-yet.png"
+  },
+  {
+    "node": "WalkInset",
+    "test": "a card",
+    "file": "home/watch/walk-inset/01-a-card.png"
+  },
+  {
+    "node": "WalkInset",
+    "test": "a screenshot",
+    "file": "home/watch/walk-inset/02-a-screenshot.png"
+  },
+  {
+    "node": "WalkCaption",
+    "test": "a branch chapter",
+    "file": "home/watch/walk-caption/01-a-branch-chapter.png"
+  },
+  {
+    "node": "WalkControls",
+    "test": "on the first chapter",
+    "file": "home/watch/walk-controls/01-on-the-first-chapter.png"
+  },
+  {
+    "node": "WalkControls",
+    "test": "moving on",
+    "file": "home/watch/walk-controls/02-moving-on.png"
+  },
+  {
+    "node": "WalkTimeline",
+    "test": "the chapters",
+    "file": "home/watch/walk-timeline/01-the-chapters.png"
+  },
+  {
+    "node": "WalkTimeline",
+    "test": "picking a chapter",
+    "file": "home/watch/walk-timeline/02-picking-a-chapter.png"
+  },
+  {
+    "node": "Readers",
+    "test": "the first reader",
+    "file": "home/readers/readers/01-the-first-reader.png"
+  },
+  {
+    "node": "Readers",
+    "test": "picking another reader",
+    "file": "home/readers/readers/02-picking-another-reader.png"
+  },
+  {
+    "node": "Readers",
+    "test": "arrow keys",
+    "file": "home/readers/readers/03-arrow-keys.png"
+  }
+]

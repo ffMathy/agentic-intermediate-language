@@ -6,7 +6,7 @@ const linkStyle = {
   textDecoration: "underline",
 };
 
-/** a strip of the four level colors, one sentence on where this page and the game came from, and five links */
+/** a strip of the four level colors, one sentence on where this page and the game came from, and seven links */
 export function Footer() {
   return (
     <footer
@@ -69,10 +69,22 @@ export function Footer() {
               Claude Code guide
             </a>
             <a
+              href="https://github.com/ffMathy/agentic-intermediate-language/blob/main/docs/cursor.md"
+              style={linkStyle}
+            >
+              Cursor guide
+            </a>
+            <a
+              href="https://github.com/ffMathy/agentic-intermediate-language/blob/main/docs/copilot.md"
+              style={linkStyle}
+            >
+              Copilot guide
+            </a>
+            <a
               href="https://github.com/ffMathy/agentic-intermediate-language/tree/main/site"
               style={linkStyle}
             >
-              This site&apos;s spec
+              This site's spec
             </a>
           </Stack>
         </nav>

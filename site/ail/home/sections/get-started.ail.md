@@ -2,10 +2,10 @@
 
 ```ail
 node GetStarted : view   level: experience
-  why   Turn interest into a first try, from wherever the visitor already works: Claude Code or a terminal.   <- HomePage
+  why   Turn interest into a first try, from wherever the visitor already works: Claude Code, Cursor, GitHub Copilot or a terminal.   <- HomePage
   what
     the section has the id "start", so the page can link to it
-    two cards, "In Claude Code" and "In a terminal", side by side when there is room
+    four cards, "In Claude Code", then the two AgentCards ("In Cursor" and "In GitHub Copilot"), then "In a terminal", in that order, side by side when there is room
     every command has its own copy button
     the terminal card lists the three commands that make up the whole tool
     the terminal card says the commands run inside a project, meaning a folder with an ail.config.json, and ends with copyable steps to try the tic-tac-toe demo from this page
@@ -28,7 +28,7 @@ node GetStarted : view   level: experience
     band      Section with id "start", tone plain
     layout    stack(v, gap: space.6, align: stretch) [ head, cards, ReviewNote, next ]
     head      SectionHeading with text from start.heading, lead from start.lead
-    cards     a div: display grid, grid-template-columns repeat(auto-fit, minmax(min(320px, 100%), 1fr)), gap space.6, align-items start
+    cards     a div: display grid, grid-template-columns repeat(auto-fit, minmax(min(320px, 100%), 1fr)), gap space.6, align-items start; holding [ claude card, AgentCards, cli card ]
     card      background color.surface, a 1px solid color.border border, radius.lg, pad space.6, min-width 0; stack(v, gap: space.3, align: stretch)
     title     an h3: font.lead, weight 700, color.text, margin 0
     subtitle  a p: font.small, color.text.muted, margin 0
@@ -73,8 +73,8 @@ node GetStarted : view   level: experience
     example  a link to "https://github.com/ffMathy/agentic-intermediate-language/tree/main/examples/tictactoe"
     repo     a link to "https://github.com/ffMathy/agentic-intermediate-language"
     cards    each card is a region named by its h3
-  uses  Section, SectionHeading, Stack, CopyCommand, ReviewNote
-  children  ReviewNote
+  uses  Section, SectionHeading, Stack, CopyCommand, AgentCards, ReviewNote
+  children  AgentCards, ReviewNote
 ```
 
 ```ail

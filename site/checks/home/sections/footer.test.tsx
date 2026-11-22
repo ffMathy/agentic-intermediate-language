@@ -1,4 +1,4 @@
-// ail-derived-from: Footer@a7709adb9c15810f
+// ail-derived-from: Footer@6ecebf11faf76115
 import { afterEach, expect, test } from "bun:test";
 import { cleanup, render, screen } from "@testing-library/react";
 import { Footer } from "../../../src/gen/home/sections/footer";
@@ -23,6 +23,14 @@ test("the links", () => {
     [
       "Claude Code guide",
       "https://github.com/ffMathy/agentic-intermediate-language/blob/main/docs/claude-code.md",
+    ],
+    [
+      "Cursor guide",
+      "https://github.com/ffMathy/agentic-intermediate-language/blob/main/docs/cursor.md",
+    ],
+    [
+      "Copilot guide",
+      "https://github.com/ffMathy/agentic-intermediate-language/blob/main/docs/copilot.md",
     ],
     [
       "This site's spec",

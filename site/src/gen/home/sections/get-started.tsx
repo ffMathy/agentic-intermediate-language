@@ -1,9 +1,9 @@
-import { useId } from "react";
 import type { CSSProperties } from "react";
 import { Section } from "../../parts/section";
 import { SectionHeading } from "../../parts/section-heading";
 import { Stack } from "../../parts/stack";
 import { CopyCommand } from "../../parts/copy-command";
+import { AgentCards } from "./get-started/agent-cards";
 import { ReviewNote } from "./review-note";
 
 const cardsStyle: CSSProperties = {
@@ -108,10 +108,8 @@ const toolRows: { command: string; does: string }[] = [
   },
 ];
 
-/** "two cards, "In Claude Code" and "In a terminal", side by side when there is room" */
+/** Turn interest into a first try, from wherever the visitor already works: Claude Code, Cursor, GitHub Copilot or a terminal. */
 export function GetStarted() {
-  const claudeId = useId();
-  const cliId = useId();
   return (
     <Section id="start" tone="plain">
       <Stack dir="v" gap="space.6" align="stretch">
@@ -120,11 +118,9 @@ export function GetStarted() {
           lead="Install it, then describe a feature in plain words. You get a spec you can review, and code that is checked against it."
         />
         <div style={cardsStyle}>
-          <section aria-labelledby={claudeId} style={cardStyle}>
+          <section aria-label="In Claude Code" style={cardStyle}>
             <Stack dir="v" gap="space.3" align="stretch">
-              <h3 id={claudeId} style={titleStyle}>
-                In Claude Code
-              </h3>
+              <h3 style={titleStyle}>In Claude Code</h3>
               <p style={subtitleStyle}>
                 No API key. It runs on your Claude subscription.
               </p>
@@ -136,11 +132,10 @@ export function GetStarted() {
               </p>
             </Stack>
           </section>
-          <section aria-labelledby={cliId} style={cardStyle}>
+          <AgentCards />
+          <section aria-label="In a terminal" style={cardStyle}>
             <Stack dir="v" gap="space.3" align="stretch">
-              <h3 id={cliId} style={titleStyle}>
-                In a terminal
-              </h3>
+              <h3 style={titleStyle}>In a terminal</h3>
               <p style={subtitleStyle}>Needs Bun 1.2 or later.</p>
               <CopyCommand command="bun add -g github:ffMathy/agentic-intermediate-language" />
               <table style={tableStyle}>

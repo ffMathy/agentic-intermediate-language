@@ -1,4 +1,4 @@
-// ail-derived-from: AdoptSection@e1605c91943ea6f9
+// ail-derived-from: AdoptSection@66002b1f508dbfe3
 import { afterEach, expect, test } from "bun:test";
 import { cleanup, render, within } from "@testing-library/react";
 import { AdoptSection } from "../../../src/gen/home/adopt/adopt-section";
@@ -7,18 +7,24 @@ afterEach(() => {
   cleanup();
 });
 
+const hasElementWithText = (root: HTMLElement, text: string): boolean =>
+  Array.from(root.querySelectorAll("*")).some(
+    (el) => (el.textContent ?? "").trim() === text,
+  );
+
 test("adopting is explained", () => {
   const { container } = render(<AdoptSection />);
 
-  const section = container.querySelector("#adopt");
+  const section = container.querySelector("#adopt") as HTMLElement | null;
   expect(section).not.toBeNull();
-  const band = section as HTMLElement;
+  const scope = within(section as HTMLElement);
 
-  const heading = within(band).getByRole("heading", {
-    level: 2,
-    name: "Already have an app? Adopt it.",
-  });
-  expect(heading).toBeTruthy();
+  expect(
+    scope.getByRole("heading", {
+      level: 2,
+      name: "Already have an app? Adopt it.",
+    }),
+  ).toBeTruthy();
 
   const expected = [
     "Why, from people and tickets",
@@ -26,18 +32,15 @@ test("adopting is explained", () => {
     "How, from the code",
     "Proof, on the old app",
   ];
-  const h3Texts = within(band)
+  for (const name of expected) {
+    expect(scope.getByRole("heading", { level: 3, name })).toBeTruthy();
+  }
+  const h3Names = scope
     .getAllByRole("heading", { level: 3 })
-    .map((h) => (h.textContent ?? "").trim());
-  const positions = expected.map((name) => h3Texts.indexOf(name));
-  for (const position of positions) {
-    expect(position).toBeGreaterThanOrEqual(0);
-  }
-  for (let i = 1; i < positions.length; i++) {
-    expect(positions[i]).toBeGreaterThan(positions[i - 1]);
-  }
+    .map((h) => (h.textContent ?? "").trim())
+    .filter((name) => expected.includes(name));
+  expect(h3Names).toEqual(expected);
 
-  const text = band.textContent ?? "";
-  expect(text).toContain("/ail:adopt");
-  expect(text).toContain("ail adopt");
+  expect(hasElementWithText(section as HTMLElement, "/ail:adopt")).toBe(true);
+  expect(hasElementWithText(section as HTMLElement, "ail adopt")).toBe(true);
 });

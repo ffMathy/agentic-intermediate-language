@@ -35,7 +35,7 @@ node BuildLoop : view   level: experience
     loop.heading    "How a spec becomes code you can trust"
     loop.lead       "Four steps, repeated for every change. You only ever edit the spec."
     loop.1.title    "Write"
-    loop.1.text     "Change the spec, in plain words or with Claude Code's help. Generated code is never edited by hand."
+    loop.1.text     "Change the spec, in plain words or with the help of Claude Code, Cursor or Copilot. Generated code is never edited by hand."
     loop.2.title    "Build"
     loop.2.text     "ail build recompiles only the nodes whose slice changed: their own spec, the contracts of the nodes they use, or shared parts like the tokens. Each node is compiled by an agent that sees only that slice."
     loop.3.title    "Check"

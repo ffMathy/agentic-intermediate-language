@@ -6,45 +6,47 @@ import { AdoptFigure } from "./adopt-figure";
 
 const steps = [
   {
-    number: "1",
+    n: "1",
+    color: "var(--color-level-product)",
     title: "Why, from people and tickets",
     text: "The reasons come from the task tracker (Asana, Jira, Linear) and from interviewing the people who own the app. A reason nobody can confirm is written down as unknown, and every build lists it until someone answers.",
-    color: "var(--color-level-product)",
   },
   {
-    number: "2",
+    n: "2",
+    color: "var(--color-level-experience)",
     title: "What, from the running app",
     text: "An agent finds out how to start the app, whatever it is (a website, a mobile app on a simulator, a command-line tool), along with the backend or database it needs. Each scenario's test data is created through the app's own API, never straight into its database. Then it drives every screen and error path, and writes down what it sees, quirks included.",
-    color: "var(--color-level-experience)",
   },
   {
-    number: "3",
+    n: "3",
+    color: "var(--color-level-system)",
     title: "How, from the code",
     text: "The code tells what the screen can't: data shapes, rules, edge cases and timing. Real inputs and outputs become examples, and every claim records where it came from.",
-    color: "var(--color-level-system)",
   },
   {
-    number: "4",
+    n: "4",
+    color: "var(--color-pass)",
     title: "Proof, on the old app",
     text: "Every flow gets an end-to-end check that plays its scenarios and screenshots the screen each one ends on, on any platform. ail adopt starts the old app, runs them, commits the screenshots, and records the app as built, so the first build only builds what changes.",
-    color: "var(--color-pass)",
   },
 ];
 
 const cards = [
   {
-    title: "In Claude Code",
+    id: "adopt-claude-title",
+    title: "In Claude Code, Cursor or Copilot",
     cmd: "/ail:adopt",
-    text: "Claude writes the spec one slice at a time: a screen, a flow or a rule. It asks you what only the owners know.",
+    text: "The agent writes the spec one slice at a time: a screen, a flow or a rule. It asks you what only the owners know. In Cursor and Copilot, pick adopt from the / menu.",
   },
   {
+    id: "adopt-cli-title",
     title: "In a terminal",
     cmd: "ail adopt",
     text: "Starts the app as ail.config.json says, runs every end-to-end check against it, and stops it.",
   },
 ];
 
-/** Most software already exists: show that AIL can take over an existing app, and carry it to a new technology without changing what it does. */
+/** "a heading, a picture of an old app and a new app checked against the same spec, four steps that write and prove the spec, and the two commands that do it" */
 export function AdoptSection() {
   return (
     <Section id="adopt" tone="plain">
@@ -76,7 +78,7 @@ export function AdoptSection() {
         >
           {steps.map((step) => (
             <li
-              key={step.number}
+              key={step.n}
               style={{
                 background: "var(--color-surface)",
                 border: "1px solid var(--color-border)",
@@ -97,7 +99,7 @@ export function AdoptSection() {
                   color: step.color,
                 }}
               >
-                {step.number}
+                {step.n}
               </span>
               <h3
                 style={{
@@ -131,8 +133,8 @@ export function AdoptSection() {
         >
           {cards.map((card) => (
             <section
-              key={card.cmd}
-              aria-label={card.title}
+              key={card.id}
+              aria-labelledby={card.id}
               style={{
                 background: "var(--color-surface)",
                 border: "1px solid var(--color-border)",
@@ -143,6 +145,7 @@ export function AdoptSection() {
             >
               <Stack dir="v" gap="space.3" align="stretch">
                 <h3
+                  id={card.id}
                   style={{
                     fontSize: "var(--font-lead)",
                     fontWeight: 700,

@@ -1,4 +1,4 @@
-// ail-derived-from: AdoptSection@66002b1f508dbfe3
+// ail-derived-from: AdoptSection@0e3ae409730c3ca3
 import { afterEach, expect, test } from "bun:test";
 import { cleanup, render, within } from "@testing-library/react";
 import { AdoptSection } from "../../../src/gen/home/adopt/adopt-section";
@@ -7,23 +7,15 @@ afterEach(() => {
   cleanup();
 });
 
-const hasElementWithText = (root: HTMLElement, text: string): boolean =>
-  Array.from(root.querySelectorAll("*")).some(
-    (el) => (el.textContent ?? "").trim() === text,
-  );
-
 test("adopting is explained", () => {
   const { container } = render(<AdoptSection />);
 
-  const section = container.querySelector("#adopt") as HTMLElement | null;
+  const section = container.querySelector("#adopt");
   expect(section).not.toBeNull();
   const scope = within(section as HTMLElement);
 
   expect(
-    scope.getByRole("heading", {
-      level: 2,
-      name: "Already have an app? Adopt it.",
-    }),
+    scope.getByRole("heading", { level: 2, name: "Already have an app? Adopt it." }),
   ).toBeTruthy();
 
   const expected = [
@@ -35,12 +27,12 @@ test("adopting is explained", () => {
   for (const name of expected) {
     expect(scope.getByRole("heading", { level: 3, name })).toBeTruthy();
   }
-  const h3Names = scope
+  const h3Texts = scope
     .getAllByRole("heading", { level: 3 })
     .map((h) => (h.textContent ?? "").trim())
-    .filter((name) => expected.includes(name));
-  expect(h3Names).toEqual(expected);
+    .filter((t) => expected.includes(t));
+  expect(h3Texts).toEqual(expected);
 
-  expect(hasElementWithText(section as HTMLElement, "/ail:adopt")).toBe(true);
-  expect(hasElementWithText(section as HTMLElement, "ail adopt")).toBe(true);
+  expect(scope.getAllByText("/ail:adopt").length).toBeGreaterThan(0);
+  expect(scope.getAllByText("ail adopt").length).toBeGreaterThan(0);
 });

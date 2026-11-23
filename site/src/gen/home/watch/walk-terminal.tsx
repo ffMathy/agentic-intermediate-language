@@ -1,6 +1,6 @@
-import type { CSSProperties, ReactNode } from "react";
+import type { CSSProperties } from "react";
 
-export type WalkTerminalProps = {
+type WalkTerminalProps = {
   place: string;
   lines: string[];
   caret: boolean;
@@ -25,7 +25,7 @@ const headStyle: CSSProperties = {
 
 const bodyStyle: CSSProperties = {
   flex: "1 1 auto",
-  minHeight: "320px",
+  minHeight: "clamp(9em, 40vw, 320px)",
   boxSizing: "border-box",
   padding: "var(--space-3) var(--space-4)",
   fontFamily: "var(--font-mono)",
@@ -65,21 +65,7 @@ function lineColor(line: string): string {
   return "var(--color-code-text)";
 }
 
-function lineContent(line: string): ReactNode {
-  if (line.startsWith("$ ") || line.startsWith("> ")) {
-    return (
-      <>
-        <span data-part="prompt" style={promptStyle}>
-          {line.slice(0, 2)}
-        </span>
-        {line.slice(2)}
-      </>
-    );
-  }
-  return line;
-}
-
-/** "a header naming where the commands run, then the given lines exactly, one per line, keeping every space; long lines wrap and are never cut off" */
+/** a header naming where the commands run, then the given lines exactly, one per line, keeping every space; long lines wrap and are never cut off */
 export function WalkTerminal({ place, lines, caret }: WalkTerminalProps) {
   return (
     <div style={rootStyle}>
@@ -88,23 +74,36 @@ export function WalkTerminal({ place, lines, caret }: WalkTerminalProps) {
         {lines.length === 0 ? (
           <p style={emptyStyle}>Nothing is printed in this chapter.</p>
         ) : (
-          lines.map((line, index) => (
-            <div
-              key={index}
-              style={{
-                margin: 0,
-                minHeight: "1.5em",
-                whiteSpace: "pre-wrap",
-                overflowWrap: "anywhere",
-                color: lineColor(line),
-              }}
-            >
-              {lineContent(line)}
-              {caret && index === lines.length - 1 ? (
-                <span data-part="caret" aria-hidden="true" style={caretStyle} />
-              ) : null}
-            </div>
-          ))
+          lines.map((line, index) => {
+            const hasPrompt = line.startsWith("$ ") || line.startsWith("> ");
+            const isLast = index === lines.length - 1;
+            return (
+              <div
+                key={index}
+                style={{
+                  margin: 0,
+                  minHeight: "1.5em",
+                  whiteSpace: "pre-wrap",
+                  overflowWrap: "anywhere",
+                  color: lineColor(line),
+                }}
+              >
+                {hasPrompt ? (
+                  <>
+                    <span data-part="prompt" style={promptStyle}>
+                      {line.slice(0, 2)}
+                    </span>
+                    {line.slice(2)}
+                  </>
+                ) : (
+                  line
+                )}
+                {caret && isLast ? (
+                  <span data-part="caret" aria-hidden="true" style={caretStyle} />
+                ) : null}
+              </div>
+            );
+          })
         )}
       </div>
     </div>

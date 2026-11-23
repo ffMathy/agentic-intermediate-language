@@ -1,4 +1,4 @@
-// ail-derived-from: WalkInset@1d0083a6c0b3e493
+// ail-derived-from: WalkInset@73099075182b77fc
 import { afterEach, expect, test } from "bun:test";
 import { cleanup, render, screen } from "@testing-library/react";
 import { WalkInset } from "../../../src/gen/home/watch/walk-inset";
@@ -8,22 +8,8 @@ afterEach(() => {
   cleanup();
 });
 
-function textBefore(container: HTMLElement, target: Node): string {
-  const doc = container.ownerDocument;
-  const walker = doc.createTreeWalker(container, 4);
-  let out = "";
-  let node = walker.nextNode();
-  while (node) {
-    if (node.compareDocumentPosition(target) & 4) {
-      out += node.textContent ?? "";
-    }
-    node = walker.nextNode();
-  }
-  return out;
-}
-
-function precedes(a: Node, b: Node): boolean {
-  return (a.compareDocumentPosition(b) & 4) !== 0;
+function isBefore(a: Node, b: Node): boolean {
+  return (a.compareDocumentPosition(b) & Node.DOCUMENT_POSITION_FOLLOWING) !== 0;
 }
 
 test("a card", () => {
@@ -39,8 +25,8 @@ test("a card", () => {
   expect(first).not.toBe(second);
   expect(first.contains(second)).toBe(false);
   expect(second.contains(first)).toBe(false);
-  expect(precedes(label, first)).toBe(true);
-  expect(precedes(first, second)).toBe(true);
+  expect(isBefore(label, first)).toBe(true);
+  expect(isBefore(first, second)).toBe(true);
 });
 
 test("a screenshot", () => {
@@ -51,17 +37,19 @@ test("a screenshot", () => {
     label: "Your app today · localhost:3000",
     verdict: "MATCHES",
   };
-  const { container } = render(<WalkInset inset={inset} />);
+  render(<WalkInset inset={inset} />);
   const image = screen.getByRole("img", {
     name: "Screenshot of the app at the end of the check “winning”",
   });
-  const before = textBefore(container, image);
-  expect(before).toContain("Your app today · localhost:3000");
-  expect(before).toContain("MATCHES");
+  const label = screen.getByText("Your app today · localhost:3000");
+  const verdict = screen.getByText("MATCHES");
+  expect(isBefore(label, image)).toBe(true);
+  expect(isBefore(verdict, image)).toBe(true);
 });
 
 test("nothing", () => {
   const inset: Inset = { kind: "none" };
   const { container } = render(<WalkInset inset={inset} />);
-  expect(container.innerHTML).toBe("");
+  expect(container.childNodes.length).toBe(0);
+  expect(container.textContent).toBe("");
 });

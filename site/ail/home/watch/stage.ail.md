@@ -19,10 +19,10 @@ node WalkTitleBar : view   level: experience
       When the visitor presses the right arrow key
       Then the bar asks for the tab "adopt", once, and the tab "ail adopt" has focus
   look
-    bar      a div: display flex, flex-wrap wrap, align-items center, gap space.3, pad space.2 space.3, background color.code.bar, a 1px solid color.code.border bottom border; holding [ dots, tabs, time ]
+    bar      a div: display flex, flex-wrap wrap, align-items center, gap space.3, pad space.1 space.3, background color.code.bar, a 1px solid color.code.border bottom border; holding [ dots, tabs, time ]
     dots     an aria-hidden div with three 10px circles 6px apart: color.dot.red, color.dot.amber, color.dot.green
     tabs     a div with role tablist: display flex, gap space.1
-    tab      a native button with type "button": height 32px, pad 0 space.3, radius.md, border none, font.mono at font.small, weight 600, cursor pointer; the picked tab has background color.code.pick and color color.code.text, the other background transparent and color color.code.muted
+    tab      a native button with type "button": height 44px, pad 0 space.3, radius.md, border none, font.mono at font.small, weight 600, cursor pointer; the picked tab has background color.code.pick and color color.code.text, the other background transparent and color color.code.muted
     time     a p: margin 0 0 0 auto, font.mono at font.small, color color.code.muted; now in a span with color color.code.text, then the rest of walk.time
   copy
     walk.tabs        "Walkthroughs"
@@ -68,6 +68,7 @@ node WalkTerminal : view   level: experience
     a line whose first visible mark is ✓, ✗, ! or ? is green, red, amber or yellow; the mark itself says what the line is, so colour is never the only sign
     when asked, a still block caret follows the last line; it never blinks
     with no lines, it says that nothing is printed in this chapter
+    on a narrow screen the terminal keeps room for about six lines, so the parts under it move little while lines appear; side by side with the tree it stretches to the tree's height
     Scenario: lines kept exactly
       Given the place "terminal · examples/tictactoe" and the lines "$ ail build" and "✓ spec     no errors"
       Then the region named "Terminal output" shows exactly those two lines, each on its own line, with their spaces kept
@@ -81,7 +82,7 @@ node WalkTerminal : view   level: experience
   look
     root     a div: display flex, flex-direction column, height 100%, background color.code; holding [ head, body ]
     head     a p: margin 0, pad space.2 space.4, font.mono at font.tiny, color color.code.muted, a 1px solid color.code.border bottom border, overflow-wrap anywhere
-    body     a div: flex 1 1 auto, min-height 320px, box-sizing border-box, pad space.3 space.4, font.mono at font.code, line-height 1.5, color color.code.text
+    body     a div: flex 1 1 auto, min-height clamp(9em, 40vw, 320px), box-sizing border-box, pad space.3 space.4, font.mono at font.code, line-height 1.5, color color.code.text
     line     a div per line: margin 0, min-height 1.5em, white-space pre-wrap, overflow-wrap anywhere
     prompt   a span: color color.thread, weight 700
     marks    by the line's first non-space character: ✓ color color.dot.green, ✗ color color.dot.red, ! color color.dot.amber, ? color color.thread; any other line color.code.text
@@ -103,8 +104,8 @@ node WalkPicture : view   level: experience
   what
     the walkthrough's picture title, then the 16 compiled Tic-Tac-Toe nodes as boxes: the app and its screens as a tree on top, then the three libraries as bands with their nodes inside
     each box shows the node's name and its state, by its outline and by a short word, so the state never depends on colour alone; a node with no spec yet has a dotted outline, a muted name and no word
-    under the tree, the chapter's inset, then a legend listing every state the walkthrough uses, each with its outline and what it means
-    the whole tree is always visible: it scales down with the space it has, and never scrolls or is cut off
+    under the tree, the chapter's inset, then, at 600px viewport width or more, a legend listing every state the walkthrough uses, each with its outline and what it means
+    at 600px viewport width or more the whole tree is visible: it scales down with the space it has, and never scrolls or is cut off; below 600px it is replaced by a wrapped list of chips, "Name · word", for just the nodes whose state differs from the rest state, then a muted line saying how many other nodes there are and what their state means
     Scenario: a stale chapter
       Given the build walkthrough at its second chapter
       Then the image named "Tic-Tac-Toe spec · 16 nodes: TicTacToe: up to date; App: out of date; …" is shown, its name listing all 16 nodes in drawing order
@@ -114,10 +115,11 @@ node WalkPicture : view   level: experience
       Then the box of "PlayAGame" reads "the slice", and the box of "App" shows no word
       And the legend includes "no spec yet"
   look
-    root     a div: display flex, flex-direction column, gap space.3, pad space.4, height 100%, box-sizing border-box, background color.code.side; holding [ title, row, legend ]
-    title    a p: margin 0, font.sans at font.tiny, weight 700, letter-spacing 0.08em, text-transform uppercase, color color.code.muted
-    row      a div: display flex, flex-direction column, gap space.4, align-items stretch; holding [ tree, WalkInset in a div with min-width 0 ]
-    tree     a div with min-width 0 holding an svg: viewBox 0 0 480 436, width 100%, max-width 480px, height auto, display block, margin 0 auto (it scales down to the width it has)
+    root     a div: display flex, flex-direction column, gap space.3, pad space.4, height 100%, box-sizing border-box, background color.code.side; holding [ title, row, legend ]; the title is a p: margin 0, font.sans at font.tiny, weight 700, letter-spacing 0.08em, text-transform uppercase, color color.code.muted
+    row      a div: display flex, flex-direction column, gap space.4, align-items stretch; holding [ tree, chips, WalkInset with inset = walkthrough.beats[chapter].inset, in a div with min-width 0 ]
+    tree     a div with class "ail-wide" and min-width 0 holding an svg: viewBox 0 0 480 436, width 100%, max-width 480px, height auto, display block, margin 0 auto (it scales down to the width it has)
+    chips    a div with class "ail-narrow" (shown only below 600px viewport width) holding [ chiplist, rest ]; it sets no display of its own, because the class sets it; the chiplist is a ul: list-style none, margin 0, pad 0, display flex, flex-wrap wrap, gap space.2; the rest is a p: margin space.2 0 0, font.sans at font.small, color color.code.muted
+    chip     an li: display inline-flex, align-items center, gap space.1, pad space.1 space.2, radius.md, background color.code (none for unwritten), a border in the state's stroke color and width, solid, or dotted for dasharray 1 2 and 2 3, or dashed for any other dasharray; font.sans at font.small, line-height 1.4, color color.code.text; the name in weight 600, then " · ", then the word in weight 700 in the state's word color; a state with no word shows only the name, in color.code.muted
     edges    drawn first, lines with stroke color.code.muted, stroke-width 1.5: 240,40 to 240,60; 240,96 to 144,116; 240,96 to 336,116; 144,152 to 74,172; 144,152 to 222,172
     bands    rects x 0, width 480, height 64, rx 8, fill color.code.bar, stroke color.code.border, stroke-width 1, at y 224, 296 and 368; in each a mono text at x 10, y band + 15, font-size 10, fill color.code.muted: "UiKit · library", "BoardKit · library", "Engine · library"
     boxes    rects height 36, rx 6: "TicTacToe" x 170 y 4 w 140; "App" x 170 y 60 w 140; "PlayAGame" x 74 y 116 w 140; "WatchADemo" x 266 y 116 w 140; "ChooseOpponent" x 4 y 172 w 140; "NewGameButton" x 152 y 172 w 140; "Stack" x 10 y 246 w 108; "Text" x 126 y 246 w 108; "Button" x 242 y 246 w 108; "Segmented" x 358 y 246 w 112; "BoardView" x 10 y 318 w 140; "StatusLine" x 158 y 318 w 140; "GameState" x 10 y 390 w 108; "Rules" x 126 y 390 w 108; "GameReducer" x 242 y 390 w 108; "ComputerPlayer" x 358 y 390 w 112
@@ -136,7 +138,7 @@ node WalkPicture : view   level: experience
     written    stroke color.code.text, stroke-width 1.5, fill color.code; word in color.code.text
     adopted    stroke color.level.experience, stroke-width 1.5, stroke-dasharray 5 3, fill color.code; word in color.level.experience
     proven     stroke color.pass, stroke-width 3, fill color.code; word in color.dot.green
-    legend   a ul: list-style none, margin 0, pad 0, display flex, flex-wrap wrap, gap space.1 space.4, font.sans at font.tiny, color color.code.muted; each li: display flex, align-items center, gap space.2; an aria-hidden svg, viewBox 0 0 16 12, width 16px, height 12px, holding a rect x 1 y 1 width 14 height 10 rx 2 with that state's stroke, dasharray and fill and stroke-width 1.5, then the state's meaning
+    legend   a ul with class "ail-wide": list-style none, margin 0, pad 0, display flex, flex-wrap wrap, gap space.1 space.4, font.sans at font.tiny, color color.code.muted; each li: display flex, align-items center, gap space.2; an aria-hidden svg, viewBox 0 0 16 12, width 16px, height 12px, holding a rect x 1 y 1 width 14 height 10 rx 2 with that state's stroke, dasharray and fill and stroke-width 1.5, then the state's meaning
   copy
     walk.tree.label   "{picture}: {nodes}"
     walk.tree.node    "{name}: {meaning}"
@@ -167,13 +169,14 @@ node WalkPicture : view   level: experience
     walk.mean.written "spec written"
     walk.mean.adopted "adopted, not checked yet"
     walk.mean.proven "checked and proven"
+    walk.chips "Nodes this chapter touches"
+    walk.rest "the other {count} nodes: {meaning}"
+    walk.rest.all "all {count} nodes: {meaning}"
   binds
     props    walkthrough: Walkthrough, chapter: integer
-    state    each node's state is stateOf(walkthrough, chapter, its name)
-    words    a box's word is walk.word.{its state}, and none for "unwritten"; its meaning, in the aria-label and in the legend, is walk.mean.{its state}
+    words    each node's state is stateOf(walkthrough, chapter, its name); a box's word is walk.word.{its state}, and none for "unwritten"; its meaning, in the aria-label and in the legend, is walk.mean.{its state}; the legend has one li per state of statesIn(walkthrough), in that order
     svg      the tree has role img and aria-label walk.tree.label, with picture = walkthrough.picture and nodes = walk.tree.node with name the node and meaning walk.mean.{its state}, for each of NODES in order, joined by "; "; each node is a g with data-node its name and data-state its state; bands and edges are inside an aria-hidden g
-    legend   one li per state of statesIn(walkthrough), in that order
-    inset    WalkInset with inset = walkthrough.beats[chapter].inset
+    chips    one chip per name of NODES, in order, whose stateOf differs from walkthrough.rest; the ul has aria-label walk.chips; rest reads walk.rest with count = the number of nodes left out and meaning = walk.mean.{walkthrough.rest} (the meaning, not the word, because unwritten has no word), or walk.rest.all with count 16 when no node differs, and is left out when every node differs
   uses      Walkthrough, WalkInset
   children  WalkInset
 ```
@@ -197,8 +200,8 @@ node WalkInset : view   level: experience
       Then nothing is shown
   look
     card     a div: display flex, flex-direction column, gap space.2, min-width 0, pad space.3, background color.code, a 1px solid color.code.border border, radius.md
-    label    a p: margin 0, font.mono at font.tiny, color color.code.muted, overflow-wrap anywhere
-    lines    a div: display flex, flex-direction column, gap space.1; each line a p: margin 0, font.mono at font.tiny, line-height 1.5, color color.code.text, white-space pre-wrap, overflow-wrap anywhere
+    label    a p: margin 0, font.mono at font.tiny, color color.code.muted, overflow-wrap anywhere, line-height 1.4
+    lines    a div: display flex, flex-direction column, gap 0; each line a p: margin 0, font.mono at font.tiny, line-height 1.5, color color.code.text, white-space pre-wrap, overflow-wrap anywhere
     shot     a figure: margin 0, display flex, flex-direction column, gap space.2, min-width 0; holding [ caption, image ]
     caption  a figcaption: display flex, flex-wrap wrap, align-items center, gap space.2; the label in font.sans at font.tiny, weight 700, color color.code.muted; then, when given, the verdict pill
     pill     a span: pad 2px space.2, radius.pill, background color.pass, color color.on.accent, font.micro, weight 700, letter-spacing 0.08em
@@ -216,7 +219,7 @@ node WalkInset : view   level: experience
 node WalkControls : view   level: experience
   why   Moving through a walkthrough takes one press: back a chapter, play or pause, or on a chapter.   <- WalkthroughPlayer
   what
-    three buttons in a row: "Previous chapter", the play button and "Next chapter"
+    three buttons on one row: Previous, the play button and Next, named "Previous chapter" and "Next chapter"
     the play button reads "Play", "Pause" or "Replay", as the player says
     "Previous chapter" is disabled on the first chapter, and "Next chapter" on the last
     Scenario: on the first chapter
@@ -228,19 +231,21 @@ node WalkControls : view   level: experience
       When the visitor presses "Next chapter"
       Then the controls ask for the next chapter, once
   look
-    row       a div: display flex, flex-wrap wrap, align-items center, gap space.2, pad space.3 space.4; holding [ previous, play, next ]
-    button    previous and next: native buttons with type "button": height 36px, pad 0 space.3, radius.md, a 1px solid color.code.border border, background transparent, color color.code.text, font.sans at font.small, weight 600, cursor pointer
-    play      a native button with type "button": height 36px, min-width 96px, pad 0 space.3, radius.md, a 1px solid color.thread border, background color.thread, color color.code, font.sans at font.small, weight 700, cursor pointer
+    row       a div: display flex, align-items center, gap space.2, pad space.3 space.4; holding [ previous, play, next ]
+    button    previous and next: native buttons with type "button": flex 1 1 0, min-width 0, max-width 160px, height 44px, pad 0 space.2, radius.md, a 1px solid color.code.border border, background transparent, color color.code.text, font.sans at font.small, weight 600, cursor pointer
+    play      a native button with type "button": flex 1 1 0, min-width 0, max-width 160px, height 44px, pad 0 space.2, radius.md, a 1px solid color.thread border, background color.thread, color color.code, font.sans at font.small, weight 700, cursor pointer
     disabled  a disabled button has opacity 0.4 and cursor default
   copy
     walk.previous  "Previous chapter"
     walk.next      "Next chapter"
+    walk.previous.short  "Previous"
+    walk.next.short      "Next"
     walk.play      "Play"
     walk.pause     "Pause"
     walk.replay    "Replay"
   binds
     props    mode: "play" | "pause" | "replay", first: boolean, last: boolean, onPrevious(), onPlay(), onNext()
-    buttons  native buttons with their copy as text; the play button has id "walk-play"; previous is disabled when first is true, next when last is true; play shows walk.play, walk.pause or walk.replay for its mode
+    buttons  native buttons; previous shows walk.previous.short with aria-label walk.previous; next shows walk.next.short with aria-label walk.next; the play button has id "walk-play"; previous is disabled when first is true, next when last is true; play shows walk.play, walk.pause or walk.replay for its mode
 ```
 
 ```ail
@@ -262,7 +267,7 @@ node WalkTimeline : view   level: experience
   look
     list     an ol: list-style none, margin 0, pad 0, display flex, gap space.1, align-items flex-start
     item     an li per chapter: flex-grow its seconds, flex-shrink 1, flex-basis 0, min-width 0
-    button   a native button with type "button": display flex, flex-direction column, gap space.1, width 100%, min-height 24px, pad space.1 0, margin 0, border none, background transparent, text-align left, cursor pointer
+    button   a native button with type "button": display flex, flex-direction column, justify-content center, gap space.1, width 100%, min-height 44px, pad space.1 0, margin 0, border none, background transparent, text-align left, cursor pointer
     bar      a span: display block, height 8px, box-sizing border-box, radius.pill, overflow hidden, background color.code.pick, a 1px solid color.code.muted border; a branch chapter's bar instead has background transparent and a 1.5px dashed color.code.muted border
     fill     a span inside the bar: display block, height 100%, radius.pill, background color.thread; width 100% before the current chapter, the played share for the current one, 0% after it
     title    a span with class "ail-wide": display block, font.sans at font.tiny, line-height 1.3, color color.code.muted, overflow-wrap anywhere; the current chapter's title has weight 700 and color color.code.text

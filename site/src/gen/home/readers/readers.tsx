@@ -55,7 +55,6 @@ export function Readers() {
     } else {
       return;
     }
-    event.preventDefault();
     setReader(readers[next]);
     tabRefs.current[next]?.focus();
   };
@@ -66,44 +65,51 @@ export function Readers() {
         text="One spec, four readers"
         lead="Each level of the tree is written for one kind of reader. Pick a reader to see which level is theirs: they start at the top and stop where the detail stops mattering to them."
       />
-      <div role="tablist" aria-label="Readers">
-        <Stack dir="h" gap="space.2" align="center" wrap={true}>
-          {readers.map((key, index) => {
-            const picked = key === reader;
-            return (
-              <button
-                key={key}
-                ref={(element) => {
-                  tabRefs.current[index] = element;
-                }}
-                type="button"
-                role="tab"
-                id={`reader-tab-${key}`}
-                aria-selected={picked}
-                aria-controls="reader-panel"
-                tabIndex={picked ? 0 : -1}
-                onClick={() => setReader(key)}
-                onKeyDown={(event) => onKeyDown(event, index)}
-                style={{
-                  height: "40px",
-                  padding: "0 var(--space-4)",
-                  borderRadius: "var(--radius-md)",
-                  fontFamily: "var(--font-sans)",
-                  fontSize: "var(--font-small)",
-                  fontWeight: 600,
-                  cursor: "pointer",
-                  background: picked ? colors[key] : "var(--color-surface)",
-                  border: picked
-                    ? `1px solid ${colors[key]}`
-                    : "1px solid var(--color-border)",
-                  color: picked ? "var(--color-on-accent)" : "var(--color-text)",
-                }}
-              >
-                {names[key]}
-              </button>
-            );
-          })}
-        </Stack>
+      <div
+        role="tablist"
+        aria-label="Readers"
+        style={{
+          display: "grid",
+          gridTemplateColumns: "repeat(auto-fit, minmax(140px, 1fr))",
+          gap: "var(--space-2)",
+          maxWidth: "640px",
+        }}
+      >
+        {readers.map((key, index) => {
+          const picked = key === reader;
+          return (
+            <button
+              key={key}
+              ref={(element) => {
+                tabRefs.current[index] = element;
+              }}
+              type="button"
+              role="tab"
+              id={`reader-tab-${key}`}
+              aria-selected={picked}
+              aria-controls="reader-panel"
+              tabIndex={picked ? 0 : -1}
+              onClick={() => setReader(key)}
+              onKeyDown={(event) => onKeyDown(event, index)}
+              style={{
+                height: "44px",
+                padding: "0 var(--space-4)",
+                borderRadius: "var(--radius-md)",
+                fontFamily: "var(--font-sans)",
+                fontSize: "var(--font-small)",
+                fontWeight: 600,
+                cursor: "pointer",
+                background: picked ? colors[key] : "var(--color-surface)",
+                border: picked
+                  ? `1px solid ${colors[key]}`
+                  : "1px solid var(--color-border)",
+                color: picked ? "var(--color-on-accent)" : "var(--color-text)",
+              }}
+            >
+              {names[key]}
+            </button>
+          );
+        })}
       </div>
       <div
         role="tabpanel"
@@ -113,13 +119,13 @@ export function Readers() {
           background: "var(--color-surface)",
           border: "1px solid var(--color-border)",
           borderRadius: "var(--radius-lg)",
-          padding: "var(--space-6)",
+          padding: "clamp(16px, 4vw, 24px)",
         }}
       >
         <Stack dir="v" gap="space.4" align="stretch">
           <div
             style={{
-              fontSize: "var(--font-micro)",
+              fontSize: "var(--font-tiny)",
               fontWeight: 700,
               letterSpacing: "0.08em",
               color: colors[reader],

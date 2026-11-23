@@ -19,7 +19,7 @@ node AgentCards : view   level: experience
       And it says VS Code installs it from the same marketplace
   look
     layout    a fragment, with no element of its own, holding [ cursor, copilot ]
-    card      background color.surface, a 1px solid color.border border, radius.lg, pad space.6, min-width 0; stack(v, gap: space.3, align: stretch)
+    card      background color.surface, a 1px solid color.border border, radius.lg, pad clamp(16px, 4vw, 24px), min-width 0; stack(v, gap: space.3, align: stretch)
     title     an h3: font.lead, weight 700, color.text, margin 0
     subtitle  a p: font.small, color.text.muted, margin 0
     commands  one CopyCommand per command

@@ -1,4 +1,4 @@
-// ail-derived-from: WalkthroughPlayer@80eaf6f84606e830
+// ail-derived-from: WalkthroughPlayer@d583804d16a9a4fa
 import { afterEach, expect, test } from "bun:test";
 import { act, cleanup, fireEvent, render, screen } from "@testing-library/react";
 import { WalkthroughPlayer } from "../../../src/gen/home/watch/walkthrough-player";
@@ -8,23 +8,27 @@ afterEach(() => {
   cleanup();
 });
 
-const compact = (s: string | null | undefined): string => (s ?? "").replace(/\s+/g, "");
+function playerText(): string {
+  return screen.getByRole("region", { name: "Walkthrough player" }).textContent ?? "";
+}
 
-const playerText = (): string =>
-  compact(screen.getByRole("region", { name: "Walkthrough player" }).textContent);
+function liveText(container: HTMLElement): string {
+  return Array.from(container.querySelectorAll("[aria-live]"))
+    .map((el) => el.textContent ?? "")
+    .join("\n");
+}
 
-const terminalText = (): string =>
-  screen.getByRole("region", { name: "Terminal output" }).textContent ?? "";
+function terminalText(): string {
+  return screen.getByRole("region", { name: "Terminal output" }).textContent ?? "";
+}
 
 test("it opens paused", () => {
-  render(<WalkthroughPlayer />);
+  const { container } = render(<WalkthroughPlayer />);
   expect(screen.getByRole("tab", { name: "ail build" }).getAttribute("aria-selected")).toBe("true");
-  expect(
-    screen.getByRole("heading", { level: 3, name: "The spec changes, not code" }),
-  ).toBeTruthy();
-  expect(playerText()).toContain(compact("Chapter 1 of 10"));
+  expect(screen.getByRole("heading", { level: 3, name: "The spec changes, not code" })).toBeTruthy();
+  expect(liveText(container)).toContain("Chapter 1 of 10");
   expect(terminalText()).toContain("$ ail build");
-  expect(playerText()).toContain(compact("0:06 / 1:25"));
+  expect(playerText()).toContain("0:06 / 1:25");
   expect(screen.getByRole("button", { name: "Play the walkthrough (1:25)" })).toBeTruthy();
   expect(screen.getByRole("button", { name: "Play" })).toBeTruthy();
 });
@@ -33,21 +37,15 @@ test("the other walkthrough", () => {
   render(<WalkthroughPlayer />);
   fireEvent.click(screen.getByRole("tab", { name: "ail adopt" }));
   expect(screen.getByRole("tab", { name: "ail adopt" }).getAttribute("aria-selected")).toBe("true");
-  expect(screen.getByRole("tab", { name: "ail build" }).getAttribute("aria-selected")).not.toBe(
-    "true",
-  );
+  expect(screen.getByRole("tab", { name: "ail build" }).getAttribute("aria-selected")).toBe("false");
   expect(screen.getByRole("heading", { level: 3, name: "An old app, no spec" })).toBeTruthy();
-  expect(playerText()).toContain(compact("0:06 / 1:38"));
+  expect(playerText()).toContain("0:06 / 1:38");
 });
 
 test("picking a chapter", () => {
   render(<WalkthroughPlayer />);
-  fireEvent.click(
-    screen.getByRole("button", { name: "Chapter 3: Checks written once, then pinned" }),
-  );
-  expect(
-    screen.getByRole("heading", { level: 3, name: "Checks written once, then pinned" }),
-  ).toBeTruthy();
+  fireEvent.click(screen.getByRole("button", { name: "Chapter 3: Checks written once, then pinned" }));
+  expect(screen.getByRole("heading", { level: 3, name: "Checks written once, then pinned" })).toBeTruthy();
   expect(
     screen
       .getByRole("button", { name: "Chapter 3: Checks written once, then pinned" })
@@ -56,27 +54,22 @@ test("picking a chapter", () => {
   const lines = BUILD.beats[2].lines;
   expect(lines.length).toBe(4);
   expect(lines[0]).toBe("· App: deriving checks from its scenarios");
-  const shown = terminalText();
+  const text = terminalText();
   for (const line of lines) {
-    expect(shown).toContain(line);
+    expect(text).toContain(line);
   }
+  expect(text.indexOf(lines[0])).toBeLessThan(text.indexOf(lines[1]));
   fireEvent.click(screen.getByRole("button", { name: "Chapter 10: Everything checks out" }));
-  expect(
-    (screen.getByRole("button", { name: "Next chapter" }) as HTMLButtonElement).disabled,
-  ).toBe(true);
+  expect((screen.getByRole("button", { name: "Next chapter" }) as HTMLButtonElement).disabled).toBe(true);
 });
 
 test("next and previous", () => {
   render(<WalkthroughPlayer />);
-  expect(
-    (screen.getByRole("button", { name: "Previous chapter" }) as HTMLButtonElement).disabled,
-  ).toBe(true);
+  expect((screen.getByRole("button", { name: "Previous chapter" }) as HTMLButtonElement).disabled).toBe(true);
   fireEvent.click(screen.getByRole("button", { name: "Next chapter" }));
   expect(screen.getByRole("heading", { level: 3, name: "What is out of date" })).toBeTruthy();
   fireEvent.click(screen.getByRole("button", { name: "Previous chapter" }));
-  expect(
-    screen.getByRole("heading", { level: 3, name: "The spec changes, not code" }),
-  ).toBeTruthy();
+  expect(screen.getByRole("heading", { level: 3, name: "The spec changes, not code" })).toBeTruthy();
 });
 
 test("arrow keys", () => {
@@ -100,11 +93,11 @@ test("playing", async () => {
   fireEvent.click(screen.getByRole("button", { name: "Play" }));
   expect(screen.getByRole("button", { name: "Pause" })).toBeTruthy();
   expect(screen.queryByRole("button", { name: "Play the walkthrough (1:25)" })).toBeNull();
-  expect(playerText()).toContain(compact("0:00 / 1:25"));
+  expect(playerText()).toContain("0:00 / 1:25");
   await act(async () => {
     await new Promise((resolve) => setTimeout(resolve, 1500));
   });
-  expect(playerText()).toContain(compact("0:01 / 1:25"));
+  expect(playerText()).toContain("0:01 / 1:25");
   fireEvent.click(screen.getByRole("button", { name: "Pause" }));
   expect(screen.getByRole("button", { name: "Play" })).toBeTruthy();
-}, 10000);
+});

@@ -1,4 +1,4 @@
-// ail-derived-from: WatchSection@f9c9132d79f403e0
+// ail-derived-from: WatchSection@4aff1e1022df567c
 import { afterEach, expect, test } from "bun:test";
 import { cleanup, render, within } from "@testing-library/react";
 import { WatchSection } from "../../../src/gen/home/watch/watch-section";
@@ -18,7 +18,7 @@ test("the section", () => {
   });
   expect(heading).toBeTruthy();
   const eyebrow = within(band).getByText("SEE IT RUN");
-  expect(eyebrow.contains(heading)).toBe(false);
-  const position = heading.compareDocumentPosition(eyebrow);
-  expect(position & Node.DOCUMENT_POSITION_PRECEDING).toBeTruthy();
+  expect(eyebrow).toBeTruthy();
+  const position = eyebrow.compareDocumentPosition(heading);
+  expect(position & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
 });

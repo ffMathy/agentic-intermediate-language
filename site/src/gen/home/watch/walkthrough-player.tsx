@@ -1,4 +1,5 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
+import type { Walkthrough } from "./walkthrough/walkthrough";
 import { chapterStart, clock, linesShown, totalSeconds } from "./walkthrough/walkthrough";
 import { BUILD } from "./walkthrough/build-walkthrough";
 import { ADOPT } from "./walkthrough/adopt-walkthrough";
@@ -9,51 +10,43 @@ import { WalkCaption } from "./walk-caption";
 import { WalkControls } from "./walk-controls";
 import { WalkTimeline } from "./walk-timeline";
 
-type Tab = "build" | "adopt";
-
-/** a dark player window with two walkthroughs as tabs, "ail build" and "ail adopt"; "ail build" is shown first */
+/** "a dark player window with two walkthroughs as tabs, "ail build" and "ail adopt"; "ail build" is shown first" */
 export function WalkthroughPlayer() {
-  const [tab, setTab] = useState<Tab>("build");
+  const [tab, setTab] = useState<"build" | "adopt">("build");
   const [chapter, setChapter] = useState<number>(0);
   const [elapsed, setElapsed] = useState<number>(0);
   const [playing, setPlaying] = useState<boolean>(false);
   const [started, setStarted] = useState<boolean>(false);
 
-  const w = tab === "build" ? BUILD : ADOPT;
+  const w: Walkthrough = tab === "build" ? BUILD : ADOPT;
   const beat = w.beats[chapter];
   const last = w.beats.length - 1;
-  const beatMs = beat.seconds * 1000;
-  const complete = !playing && elapsed === 0;
-  const ended = !playing && chapter === last && elapsed === beatMs;
+  const length = beat.seconds * 1000;
 
-  const pos = useRef({ chapter, elapsed });
-  pos.current = { chapter, elapsed };
+  if (playing && elapsed >= length) {
+    if (chapter !== last) {
+      setChapter(chapter + 1);
+      setElapsed(0);
+    } else {
+      setElapsed(length);
+      setPlaying(false);
+    }
+  }
 
   useEffect(() => {
     if (!playing) {
       return;
     }
     const id = setInterval(() => {
-      const p = pos.current;
-      const end = w.beats[p.chapter].seconds * 1000;
-      const next = p.elapsed + 100;
-      if (next >= end) {
-        if (p.chapter !== last) {
-          pos.current = { chapter: p.chapter + 1, elapsed: 0 };
-          setChapter(p.chapter + 1);
-          setElapsed(0);
-        } else {
-          pos.current = { chapter: p.chapter, elapsed: end };
-          setElapsed(end);
-          setPlaying(false);
-        }
-      } else {
-        pos.current = { chapter: p.chapter, elapsed: next };
-        setElapsed(next);
-      }
+      setElapsed((e) => e + 100);
     }, 100);
-    return () => clearInterval(id);
-  }, [playing, w, last]);
+    return () => {
+      clearInterval(id);
+    };
+  }, [playing]);
+
+  const complete = !playing && elapsed === 0;
+  const ended = !playing && chapter === last && elapsed === length;
 
   const go = (k: number) => {
     setChapter(Math.min(Math.max(k, 0), last));
@@ -66,7 +59,7 @@ export function WalkthroughPlayer() {
     ? clock(chapterStart(w, chapter) + beat.seconds)
     : clock(chapterStart(w, chapter) + Math.floor(elapsed / 1000));
 
-  const onPick = (t: Tab) => {
+  const onPick = (t: "build" | "adopt") => {
     if (t === tab) {
       return;
     }
@@ -96,11 +89,11 @@ export function WalkthroughPlayer() {
     document.getElementById("walk-play")?.focus();
   };
 
-  const mode = playing ? "pause" : ended ? "replay" : "play";
+  const mode: "play" | "pause" | "replay" = playing ? "pause" : ended ? "replay" : "play";
   const lines = playing
-    ? beat.lines.slice(0, linesShown(beat.lines.length, beat.seconds, elapsed))
+    ? beat.lines.slice(0, linesShown(beat.lines.length, beat.seconds, Math.min(elapsed, length)))
     : beat.lines;
-  const played = complete ? 1 : elapsed / beatMs;
+  const played = complete ? 1 : Math.min(elapsed, length) / length;
 
   return (
     <div
@@ -143,9 +136,10 @@ export function WalkthroughPlayer() {
                   background: "var(--color-accent)",
                   color: "var(--color-on-accent)",
                   fontFamily: "var(--font-sans)",
-                  fontSize: "var(--font-lead)",
+                  fontSize: "clamp(16px, 4vw, 18px)",
                   fontWeight: 700,
                   lineHeight: 1.3,
+                  minHeight: "44px",
                   textAlign: "center",
                   boxShadow: "0 8px 24px rgba(0, 0, 0, 0.4)",
                   cursor: "pointer",

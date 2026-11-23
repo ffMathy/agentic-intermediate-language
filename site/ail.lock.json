@@ -150,13 +150,13 @@
       "look": "1f760850977cc170ca632d128371472d6a28855c115ad3b0c8f23e9cc89cfd7c"
     },
     "Hero": {
-      "hash": "fbfe9e0431cc3130c615d8e74456bf0cd7e20e6fa55276d3cbf08821be0751ae",
+      "hash": "b9eb1ad989dbc67502a14db9be8036ba0db994223696c05b685e9a56139a1182",
       "files": {
-        "src/gen/home/hero/hero.tsx": "38989c98cc59701acc4f1fb83660cefe25ef8fca23a45fe1ef0c7384945c12b8"
+        "src/gen/home/hero/hero.tsx": "d2924c0470d0c1d13d91f019bd2ac62273a43512616c478a64589eedd0e46d96"
       },
       "by": "claude-code",
-      "shots": "fbfe9e0431cc3130c615d8e74456bf0cd7e20e6fa55276d3cbf08821be0751ae",
-      "look": "fbfe9e0431cc3130c615d8e74456bf0cd7e20e6fa55276d3cbf08821be0751ae"
+      "shots": "b9eb1ad989dbc67502a14db9be8036ba0db994223696c05b685e9a56139a1182",
+      "look": "b9eb1ad989dbc67502a14db9be8036ba0db994223696c05b685e9a56139a1182"
     },
     "HeroFigure": {
       "hash": "3b9f05780be80dc4813f0f459fb99921eddfe59bfa0c4719e95ac5d34dbdd3d3",
@@ -168,13 +168,13 @@
       "look": "3b9f05780be80dc4813f0f459fb99921eddfe59bfa0c4719e95ac5d34dbdd3d3"
     },
     "HomePage": {
-      "hash": "36d37503f6aff330eefd82e51bf869774dc7db361c6cd6102fbe3e00033b7f73",
+      "hash": "ef3369f05dbeefaa260675d9b1f086dd09397f5bb0a09c1c8df56a8d3048170b",
       "files": {
         "src/gen/home/home-page.tsx": "50926897b992ec13c553d855aa42ab522d4ecf94d5cf3ed459817e68ccdfd83c"
       },
       "by": "claude-code",
-      "shots": "36d37503f6aff330eefd82e51bf869774dc7db361c6cd6102fbe3e00033b7f73",
-      "look": "36d37503f6aff330eefd82e51bf869774dc7db361c6cd6102fbe3e00033b7f73"
+      "shots": "ef3369f05dbeefaa260675d9b1f086dd09397f5bb0a09c1c8df56a8d3048170b",
+      "look": "ef3369f05dbeefaa260675d9b1f086dd09397f5bb0a09c1c8df56a8d3048170b"
     },
     "IdeaFigure": {
       "hash": "dc5b0e2600930ec3f1b8d7d3e0db55c995ffd13b14ad24b3514ec32b17e89887",
@@ -298,7 +298,9 @@
       "files": {
         "src/gen/home/sections/spec-browser.tsx": "6db07a8086ab53c66f4026dec19f92d969f308fa3d95fed18b5b2fabb91eeea6"
       },
-      "by": "claude-code"
+      "by": "claude-code",
+      "shots": "d8907aa2f88783920796aa1cc88a8be8822cd3e8735e0eaca8af9206fd561010",
+      "look": "d8907aa2f88783920796aa1cc88a8be8822cd3e8735e0eaca8af9206fd561010"
     },
     "SpecEditor": {
       "hash": "04d911c590e16a03506b6ebab229fc53991d01d19ef241bc40925ca755d55a18",
@@ -409,13 +411,13 @@
       "look": "ca52026965cfe817d8fd3490d5c66b71ea9b0a6035206f7b1802246faca0328f"
     },
     "TopBar": {
-      "hash": "1659262a666101794dd281328a5f7fec5cae4665c17fd779d42074ac9fb6ae6f",
+      "hash": "c329e124aad238c4c92a6dc8284917c752b15a6fdb11a15399b35a624dcde341",
       "files": {
-        "src/gen/home/sections/top-bar.tsx": "6e7743a2be69e6c28827445fd3322a16f42838bffa45f317cec3f624b42cd5ee"
+        "src/gen/home/sections/top-bar.tsx": "f6192ea000cbda1e98dcd3e3a71b76193b5b3f1d1ca2f049e563132d1b29fd6d"
       },
       "by": "claude-code",
-      "shots": "1659262a666101794dd281328a5f7fec5cae4665c17fd779d42074ac9fb6ae6f",
-      "look": "1659262a666101794dd281328a5f7fec5cae4665c17fd779d42074ac9fb6ae6f"
+      "shots": "c329e124aad238c4c92a6dc8284917c752b15a6fdb11a15399b35a624dcde341",
+      "look": "c329e124aad238c4c92a6dc8284917c752b15a6fdb11a15399b35a624dcde341"
     },
     "TreeFigure": {
       "hash": "37148bd96b701acb36035148e15aad1528a5a614b357f9a302c0e5910ea668b8",
@@ -488,22 +490,22 @@
       "by": "claude-code"
     },
     "WalkthroughPlayer": {
-      "hash": "0b3eeae547eb308c4c4134177ab7ba8579e34145ceaaee2fce6e1ab78fd72d83",
+      "hash": "9e9cbc0aaa6fe3c8c0e73583a64ee85b9d64f412c0041ba16c3f356089407479",
       "files": {
-        "src/gen/home/watch/walkthrough-player.tsx": "9ffe3b2f1813c015ac5b4fe376e87291cc70a3f61da917e337b5348192c14d6b"
+        "src/gen/home/watch/walkthrough-player.tsx": "d2e03ab17b65e78f8ab0f47074a8b161d010306f046cc3fdcc27b5f0c7035f09"
       },
       "by": "claude-code",
-      "shots": "0b3eeae547eb308c4c4134177ab7ba8579e34145ceaaee2fce6e1ab78fd72d83",
-      "look": "0b3eeae547eb308c4c4134177ab7ba8579e34145ceaaee2fce6e1ab78fd72d83"
+      "shots": "9e9cbc0aaa6fe3c8c0e73583a64ee85b9d64f412c0041ba16c3f356089407479",
+      "look": "9e9cbc0aaa6fe3c8c0e73583a64ee85b9d64f412c0041ba16c3f356089407479"
     },
     "WalkTimeline": {
-      "hash": "fedd426029dd2afd15fd0299c799714da33abffde23cd178d418f93712aba411",
+      "hash": "525308733e6b701d1750de27236110c3bcfc0775f853e02cee465826c8bf352c",
       "files": {
-        "src/gen/home/watch/walk-timeline.tsx": "fd694d853db725f9d6c01a6a130a2851997c23d320c4fd21f442583d89c35005"
+        "src/gen/home/watch/walk-timeline.tsx": "ab30736caad6fb96711aae5a507e5e4450dfa7b41fa844401750c8615848f8f3"
       },
       "by": "claude-code",
-      "shots": "fedd426029dd2afd15fd0299c799714da33abffde23cd178d418f93712aba411",
-      "look": "fedd426029dd2afd15fd0299c799714da33abffde23cd178d418f93712aba411"
+      "shots": "525308733e6b701d1750de27236110c3bcfc0775f853e02cee465826c8bf352c",
+      "look": "525308733e6b701d1750de27236110c3bcfc0775f853e02cee465826c8bf352c"
     },
     "WalkTitleBar": {
       "hash": "d673a0b78fe67c99108604a084b3a1e347b3436ee40d377121d465b3e632f036",
@@ -515,18 +517,18 @@
       "look": "d673a0b78fe67c99108604a084b3a1e347b3436ee40d377121d465b3e632f036"
     },
     "WatchSection": {
-      "hash": "fa982fb933b3fefb8388c6fa389d5f5b915f35cfe283b698f414cfcdcb4ee966",
+      "hash": "aaedb46130bad330144ba47a6f9820add6b39ffaa13df8754321964f7183c43f",
       "files": {
         "src/gen/home/watch/watch-section.tsx": "99f753b2279ac66d17caed77d6070d3ff18fd8c614920ff5eb84c71d5f8aa3c7"
       },
       "by": "claude-code",
-      "shots": "fa982fb933b3fefb8388c6fa389d5f5b915f35cfe283b698f414cfcdcb4ee966",
-      "look": "fa982fb933b3fefb8388c6fa389d5f5b915f35cfe283b698f414cfcdcb4ee966"
+      "shots": "aaedb46130bad330144ba47a6f9820add6b39ffaa13df8754321964f7183c43f",
+      "look": "aaedb46130bad330144ba47a6f9820add6b39ffaa13df8754321964f7183c43f"
     }
   },
   "glue": {
     "src/gen/assets.d.ts": "8b9044f3e94a4669ea033bbea49000ccc17e32622e282441d78862e4780ea0aa",
-    "src/gen/spec.ts": "5d8aca8d32c4f2168c52867d7523da4ed9df53ecf41cb4fbaff56ceab3dbf805",
+    "src/gen/spec.ts": "e4acebc1e4fc7b9457a93703e2ff1d21fbfffe8c53cefbe426be34770bc438b4",
     "src/gen/tokens.css": "7bbb97ebb74409b3ed971ac9b054588620ec3b1652e3b22ce61e0ae8ddbcff31"
   }
 }

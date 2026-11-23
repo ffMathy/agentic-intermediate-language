@@ -1,4 +1,4 @@
-// ail-derived-from: WalkTimeline@1b59955511aa6639
+// ail-derived-from: WalkTimeline@270a603046a1b260
 import { afterEach, expect, mock, test } from "bun:test";
 import { cleanup, fireEvent, render, screen, within } from "@testing-library/react";
 import { WalkTimeline } from "../../../src/gen/home/watch/walk-timeline";
@@ -35,22 +35,16 @@ test("the chapters", () => {
     "Chapter 2: Two",
     "Chapter 3: Three",
   ]);
-  const one = within(list).getByRole("button", { name: "Chapter 1: One" });
-  const two = within(list).getByRole("button", { name: "Chapter 2: Two" });
-  const three = within(list).getByRole("button", { name: "Chapter 3: Three" });
-  expect(two.getAttribute("aria-current")).toBe("step");
-  expect(one.getAttribute("aria-current")).not.toBe("step");
-  expect(three.getAttribute("aria-current")).not.toBe("step");
-  const current = list.querySelectorAll('[aria-current="step"]');
+  const current = buttons.filter((b) => b.getAttribute("aria-current") === "step");
   expect(current.length).toBe(1);
-  expect(current[0]).toBe(two);
+  expect(current[0]).toBe(within(list).getByRole("button", { name: "Chapter 2: Two" }));
 });
 
 test("picking a chapter", () => {
   const beats: Beat[] = [
-    beat("one", "One", 6),
-    beat("two", "Two", 9),
-    beat("three", "Three", 9),
+    beat("one", "One", 5),
+    beat("two", "Two", 5),
+    beat("three", "Three", 5),
   ];
   const onPick = mock((_chapter: number) => {});
   render(<WalkTimeline beats={beats} chapter={0} played={0} onPick={onPick} />);

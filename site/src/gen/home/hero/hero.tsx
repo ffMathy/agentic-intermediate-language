@@ -2,7 +2,7 @@ import { Section } from "../../parts/section";
 import { Stack } from "../../parts/stack";
 import { HeroFigure } from "./hero-figure";
 
-/** an eyebrow, the page's only level 1 heading, a short explanation, three links and a note, beside a picture of the sentence sinking through the levels */
+/** "an eyebrow, the page's only level 1 heading, a short explanation, three links and a note, beside a picture of the sentence sinking through the levels" */
 export function Hero() {
   return (
     <Section tone="plain">
@@ -66,8 +66,8 @@ export function Hero() {
                 padding: "var(--space-3) var(--space-6)",
                 fontWeight: 700,
                 textDecoration: "none",
-                flex: "1 1 220px",
-                maxWidth: "360px",
+                flex: "1 1 auto",
+                whiteSpace: "nowrap",
                 textAlign: "center",
                 boxSizing: "border-box",
               }}
@@ -84,8 +84,8 @@ export function Hero() {
                 padding: "var(--space-3) var(--space-6)",
                 fontWeight: 700,
                 textDecoration: "none",
-                flex: "1 1 220px",
-                maxWidth: "360px",
+                flex: "1 1 auto",
+                whiteSpace: "nowrap",
                 textAlign: "center",
                 boxSizing: "border-box",
               }}

@@ -19,7 +19,7 @@ afterEach(() => {
 });
 
 test("copying", async () => {
-  let clipboardText: string | null = null;
+  let clipboardText = null as string | null;
   Object.defineProperty(navigator, "clipboard", {
     value: {
       writeText: (text: string): Promise<void> => {

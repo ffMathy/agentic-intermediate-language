@@ -20,6 +20,7 @@ const listStyle: CSSProperties = {
 const buttonStyle: CSSProperties = {
   display: "flex",
   flexDirection: "column",
+  justifyContent: "center",
   gap: "var(--space-1)",
   width: "100%",
   minHeight: "44px",
@@ -31,41 +32,51 @@ const buttonStyle: CSSProperties = {
   cursor: "pointer",
 };
 
-/** one button per chapter in a row, each as wide as its share of the walkthrough's time */
+const barStyle: CSSProperties = {
+  display: "block",
+  height: "8px",
+  boxSizing: "border-box",
+  borderRadius: "var(--radius-pill)",
+  overflow: "hidden",
+  background: "var(--color-code-pick)",
+  border: "1px solid var(--color-code-muted)",
+};
+
+const branchBarStyle: CSSProperties = {
+  ...barStyle,
+  background: "transparent",
+  border: "1.5px dashed var(--color-code-muted)",
+};
+
+const fillStyle: CSSProperties = {
+  display: "block",
+  height: "100%",
+  borderRadius: "var(--radius-pill)",
+  background: "var(--color-thread)",
+};
+
+const titleStyle: CSSProperties = {
+  display: "block",
+  fontFamily: "var(--font-sans)",
+  fontSize: "var(--font-tiny)",
+  lineHeight: 1.3,
+  color: "var(--color-code-muted)",
+  overflowWrap: "anywhere",
+};
+
+const currentTitleStyle: CSSProperties = {
+  ...titleStyle,
+  fontWeight: 700,
+  color: "var(--color-code-text)",
+};
+
+/** "one button per chapter in a row, each as wide as its share of the walkthrough's time" */
 export function WalkTimeline({ beats, chapter, played, onPick }: WalkTimelineProps) {
   return (
     <ol aria-label="Chapters" style={listStyle}>
       {beats.map((beat, index) => {
         const current = index === chapter;
-        const fillWidth =
-          index < chapter ? "100%" : current ? `${played * 100}%` : "0%";
-        const barStyle: CSSProperties = {
-          display: "block",
-          height: "8px",
-          boxSizing: "border-box",
-          borderRadius: "var(--radius-pill)",
-          overflow: "hidden",
-          background: beat.branch ? "transparent" : "var(--color-code-pick)",
-          border: beat.branch
-            ? "1.5px dashed var(--color-code-muted)"
-            : "1px solid var(--color-code-muted)",
-        };
-        const fillStyle: CSSProperties = {
-          display: "block",
-          height: "100%",
-          borderRadius: "var(--radius-pill)",
-          background: "var(--color-thread)",
-          width: fillWidth,
-        };
-        const titleStyle: CSSProperties = {
-          display: "block",
-          fontFamily: "var(--font-sans)",
-          fontSize: "var(--font-tiny)",
-          lineHeight: 1.3,
-          color: current ? "var(--color-code-text)" : "var(--color-code-muted)",
-          overflowWrap: "anywhere",
-          ...(current ? { fontWeight: 700 } : {}),
-        };
+        const width = index < chapter ? "100%" : current ? `${played * 100}%` : "0%";
         return (
           <li
             key={beat.id}
@@ -83,10 +94,10 @@ export function WalkTimeline({ beats, chapter, played, onPick }: WalkTimelinePro
               onClick={() => onPick(index)}
               style={buttonStyle}
             >
-              <span style={barStyle}>
-                <span style={fillStyle} />
+              <span style={beat.branch ? branchBarStyle : barStyle}>
+                <span style={{ ...fillStyle, width }} />
               </span>
-              <span className="ail-wide" style={titleStyle}>
+              <span className="ail-wide" style={current ? currentTitleStyle : titleStyle}>
                 {beat.title}
               </span>
             </button>

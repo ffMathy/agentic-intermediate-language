@@ -267,7 +267,7 @@ node WalkTimeline : view   level: experience
   look
     list     an ol: list-style none, margin 0, pad 0, display flex, gap space.1, align-items flex-start
     item     an li per chapter: flex-grow its seconds, flex-shrink 1, flex-basis 0, min-width 0
-    button   a native button with type "button": display flex, flex-direction column, gap space.1, width 100%, min-height 44px, pad space.1 0, margin 0, border none, background transparent, text-align left, cursor pointer
+    button   a native button with type "button": display flex, flex-direction column, justify-content center, gap space.1, width 100%, min-height 44px, pad space.1 0, margin 0, border none, background transparent, text-align left, cursor pointer
     bar      a span: display block, height 8px, box-sizing border-box, radius.pill, overflow hidden, background color.code.pick, a 1px solid color.code.muted border; a branch chapter's bar instead has background transparent and a 1.5px dashed color.code.muted border
     fill     a span inside the bar: display block, height 100%, radius.pill, background color.thread; width 100% before the current chapter, the played share for the current one, 0% after it
     title    a span with class "ail-wide": display block, font.sans at font.tiny, line-height 1.3, color color.code.muted, overflow-wrap anywhere; the current chapter's title has weight 700 and color color.code.text

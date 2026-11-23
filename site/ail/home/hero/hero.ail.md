@@ -22,8 +22,8 @@ node Hero : view   level: experience
     headline  an h1: font.display at font.hero, weight 800, line-height 1.05, letter-spacing -0.02em, color.text, margin 0, max-width 16ch
     subhead   a p: font.lead, line-height 1.6, color.text.muted, max-width 52ch, margin 0
     links     stack(h, gap: space.3, align: center, wrap: true) [ follow, play, github ]
-    follow    a link: background color.accent, color color.on.accent, a 2px solid color.accent border, radius.pill, pad space.3 space.6, weight 700, no underline, flex 1 1 220px, max-width 360px, text-align center, box-sizing border-box
-    play      a link: background transparent, color color.text, a 2px solid color.text border, radius.pill, pad space.3 space.6, weight 700, no underline, flex 1 1 220px, max-width 360px, text-align center, box-sizing border-box
+    follow    a link: background color.accent, color color.on.accent, a 2px solid color.accent border, radius.pill, pad space.3 space.6, weight 700, no underline, flex 1 1 auto, white-space nowrap, text-align center, box-sizing border-box (each fits its text on one line; on a phone each fills its own row)
+    play      a link: background transparent, color color.text, a 2px solid color.text border, radius.pill, pad space.3 space.6, weight 700, no underline, flex 1 1 auto, white-space nowrap, text-align center, box-sizing border-box (each fits its text on one line; on a phone each fills its own row)
     github    a link: color color.text, weight 600, pad space.3 0, no underline
     note      a p: font.small, color.text.muted, margin 0
     picture   HeroFigure, centered in its column

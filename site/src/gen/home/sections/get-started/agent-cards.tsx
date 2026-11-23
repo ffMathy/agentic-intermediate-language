@@ -7,7 +7,7 @@ const cardStyle: CSSProperties = {
   background: "var(--color-surface)",
   border: "1px solid var(--color-border)",
   borderRadius: "var(--radius-lg)",
-  padding: "var(--space-6)",
+  padding: "clamp(16px, 4vw, 24px)",
   minWidth: 0,
 };
 
@@ -42,7 +42,9 @@ export function AgentCards() {
           <h3 id={cursorId} style={titleStyle}>
             In Cursor
           </h3>
-          <p style={subtitleStyle}>No API key. Builds run on your Cursor subscription.</p>
+          <p style={subtitleStyle}>
+            No API key. Builds run on your Cursor subscription.
+          </p>
           <CopyCommand command="git clone https://github.com/ffMathy/agentic-intermediate-language ~/.cursor/plugins/local/ail" />
           <p style={textStyle}>
             Then run Developer: Reload Window. Teams can import the repository as a team marketplace instead. The same skill, commands and hooks as in Claude Code.
@@ -54,11 +56,13 @@ export function AgentCards() {
           <h3 id={copilotId} style={titleStyle}>
             In GitHub Copilot
           </h3>
-          <p style={subtitleStyle}>No API key. Builds run on your Copilot subscription.</p>
+          <p style={subtitleStyle}>
+            No API key. Builds run on your Copilot subscription.
+          </p>
           <CopyCommand command="copilot plugin marketplace add ffMathy/agentic-intermediate-language" />
           <CopyCommand command="copilot plugin install ail@agentic-intermediate-language" />
           <p style={textStyle}>
-            That's the Copilot CLI. In VS Code, add the same repository under chat.plugins.marketplaces and install ail from Agent Customizations.
+            That&apos;s the Copilot CLI. In VS Code, add the same repository under chat.plugins.marketplaces and install ail from Agent Customizations.
           </p>
         </Stack>
       </section>

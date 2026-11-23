@@ -1,8 +1,7 @@
 import type { CSSProperties, KeyboardEvent } from "react";
 
-type WalkTab = "build" | "adopt";
+export type WalkTab = "build" | "adopt";
 
-/** props: tab: "build" | "adopt", now: text, total: text, onPick(tab: "build" | "adopt") */
 export type WalkTitleBarProps = {
   tab: WalkTab;
   now: string;
@@ -20,7 +19,7 @@ const barStyle: CSSProperties = {
   flexWrap: "wrap",
   alignItems: "center",
   gap: "var(--space-3)",
-  padding: "var(--space-2) var(--space-3)",
+  padding: "var(--space-1) var(--space-3)",
   background: "var(--color-code-bar)",
   borderBottom: "1px solid var(--color-code-border)",
 };
@@ -50,7 +49,7 @@ const timeStyle: CSSProperties = {
 
 function tabStyle(picked: boolean): CSSProperties {
   return {
-    height: "32px",
+    height: "44px",
     padding: "0 var(--space-3)",
     borderRadius: "var(--radius-md)",
     border: "none",
@@ -63,7 +62,7 @@ function tabStyle(picked: boolean): CSSProperties {
   };
 }
 
-/** three window dots, the tabs "ail build" and "ail adopt", then the time played and the total time */
+/** "three window dots, the tabs "ail build" and "ail adopt", then the time played and the total time" */
 export function WalkTitleBar({ tab, now, total, onPick }: WalkTitleBarProps) {
   function handleKeyDown(event: KeyboardEvent<HTMLButtonElement>, key: WalkTab) {
     if (event.key !== "ArrowRight" && event.key !== "ArrowLeft") {
@@ -78,9 +77,10 @@ export function WalkTitleBar({ tab, now, total, onPick }: WalkTitleBarProps) {
     <div style={barStyle}>
       <div aria-hidden="true" style={dotsStyle}>
         {dotColors.map((color) => (
-          <div
+          <span
             key={color}
             style={{
+              display: "block",
               width: "10px",
               height: "10px",
               borderRadius: "var(--radius-pill)",

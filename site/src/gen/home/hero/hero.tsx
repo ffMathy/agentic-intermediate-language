@@ -23,7 +23,7 @@ export function Hero() {
               color: "var(--color-stop-text)",
               background: "var(--color-accent-soft)",
               border: "1px solid var(--color-border)",
-              borderRadius: "var(--radius-pill)",
+              borderRadius: "var(--radius-lg)",
               padding: "var(--space-1) var(--space-3)",
               margin: 0,
             }}
@@ -66,6 +66,10 @@ export function Hero() {
                 padding: "var(--space-3) var(--space-6)",
                 fontWeight: 700,
                 textDecoration: "none",
+                flex: "1 1 220px",
+                maxWidth: "360px",
+                textAlign: "center",
+                boxSizing: "border-box",
               }}
             >
               Follow the sentence ↓
@@ -80,6 +84,10 @@ export function Hero() {
                 padding: "var(--space-3) var(--space-6)",
                 fontWeight: 700,
                 textDecoration: "none",
+                flex: "1 1 220px",
+                maxWidth: "360px",
+                textAlign: "center",
+                boxSizing: "border-box",
               }}
             >
               Try to beat the computer ↓

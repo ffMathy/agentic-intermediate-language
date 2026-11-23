@@ -1,4 +1,4 @@
-// ail-derived-from: WalkControls@d16ff681459173f9
+// ail-derived-from: WalkControls@56a6ccc4186cf1a6
 import { afterEach, expect, mock, test } from "bun:test";
 import { cleanup, fireEvent, render, screen } from "@testing-library/react";
 import { WalkControls } from "../../../src/gen/home/watch/walk-controls";
@@ -18,13 +18,16 @@ test("on the first chapter", () => {
       onNext={() => {}}
     />,
   );
+  const previous = screen.getByRole("button", { name: "Previous chapter" });
+  const play = screen.getByRole("button", { name: "Play" });
+  const next = screen.getByRole("button", { name: "Next chapter" });
   const buttons = screen.getAllByRole("button");
-  const names = buttons.map((b) => (b.textContent ?? "").trim());
-  expect(names).toEqual(["Previous chapter", "Play", "Next chapter"]);
-  const previous = screen.getByRole("button", { name: "Previous chapter" }) as HTMLButtonElement;
-  const next = screen.getByRole("button", { name: "Next chapter" }) as HTMLButtonElement;
-  expect(previous.disabled).toBe(true);
-  expect(next.disabled).toBe(false);
+  expect(buttons.length).toBe(3);
+  expect(buttons[0]).toBe(previous);
+  expect(buttons[1]).toBe(play);
+  expect(buttons[2]).toBe(next);
+  expect((previous as HTMLButtonElement).disabled).toBe(true);
+  expect((next as HTMLButtonElement).disabled).toBe(false);
 });
 
 test("moving on", () => {

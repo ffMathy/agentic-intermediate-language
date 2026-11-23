@@ -1,4 +1,4 @@
-// ail-derived-from: WalkTimeline@d5e414c319dd1285
+// ail-derived-from: WalkTimeline@1b59955511aa6639
 import { afterEach, expect, mock, test } from "bun:test";
 import { cleanup, fireEvent, render, screen, within } from "@testing-library/react";
 import { WalkTimeline } from "../../../src/gen/home/watch/walk-timeline";
@@ -35,12 +35,15 @@ test("the chapters", () => {
     "Chapter 2: Two",
     "Chapter 3: Three",
   ]);
-  expect(within(list).getByRole("button", { name: "Chapter 1: One" })).toBe(buttons[0]);
-  expect(within(list).getByRole("button", { name: "Chapter 2: Two" })).toBe(buttons[1]);
-  expect(within(list).getByRole("button", { name: "Chapter 3: Three" })).toBe(buttons[2]);
-  expect(buttons[0].getAttribute("aria-current")).toBeNull();
-  expect(buttons[1].getAttribute("aria-current")).toBe("step");
-  expect(buttons[2].getAttribute("aria-current")).toBeNull();
+  const one = within(list).getByRole("button", { name: "Chapter 1: One" });
+  const two = within(list).getByRole("button", { name: "Chapter 2: Two" });
+  const three = within(list).getByRole("button", { name: "Chapter 3: Three" });
+  expect(two.getAttribute("aria-current")).toBe("step");
+  expect(one.getAttribute("aria-current")).not.toBe("step");
+  expect(three.getAttribute("aria-current")).not.toBe("step");
+  const current = list.querySelectorAll('[aria-current="step"]');
+  expect(current.length).toBe(1);
+  expect(current[0]).toBe(two);
 });
 
 test("picking a chapter", () => {

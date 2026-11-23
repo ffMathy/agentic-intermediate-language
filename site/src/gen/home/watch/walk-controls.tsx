@@ -1,7 +1,6 @@
 import type { CSSProperties } from "react";
 
-/** props: mode: "play" | "pause" | "replay", first: boolean, last: boolean, onPrevious(), onPlay(), onNext() */
-export type WalkControlsProps = {
+type WalkControlsProps = {
   mode: "play" | "pause" | "replay";
   first: boolean;
   last: boolean;
@@ -12,15 +11,17 @@ export type WalkControlsProps = {
 
 const rowStyle: CSSProperties = {
   display: "flex",
-  flexWrap: "wrap",
   alignItems: "center",
   gap: "var(--space-2)",
   padding: "var(--space-3) var(--space-4)",
 };
 
-const buttonStyle: CSSProperties = {
-  height: "36px",
-  padding: "0 var(--space-3)",
+const sideStyle: CSSProperties = {
+  flex: "1 1 0",
+  minWidth: 0,
+  maxWidth: "160px",
+  height: "44px",
+  padding: "0 var(--space-2)",
   borderRadius: "var(--radius-md)",
   border: "1px solid var(--color-code-border)",
   background: "transparent",
@@ -31,15 +32,12 @@ const buttonStyle: CSSProperties = {
   cursor: "pointer",
 };
 
-const disabledStyle: CSSProperties = {
-  opacity: 0.4,
-  cursor: "default",
-};
-
 const playStyle: CSSProperties = {
-  height: "36px",
-  minWidth: "96px",
-  padding: "0 var(--space-3)",
+  flex: "1 1 0",
+  minWidth: 0,
+  maxWidth: "160px",
+  height: "44px",
+  padding: "0 var(--space-2)",
   borderRadius: "var(--radius-md)",
   border: "1px solid var(--color-thread)",
   background: "var(--color-thread)",
@@ -50,13 +48,18 @@ const playStyle: CSSProperties = {
   cursor: "pointer",
 };
 
-const playLabels = {
+const disabledStyle: CSSProperties = {
+  opacity: 0.4,
+  cursor: "default",
+};
+
+const playLabels: Record<WalkControlsProps["mode"], string> = {
   play: "Play",
   pause: "Pause",
   replay: "Replay",
 };
 
-/** three buttons in a row: "Previous chapter", the play button and "Next chapter" */
+/** three buttons on one row: Previous, the play button and Next, named "Previous chapter" and "Next chapter" */
 export function WalkControls({
   mode,
   first,
@@ -69,22 +72,24 @@ export function WalkControls({
     <div style={rowStyle}>
       <button
         type="button"
+        aria-label="Previous chapter"
         disabled={first}
         onClick={onPrevious}
-        style={first ? { ...buttonStyle, ...disabledStyle } : buttonStyle}
+        style={first ? { ...sideStyle, ...disabledStyle } : sideStyle}
       >
-        Previous chapter
+        Previous
       </button>
       <button type="button" id="walk-play" onClick={onPlay} style={playStyle}>
         {playLabels[mode]}
       </button>
       <button
         type="button"
+        aria-label="Next chapter"
         disabled={last}
         onClick={onNext}
-        style={last ? { ...buttonStyle, ...disabledStyle } : buttonStyle}
+        style={last ? { ...sideStyle, ...disabledStyle } : sideStyle}
       >
-        Next chapter
+        Next
       </button>
     </div>
   );

@@ -33,7 +33,7 @@ node WalkthroughPlayer : flow   level: experience
   why   Show each step of a real build and a real adoption in the order the tools take them, in a player the visitor controls.   <- WatchSection
   what
     a dark player window with two walkthroughs as tabs, "ail build" and "ail adopt"; "ail build" is shown first
-    the shown chapter has its terminal output on the left and the spec tree in that chapter's state on the right, then its number, title and caption, the controls and the row of chapters; on a narrow screen the tree goes under the terminal
+    the shown chapter has its terminal output on the left and the spec tree in that chapter's state on the right, then its number, title and caption, the controls and the row of chapters; on a narrow screen the chapter's nodes go under the terminal as a short list
     it never plays by itself: it opens paused on chapter 1, showing that chapter complete, with a large play button over the stage
     while it plays, the time moves on every tenth of a second, the chapter's terminal lines appear one after another with a still caret after the last, and at the end of a chapter the next one starts; after the last chapter it stops, and the play button reads "Replay"
     whenever it is not playing, the shown chapter's terminal lines are all shown, with no caret
@@ -87,7 +87,7 @@ node WalkthroughPlayer : flow   level: experience
     window    a div with role region named by watch.player: radius.lg, overflow hidden, a 1px solid color.code.border border, background color.code, box-shadow 0 12px 32px rgba(15, 23, 42, 0.18); holding [ WalkTitleBar, panel ]
     panel     a div with role tabpanel; holding [ stage, WalkCaption, WalkControls, timeline ]
     stage     a div: position relative, display flex, flex-wrap wrap, overflow hidden, a 1px solid color.code.border bottom border; holding [ a div with position relative, flex 1 1 320px and min-width 0 holding [ WalkTerminal, big ], a div with flex 1.4 1 400px, min-width 0 and box-shadow -1px 0 0 color.code.border, 0 -1px 0 color.code.border (a hairline on its left when side by side and on its top when stacked) holding WalkPicture ]
-    big       a native button with type "button" over the middle of the terminal pane (so it never covers the tree): position absolute, top 50%, left 50%, transform translate(-50%, -50%), max-width 90%, pad space.3 space.6, radius.pill, border none, background color.accent, color color.on.accent, font.sans at font.lead, weight 700, line-height 1.3, text-align center, box-shadow 0 8px 24px rgba(0, 0, 0, 0.4), cursor pointer
+    big       a native button with type "button" over the middle of the terminal pane (so it never covers the tree): position absolute, top 50%, left 50%, transform translate(-50%, -50%), max-width 90%, pad space.3 space.6, radius.pill, border none, background color.accent, color color.on.accent, font.sans at clamp(16px, 4vw, 18px), weight 700, line-height 1.3, min-height 44px, text-align center, box-shadow 0 8px 24px rgba(0, 0, 0, 0.4), cursor pointer
     timeline  a div with pad 0 space.4 space.4 holding WalkTimeline
   copy
     watch.player  "Walkthrough player"

@@ -1,0 +1,342 @@
+[
+  {
+    "node": "HomePage",
+    "test": "one story, in order",
+    "file": "home/home-page/01-one-story-in-order.png"
+  },
+  {
+    "node": "HomePage",
+    "test": "every top bar link has a place to land",
+    "file": "home/home-page/02-every-top-bar-link-has-a-place-to-land.png"
+  },
+  {
+    "node": "TopBar",
+    "test": "the links lead to the right places",
+    "file": "home/sections/top-bar/01-the-links-lead-to-the-right-places.png"
+  },
+  {
+    "node": "Hero",
+    "test": "the links go to the right places",
+    "file": "home/hero/hero/01-the-links-go-to-the-right-places.png"
+  },
+  {
+    "node": "HeroFigure",
+    "test": "the picture is described",
+    "file": "home/hero/hero-figure/01-the-picture-is-described.png"
+  },
+  {
+    "node": "GapStrip",
+    "test": "three cards",
+    "file": "home/sections/gap-strip/01-three-cards.png"
+  },
+  {
+    "node": "TreeSection",
+    "test": "the tree is explained",
+    "file": "home/tree/tree-section/01-the-tree-is-explained.png"
+  },
+  {
+    "node": "TreeFigure",
+    "test": "the picture",
+    "file": "home/tree/tree-figure/01-the-picture.png"
+  },
+  {
+    "node": "Journey",
+    "test": "eight stops in order",
+    "file": "home/journey/journey/01-eight-stops-in-order.png"
+  },
+  {
+    "node": "Journey",
+    "test": "the thread is explained",
+    "file": "home/journey/journey/02-the-thread-is-explained.png"
+  },
+  {
+    "node": "JourneyStop",
+    "test": "a stop",
+    "file": "home/journey/journey-stop/01-a-stop.png"
+  },
+  {
+    "node": "JourneyStop",
+    "test": "a stop with a file to browse",
+    "file": "home/journey/journey-stop/02-a-stop-with-a-file-to-browse.png"
+  },
+  {
+    "node": "StopExperience",
+    "test": "the experience level",
+    "file": "home/journey/stops/stop-experience/01-the-experience-level.png"
+  },
+  {
+    "node": "ExperienceFigure",
+    "test": "the picture",
+    "file": "home/journey/stops/experience-figure/01-the-picture.png"
+  },
+  {
+    "node": "StopSystem",
+    "test": "the system level",
+    "file": "home/journey/stops/stop-system/01-the-system-level.png"
+  },
+  {
+    "node": "SystemFigure",
+    "test": "the picture",
+    "file": "home/journey/stops/system-figure/01-the-picture.png"
+  },
+  {
+    "node": "StopSpecialist",
+    "test": "the specialist level",
+    "file": "home/journey/stops/stop-specialist/01-the-specialist-level.png"
+  },
+  {
+    "node": "SpecialistFigure",
+    "test": "the picture",
+    "file": "home/journey/stops/specialist-figure/01-the-picture.png"
+  },
+  {
+    "node": "StopBuild",
+    "test": "the build",
+    "file": "home/journey/stops/stop-build/01-the-build.png"
+  },
+  {
+    "node": "BuildFigure",
+    "test": "the picture",
+    "file": "home/journey/stops/build-figure/01-the-picture.png"
+  },
+  {
+    "node": "StopProof",
+    "test": "the proof",
+    "file": "home/journey/stops/stop-proof/01-the-proof.png"
+  },
+  {
+    "node": "ProofScreens",
+    "test": "the screens",
+    "file": "home/journey/stops/proof-screens/01-the-screens.png"
+  },
+  {
+    "node": "WatchSection",
+    "test": "the section",
+    "file": "home/watch/watch-section/01-the-section.png"
+  },
+  {
+    "node": "WalkthroughPlayer",
+    "test": "it opens paused",
+    "file": "home/watch/walkthrough-player/01-it-opens-paused.png"
+  },
+  {
+    "node": "WalkthroughPlayer",
+    "test": "the other walkthrough",
+    "file": "home/watch/walkthrough-player/02-the-other-walkthrough.png"
+  },
+  {
+    "node": "WalkthroughPlayer",
+    "test": "picking a chapter",
+    "file": "home/watch/walkthrough-player/03-picking-a-chapter.png"
+  },
+  {
+    "node": "WalkthroughPlayer",
+    "test": "next and previous",
+    "file": "home/watch/walkthrough-player/04-next-and-previous.png"
+  },
+  {
+    "node": "WalkthroughPlayer",
+    "test": "arrow keys",
+    "file": "home/watch/walkthrough-player/05-arrow-keys.png"
+  },
+  {
+    "node": "WalkthroughPlayer",
+    "test": "playing",
+    "file": "home/watch/walkthrough-player/06-playing.png"
+  },
+  {
+    "node": "WalkTitleBar",
+    "test": "the tabs",
+    "file": "home/watch/walk-title-bar/01-the-tabs.png"
+  },
+  {
+    "node": "WalkTitleBar",
+    "test": "arrow keys",
+    "file": "home/watch/walk-title-bar/02-arrow-keys.png"
+  },
+  {
+    "node": "WalkTerminal",
+    "test": "lines kept exactly",
+    "file": "home/watch/walk-terminal/01-lines-kept-exactly.png"
+  },
+  {
+    "node": "WalkTerminal",
+    "test": "the caret",
+    "file": "home/watch/walk-terminal/02-the-caret.png"
+  },
+  {
+    "node": "WalkTerminal",
+    "test": "nothing printed",
+    "file": "home/watch/walk-terminal/03-nothing-printed.png"
+  },
+  {
+    "node": "WalkPicture",
+    "test": "a stale chapter",
+    "file": "home/watch/walk-picture/01-a-stale-chapter.png"
+  },
+  {
+    "node": "WalkPicture",
+    "test": "nodes with no spec yet",
+    "file": "home/watch/walk-picture/02-nodes-with-no-spec-yet.png"
+  },
+  {
+    "node": "WalkInset",
+    "test": "a card",
+    "file": "home/watch/walk-inset/01-a-card.png"
+  },
+  {
+    "node": "WalkInset",
+    "test": "a screenshot",
+    "file": "home/watch/walk-inset/02-a-screenshot.png"
+  },
+  {
+    "node": "WalkControls",
+    "test": "on the first chapter",
+    "file": "home/watch/walk-controls/01-on-the-first-chapter.png"
+  },
+  {
+    "node": "WalkControls",
+    "test": "moving on",
+    "file": "home/watch/walk-controls/02-moving-on.png"
+  },
+  {
+    "node": "WalkTimeline",
+    "test": "the chapters",
+    "file": "home/watch/walk-timeline/01-the-chapters.png"
+  },
+  {
+    "node": "WalkTimeline",
+    "test": "picking a chapter",
+    "file": "home/watch/walk-timeline/02-picking-a-chapter.png"
+  },
+  {
+    "node": "Readers",
+    "test": "the first reader",
+    "file": "home/readers/readers/01-the-first-reader.png"
+  },
+  {
+    "node": "Readers",
+    "test": "picking another reader",
+    "file": "home/readers/readers/02-picking-another-reader.png"
+  },
+  {
+    "node": "Readers",
+    "test": "arrow keys",
+    "file": "home/readers/readers/03-arrow-keys.png"
+  },
+  {
+    "node": "BuildLoop",
+    "test": "four steps",
+    "file": "home/build-loop/build-loop/01-four-steps.png"
+  },
+  {
+    "node": "AdoptSection",
+    "test": "adopting is explained",
+    "file": "home/adopt/adopt-section/01-adopting-is-explained.png"
+  },
+  {
+    "node": "AdoptFigure",
+    "test": "the picture",
+    "file": "home/adopt/adopt-figure/01-the-picture.png"
+  },
+  {
+    "node": "SpecBrowser",
+    "test": "the demo's spec is shown first",
+    "file": "home/sections/spec-browser/01-the-demo-s-spec-is-shown-first.png"
+  },
+  {
+    "node": "SpecBrowser",
+    "test": "picking another file",
+    "file": "home/sections/spec-browser/02-picking-another-file.png"
+  },
+  {
+    "node": "SpecBrowser",
+    "test": "showing this website's spec",
+    "file": "home/sections/spec-browser/03-showing-this-website-s-spec.png"
+  },
+  {
+    "node": "SpecBrowser",
+    "test": "opened from a link",
+    "file": "home/sections/spec-browser/04-opened-from-a-link.png"
+  },
+  {
+    "node": "SpecBrowser",
+    "test": "the language is defined",
+    "file": "home/sections/spec-browser/05-the-language-is-defined.png"
+  },
+  {
+    "node": "SpecBrowser",
+    "test": "following the same link twice",
+    "file": "home/sections/spec-browser/06-following-the-same-link-twice.png"
+  },
+  {
+    "node": "GetStarted",
+    "test": "in Claude Code",
+    "file": "home/sections/get-started/01-in-claude-code.png"
+  },
+  {
+    "node": "GetStarted",
+    "test": "in a terminal",
+    "file": "home/sections/get-started/02-in-a-terminal.png"
+  },
+  {
+    "node": "GetStarted",
+    "test": "what to do next",
+    "file": "home/sections/get-started/03-what-to-do-next.png"
+  },
+  {
+    "node": "AgentCards",
+    "test": "in Cursor",
+    "file": "home/sections/get-started/agent-cards/01-in-cursor.png"
+  },
+  {
+    "node": "AgentCards",
+    "test": "in GitHub Copilot",
+    "file": "home/sections/get-started/agent-cards/02-in-github-copilot.png"
+  },
+  {
+    "node": "ReviewNote",
+    "test": "generated code stays out of review",
+    "file": "home/sections/review-note/01-generated-code-stays-out-of-review.png"
+  },
+  {
+    "node": "Footer",
+    "test": "the links",
+    "file": "home/sections/footer/01-the-links.png"
+  },
+  {
+    "node": "Section",
+    "test": "an anchored band",
+    "file": "parts/section/01-an-anchored-band.png"
+  },
+  {
+    "node": "CodeBlock",
+    "test": "shown exactly",
+    "file": "parts/code-block/01-shown-exactly.png"
+  },
+  {
+    "node": "CodeBlock",
+    "test": "the thread is marked",
+    "file": "parts/code-block/02-the-thread-is-marked.png"
+  },
+  {
+    "node": "CodeBlock",
+    "test": "a caption",
+    "file": "parts/code-block/03-a-caption.png"
+  },
+  {
+    "node": "CodeBlock",
+    "test": "a long line wraps under itself",
+    "file": "parts/code-block/04-a-long-line-wraps-under-itself.png"
+  },
+  {
+    "node": "CopyCommand",
+    "test": "copying",
+    "file": "parts/copy-command/01-copying.png"
+  },
+  {
+    "node": "SpecEditor",
+    "test": "readable before the editor loads",
+    "file": "parts/spec-editor/01-readable-before-the-editor-loads.png"
+  }
+]

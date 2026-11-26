@@ -27,7 +27,7 @@ test("nothing changed: nothing to check", () => {
 
 test("a node's check changed: that node and every node that uses it, directly or not", () => {
   const dir = repo();
-  appendFileSync(join(dir, "checks/ui/text.test.tsx"), "\n// a new case\n");
+  appendFileSync(join(dir, "checks/ui/text/text.test.tsx"), "\n// a new case\n");
   const a = affectedNodes(loadProject(dir), "HEAD");
   expect(a.nodes).toEqual(expect.arrayContaining(["Text", "StatusLine", "PlayAGame", "TicTacToe"]));
   expect(a.nodes).not.toContain("Rules");
@@ -37,7 +37,7 @@ test("a node's check changed: that node and every node that uses it, directly or
 
 test("a node's generated code changed: it is affected", () => {
   const dir = repo();
-  appendFileSync(join(dir, "src/gen/engine/rules.ts"), "\n");
+  appendFileSync(join(dir, "src/gen/engine/rules/rules.ts"), "\n");
   expect(affectedNodes(loadProject(dir), "HEAD").nodes).toContain("Rules");
 });
 

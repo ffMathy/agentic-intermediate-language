@@ -1,120 +1,148 @@
-// ail-derived-from: SpecBrowser@8838cacf10d65b22
+// ail-derived-from: SpecBrowser@05f13ac001dc5cb1
 import { afterEach, beforeEach, expect, test } from "bun:test";
 import { act, cleanup, fireEvent, render, screen, within } from "@testing-library/react";
 import { SpecBrowser } from "../../../../src/gen/home/sections/spec-browser/spec-browser";
 import { specProjects } from "../../../../src/gen/spec";
 
-beforeEach(() => {
-  if (typeof Element.prototype.scrollIntoView !== "function") {
-    Element.prototype.scrollIntoView = () => {};
+const LANGUAGE_URL =
+  "https://github.com/ffMathy/agentic-intermediate-language/blob/main/docs/language.md";
+
+function setHash(hash: string): void {
+  window.location.hash = hash;
+}
+
+function specsSection(container: HTMLElement): HTMLElement {
+  const section = container.querySelector("#specs");
+  if (!(section instanceof HTMLElement)) {
+    throw new Error("no element with the id \"specs\"");
   }
-  window.location.hash = "";
+  return section;
+}
+
+function elementWithText(root: HTMLElement, text: string): HTMLElement {
+  const matches = Array.from(root.querySelectorAll("*")).filter(
+    (el): el is HTMLElement =>
+      el instanceof HTMLElement &&
+      el.closest("select") === null &&
+      (el.textContent ?? "").trim() === text,
+  );
+  const deepest = matches.filter(
+    (el) => !matches.some((other) => other !== el && el.contains(other)),
+  );
+  if (deepest.length === 0) {
+    throw new Error(`no element reads "${text}"`);
+  }
+  return deepest[0];
+}
+
+function expectPicked(name: string): void {
+  expect(screen.getByRole("button", { name }).getAttribute("aria-pressed")).toBe("true");
+}
+
+function expectNotPicked(name: string): void {
+  expect(screen.getByRole("button", { name }).getAttribute("aria-pressed")).not.toBe("true");
+}
+
+beforeEach(() => {
+  setHash("");
+  if (typeof Element.prototype.scrollIntoView !== "function") {
+    Element.prototype.scrollIntoView = function scrollIntoView(): void {};
+  }
 });
 
 afterEach(() => {
   cleanup();
-  window.location.hash = "";
+  setHash("");
 });
-
-function isPicked(name: string): boolean {
-  return screen.getByRole("button", { name }).getAttribute("aria-pressed") === "true";
-}
-
-function regionContains(name: string, text: string): boolean {
-  return screen
-    .getAllByRole("region", { name })
-    .some((region) => (region.textContent ?? "").includes(text));
-}
-
-function deepestWithText(text: string): Element[] {
-  return Array.from(document.body.querySelectorAll("*")).filter(
-    (el) =>
-      (el.textContent ?? "").trim() === text &&
-      !Array.from(el.children).some((child) => (child.textContent ?? "").trim() === text),
-  );
-}
 
 test("the demo's spec is shown first", () => {
   render(<SpecBrowser />);
-  expect(isPicked("Tic-Tac-Toe demo")).toBe(true);
-  expect(isPicked("tictactoe.ail.md")).toBe(true);
-  expect(regionContains("Source of tictactoe.ail.md", "node TicTacToe : system")).toBe(true);
+  expectPicked("Tic-Tac-Toe demo");
+  expectPicked("tictactoe.ail.md");
+  const region = screen.getByRole("region", { name: "Source of tictactoe.ail.md" });
+  expect(region.textContent ?? "").toContain("node TicTacToe : system");
 });
 
 test("picking another file", () => {
   render(<SpecBrowser />);
-  fireEvent.click(screen.getByRole("button", { name: "board/board-view.ail.md" }));
-  expect(isPicked("board/board-view.ail.md")).toBe(true);
-  expect(isPicked("tictactoe.ail.md")).toBe(false);
-  expect(regionContains("Source of board/board-view.ail.md", "node BoardView : view")).toBe(true);
+  act(() => {
+    fireEvent.click(screen.getByRole("button", { name: "board/board-view/board-view.ail.md" }));
+  });
+  expectPicked("board/board-view/board-view.ail.md");
+  expectNotPicked("tictactoe.ail.md");
+  const region = screen.getByRole("region", {
+    name: "Source of board/board-view/board-view.ail.md",
+  });
+  expect(region.textContent ?? "").toContain("node BoardView : view");
 });
 
 test("showing this website's spec", () => {
   const site = specProjects.find((p) => p.key === "site");
-  expect(site).toBeDefined();
-  if (!site) return;
-  render(<SpecBrowser />);
-  fireEvent.click(screen.getByRole("button", { name: "This website" }));
-  expect(isPicked("This website")).toBe(true);
-  expect(isPicked(site.files[0].path)).toBe(true);
-  const sizeText = `${site.nodeCount} nodes in ${site.files.length} files`;
-  const sizeLines = Array.from(document.body.querySelectorAll("p")).filter((p) =>
-    (p.textContent ?? "").trim().startsWith(sizeText),
+  if (!site) {
+    throw new Error("no project with the key \"site\"");
+  }
+  const { container } = render(<SpecBrowser />);
+  act(() => {
+    fireEvent.click(screen.getByRole("button", { name: "This website" }));
+  });
+  expectPicked("This website");
+  expectNotPicked("Tic-Tac-Toe demo");
+  expectPicked(site.files[0].path);
+  expect(specsSection(container).textContent ?? "").toContain(
+    `${site.nodeCount} nodes in ${site.files.length} files`,
   );
-  expect(sizeLines.length).toBeGreaterThan(0);
 });
 
 test("a screenshot beside its spec", () => {
-  render(<SpecBrowser />);
-  const shotPath = "board/shots/board-view/01-picking-an-empty-square.png";
-  fireEvent.click(screen.getByRole("button", { name: shotPath }));
-  expect(isPicked(shotPath)).toBe(true);
+  const { container } = render(<SpecBrowser />);
+  act(() => {
+    fireEvent.click(
+      screen.getByRole("button", { name: "board/board-view/shots/01-picking-an-empty-square.png" }),
+    );
+  });
+  expectPicked("board/board-view/shots/01-picking-an-empty-square.png");
   expect(
     screen.getByRole("img", {
       name: "Screenshot at the end of the check “picking an empty square”",
     }),
   ).toBeTruthy();
-  const fileButton = screen.getByRole("button", { name: "board/board-view.ail.md" });
-  const folders = deepestWithText("board/shots/board-view/");
-  expect(folders.length).toBeGreaterThan(0);
-  expect(
-    folders.some(
-      (folder) =>
-        (fileButton.compareDocumentPosition(folder) & Node.DOCUMENT_POSITION_FOLLOWING) !== 0,
-    ),
-  ).toBe(true);
+  const file = screen.getByRole("button", { name: "board/board-view/board-view.ail.md" });
+  const folder = elementWithText(specsSection(container), "board/board-view/shots/");
+  expect(file.compareDocumentPosition(folder) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
 });
 
 test("opened from a link", () => {
-  window.location.hash = "#spec/tictactoe/app/play/play.ail.md";
+  setHash("#spec/tictactoe/app/play/play.ail.md");
   render(<SpecBrowser />);
-  expect(isPicked("Tic-Tac-Toe demo")).toBe(true);
-  expect(isPicked("app/play/play.ail.md")).toBe(true);
+  expectPicked("Tic-Tac-Toe demo");
+  expectPicked("app/play/play.ail.md");
 });
 
 test("the language is defined", () => {
-  render(<SpecBrowser />);
-  const section = document.getElementById("specs");
-  expect(section).not.toBeNull();
-  if (!section) return;
-  const link = within(section).getByRole("link", { name: "the language definition" });
-  expect(link.getAttribute("href")).toBe(
-    "https://github.com/ffMathy/agentic-intermediate-language/blob/main/docs/language.md",
-  );
+  const { container } = render(<SpecBrowser />);
+  const link = within(specsSection(container)).getByRole("link", {
+    name: "the language definition",
+  });
+  expect(link.getAttribute("href")).toBe(LANGUAGE_URL);
 });
 
 test("following the same link twice", () => {
-  window.location.hash = "#spec/tictactoe/app/play/play.ail.md";
+  setHash("#spec/tictactoe/app/play/play.ail.md");
   render(<SpecBrowser />);
-  fireEvent.click(screen.getByRole("button", { name: "tictactoe.ail.md" }));
-  expect(isPicked("tictactoe.ail.md")).toBe(true);
-  const link = document.createElement("a");
-  link.setAttribute("href", "#spec/tictactoe/app/play/play.ail.md");
-  link.textContent = "Open play";
-  document.body.appendChild(link);
   act(() => {
-    fireEvent.click(link);
+    fireEvent.click(screen.getByRole("button", { name: "tictactoe.ail.md" }));
   });
-  expect(isPicked("app/play/play.ail.md")).toBe(true);
-  link.remove();
+  expectPicked("tictactoe.ail.md");
+  const anchor = document.createElement("a");
+  anchor.setAttribute("href", "#spec/tictactoe/app/play/play.ail.md");
+  anchor.textContent = "Open play";
+  document.body.appendChild(anchor);
+  try {
+    act(() => {
+      fireEvent.click(anchor);
+    });
+    expectPicked("app/play/play.ail.md");
+  } finally {
+    anchor.remove();
+  }
 });

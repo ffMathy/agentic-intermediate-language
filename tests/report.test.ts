@@ -33,7 +33,7 @@ test("JUnit results say which tests passed", () => {
 });
 
 test.skipIf(!installed)("a test run names every test, passed or failed", () => {
-  const r = runBunTest(KATA, ["checks/board/board-view.test.tsx"]);
+  const r = runBunTest(KATA, ["checks/board/board-view/board-view.test.tsx"]);
   expect(r.tests).toEqual([
     { name: "picking an empty square", ok: true }, { name: "a taken square does nothing", ok: true }, { name: "the winning line stands out", ok: true },
   ]);
@@ -63,9 +63,9 @@ test("each test's screen sits under it: the one just taken, else the committed o
   expect(md).toContain("<details><summary>✅ <b>BoardView</b> — 2/2 passed · ");
   expect(md).toContain(`- ✅ a win &lt;3\n\n  <img src="https://x.test/s/board/board-view/02-a-win.png"`);
   // No fresh screen for this one: the build's committed screenshot, copied next to the fresh ones.
-  expect(existsSync(join(KATA, "ail/board/shots/board-view/shots.json"))).toBe(true);
-  expect(md).toContain(`- ✅ picking an empty square\n\n  <img src="https://x.test/s/ail/board/shots/board-view/01-picking-an-empty-square.png"`);
-  expect(existsSync(join(out, "ail/board/shots/board-view/01-picking-an-empty-square.png"))).toBe(true);
+  expect(existsSync(join(KATA, "ail/board/board-view/shots/shots.json"))).toBe(true);
+  expect(md).toContain(`- ✅ picking an empty square\n\n  <img src="https://x.test/s/ail/board/board-view/shots/01-picking-an-empty-square.png"`);
+  expect(existsSync(join(out, "ail/board/board-view/shots/01-picking-an-empty-square.png"))).toBe(true);
 });
 
 test("without a place to publish them, only the tests are listed", () => {

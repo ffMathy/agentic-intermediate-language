@@ -1,7 +1,7 @@
-import { Section } from "../../parts/section";
-import { SectionHeading } from "../../parts/section-heading";
-import { Stack } from "../../parts/stack";
-import { SamplePullRequest } from "./sample-pull-request";
+import { Section } from "../../parts/section/section";
+import { SectionHeading } from "../../parts/section-heading/section-heading";
+import { Stack } from "../../parts/stack/stack";
+import { SamplePullRequest } from "./sample-pull-request/sample-pull-request";
 
 /** a heading, a sample pull request, and a note on why it reads that way */
 export function ReviewSection() {

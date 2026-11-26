@@ -1,15 +1,15 @@
-import { Section } from "../../parts/section";
-import { SectionHeading } from "../../parts/section-heading";
-import { Stack } from "../../parts/stack";
-import { JumpGauge } from "./jump-gauge";
-import { StopIdea } from "./stops/stop-idea";
-import { StopProduct } from "./stops/stop-product";
-import { StopExperience } from "./stops/stop-experience";
-import { StopSystem } from "./stops/stop-system";
-import { StopSpecialist } from "./stops/stop-specialist";
-import { StopBuild } from "./stops/stop-build";
-import { StopProof } from "./stops/stop-proof";
-import { StopResult } from "./stops/stop-result";
+import { Section } from "../../parts/section/section";
+import { SectionHeading } from "../../parts/section-heading/section-heading";
+import { Stack } from "../../parts/stack/stack";
+import { JumpGauge } from "./jump-gauge/jump-gauge";
+import { StopIdea } from "./stops/stop-idea/stop-idea";
+import { StopProduct } from "./stops/stop-product/stop-product";
+import { StopExperience } from "./stops/stop-experience/stop-experience";
+import { StopSystem } from "./stops/stop-system/stop-system";
+import { StopSpecialist } from "./stops/stop-specialist/stop-specialist";
+import { StopBuild } from "./stops/stop-build/stop-build";
+import { StopProof } from "./stops/stop-proof/stop-proof";
+import { StopResult } from "./stops/stop-result/stop-result";
 
 /** a heading, an introduction, a legend for the yellow thread, a map of the stops, then eight stops in order */
 export function Journey() {

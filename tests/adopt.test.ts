@@ -6,7 +6,7 @@ import { adopt, e2eCheckPath } from "../src/adopt.ts";
 import { compileHash } from "../src/hash.ts";
 import { lint } from "../src/lint.ts";
 import { loadProject } from "../src/project.ts";
-import { KATA, freePort, load, tempProject } from "./helpers.ts";
+import { KATA, freePort, load, tempProject, specFile } from "./helpers.ts";
 
 const installed = existsSync(join(KATA, "node_modules", "react")) && existsSync(join(KATA, "node_modules", "playwright"));
 const chromium = await import("playwright").then(async ({ chromium }) => { await (await chromium.launch()).close(); return true; }).catch(() => false);
@@ -37,7 +37,8 @@ test("a reason nobody could confirm stays visible as a warning", () => {
 
 test("a check pinned to an older spec is reported stale, and flows without a check are listed", async () => {
   const dir = tempProject("areas");
-  writeFileSync(join(dir, "a", "checkout.ail.md"), "```ail\nnode Checkout : flow   level: experience\n  why   People pay for what they picked.   <- AreaA\n  what\n    Scenario: paying\n      Given a full basket\n      When the person pays\n      Then the receipt is shown\n```\n\n```ail\nnode Browse : flow   level: experience\n  why   People find things.   <- AreaA\n  what\n    Scenario: looking\n      Given the shop is open\n      Then the products are listed\n```\n");
+  writeFileSync(specFile(dir, "a/checkout/checkout.ail.md"), "```ail\nnode Checkout : flow   level: experience\n  why   People pay for what they picked.   <- AreaA\n  what\n    Scenario: paying\n      Given a full basket\n      When the person pays\n      Then the receipt is shown\n```\n");
+  writeFileSync(specFile(dir, "a/browse/browse.ail.md"), "```ail\nnode Browse : flow   level: experience\n  why   People find things.   <- AreaA\n  what\n    Scenario: looking\n      Given the shop is open\n      Then the products are listed\n```\n");
   const p = load(dir);
   const flow = p.nodes.get("Checkout")!;
   const file = e2eCheckPath(p, flow);
@@ -51,7 +52,7 @@ test("a check pinned to an older spec is reported stale, and flows without a che
 
 test("without a run entry, adopt says to find out how to start the app", async () => {
   const dir = tempProject("areas");
-  writeFileSync(join(dir, "a", "checkout.ail.md"), "```ail\nnode Checkout : flow   level: experience\n  why   People pay.   <- AreaA\n  what\n    Scenario: paying\n      Then the receipt is shown\n```\n");
+  writeFileSync(specFile(dir, "a/checkout/checkout.ail.md"), "```ail\nnode Checkout : flow   level: experience\n  why   People pay.   <- AreaA\n  what\n    Scenario: paying\n      Then the receipt is shown\n```\n");
   const p = load(dir);
   const file = e2eCheckPath(p, p.nodes.get("Checkout")!);
   mkdirSync(join(file, ".."), { recursive: true });
@@ -63,7 +64,7 @@ test("without a run entry, adopt says to find out how to start the app", async (
 
 test("the app is started as run says, checked, and stopped; any platform, here a plain process", async () => {
   const dir = tempProject("areas");
-  writeFileSync(join(dir, "a", "checkout.ail.md"), "```ail\nnode Checkout : flow   level: experience\n  why   People pay.   <- AreaA\n  what\n    Scenario: paying\n      Then the receipt is shown\n```\n");
+  writeFileSync(specFile(dir, "a/checkout/checkout.ail.md"), "```ail\nnode Checkout : flow   level: experience\n  why   People pay.   <- AreaA\n  what\n    Scenario: paying\n      Then the receipt is shown\n```\n");
   const port = freePort();
   writeFileSync(join(dir, "server.ts"), `Bun.serve({ port: ${port}, fetch: () => new Response("receipt") });`);
   const cfg = { run: { legacy: { start: "bun server.ts", ready: `http://localhost:${port}`, env: { AIL_APP_URL: `http://localhost:${port}` } } } };
@@ -106,7 +107,7 @@ test("adopting takes the checks' screenshots as proof and records the existing a
   // Checkout is AreaA's child, so the project lints and builds.
   const area = join(dir, "a", "a.ail.md");
   writeFileSync(area, readFileSync(area, "utf8").replace("  uses  Price", "  uses  Price\n  children  Checkout"));
-  writeFileSync(join(dir, "a", "checkout.ail.md"), "```ail\nnode Checkout : flow   level: system\n  why   People pay.   <- AreaA\n  what\n    Scenario: paying\n      Then the receipt is shown\n```\n");
+  writeFileSync(specFile(dir, "a/checkout/checkout.ail.md"), "```ail\nnode Checkout : flow   level: system\n  why   People pay.   <- AreaA\n  what\n    Scenario: paying\n      Then the receipt is shown\n```\n");
   const port = freePort();
   writeFileSync(join(dir, "server.ts"), `Bun.serve({ port: ${port}, fetch: () => new Response("receipt") });`);
   writeFileSync(join(dir, "ail.config.json"), JSON.stringify({ run: { legacy: { start: "bun server.ts", ready: `http://localhost:${port}`, env: { AIL_APP_URL: `http://localhost:${port}` } } } }));
@@ -147,7 +148,7 @@ test("paying", async () => {
 
 test("the app's services start first, seed data goes in through the app's API, and everything stops afterwards", async () => {
   const dir = tempProject("areas");
-  writeFileSync(join(dir, "a", "checkout.ail.md"), "```ail\nnode Checkout : flow   level: experience\n  why   People pay.   <- AreaA\n  what\n    Scenario: an order is listed\n      Then the seeded order is shown\n```\n");
+  writeFileSync(specFile(dir, "a/checkout/checkout.ail.md"), "```ail\nnode Checkout : flow   level: experience\n  why   People pay.   <- AreaA\n  what\n    Scenario: an order is listed\n      Then the seeded order is shown\n```\n");
   const api = freePort();
   let web = freePort();
   while (web === api) web = freePort();
@@ -188,7 +189,7 @@ test("an order is listed", async () => {
 
 test("a failing seed stops everything and says why", async () => {
   const dir = tempProject("areas");
-  writeFileSync(join(dir, "a", "checkout.ail.md"), "```ail\nnode Checkout : flow   level: experience\n  why   People pay.   <- AreaA\n  what\n    Scenario: paying\n      Then the receipt is shown\n```\n");
+  writeFileSync(specFile(dir, "a/checkout/checkout.ail.md"), "```ail\nnode Checkout : flow   level: experience\n  why   People pay.   <- AreaA\n  what\n    Scenario: paying\n      Then the receipt is shown\n```\n");
   const port = freePort();
   writeFileSync(join(dir, "app.ts"), `Bun.serve({ port: ${port}, fetch: () => new Response("x") });`);
   writeFileSync(join(dir, "ail.config.json"), JSON.stringify({ run: { legacy: { start: "bun app.ts", ready: `http://localhost:${port}`, seed: "echo 'POST /orders: 422 invalid' >&2; exit 3" } } }));
@@ -206,7 +207,7 @@ test("a failing seed stops everything and says why", async () => {
 test("a build whose end-to-end checks can't run fails: it proves nothing", async () => {
   const { build } = await import("../src/build.ts");
   const dir = tempProject("areas");
-  writeFileSync(join(dir, "a", "checkout.ail.md"), "```ail\nnode Checkout : flow   level: system\n  why   People pay.   <- AreaA\n  what\n    Scenario: paying\n      Then the receipt is shown\n```\n");
+  writeFileSync(specFile(dir, "a/checkout/checkout.ail.md"), "```ail\nnode Checkout : flow   level: system\n  why   People pay.   <- AreaA\n  what\n    Scenario: paying\n      Then the receipt is shown\n```\n");
   writeFileSync(join(dir, "ail.config.json"), JSON.stringify({ run: { legacy: { start: "true" } } }));
   const area = join(dir, "a", "a.ail.md");
   writeFileSync(area, readFileSync(area, "utf8").replace("  uses  Price", "  uses  Price\n  children  Checkout"));

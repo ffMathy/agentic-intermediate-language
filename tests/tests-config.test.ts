@@ -5,7 +5,7 @@ import { existsSync, mkdirSync, readFileSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
 import { adopt, e2eCheckPath, e2eShotsDir } from "../src/adopt.ts";
 import { pinOf, reportTests, withPin } from "../src/tests.ts";
-import { load, tempProject } from "./helpers.ts";
+import { load, tempProject, specFile } from "./helpers.ts";
 
 const CHECKOUT = "```ail\nnode Checkout : flow   level: experience\n  why   People pay.   <- AreaA\n  what\n    Scenario: paying\n      Then the receipt is shown\n    Scenario: paying twice\n      Then one receipt is shown\n```\n";
 
@@ -20,7 +20,7 @@ exit $code
 
 function project(check: string, extra: Record<string, unknown> = {}) {
   const dir = tempProject("areas");
-  writeFileSync(join(dir, "a", "checkout.ail.md"), CHECKOUT);
+  writeFileSync(specFile(dir, "a/checkout/checkout.ail.md"), CHECKOUT);
   writeFileSync(join(dir, "runner.sh"), RUNNER);
   writeFileSync(join(dir, "ail.config.json"), JSON.stringify({
     run: { legacy: { env: { AIL_APP: "receipt" } } },
@@ -40,7 +40,7 @@ printf png > "$AIL_SHOTS_DIR/paying-twice.png"
 [ "$AIL_APP" = receipt ] && [ "$AIL_CHECK_NODE" = Checkout ] || exit 1
 echo '<testcase name="paying"/><testcase name="paying twice"/>'
 `);
-  expect(file).toBe(join(dir, "checks/e2e/a/CheckoutChecks.sh"));
+  expect(file).toBe(join(dir, "checks/e2e/a/checkout/CheckoutChecks.sh"));
   const r = await adopt(p);
   expect(r.error).toBeUndefined();
   const res = r.results.find((x) => x.node === "Checkout")!;

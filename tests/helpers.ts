@@ -1,6 +1,6 @@
-import { cpSync, mkdtempSync, readFileSync, writeFileSync } from "node:fs";
+import { cpSync, mkdirSync, mkdtempSync, readFileSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
-import { join } from "node:path";
+import { dirname, join } from "node:path";
 import { loadProject } from "../src/project.ts";
 
 export const KATA = join(import.meta.dir, "..", "examples", "tictactoe");
@@ -21,6 +21,12 @@ export function mockFile(dir: string, responses: Record<string, string[]>): stri
 export const reply = (path: string, body: string) => `=== FILE: ${path} ===\n${body}\n=== END ===`;
 
 export const load = (dir: string) => loadProject(dir);
+
+/** A spec file's path under `dir`, its folder made: every node has a folder of its own. */
+export function specFile(dir: string, rel: string): string {
+  mkdirSync(dirname(join(dir, rel)), { recursive: true });
+  return join(dir, rel);
+}
 
 /** The spec file under `dir` that holds `text` (a spec file holds one node, so a test edits the one that has it). */
 export function specFileWith(dir: string, text: string): string {

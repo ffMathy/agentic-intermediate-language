@@ -186,13 +186,13 @@
       "look": "dc5b0e2600930ec3f1b8d7d3e0db55c995ffd13b14ad24b3514ec32b17e89887"
     },
     "Journey": {
-      "hash": "d0690a35024cc202da434d9745dbe9e1a37d770380c27ba128eab23efd01351c",
+      "hash": "754278149dec15b77e35e41569ac872128d0bfb02dd7d9509f42d9725284a4f0",
       "files": {
         "src/gen/home/journey/journey.tsx": "c0f9962ab9f081f6470cdf13e3084be2e8eb4e54eb7a3a6d5765ca7f16d6551e"
       },
       "by": "claude-code",
-      "shots": "d0690a35024cc202da434d9745dbe9e1a37d770380c27ba128eab23efd01351c",
-      "look": "d0690a35024cc202da434d9745dbe9e1a37d770380c27ba128eab23efd01351c"
+      "shots": "754278149dec15b77e35e41569ac872128d0bfb02dd7d9509f42d9725284a4f0",
+      "look": "754278149dec15b77e35e41569ac872128d0bfb02dd7d9509f42d9725284a4f0"
     },
     "JourneyStop": {
       "hash": "fcfce0483bec54f99c6dc4c759a6a17f136e81a3e09f529fecb084d61972ef67",
@@ -411,13 +411,13 @@
       "look": "8c3689b0110b365b4ef7a2a901dbffc5babb98a12a8d878d50f386b2b902d5e7"
     },
     "StopProof": {
-      "hash": "fd76001c585e1eb893e1dbe8625bb38fba1de4c67c9831412f09e1bb54ffef82",
+      "hash": "09daa52b00aeecac0c29b88eab8f733676d786fcae679f1cdca96beaea0eb385",
       "files": {
         "src/gen/home/journey/stops/stop-proof.tsx": "0b35707cd504c8620499be897ffd4db0c239928d0b94ba89f400246b3444fe30"
       },
       "by": "claude-code",
-      "shots": "fd76001c585e1eb893e1dbe8625bb38fba1de4c67c9831412f09e1bb54ffef82",
-      "look": "fd76001c585e1eb893e1dbe8625bb38fba1de4c67c9831412f09e1bb54ffef82"
+      "shots": "09daa52b00aeecac0c29b88eab8f733676d786fcae679f1cdca96beaea0eb385",
+      "look": "09daa52b00aeecac0c29b88eab8f733676d786fcae679f1cdca96beaea0eb385"
     },
     "StopResult": {
       "hash": "5a26d5f42f5ef58b6c5c95b8df86c99af8b27f97c1269ff91226e1c4df630919",
@@ -573,7 +573,7 @@
   },
   "glue": {
     "src/gen/assets.d.ts": "8b9044f3e94a4669ea033bbea49000ccc17e32622e282441d78862e4780ea0aa",
-    "src/gen/spec.ts": "5f4fa40794e93f325d1395add5e0fe03bde30439efc106115fa5054b9e285217",
+    "src/gen/spec.ts": "8429641bda95329f81c2d013623ea537c696e7c88a2a6adff7953102d2f51850",
     "src/gen/tokens.css": "7bbb97ebb74409b3ed971ac9b054588620ec3b1652e3b22ce61e0ae8ddbcff31"
   }
 }

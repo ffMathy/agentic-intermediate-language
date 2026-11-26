@@ -2,7 +2,7 @@
 // derived check is run once more with a preload that records the final
 // screen; each screen is then rendered in Chromium (Playwright) with the
 // project's own page styles, so a reviewer sees what each scenario ends on.
-import { existsSync, mkdirSync, mkdtempSync, readdirSync, readFileSync, renameSync, rmdirSync, rmSync, statSync, writeFileSync } from "node:fs";
+import { copyFileSync, existsSync, mkdirSync, mkdtempSync, readdirSync, readFileSync, renameSync, rmdirSync, rmSync, statSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { basename, dirname, join, relative, resolve, sep } from "node:path";
 import type { AilNode } from "./parse.ts";
@@ -168,8 +168,22 @@ export function clearShots(dir: string): void {
 /** Retake a node's committed proof screenshots, and record the build they belong to. */
 export async function refreshNodeShots(p: Project, n: AilNode, log: (s: string) => void = () => {}): Promise<Shot[]> {
   const dir = nodeShotsDir(p, n);
-  clearShots(dir);
-  const shots = await takeShots(p, dir, [n.name], log, { scale: 1, manifest: false, dirOf: (m) => nodeShotsDir(p, m) });
+  // Taken into a scratch folder first: the old screenshots stay in place while the tests run, since a page
+  // can import them (through the spec module), and a test that imports a missing image never renders.
+  const tmp = mkdtempSync(join(tmpdir(), "ail-retake-"));
+  let shots: Shot[];
+  try {
+    const taken = await takeShots(p, tmp, [n.name], log, { scale: 1, manifest: false, dirOf: () => tmp });
+    clearShots(dir);
+    if (taken.length) mkdirSync(dir, { recursive: true });
+    shots = taken.map((s) => {
+      const file = join(dir, basename(s.file));
+      copyFileSync(s.file, file);
+      return { ...s, file };
+    });
+  } finally {
+    rmSync(tmp, { recursive: true, force: true });
+  }
   if (shots.length) writeFileSync(join(dir, "shots.json"), JSON.stringify({ node: n.name, shots: shots.map((s) => ({ test: s.test, file: relative(dir, s.file) })) }, null, 2) + "\n");
   const lock = readLock(p);
   const entry = lock.nodes[n.name];

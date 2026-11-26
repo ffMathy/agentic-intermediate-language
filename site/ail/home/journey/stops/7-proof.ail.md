@@ -5,7 +5,7 @@ node StopProof : view   level: experience
   why   Show that the promise is not taken on trust: the verify line became a test that plays every game, and what the player sees is proven and pictured too.   <- Journey
   what
     the seventh stop, in the build color, showing the derived check, and screenshots of the screens the demo's checks end on
-    it says that every check's final screen is screenshotted, compared with the spec's look by a model, and committed next to the checks
+    it says that every check's final screen is screenshotted, compared with the spec's look by a model, and committed beside the spec it proves
     Scenario: the proof
       Given the page is open
       Then the article "stop-7" has the level 3 heading "Proof: the verify line becomes a test that plays every game."

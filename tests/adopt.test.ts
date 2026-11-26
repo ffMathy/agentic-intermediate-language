@@ -6,7 +6,7 @@ import { adopt, e2eCheckPath } from "../src/adopt.ts";
 import { compileHash } from "../src/hash.ts";
 import { lint } from "../src/lint.ts";
 import { loadProject } from "../src/project.ts";
-import { KATA, load, tempProject } from "./helpers.ts";
+import { KATA, freePort, load, tempProject } from "./helpers.ts";
 
 const installed = existsSync(join(KATA, "node_modules", "react")) && existsSync(join(KATA, "node_modules", "playwright"));
 const chromium = await import("playwright").then(async ({ chromium }) => { await (await chromium.launch()).close(); return true; }).catch(() => false);
@@ -64,7 +64,7 @@ test("without a run entry, adopt says to find out how to start the app", async (
 test("the app is started as run says, checked, and stopped; any platform, here a plain process", async () => {
   const dir = tempProject("areas");
   writeFileSync(join(dir, "a", "checkout.ail.md"), "```ail\nnode Checkout : flow   level: experience\n  why   People pay.   <- AreaA\n  what\n    Scenario: paying\n      Then the receipt is shown\n```\n");
-  const port = 32000 + Math.floor(Math.random() * 1000);
+  const port = freePort();
   writeFileSync(join(dir, "server.ts"), `Bun.serve({ port: ${port}, fetch: () => new Response("receipt") });`);
   const cfg = { run: { legacy: { start: "bun server.ts", ready: `http://localhost:${port}`, env: { AIL_APP_URL: `http://localhost:${port}` } } } };
   writeFileSync(join(dir, "ail.config.json"), JSON.stringify(cfg));
@@ -107,7 +107,7 @@ test("adopting takes the checks' screenshots as proof and records the existing a
   const area = join(dir, "a", "a.ail.md");
   writeFileSync(area, readFileSync(area, "utf8").replace("  uses  Price", "  uses  Price\n  children  Checkout"));
   writeFileSync(join(dir, "a", "checkout.ail.md"), "```ail\nnode Checkout : flow   level: system\n  why   People pay.   <- AreaA\n  what\n    Scenario: paying\n      Then the receipt is shown\n```\n");
-  const port = 33000 + Math.floor(Math.random() * 1000);
+  const port = freePort();
   writeFileSync(join(dir, "server.ts"), `Bun.serve({ port: ${port}, fetch: () => new Response("receipt") });`);
   writeFileSync(join(dir, "ail.config.json"), JSON.stringify({ run: { legacy: { start: "bun server.ts", ready: `http://localhost:${port}`, env: { AIL_APP_URL: `http://localhost:${port}` } } } }));
   let p = load(dir);
@@ -148,7 +148,9 @@ test("paying", async () => {
 test("the app's services start first, seed data goes in through the app's API, and everything stops afterwards", async () => {
   const dir = tempProject("areas");
   writeFileSync(join(dir, "a", "checkout.ail.md"), "```ail\nnode Checkout : flow   level: experience\n  why   People pay.   <- AreaA\n  what\n    Scenario: an order is listed\n      Then the seeded order is shown\n```\n");
-  const api = 34000 + Math.floor(Math.random() * 500), web = api + 500;
+  const api = freePort();
+  let web = freePort();
+  while (web === api) web = freePort();
   // A backend that keeps orders in memory, and an app that only talks to it.
   writeFileSync(join(dir, "backend.ts"), `const orders: string[] = [];
 Bun.serve({ port: ${api}, async fetch(req) {
@@ -187,7 +189,7 @@ test("an order is listed", async () => {
 test("a failing seed stops everything and says why", async () => {
   const dir = tempProject("areas");
   writeFileSync(join(dir, "a", "checkout.ail.md"), "```ail\nnode Checkout : flow   level: experience\n  why   People pay.   <- AreaA\n  what\n    Scenario: paying\n      Then the receipt is shown\n```\n");
-  const port = 35000 + Math.floor(Math.random() * 1000);
+  const port = freePort();
   writeFileSync(join(dir, "app.ts"), `Bun.serve({ port: ${port}, fetch: () => new Response("x") });`);
   writeFileSync(join(dir, "ail.config.json"), JSON.stringify({ run: { legacy: { start: "bun app.ts", ready: `http://localhost:${port}`, seed: "echo 'POST /orders: 422 invalid' >&2; exit 3" } } }));
   const p = load(dir);

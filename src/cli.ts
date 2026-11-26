@@ -15,8 +15,9 @@ const HELP = `ail — write the spec, let agents build the code.
 
   ail build [Node…]     Compile whatever changed, then check everything: the spec is
                         sound, the code is built from it, every check passes, a model
-                        has compared each screen with its look, and, with run.app set,
-                        the app behaves as the spec says end to end. With nothing to compile it
+                        has compared each screen with its look, and the app, started
+                        as run.app says, behaves as the spec says end to end. A check
+                        that can't run fails the build. With nothing to compile it
                         only checks, so CI runs it too. Without ANTHROPIC_API_KEY it uses the
                         login of Claude Code, the Cursor CLI or the Copilot CLI, whichever is
                         installed (a Claude, Cursor or Copilot subscription works).

@@ -20,7 +20,13 @@ build), ask the user whether to add them. They keep the generated code out of
 pull request diffs while it stays committed, so reviewers read the spec. If the
 user agrees, add the lines to the `.gitattributes` at the repository's root.
 
-If the result says the end-to-end checks were not run because there is no
+A build passes only when every check it found ran and passed. Checks that
+could not run are a failed build, never a warning to weigh against how long the
+checks take or what they need (a model, a display, a device): the point of
+`ail build` is to verify them. Never report a build as passing while any check
+was skipped, and never propose skipping them.
+
+If the result says the end-to-end checks could not run because there is no
 `run.app`, find out how the app this project builds is started, along with what it
 depends on (a backend, a database). Look at the target, its package scripts
 and its build files. Then record it in `ail.config.json` under `run.app`:
@@ -28,5 +34,8 @@ and its build files. Then record it in `ail.config.json` under `run.app`:
 data every scenario needs, created through the app's own API, never directly
 in its database, as `/ail:adopt` describes. Data for a single scenario comes
 from its Given, and its test creates it. If it can't run locally yet, make it possible. Then
-build again. If starting it needs something this
-machine lacks, such as a simulator or a device, say exactly what.
+build again. For an adopted app that ail
+hasn't rebuilt yet, `run.app` is the same as `run.legacy` (`ail_adopt` records
+it). If starting it needs something this machine lacks, such as a simulator or
+a device, install it if you can; otherwise the build has failed, and say
+exactly what is missing.

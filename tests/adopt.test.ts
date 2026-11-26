@@ -6,7 +6,7 @@ import { adopt, e2eCheckPath } from "../src/adopt.ts";
 import { compileHash } from "../src/hash.ts";
 import { lint } from "../src/lint.ts";
 import { loadProject } from "../src/project.ts";
-import { KATA, load, tempProject } from "./helpers.ts";
+import { KATA, freePort, load, tempProject } from "./helpers.ts";
 
 const installed = existsSync(join(KATA, "node_modules", "react")) && existsSync(join(KATA, "node_modules", "playwright"));
 const chromium = await import("playwright").then(async ({ chromium }) => { await (await chromium.launch()).close(); return true; }).catch(() => false);
@@ -64,7 +64,7 @@ test("without a run entry, adopt says to find out how to start the app", async (
 test("the app is started as run says, checked, and stopped; any platform, here a plain process", async () => {
   const dir = tempProject("areas");
   writeFileSync(join(dir, "a", "checkout.ail.md"), "```ail\nnode Checkout : flow   level: experience\n  why   People pay.   <- AreaA\n  what\n    Scenario: paying\n      Then the receipt is shown\n```\n");
-  const port = 32000 + Math.floor(Math.random() * 1000);
+  const port = freePort();
   writeFileSync(join(dir, "server.ts"), `Bun.serve({ port: ${port}, fetch: () => new Response("receipt") });`);
   const cfg = { run: { legacy: { start: "bun server.ts", ready: `http://localhost:${port}`, env: { AIL_APP_URL: `http://localhost:${port}` } } } };
   writeFileSync(join(dir, "ail.config.json"), JSON.stringify(cfg));
@@ -103,8 +103,11 @@ test("adopting takes the checks' screenshots as proof and records the existing a
   const { verifyProject } = await import("../src/verify.ts");
   const { e2eShotsDir } = await import("../src/adopt.ts");
   const dir = tempProject("areas");
-  writeFileSync(join(dir, "a", "checkout.ail.md"), "```ail\nnode Checkout : flow   level: experience\n  why   People pay.   <- AreaA\n  what\n    Scenario: paying\n      Then the receipt is shown\n```\n");
-  const port = 33000 + Math.floor(Math.random() * 1000);
+  // Checkout is AreaA's child, so the project lints and builds.
+  const area = join(dir, "a", "a.ail.md");
+  writeFileSync(area, readFileSync(area, "utf8").replace("  uses  Price", "  uses  Price\n  children  Checkout"));
+  writeFileSync(join(dir, "a", "checkout.ail.md"), "```ail\nnode Checkout : flow   level: system\n  why   People pay.   <- AreaA\n  what\n    Scenario: paying\n      Then the receipt is shown\n```\n");
+  const port = freePort();
   writeFileSync(join(dir, "server.ts"), `Bun.serve({ port: ${port}, fetch: () => new Response("receipt") });`);
   writeFileSync(join(dir, "ail.config.json"), JSON.stringify({ run: { legacy: { start: "bun server.ts", ready: `http://localhost:${port}`, env: { AIL_APP_URL: `http://localhost:${port}` } } } }));
   let p = load(dir);
@@ -129,6 +132,13 @@ test("paying", async () => {
   // the existing app is the build: nothing to rebuild, and nothing fails for lack of generated code
   expect(plan(p).filter((e) => e.status !== "fresh")).toEqual([]);
   expect(verifyProject(p).ok).toBe(true);
+  // ...and the app ail build makes, so every build runs the end-to-end checks against it
+  expect(r.runApp).toBe(true);
+  expect(JSON.parse(readFileSync(join(dir, "ail.config.json"), "utf8")).run.app).toEqual(p.config.run!.legacy);
+  const { build } = await import("../src/build.ts");
+  const built = await build(p, { models: ["openai:none"], look: false });
+  expect(built.e2e?.results).toEqual([expect.objectContaining({ node: "Checkout", status: "pass" })]);
+  expect(built.ok).toBe(true);
   // a spec change after adopting makes that node, and the nodes using its contract, due for building
   const f = join(dir, p.nodes.get("Price")!.file);
   writeFileSync(f, readFileSync(f, "utf8").replace("price(1999) => 19", "price(1999) => 19\n      price(0) => 0"));
@@ -138,7 +148,9 @@ test("paying", async () => {
 test("the app's services start first, seed data goes in through the app's API, and everything stops afterwards", async () => {
   const dir = tempProject("areas");
   writeFileSync(join(dir, "a", "checkout.ail.md"), "```ail\nnode Checkout : flow   level: experience\n  why   People pay.   <- AreaA\n  what\n    Scenario: an order is listed\n      Then the seeded order is shown\n```\n");
-  const api = 34000 + Math.floor(Math.random() * 500), web = api + 500;
+  const api = freePort();
+  let web = freePort();
+  while (web === api) web = freePort();
   // A backend that keeps orders in memory, and an app that only talks to it.
   writeFileSync(join(dir, "backend.ts"), `const orders: string[] = [];
 Bun.serve({ port: ${api}, async fetch(req) {
@@ -177,7 +189,7 @@ test("an order is listed", async () => {
 test("a failing seed stops everything and says why", async () => {
   const dir = tempProject("areas");
   writeFileSync(join(dir, "a", "checkout.ail.md"), "```ail\nnode Checkout : flow   level: experience\n  why   People pay.   <- AreaA\n  what\n    Scenario: paying\n      Then the receipt is shown\n```\n");
-  const port = 35000 + Math.floor(Math.random() * 1000);
+  const port = freePort();
   writeFileSync(join(dir, "app.ts"), `Bun.serve({ port: ${port}, fetch: () => new Response("x") });`);
   writeFileSync(join(dir, "ail.config.json"), JSON.stringify({ run: { legacy: { start: "bun app.ts", ready: `http://localhost:${port}`, seed: "echo 'POST /orders: 422 invalid' >&2; exit 3" } } }));
   const p = load(dir);
@@ -190,3 +202,20 @@ test("a failing seed stops everything and says why", async () => {
   await Bun.sleep(300);
   expect(await fetch(`http://localhost:${port}`).then(() => "up", () => "down")).toBe("down");
 }, 60_000);
+
+test("a build whose end-to-end checks can't run fails: it proves nothing", async () => {
+  const { build } = await import("../src/build.ts");
+  const dir = tempProject("areas");
+  writeFileSync(join(dir, "a", "checkout.ail.md"), "```ail\nnode Checkout : flow   level: system\n  why   People pay.   <- AreaA\n  what\n    Scenario: paying\n      Then the receipt is shown\n```\n");
+  writeFileSync(join(dir, "ail.config.json"), JSON.stringify({ run: { legacy: { start: "true" } } }));
+  const area = join(dir, "a", "a.ail.md");
+  writeFileSync(area, readFileSync(area, "utf8").replace("  uses  Price", "  uses  Price\n  children  Checkout"));
+  const p = load(dir);
+  const file = e2eCheckPath(p, p.nodes.get("Checkout")!);
+  mkdirSync(join(file, ".."), { recursive: true });
+  writeFileSync(file, `import { test } from "bun:test";\ntest("paying", () => {});\n`);
+  const r = await build(p, { models: ["openai:none"], look: false });
+  expect(r.ok).toBe(false);
+  expect(r.text).toContain("✗ app      end-to-end checks could not run");
+  expect(r.text).not.toMatch(/^! app/m);
+});

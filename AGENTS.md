@@ -10,7 +10,9 @@
 - If the spec leaves something open and it isn't in `free`, stop and ask for a
   spec change. Never guess in code.
 - Before finishing, `ail build` (or `/ail:build`) must pass: it compiles what
-  changed and then checks everything.
+  changed and then checks everything, the end-to-end checks included. A build
+  in which any check didn't run has failed: install what it needs, or say what
+  is missing. Never present skipping checks as an option.
 - A pull request for a change to an AIL project carries the build's checks in
   its description, for what the change affects only: build with
   `--since <base branch>` (`ail_build` with `since`), push, and put

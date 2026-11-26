@@ -7,7 +7,7 @@ import { loadProject } from "../src/project.ts";
 import { githubLink, hasSection, lastReportPath, prSection, projectKey, renderChecks, sectionFor, upsertSection, writeReport, type BuildReport } from "../src/report.ts";
 import { junitResults } from "../src/shots.ts";
 import { runBunTest } from "../src/verify.ts";
-import { KATA } from "./helpers.ts";
+import { KATA, load, tempProject } from "./helpers.ts";
 
 const installed = existsSync(join(KATA, "node_modules", "react"));
 
@@ -135,4 +135,28 @@ test("a build that ran only what a change affects says so", () => {
   expect(renderChecks(p, report({ affected: { since: "origin/main", nodes: ["BoardView", "Rules"] } }))).toContain("Only the checks of what changed since `origin/main` and what uses it: 2 node(s).");
   expect(renderChecks(p, report({ affected: { since: "origin/main", nodes: [] } }))).toContain("so no tests ran");
   expect(renderChecks(p, report({ affected: { since: "origin/main", nodes: ["Rules"], everything: ["package.json"] } }))).toContain("Every check ran");
+});
+
+test("screens link to the commit that holds the build's own screenshots, and only that one", async () => {
+  const { screensCommit, buildHead } = await import("../src/report.ts");
+  const { e2eShotsDir } = await import("../src/shots.ts");
+  const dir = tempProject("areas");
+  const sh = (...a: string[]) => Bun.spawnSync(["git", ...a], { cwd: dir, stdout: "pipe" }).stdout.toString().trim();
+  sh("init", "-q"); sh("-c", "user.email=a@b", "-c", "user.name=a", "commit", "-qam", "x", "--allow-empty");
+  sh("add", "-A"); sh("-c", "user.email=a@b", "-c", "user.name=a", "commit", "-qm", "spec");
+  const p = load(dir);
+  const ran = buildHead(p);
+  expect(ran.dirty).toBe(false);
+  // the build writes its proof screenshots; that is not a change it ran on
+  const shots = e2eShotsDir(p, p.nodes.get("Price")!);
+  mkdirSync(shots, { recursive: true });
+  writeFileSync(join(shots, "paying.png"), "png");
+  expect(screensCommit(p, ran.head!)).toBe(ran.head!);
+  sh("add", "-A"); sh("-c", "user.email=a@b", "-c", "user.name=a", "commit", "-qm", "shots");
+  const withShots = sh("rev-parse", "HEAD");
+  expect(screensCommit(p, ran.head!)).toBe(withShots);
+  // anything else committed since means the screens may not be the ones checked: keep the commit the build ran on
+  writeFileSync(join(dir, "a", "a.ail.md"), readFileSync(join(dir, "a", "a.ail.md"), "utf8") + "\n");
+  sh("-c", "user.email=a@b", "-c", "user.name=a", "commit", "-qam", "spec change");
+  expect(screensCommit(p, ran.head!)).toBe(ran.head!);
 });

@@ -102,7 +102,23 @@ export async function startApp(p: Project, spec: RunSpec, log: (s: string) => vo
 export const runEnv = (spec: RunSpec): Record<string, string> =>
   ({ ...Object.assign({}, ...Object.values(spec.services ?? {}).map((s) => s.env ?? {})), ...(spec.env ?? {}) });
 
-export interface AdoptReport { ok: boolean; app: string; results: AdoptResult[]; error?: string; review?: { file: string; missing: string[] }; looks?: LookResult[]; recorded?: string[] }
+export interface AdoptReport { ok: boolean; app: string; results: AdoptResult[]; error?: string; review?: { file: string; missing: string[] }; looks?: LookResult[]; recorded?: string[]; runApp?: boolean }
+
+/**
+ * Once the existing app is proven to be the build, it is also the app `ail build` makes: record run.app as a copy of
+ * run.legacy when there is none, so every later build runs the end-to-end checks instead of skipping them. Moving to
+ * another technology later means changing the target and pointing run.app at the new app. True when it wrote one.
+ */
+export function recordRunApp(p: Project): boolean {
+  const run = p.config.run;
+  if (!run?.legacy || run.app) return false;
+  const file = join(p.root, "ail.config.json");
+  const raw = existsSync(file) ? JSON.parse(readFileSync(file, "utf8")) : {};
+  raw.run = { ...(raw.run ?? {}), app: structuredClone(run.legacy) };
+  writeFileSync(file, JSON.stringify(raw, null, 2) + "\n");
+  p.config.run = { ...run, app: structuredClone(run.legacy) };
+  return true;
+}
 
 /**
  * Record each compilable node that isn't built yet (or was adopted from an
@@ -199,7 +215,8 @@ export async function adopt(p: Project, opts: {
   const ok = results.every((r) => r.status === "pass" || r.status === "missing") && looks.every((l) => l.ok);
   // Proven on the existing app: record every node as built by it, so the first ail build has nothing to redo.
   const recorded = ok && opts.record ? recordAdopted(p) : [];
-  return { ok, app: label, results, review, looks, recorded };
+  const runApp = ok && !!opts.record && recordRunApp(p);
+  return { ok, app: label, results, review, looks, recorded, runApp };
 }
 
 /**
@@ -241,6 +258,7 @@ export function formatAdopt(r: AdoptReport): string {
   for (const x of ran.filter((y) => y.status !== "pass")) lines.push(`    ${icon[x.status]} ${x.node} ${x.status}: ${x.detail.split("\n").join("\n      ")}`);
   if (missing.length) lines.push(`    · ${missing.length} node(s) with scenarios have no end-to-end check yet: ${missing.map((x) => x.node).join(", ")}`);
   for (const l of r.looks ?? []) lines.push(l.skipped ? `    · ${l.node}: screenshots not compared with its look (${l.skipped})` : l.ok ? `    ✓ ${l.node}: ${l.shots.length} screenshot(s) match its look` : `    ✗ ${l.node}: its screenshots don't match its look\n${l.problems.map((x) => `        - ${x}`).join("\n")}`);
+  if (r.runApp) lines.push("    ✓ recorded run.app in ail.config.json as a copy of run.legacy: the existing app is what ail build makes, so every build runs these checks against it");
   if (r.recorded?.length) lines.push(`    ✓ recorded ${r.recorded.length} node(s) as built by the existing app in the lock file, so ail build only builds what changes from now on`);
   if (r.review) { const tip = formatReview(r.review); if (tip) lines.push(tip); }
   return lines.join("\n");

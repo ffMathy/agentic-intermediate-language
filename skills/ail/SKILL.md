@@ -108,6 +108,13 @@ or `binds`, or move it one level down. Define domain words once in the
 change affects and refine downwards. The post-edit hook lints the spec. Then
 run `/ail:build`, which ends by checking everything.
 
+**A build verifies every check.** `ail build` passes only when the spec is
+sound, the code is built from it, and every check it found ran and passed, the
+end-to-end checks included. A check that could not run (no `run.app`, a
+missing tool, a model or a display it needs) fails the build: install what it
+needs or say exactly what is missing. Never call a build passing while a check
+was skipped, and never offer to skip checks because they are slow or need setup.
+
 **A STOP question.** The compiler refused to guess. Answer the question in the
 spec (an example, a tie-break, or a `free` entry), then rebuild. Never answer
 it in code.
@@ -163,5 +170,5 @@ creates test data through the app's own API, never its database. Each flow gets 
 `checks/e2e/` that drives the app with what suits it (a browser, a simulator,
 a process), written in the target's language and test framework; for a
 language other than TypeScript, `tests` in `ail.config.json` says where the
-checks live and the command that runs one and writes a JUnit report, and `ail_adopt` proves the spec describes the app. Later, with
-`run.app` recorded, every build runs the same checks against the rebuilt app.
+checks live and the command that runs one and writes a JUnit report, and `ail_adopt` proves the spec describes the app. Then it records `run.app` (a copy of
+`run.legacy`, until the target changes), so every build runs the same checks against the app.

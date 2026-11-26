@@ -124,8 +124,10 @@ Follow the `ail` skill for how nodes are written. On top of it:
    check, or a screenshot that doesn't match its `look`, means the spec or the
    check is wrong about the app: fix that, never the app. When everything
    passes, the spec describes the app, and `ail_adopt` records every node in
-   the lock file as built by the existing app. A later `/ail:build` then only
-   builds what changes.
+   the lock file as built by the existing app, and records `run.app` as a copy
+   of `run.legacy`: the existing app is what `ail build` makes until the target
+   changes. A later `/ail:build` then only builds what changes, and runs every
+   end-to-end check against the app.
 6. **Report.** Report the nodes written, what `ail_adopt` says, and every
    open question, each with who could answer it. If `ail_adopt` suggests
    `.gitattributes` lines, ask the user whether to add them. They keep the
@@ -135,6 +137,7 @@ Follow the `ail` skill for how nodes are written. On top of it:
 
 To move to another technology afterwards:
 1. Change the root's `target` and run `/ail:build`.
-2. Find out how the new app starts, and record it as `run.app`.
+2. Find out how the new app starts, and point `run.app` at it (until then it
+   starts the existing app).
 3. From then on, every build runs the same checks against the new app, which
    proves it behaves like the old one.

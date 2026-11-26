@@ -28,6 +28,23 @@ export interface RunSpec {
   seedTimeout?: number;
 }
 
+/**
+ * How the end-to-end checks are written and run, in the target's language
+ * (its derived checks are the target's `checks.path` and `checks.run`). The
+ * path and commands may use {dir} (the node's folder), {kebab} and {name};
+ * the command also gets {file} (the check, relative to the project), {node}
+ * and {report}, where it must write a JUnit or TRX report of the scenarios it
+ * ran. Without it, end-to-end checks are bun tests in TypeScript.
+ */
+export interface TestsSpec {
+  /** Where a flow's end-to-end check lives, relative to the project (e.g. "checks/e2e/{dir}/{name}Checks.cs"). */
+  e2e?: string;
+  /** Shell command, from the project, that runs one end-to-end check and writes its report to {report}. */
+  command?: string;
+  /** Shell command, from the project, run once before the end-to-end checks run: builds them. */
+  prepare?: string;
+}
+
 export interface Config {
   /** Lint warns when a node spans more lines than this (default 80): split it into children. */
   maxNodeLines?: number;
@@ -41,6 +58,8 @@ export interface Config {
    * with a key, a display name and its spec folder (relative to this project). */
   specModule?: string | { path: string; projects: { key: string; name: string; dir: string; shots?: boolean }[] };
   checksDir?: string;
+  /** How the end-to-end checks are written and run, when not as bun tests: see TestsSpec. */
+  tests?: TestsSpec;
   /** How to run apps for the end-to-end checks, found out by the agent that adopts or builds the project:
    * "legacy" is the existing app a spec is written from, "app" the one `ail build` makes. */
   run?: Record<string, RunSpec>;

@@ -12,7 +12,7 @@ import { orphanShots, refreshNodeShots, staleShots, takeShots } from "./shots.ts
 import { rmSync } from "node:fs";
 import { existsSync } from "node:fs";
 import { join } from "node:path";
-import { adopt, formatAdopt, formatReview, reviewAttributes, type AdoptReport } from "./adopt.ts";
+import { adopt, e2eCheckPath, formatAdopt, formatReview, reviewAttributes, type AdoptReport } from "./adopt.ts";
 import { readLock } from "./lock.ts";
 import { checksDir, foreignChecks } from "./verify.ts";
 import { buildHead, lastReportPath, writeReport } from "./report.ts";
@@ -101,7 +101,7 @@ export async function build(p: Project, o: BuildOptions = {}): Promise<BuildResu
   }
   // The end-to-end checks, against the app this build made, started as run.app says.
   let e2e: AdoptReport | undefined;
-  if (existsSync(join(checksDir(p), "e2e")) && (!scope || scope.length)) {
+  if (p.ordered.some((n) => existsSync(e2eCheckPath(p, n))) && (!scope || scope.length)) {
     if (p.config.run?.app) {
       const r = e2e = await adopt(p, { app: "app", names: scope ?? names, log, judge: noModel || o.look === false ? undefined : getProvider(specs[0]!) });
       ok &&= r.ok;

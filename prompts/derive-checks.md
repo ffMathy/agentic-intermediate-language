@@ -14,7 +14,9 @@ run.
    aren't in `look`.
 3. Find elements the way a user would: by role and accessible name, using the
    `copy` text verbatim (`getByRole("button", { name: "New game" })`).
-4. Use the test tools the target names. For React targets that is `bun:test`
+4. Write the check in the target's language, with the test tools the target
+   names (its `tests` setting): xUnit for C#, pytest for Python, `bun:test`
+   for TypeScript. For React targets that is `bun:test`
    with `@testing-library/react` (`render`, `screen`, `fireEvent`, `act`,
    `cleanup`); call `cleanup()` in `afterEach`. Import the module under test
    relative to the check file.
@@ -28,7 +30,8 @@ run.
 6. The test DOM (happy-dom) drops CSS functions such as clamp(), min() and
    calc() from inline styles, so never assert on a style value that uses one.
    Assert on plain values (px, vw, %) or on structure and text instead.
-7. The first line is the `// ail-derived-from: Node@hash` header you were given.
+7. The first line is the `ail-derived-from: Node@hash` comment you were given,
+   in the language's comment syntax.
 8. The spec is written in AIL notation (`text`, `list of T`, `nothing`,
    `later T`, `is`, `and`). Write the test in the target's language and
    conventions, and spell each name the way the target's naming convention
@@ -37,7 +40,7 @@ run.
    `STOP: <question>`.
 
 ## Output
-    === FILE: checks/<kebab>.test.tsx ===
+    === FILE: <the check file you were given> ===
     <complete file>
     === END ===
 

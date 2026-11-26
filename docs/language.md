@@ -249,6 +249,13 @@ into the platform (`svg`, `hash`, `tablist`) and say what it does in words.
   against the `look` and `copy`.
 - A flow may also have an end-to-end check in `checks/e2e/` that drives the
   running app.
+- End-to-end checks are written in the target's language too. For TypeScript
+  they are bun tests. For any other language, `tests` in `ail.config.json`
+  gives where a flow's check lives (`e2e`, with `{dir}`, `{name}` and
+  `{kebab}`), the command that runs one (`command`, with `{file}` and
+  `{report}`: a JUnit or TRX report it writes, from which ail reads each
+  scenario's name and outcome) and, optionally, a command that builds them
+  first (`prepare`). Its pin is written in the language's comment syntax.
 
 ## 8. Editors
 

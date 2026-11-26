@@ -161,5 +161,7 @@ yourself how the app starts, whatever its platform, along with the services it
 needs, and record it in `ail.config.json` under `run.legacy`, with a `seed` that
 creates test data through the app's own API, never its database. Each flow gets an end-to-end check in
 `checks/e2e/` that drives the app with what suits it (a browser, a simulator,
-a process), and `ail_adopt` proves the spec describes the app. Later, with
+a process), written in the target's language and test framework; for a
+language other than TypeScript, `tests` in `ail.config.json` says where the
+checks live and the command that runs one and writes a JUnit report, and `ail_adopt` proves the spec describes the app. Later, with
 `run.app` recorded, every build runs the same checks against the rebuilt app.

@@ -13,6 +13,7 @@ import { parseFile, type AilNode } from "./parse.ts";
 import { adoptedFresh, plan } from "./plan.ts";
 import { AIL_HOME, isCompilable, kebab, modulePath, specModulePath, topoByUses, type Project } from "./project.ts";
 import type { Provider } from "./providers/index.ts";
+import { e2eCheckPath } from "./tests.ts";
 import { checkHeader, checkPath, checksDir, DERIVED_HEADER, derivedCheckFile, foreignChecks, loadPrompt, needsDerivedCheck, stampCheck, verifyNode, type VerifyResult } from "./verify.ts";
 export { checkPath, loadPrompt } from "./verify.ts";
 
@@ -221,11 +222,12 @@ export function prune(p: Project): { removed: string[]; kept: string[] } {
     delete lock.nodes[name];
   }
   writeLock(p, lock);
-  // Derived checks of nodes that are gone, or that moved to another folder.
+  // Derived checks of nodes that are gone, or that moved to another folder. End-to-end checks stay.
   for (const abs of derivedCheckFiles(p)) {
     const name = DERIVED_HEADER.exec(readFileSync(abs, "utf8"))?.[1];
     if (!name) continue;
     const n = p.nodes.get(name);
+    if (n && e2eCheckPath(p, n) === abs) continue;
     const file = relative(p.root, abs);
     if (!n || !needsDerivedCheck(n, p) || checkPath(p, n) !== file) { rmSync(abs); removed.push(file); }
   }

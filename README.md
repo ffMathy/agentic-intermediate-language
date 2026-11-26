@@ -146,6 +146,8 @@ time:
    and a 499 kr rug, Then the total reads 698 kr"). Each test creates its
    own through the app's own API, never directly in its database, so it is
    made the way users make it.
+   The checks are written in the target's language (xUnit for a C# app);
+   `tests` in `ail.config.json` says where they live and how to run one.
    `ail adopt` starts the old app, runs the checks and stops it, which proves
    the spec describes the old app. Each check also saves a screenshot of the
    screen every scenario ends on, however its platform takes one. `ail adopt`

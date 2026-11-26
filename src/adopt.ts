@@ -15,14 +15,14 @@ import { compileHash, oracleHash, specHash } from "./hash.ts";
 import { adoptedFresh } from "./plan.ts";
 import { hasLook, judgeShots, type LookResult } from "./look.ts";
 import type { Provider } from "./providers/index.ts";
-import { shotsDir, slugOf, type Shot } from "./shots.ts";
+import { collectShots, shotsDir, type Shot } from "./shots.ts";
+import { e2eCheckPath, failureText, ownRunner, pinOf, prepareChecks, runCheckFile, withPin } from "./tests.ts";
 import type { AilNode } from "./parse.ts";
 import { isCompilable, kebab, type Project, type RunSpec } from "./project.ts";
 import { lockPath, readLock, writeLock } from "./lock.ts";
-import { checkHeader, checksDir, errorExcerpt, runBunTest, type TestResult } from "./verify.ts";
+import { errorExcerpt, type TestResult } from "./verify.ts";
 
-/** Where a node's end-to-end check lives: checks/e2e/<dir>/<kebab>.e2e.ts (not picked up by a plain `bun test`). */
-export const e2eCheckPath = (p: Project, n: AilNode) => join(checksDir(p), "e2e", n.dir, `${kebab(n.name)}.e2e.ts`);
+export { e2eCheckPath } from "./tests.ts";
 
 /** Nodes whose scenarios a person could play through in the app: its flows and the root. */
 export const observable = (n: AilNode) => n.scenarios.length > 0 && (n.kind === "flow" || n.kind === "system");
@@ -32,19 +32,7 @@ export interface AdoptResult { node: string; file: string | null; status: "pass"
 /** Where a flow's end-to-end screenshots go: checks/shots/e2e/<dir>/<kebab>/, handed to its check as AIL_SHOTS_DIR. */
 export const e2eShotsDir = (p: Project, n: AilNode) => join(shotsDir(p), "e2e", n.dir, kebab(n.name));
 
-/** The file name a check saves a scenario's screenshot under: the test's name as a slug, plus ".png". */
-export const shotFileName = (test: string) => `${slugOf(test)}.png`;
-
-/** Pair the screenshots a check saved with its tests (in run order), and write the folder's index. */
-export function collectShots(dir: string, node: string, tests: string[]): { shots: Shot[]; missing: string[] } {
-  const shots: Shot[] = [], missing: string[] = [];
-  for (const t of tests) {
-    const f = join(dir, shotFileName(t));
-    if (existsSync(f)) shots.push({ node, test: t, file: f }); else missing.push(t);
-  }
-  if (shots.length) writeFileSync(join(dir, "shots.json"), JSON.stringify({ node, shots: shots.map((s) => ({ test: s.test, file: relative(dir, s.file) })) }, null, 2) + "\n");
-  return { shots, missing };
-}
+export { collectShots, shotFileName } from "./shots.ts";
 
 /** Which app to run: the given name, else "legacy" while adopting, else "app". */
 export function runSpecName(p: Project, name?: string): string | null {
@@ -170,8 +158,8 @@ export async function adopt(p: Project, opts: {
       continue;
     }
     const text = readFileSync(abs, "utf8");
-    const pinned = /^\/\/ ail-derived-from:\s*\w+@([0-9a-f]+)/.exec(text)?.[1];
-    if (!pinned) writeFileSync(abs, `${checkHeader(p, n)}\n${text}`);
+    const pinned = pinOf(text)?.hash;
+    if (!pinned) writeFileSync(abs, withPin(abs, text, n.name, oracleHash(p, n).slice(0, 16)));
     else if (pinned !== oracleHash(p, n).slice(0, 16)) {
       results.push({ node: n.name, file, status: "stale", detail: "the node's spec changed since this check was written; update the check, then run again" });
       continue;
@@ -184,20 +172,23 @@ export async function adopt(p: Project, opts: {
   try { app = await startApp(p, spec, opts.log); }
   catch (e) { return { ok: false, app: label, results, review, error: (e as Error).message }; }
   try {
+    // The checks' own build (in the target's language), once, before any of them runs.
+    const unprepared = prepareChecks(p, runEnv(spec));
+    if (unprepared) return { ok: false, app: label, results, review, error: unprepared };
     for (const { n, abs, file } of toRun) {
       // A fresh folder for the screenshots the check takes as proof, however its platform takes them.
       const shotsAt = e2eShotsDir(p, n);
       rmSync(shotsAt, { recursive: true, force: true });
       mkdirSync(shotsAt, { recursive: true });
-      // Run from outside the project, so its test setup (a simulated DOM) stays out of a real app's way.
-      const r = runBunTest(tmpdir(), [abs], { ...runEnv(spec), AIL_SHOTS_DIR: shotsAt });
+      // As bun tests, run from outside the project, so its test setup (a simulated DOM) stays out of a real app's way.
+      const r = runCheckFile(p, n, abs, { ...runEnv(spec), AIL_SHOTS_DIR: shotsAt }, tmpdir());
       const tests = r.tests.map((t) => t.name);
       const { shots, missing: unpictured } = collectShots(shotsAt, n.name, tests);
       if (!shots.length) rmSync(shotsAt, { recursive: true, force: true });
       const pictured = !tests.length ? "" : !shots.length ? "; no screenshots saved (the check should save one per scenario into AIL_SHOTS_DIR)" : unpictured.length ? `; no screenshot for: ${unpictured.join(", ")}` : `, each with a screenshot`;
       results.push(r.ok
         ? { node: n.name, file, status: "pass", detail: `${r.passes} scenario(s) behave as specified${pictured}`, shots, tests: r.tests }
-        : { node: n.name, file, status: "fail", detail: `${r.failures.length ? r.failures.join("; ") : "the check did not run"}\n${errorExcerpt(r.output, 20)}`, shots, tests: r.tests });
+        : { node: n.name, file, status: "fail", detail: `${r.failures.length ? r.failures.join("; ") : "the check did not run"}\n${ownRunner(p) ? failureText(r) : errorExcerpt(r.output, 20)}`, shots, tests: r.tests });
     }
   } finally { app.stop(); }
   // The screenshots are proof of the look too: a model compares them with it.

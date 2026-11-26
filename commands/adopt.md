@@ -77,27 +77,46 @@ Follow the `ail` skill for how nodes are written. On top of it:
 4. **Sources.** Give each node a `sources` section listing where its claims
    came from: ticket links, interview answers (who, and when), screens, and
    code paths. It is kept for review and never compiled.
-5. **Prove it on the old app.** For each flow, write an end-to-end check at
-   `checks/e2e/<the node's folder>/<node in kebab-case>.e2e.ts`:
-   - a `bun:test` file, with one test per scenario, named exactly as the
-     scenario
+5. **Prove it on the old app.** For each flow, write an end-to-end check in
+   the target's language, with the test framework its `tests` setting names
+   (xUnit for C#, pytest for Python, `bun:test` for TypeScript):
+   - one test per scenario, named exactly as the scenario (in xUnit, its
+     `DisplayName`)
    - it drives the app with the same tool as step 2, and reaches it through
      the `env` in `run`
    - it uses only what a user can see and do, never the old app's code or
      markup, so that it also works against the rebuilt app
+   - it lives at `checks/e2e/<the node's folder>/<node in kebab-case>.e2e.ts`
+     for a TypeScript target. For any other language, say where in
+     `ail.config.json` under `tests`, and how to run one:
+
+     ```json
+     "tests": {
+       "e2e": "checks/e2e/{dir}/{name}Checks.cs",
+       "prepare": "dotnet build checks/e2e -c Release",
+       "command": "dotnet checks/e2e/bin/Release/net10.0/Checks.dll -class '*.{name}Checks' -result-junit {report}"
+     }
+     ```
+
+     `{dir}`, `{name}` and `{kebab}` are the node's folder and name; the
+     command also gets `{file}` (the check) and `{report}`, where it writes a
+     JUnit or TRX report, from which ail reads each test's name and outcome.
+     `prepare` builds the checks once before they run. (The derived checks
+     `ail build` writes follow the target's `checks.path` and `checks.run`.)
 
    - at the end of every test it saves visual proof: a screenshot of the screen
      the scenario ends on, as a PNG in the folder `process.env.AIL_SHOTS_DIR`,
      named after the test: the test's name in lower case, each run of other
      characters turned into one `-`, trimmed of `-`, at most 60 characters, plus
-     `.png` ("X always starts" → `x-always-starts.png`). Work out how to take it
+     `.png` ("X always starts" → `x-always-starts.png`). A shared helper that
+     wraps each test does this best. Work out how to take it
      on this platform and make it work: `page.screenshot()` for the web, the X
      display (`import -window root`, `xwd`) or the OS's screenshot tool for a
      desktop app, `xcrun simctl io booted screenshot` or `adb exec-out
      screencap -p` for mobile. For an app with no screen (a CLI, an API), save
      an image of what the scenario ends with, such as its rendered output.
 
-   Add any driver it needs to the project's dev dependencies. Call `ail_adopt`:
+   Add any driver it needs to the checks' own dependencies. Call `ail_adopt`:
    it starts the app's services and the app as `run.legacy` says, runs its
    baseline seed, runs the checks, collects their
    screenshots into `checks/shots/e2e/` (committed, like the other proof), has

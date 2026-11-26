@@ -49,7 +49,7 @@ export function parseVerdict(reply: string): { ok: boolean; problems: string[] }
 }
 
 /**
- * Retake a node's proof screenshots (the committed ones, in checks/shots/)
+ * Retake a node's proof screenshots (the committed ones, beside its spec in shots/)
  * and ask the model whether they match its look.
  */
 export async function lookCheck(p: Project, n: AilNode, provider: Provider, log: (s: string) => void = () => {}): Promise<LookResult> {

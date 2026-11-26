@@ -17,7 +17,7 @@ node StopProof : view   level: experience
     proof.chip      "PROOF"
     proof.reader    "everyone: a green check means the sentence at the top is true"
     proof.headline  "Proof: the verify line becomes a test that plays every game."
-    proof.body      "The verify line from the specialist level became a derived check, pinned to a hash of the node: it plays every possible game against the computer and asserts that X never wins. What people see is proven too. The final screen of every check is screenshotted, a model compares it with the spec's look, and the screenshots are committed next to the checks, so a reviewer sees exactly what was proven. Every ail build runs it all, on your machine and in CI."
+    proof.body      "The verify line from the specialist level became a derived check, pinned to a hash of the node: it plays every possible game against the computer and asserts that X never wins. What people see is proven too. The final screen of every check is screenshotted, a model compares it with the spec's look, and the screenshots are committed beside the spec they prove, so a reviewer sees exactly what was proven, next to what it was proven against. Every ail build runs it all, on your machine and in CI."
     proof.label     "Derived check excerpt"
     proof.file      "examples/tictactoe/checks/engine/computer-player/computer-player.test.ts"
     proof.line.1    "// ail-derived-from: ComputerPlayer@0c990bfbddc62e20"
@@ -41,11 +41,11 @@ node ProofScreens : view   level: experience
   why   Show that proof covers what people see, too: the screens the checks end on are pictured, judged against the look, and committed.   <- StopProof
   what
     two screenshots of the demo's play screen, taken at the end of its checks "winning" and "the computer answers", side by side when there is room, each with a check mark and the check's name under it
-    under them, a line says the screenshots are committed with the checks, and where
+    under them, a line says the screenshots are committed beside the spec, and where
     Scenario: the screens
       Given the stop is shown
       Then it shows the images named "Screenshot at the end of the check “winning”" and "Screenshot at the end of the check “the computer answers”", in that order
-      And it shows a line containing "examples/tictactoe/checks/shots/"
+      And it shows a line containing "examples/tictactoe/ail/app/play/shots/"
   look
     layout   stack(v, gap: space.3, align: stretch) [ grid, where ]
     grid     a div: display grid, grid-template-columns repeat(auto-fit, minmax(min(128px, 100%), 1fr)), gap space.3, width 100%
@@ -56,8 +56,8 @@ node ProofScreens : view   level: experience
   copy
     proof.shots.alt    "Screenshot at the end of the check “{test}”"
     proof.shots.mark   "✓"
-    proof.shots.where  "Committed with the checks, in"
-    proof.shots.path   "examples/tictactoe/checks/shots/"
+    proof.shots.where  "Committed beside the spec, in"
+    proof.shots.path   "examples/tictactoe/ail/app/play/shots/"
   binds
     data     specProjects from the spec module: of the project with key "tictactoe", the shots of node "PlayAGame" whose test is "winning", then the one whose test is "the computer answers"; a missing one is left out
     img      src the shot's src; alt from proof.shots.alt with {test} filled in

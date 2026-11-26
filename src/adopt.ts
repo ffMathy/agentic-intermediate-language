@@ -15,7 +15,7 @@ import { compileHash, oracleHash, specHash } from "./hash.ts";
 import { adoptedFresh } from "./plan.ts";
 import { hasLook, judgeShots, type LookResult } from "./look.ts";
 import type { Provider } from "./providers/index.ts";
-import { collectShots, shotsDir, type Shot } from "./shots.ts";
+import { collectShots, e2eShotsDir, type Shot } from "./shots.ts";
 import { e2eCheckPath, failureText, ownRunner, pinOf, prepareChecks, runCheckFile, withPin } from "./tests.ts";
 import type { AilNode } from "./parse.ts";
 import { isCompilable, kebab, type Project, type RunSpec } from "./project.ts";
@@ -29,10 +29,7 @@ export const observable = (n: AilNode) => n.scenarios.length > 0 && (n.kind === 
 
 export interface AdoptResult { node: string; file: string | null; status: "pass" | "fail" | "stale" | "missing"; detail: string; shots?: Shot[]; tests?: TestResult[] }
 
-/** Where a flow's end-to-end screenshots go: checks/shots/e2e/<dir>/<kebab>/, handed to its check as AIL_SHOTS_DIR. */
-export const e2eShotsDir = (p: Project, n: AilNode) => join(shotsDir(p), "e2e", n.dir, kebab(n.name));
-
-export { collectShots, shotFileName } from "./shots.ts";
+export { collectShots, e2eShotsDir, shotFileName } from "./shots.ts";
 
 /** Which app to run: the given name, else "legacy" while adopting, else "app". */
 export function runSpecName(p: Project, name?: string): string | null {

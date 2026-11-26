@@ -59,10 +59,9 @@ test("each test's screen sits under it: the one just taken, else the committed o
   const md = renderChecks(p, report(), { outDir: out, base: "https://x.test/s/", shots: [{ node: "BoardView", test: "a win <3", file: join(out, "board/board-view/02-a-win.png") }] });
   expect(md).toContain(`- ✅ a win &lt;3\n\n  <img src="https://x.test/s/board/board-view/02-a-win.png"`);
   // No fresh screen for this one: the build's committed screenshot, copied next to the fresh ones.
-  if (existsSync(join(KATA, "checks/shots/board/board-view/shots.json"))) {
-    expect(md).toContain(`- ✅ picking an empty square\n\n  <img src="https://x.test/s/checks/board/board-view/01-picking-an-empty-square.png"`);
-    expect(existsSync(join(out, "checks/board/board-view/01-picking-an-empty-square.png"))).toBe(true);
-  }
+  expect(existsSync(join(KATA, "ail/board/shots/board-view/shots.json"))).toBe(true);
+  expect(md).toContain(`- ✅ picking an empty square\n\n  <img src="https://x.test/s/ail/board/shots/board-view/01-picking-an-empty-square.png"`);
+  expect(existsSync(join(out, "ail/board/shots/board-view/01-picking-an-empty-square.png"))).toBe(true);
 });
 
 test("without a place to publish them, only the tests are listed", () => {
@@ -110,7 +109,7 @@ test("screens link to the committed screenshot on GitHub, at the commit the buil
   const p = loadProject(KATA);
   const link = githubLink(p, "abc123");
   if (!link) return; // a checkout without a GitHub origin
-  expect(link(join(KATA, "checks/shots/ui/text/01-content-is-shown.png"))).toMatch(/^https:\/\/github\.com\/[^/]+\/[^/]+\/blob\/abc123\/examples\/tictactoe\/checks\/shots\/ui\/text\/01-content-is-shown\.png\?raw=true$/);
+  expect(link(join(KATA, "ail/ui/shots/text/01-content-is-shown.png"))).toMatch(/^https:\/\/github\.com\/[^/]+\/[^/]+\/blob\/abc123\/examples\/tictactoe\/ail\/ui\/shots\/text\/01-content-is-shown\.png\?raw=true$/);
   expect(projectKey(p)).toBe("examples/tictactoe");
 });
 

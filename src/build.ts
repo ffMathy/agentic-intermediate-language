@@ -8,8 +8,7 @@ import { formatDiagnostics, lint } from "./lint.ts";
 import { plan } from "./plan.ts";
 import { isCompilable, type Project } from "./project.ts";
 import { getProvider, modelUnavailable, resolveModels } from "./providers/index.ts";
-import { orphanShots, refreshNodeShots, staleShots, takeShots } from "./shots.ts";
-import { rmSync } from "node:fs";
+import { clearShots, moveLegacyShots, orphanShots, refreshNodeShots, staleShots, takeShots } from "./shots.ts";
 import { existsSync } from "node:fs";
 import { join } from "node:path";
 import { adopt, e2eCheckPath, formatAdopt, formatReview, reviewAttributes, type AdoptReport } from "./adopt.ts";
@@ -120,8 +119,9 @@ export async function build(p: Project, o: BuildOptions = {}): Promise<BuildResu
 
 /** Retake the committed screenshots that are out of date and remove orphaned ones. True when anything changed. */
 async function refreshShots(p: Project, log: (s: string) => void): Promise<boolean> {
-  let changed = false;
-  for (const dir of orphanShots(p)) { rmSync(dir, { recursive: true, force: true }); changed = true; }
+  let changed = moveLegacyShots(p);
+  if (changed) log("proof screenshots moved beside the spec, into each spec folder's shots/");
+  for (const dir of orphanShots(p)) { clearShots(dir); changed = true; }
   for (const n of staleShots(p)) {
     try {
       await refreshNodeShots(p, n);

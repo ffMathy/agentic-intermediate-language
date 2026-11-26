@@ -11,7 +11,7 @@ import { fileHash, readLock, writeLock } from "./lock.ts";
 import { hasLook, lookCheck, recordLook, type LookResult } from "./look.ts";
 import { parseFile, type AilNode } from "./parse.ts";
 import { adoptedFresh, plan } from "./plan.ts";
-import { AIL_HOME, isCompilable, kebab, modulePath, specModulePath, topoByUses, type Project } from "./project.ts";
+import { AIL_HOME, isCompilable, kebab, modulePath, SHOTS, specModulePath, topoByUses, type Project } from "./project.ts";
 import type { Provider } from "./providers/index.ts";
 import { e2eCheckPath } from "./tests.ts";
 import { checkHeader, checkPath, checksDir, DERIVED_HEADER, derivedCheckFile, foreignChecks, loadPrompt, needsDerivedCheck, stampCheck, verifyNode, type VerifyResult } from "./verify.ts";
@@ -68,15 +68,18 @@ export function specModuleProjects(p: Project): { key: string; name: string; dir
     : [{ key: "this", name: "This project", dir: p.specRoot, configDir: relative(p.root, p.specRoot) || ".", shots: false }];
 }
 
-/** The committed proof screenshots of the AIL project whose spec folder is `specDir`, in path order. */
+/** The committed proof screenshots of the AIL project whose spec folder is `specDir`, in path order, end-to-end ones last. */
 export function projectShots(specDir: string): { node: string; test: string; file: string }[] {
   let root = specDir;
   while (!existsSync(join(root, "ail.config.json")) && dirname(root) !== root) root = dirname(root);
   if (!existsSync(join(root, "ail.config.json"))) return [];
-  const config = JSON.parse(readFileSync(join(root, "ail.config.json"), "utf8")) as { checksDir?: string };
-  const dir = join(root, config.checksDir ?? "checks", "shots");
+  const config = JSON.parse(readFileSync(join(root, "ail.config.json"), "utf8")) as { specRoot?: string };
+  // Beside the spec: each spec folder's shots/<node>/ (and its e2e/), as nodeShotsDir in shots.ts puts them.
+  const dir = resolve(root, config.specRoot ?? ".");
   if (!existsSync(dir)) return [];
-  return [...new Bun.Glob("**/shots.json").scanSync({ cwd: dir })].sort().flatMap((f) => {
+  return [...new Bun.Glob(`**/${SHOTS}/**/shots.json`).scanSync({ cwd: dir })].filter((f) => !/(^|\/)(node_modules|\.[^/]+)\//.test(f))
+    // A node's own screens first, its end-to-end ones after all of them.
+    .sort((a, b) => Number(/(^|\/)e2e\/shots\.json$/.test(a)) - Number(/(^|\/)e2e\/shots\.json$/.test(b)) || (a < b ? -1 : a > b ? 1 : 0)).flatMap((f) => {
     const idx = JSON.parse(readFileSync(join(dir, f), "utf8")) as { node: string; shots: { test: string; file: string }[] };
     return idx.shots.map((s) => ({ node: idx.node, test: s.test, file: join(dir, dirname(f), s.file) }));
   });

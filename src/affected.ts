@@ -9,7 +9,7 @@ import { e2eCheckPath } from "./adopt.ts";
 import { changedNodes } from "./lens.ts";
 import { lockPath } from "./lock.ts";
 import { dependants, modulePath, type Project } from "./project.ts";
-import { shotsDir } from "./shots.ts";
+import { isShotFile, legacyShotsDir } from "./shots.ts";
 import { derivedCheckFile } from "./verify.ts";
 
 export interface Affected {
@@ -42,9 +42,9 @@ export function affectedNodes(p: Project, since: string): Affected {
     own(e2eCheckPath(p, n), n.name);
   }
   // Written by a build from what's already covered: the spec, the lock, the screenshots, ail's own scratch space.
-  const shots = relative(p.root, shotsDir(p)).split("\\").join("/") + "/";
   const lock = relative(p.root, lockPath(p)).split("\\").join("/");
-  const derived = (f: string) => f.endsWith(".ail.md") || f === lock || f.startsWith(shots) || f.startsWith(".ail/") || f.includes("node_modules/");
+  const legacy = relative(p.root, legacyShotsDir(p)).split("\\").join("/") + "/";
+  const derived = (f: string) => f.endsWith(".ail.md") || f === lock || isShotFile(p, f) || f.startsWith(legacy) || f.startsWith(".ail/") || f.includes("node_modules/");
   const everything: string[] = [];
   for (const f of changedFiles(p, since)) {
     if (derived(f)) continue;

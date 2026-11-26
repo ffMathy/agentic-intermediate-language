@@ -11,7 +11,7 @@ export interface LockEntry {
   by?: string;
   /** The build (compile hash) whose screens a model found to match the node's look. */
   look?: string;
-  /** The build (compile hash) whose proof screenshots are committed in checks/shots/. */
+  /** The build (compile hash) whose proof screenshots are committed beside its spec, in shots/. */
   shots?: string;
   /** Built by the existing app, not by ail: recorded by `ail adopt` once the spec was proven on it. No generated files. */
   adopted?: boolean;

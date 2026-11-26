@@ -2,11 +2,11 @@
 // derived check is run once more with a preload that records the final
 // screen; each screen is then rendered in Chromium (Playwright) with the
 // project's own page styles, so a reviewer sees what each scenario ends on.
-import { existsSync, mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from "node:fs";
+import { existsSync, mkdirSync, mkdtempSync, readdirSync, readFileSync, renameSync, rmdirSync, rmSync, statSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
-import { dirname, join, relative, resolve } from "node:path";
+import { basename, dirname, join, relative, resolve, sep } from "node:path";
 import type { AilNode } from "./parse.ts";
-import { AIL_HOME, kebab, type Project } from "./project.ts";
+import { AIL_HOME, kebab, SHOTS, type Project } from "./project.ts";
 import { readLock, writeLock } from "./lock.ts";
 import { checksDir, derivedCheckFile, junitResults } from "./verify.ts";
 export { junitResults, type TestResult } from "./verify.ts";
@@ -93,9 +93,9 @@ const slug = slugOf;
 
 /**
  * Screenshots of every visual node's proofs (or of `names` only), written to
- * `<outDir>/<node folder>/<node>/<nn>-<test>.png`.
+ * `<outDir>/<node folder>/<node>/<nn>-<test>.png`, or to `opts.dirOf(node)`.
  */
-export async function takeShots(p: Project, outDir: string, names?: string[], log: (s: string) => void = () => {}, opts: { scale?: number; manifest?: boolean } = {}): Promise<Shot[]> {
+export async function takeShots(p: Project, outDir: string, names?: string[], log: (s: string) => void = () => {}, opts: { scale?: number; manifest?: boolean; dirOf?: (n: AilNode) => string } = {}): Promise<Shot[]> {
   const nodes = visualNodes(p, names);
   if (!nodes.length) return [];
   let chromium: typeof import("playwright").chromium;
@@ -113,7 +113,7 @@ export async function takeShots(p: Project, outDir: string, names?: string[], lo
       const screens = captureScreens(p, derivedCheckFile(p, n).file!);
       log(`· ${n.name}: ${screens.length} screen(s)`);
       for (const [i, s] of screens.entries()) {
-        const file = join(outDir, n.dir, kebab(n.name), `${String(i + 1).padStart(2, "0")}-${slug(s.test)}.png`);
+        const file = join(opts.dirOf?.(n) ?? join(outDir, n.dir, kebab(n.name)), `${String(i + 1).padStart(2, "0")}-${slug(s.test)}.png`);
         mkdirSync(dirname(file), { recursive: true });
         await page.setContent(shotPage(styles, s), { waitUntil: "networkidle", timeout: 15000 }).catch(() => {});
         await page.evaluate(() => document.fonts.ready).catch(() => {});
@@ -130,21 +130,46 @@ export async function takeShots(p: Project, outDir: string, names?: string[], lo
 
 // --- the committed proof screenshots ------------------------------------------
 //
-// Every node with a look keeps the screenshots of its proofs next to its
-// checks, in checks/shots/<folder>/<node>/, with a shots.json index. They are
+// Every node with a look keeps the screenshots of its proofs beside its spec,
+// in <spec folder>/shots/<node>/, with a shots.json index; a flow's end-to-end
+// screenshots are in that folder's e2e/. So a spec folder holds the spec and
+// the proof of how it looks, and a pull request shows both together. They are
 // part of what a build produces, like the generated code: reviewed in pull
 // requests, shown on pages through the spec module, and judged against the
 // look. A build retakes them when it builds the node; the lock records which
 // build they were taken from, so a check can tell when they are out of date.
+// There is no other place for them: `shots` is a reserved folder name in a spec.
 
-export const shotsDir = (p: Project) => join(checksDir(p), "shots");
-export const nodeShotsDir = (p: Project, n: AilNode) => join(shotsDir(p), n.dir, kebab(n.name));
+export { SHOTS };
+export const nodeShotsDir = (p: Project, n: AilNode) => join(p.specRoot, n.dir, SHOTS, kebab(n.name));
+/** Where a flow's end-to-end screenshots go, handed to its check as AIL_SHOTS_DIR. */
+export const e2eShotsDir = (p: Project, n: AilNode) => join(nodeShotsDir(p, n), "e2e");
+/** Where proof screenshots were kept before they moved beside the spec: moved by a build. */
+export const legacyShotsDir = (p: Project) => join(checksDir(p), "shots");
+
+/** Whether a file (relative to the project) is a committed proof screenshot or its index. */
+export function isShotFile(p: Project, rel: string): boolean {
+  const spec = relative(p.root, p.specRoot).split("\\").join("/");
+  const f = rel.split("\\").join("/");
+  const inSpec = spec ? (f.startsWith(spec + "/") ? f.slice(spec.length + 1) : null) : f;
+  return inSpec !== null && !inSpec.endsWith(".ail.md") && new RegExp(`(^|/)${SHOTS}/`).test(inSpec);
+}
+
+/** Remove a folder's screenshots and index, keeping subfolders (a node's e2e/); empty folders up to the spec folder go too. */
+export function clearShots(dir: string): void {
+  if (!existsSync(dir)) return;
+  for (const f of readdirSync(dir)) if (!statSync(join(dir, f)).isDirectory()) rmSync(join(dir, f), { force: true });
+  for (let d = dir; existsSync(d) && readdirSync(d).length === 0; d = dirname(d)) {
+    rmdirSync(d);
+    if (basename(d) === SHOTS) break;
+  }
+}
 
 /** Retake a node's committed proof screenshots, and record the build they belong to. */
 export async function refreshNodeShots(p: Project, n: AilNode, log: (s: string) => void = () => {}): Promise<Shot[]> {
   const dir = nodeShotsDir(p, n);
-  rmSync(dir, { recursive: true, force: true });
-  const shots = await takeShots(p, shotsDir(p), [n.name], log, { scale: 1, manifest: false });
+  clearShots(dir);
+  const shots = await takeShots(p, dir, [n.name], log, { scale: 1, manifest: false, dirOf: (m) => nodeShotsDir(p, m) });
   if (shots.length) writeFileSync(join(dir, "shots.json"), JSON.stringify({ node: n.name, shots: shots.map((s) => ({ test: s.test, file: relative(dir, s.file) })) }, null, 2) + "\n");
   const lock = readLock(p);
   const entry = lock.nodes[n.name];
@@ -158,14 +183,44 @@ export function staleShots(p: Project): AilNode[] {
   return visualNodes(p).filter((n) => { const e = lock.nodes[n.name]; return e && e.shots !== e.hash; });
 }
 
+/** Every committed screenshot folder: the folders under the spec that hold a shots.json, in path order. */
+export function shotFolders(p: Project): string[] {
+  if (!existsSync(p.specRoot)) return [];
+  const legacy = legacyShotsDir(p);
+  return [...new Bun.Glob(`**/${SHOTS}/**/shots.json`).scanSync({ cwd: p.specRoot })]
+    .filter((f) => !/(^|\/)(node_modules|\.[^/]+)\//.test(f))
+    .map((f) => join(p.specRoot, dirname(f)))
+    .filter((d) => d !== legacy && !d.startsWith(legacy + sep)).sort();
+}
+
 /** Screenshot folders of nodes that no longer exist, or no longer have a look: removed by a build. */
 export function orphanShots(p: Project): string[] {
-  const root = shotsDir(p);
-  if (!existsSync(root)) return [];
   const keep = new Set(visualNodes(p).map((n) => nodeShotsDir(p, n)));
   // A flow's end-to-end screenshots stay while it has an end-to-end check.
-  for (const n of p.ordered) if (existsSync(e2eCheckPath(p, n))) keep.add(join(root, "e2e", n.dir, kebab(n.name)));
-  return [...new Bun.Glob("**/shots.json").scanSync({ cwd: root })].map((f) => join(root, dirname(f))).filter((d) => !keep.has(d));
+  for (const n of p.ordered) if (existsSync(e2eCheckPath(p, n))) keep.add(e2eShotsDir(p, n));
+  return shotFolders(p).filter((d) => !keep.has(d));
+}
+
+/**
+ * Move screenshots from where they used to be kept (checks/shots/) to beside
+ * the spec, by the node each index names. Those of nodes that are gone are
+ * dropped. True when there was anything to move.
+ */
+export function moveLegacyShots(p: Project): boolean {
+  const old = legacyShotsDir(p);
+  if (!existsSync(old)) return false;
+  for (const f of new Bun.Glob("**/shots.json").scanSync({ cwd: old })) {
+    const from = join(old, dirname(f));
+    const idx = JSON.parse(readFileSync(join(from, "shots.json"), "utf8")) as { node: string };
+    const n = p.nodes.get(idx.node);
+    if (!n) continue;
+    const to = f.split("/")[0] === "e2e" ? e2eShotsDir(p, n) : nodeShotsDir(p, n);
+    clearShots(to);
+    mkdirSync(to, { recursive: true });
+    for (const file of readdirSync(from)) if (!statSync(join(from, file)).isDirectory()) renameSync(join(from, file), join(to, file));
+  }
+  rmSync(old, { recursive: true, force: true });
+  return true;
 }
 
 /** A folder's committed screenshots: the index a build wrote, with absolute files. */

@@ -111,7 +111,7 @@ node AdoptSecondHalf : data   level: system
           caption: "ail_adopt starts and seeds the old app and its API, runs each check, then stops everything. A failing check means the spec or the check is wrong, never the app.",
           lines: ["· starting the service api: npm run api", "· starting the app: npm start", "· seeding through the app: bun ../tictactoe-ail/checks/e2e/data.ts seed"],
           states: { "PlayAGame": "checking", "App": "written", "NewGameButton": "written", "StatusLine": "written", "BoardView": "written", "ChooseOpponent": "written", "GameReducer": "written", "Rules": "written", "GameState": "written" },
-          inset: { kind: "card", label: "Run from outside the project", lines: ["// ail-derived-from: PlayAGame@5445e0669a18e44c", "a temp folder gets only AIL_APP_URL, AIL_API_URL and AIL_SHOTS_DIR", "✓ 7 tests, 7 screenshots in checks/shots/e2e/app/play/play-a-game/", "everything stops, the app first"] } },
+          inset: { kind: "card", label: "Run from outside the project", lines: ["// ail-derived-from: PlayAGame@5445e0669a18e44c", "a temp folder gets only AIL_APP_URL, AIL_API_URL and AIL_SHOTS_DIR", "✓ 7 tests, 7 screenshots in ail/app/play/shots/play-a-game/e2e/", "everything stops, the app first"] } },
         { id: "judge", seconds: 12, branch: false, title: "A model checks the look",
           caption: "One model call judges all the flow's screenshots together. Once everything has passed, every node ail hasn't built is recorded in the lock as built by the existing app.",
           lines: [

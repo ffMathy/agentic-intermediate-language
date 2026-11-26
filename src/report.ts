@@ -9,7 +9,7 @@ import type { AdoptReport } from "./adopt.ts";
 import type { Affected } from "./affected.ts";
 import type { CheckReport } from "./check.ts";
 import type { Project } from "./project.ts";
-import { nodeShotsDir, readShotsIndex, shotsDir, type Shot } from "./shots.ts";
+import { nodeShotsDir, readShotsIndex, type Shot } from "./shots.ts";
 import type { TestResult } from "./verify.ts";
 
 export interface BuildReport {
@@ -60,7 +60,7 @@ export function renderChecks(p: Project, r: BuildReport, opts: { shots?: Shot[];
     let rel = relative(opts.outDir, file);
     if (rel.startsWith("..")) {
       // A committed screenshot: published next to the fresh ones.
-      rel = join("checks", relative(shotsDir(p), file));
+      rel = relative(p.root, file);
       const dest = join(opts.outDir, rel);
       mkdirSync(dirname(dest), { recursive: true });
       copyFileSync(file, dest);

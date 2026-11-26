@@ -3,7 +3,8 @@
 // Read-only, and never calls a model.
 import { relative } from "node:path";
 import { staleGlue } from "./compile.ts";
-import { nodeShotsDir, orphanShots, staleShots } from "./shots.ts";
+import { existsSync } from "node:fs";
+import { legacyShotsDir, nodeShotsDir, orphanShots, staleShots } from "./shots.ts";
 import { lint, type Diagnostic } from "./lint.ts";
 import { unjudged } from "./look.ts";
 import { plan, type PlanEntry } from "./plan.ts";
@@ -36,6 +37,7 @@ export function runCheck(p: Project, nodes: string[] = [], opts: { scope?: strin
     ...staleGlue(p),
     ...staleShots(p).filter((n) => !nodes.length || nodes.includes(n.name)).map((n) => relative(p.root, nodeShotsDir(p, n))),
     ...orphanShots(p).map((d) => relative(p.root, d)),
+    ...(existsSync(legacyShotsDir(p)) ? [`${relative(p.root, legacyShotsDir(p))} (proof screenshots now live beside the spec, in shots/)`] : []),
   ];
   const ok = !l.some((d) => d.severity === "error") && pl.every((e) => e.status === "fresh") && !glue.length && v.ok;
   const looks = unjudged(p).filter((n) => (!nodes.length || nodes.includes(n)) && (!scope || scope.includes(n)));

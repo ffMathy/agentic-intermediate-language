@@ -66,8 +66,8 @@ export function ProofScreens() {
           overflowWrap: "anywhere",
         }}
       >
-        Committed with the checks, in{" "}
-        <code style={{ fontFamily: "var(--font-mono)" }}>examples/tictactoe/checks/shots/</code>
+        Committed beside the spec, in{" "}
+        <code style={{ fontFamily: "var(--font-mono)" }}>examples/tictactoe/ail/app/play/shots/</code>
       </p>
     </Stack>
   );

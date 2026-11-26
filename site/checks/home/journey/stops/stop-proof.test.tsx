@@ -1,42 +1,38 @@
-// ail-derived-from: StopProof@dc0ecf4f6caee128
+// ail-derived-from: StopProof@50150f2565dcacf4
 import { afterEach, expect, test } from "bun:test";
-import { cleanup, render, screen, within } from "@testing-library/react";
+import { cleanup, render, within } from "@testing-library/react";
 import { StopProof } from "../../../../src/gen/home/journey/stops/stop-proof";
 
 afterEach(() => {
   cleanup();
 });
 
-const lines = [
-  "// ail-derived-from: ComputerPlayer@0c990bfbddc62e20",
-  "test(\"never loses\", () => {",
-  "  …",
-  "  explore(Array(9).fill(null), \"X\");",
-  "  expect(games).toBeGreaterThan(0);",
-  "  expect(xWins).toBe(0);",
-  "});",
-];
-
 test("the proof", () => {
-  render(<StopProof />);
+  const { container } = render(<StopProof />);
 
-  const article = screen
-    .getAllByRole("article")
-    .find((el) => el.id === "stop-7");
-  expect(article).toBeDefined();
-  if (!article) return;
+  const article = container.querySelector("#stop-7");
+  expect(article).not.toBeNull();
+  expect(article?.tagName.toLowerCase()).toBe("article");
+  const stop = within(article as HTMLElement);
 
   expect(
-    within(article).getByRole("heading", {
+    stop.getByRole("heading", {
       level: 3,
       name: "Proof: the verify line becomes a test that plays every game.",
     }),
   ).toBeTruthy();
 
-  const region = within(article).getByRole("region", {
-    name: "Derived check excerpt",
-  });
+  const region = stop.getByRole("region", { name: "Derived check excerpt" });
   const text = region.textContent ?? "";
+  const lines = [
+    "// ail-derived-from: ComputerPlayer@0c990bfbddc62e20",
+    "test(\"never loses\", () => {",
+    "  …",
+    "  explore(Array(9).fill(null), \"X\");",
+    "  expect(games).toBeGreaterThan(0);",
+    "  expect(xWins).toBe(0);",
+    "});",
+  ];
   let from = 0;
   for (const line of lines) {
     const at = text.indexOf(line, from);

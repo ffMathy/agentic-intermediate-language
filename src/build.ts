@@ -14,7 +14,7 @@ import { existsSync } from "node:fs";
 import { join } from "node:path";
 import { adopt, formatAdopt, formatReview, reviewAttributes, type AdoptReport } from "./adopt.ts";
 import { readLock } from "./lock.ts";
-import { checksDir } from "./verify.ts";
+import { checksDir, foreignChecks } from "./verify.ts";
 
 export interface BuildOptions {
   /** Only these nodes (default: all). */
@@ -48,11 +48,14 @@ export async function build(p: Project, o: BuildOptions = {}): Promise<BuildResu
   const noModel = modelUnavailable(specs[0]!);
   const targets = p.ordered.filter((n) => isCompilable(p, n) && (!names.length || names.includes(n.name)));
   const stale = plan(p).filter((e) => (o.force || e.status !== "fresh") && targets.some((t) => t.name === e.node));
-  const toDerive = checksToDerive(p, targets);
+  // A target that checks in its own language derives each check as its node is built (CompileOptions.derive).
+  const deriveWhileBuilding = !!foreignChecks(p);
+  const toDerive = deriveWhileBuilding ? [] : checksToDerive(p, targets);
+  const pendingChecks = deriveWhileBuilding ? checksToDerive(p, targets) : [];
   let out: CompileOutcome[] = [];
-  if (noModel && (stale.length || toDerive.length)) {
+  if (noModel && (stale.length || toDerive.length || pendingChecks.length)) {
     // e.g. in CI: report what is out of date instead of failing on every model call
-    log(`${new Set([...stale.map((e) => e.node), ...toDerive.map((n) => n.name)]).size} node(s) need building, but there is no model here: ${noModel}. Build where there is one and commit the result.`);
+    log(`${new Set([...stale.map((e) => e.node), ...toDerive.map((n) => n.name), ...pendingChecks.map((n) => n.name)]).size} node(s) need building, but there is no model here: ${noModel}. Build where there is one and commit the result.`);
   } else {
     const provider = getProvider(specs[0]!);
     const stopped = new Map<string, string>();
@@ -68,7 +71,7 @@ export async function build(p: Project, o: BuildOptions = {}): Promise<BuildResu
       }
     });
     out = await compile(p, targets.filter((n) => !stopped.has(n.name) && !failed.has(n.name)).map((n) => n.name), {
-      provider, jobs, force: o.force, log, look: !noModel && o.look !== false, temperature: o.temperature,
+      provider, jobs, force: o.force, log, look: !noModel && o.look !== false, temperature: o.temperature, derive: deriveWhileBuilding,
     });
     for (const [node, q] of stopped) out.push({ node, status: "stopped", attempts: 0, detail: q });
     for (const [node, why] of failed) out.push({ node, status: "failed", attempts: 0, detail: why });

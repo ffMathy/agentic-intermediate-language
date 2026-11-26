@@ -105,9 +105,10 @@ or `binds`, or move it one level down. Define domain words once in the
 
 ## Workflows
 **Change behaviour.** Edit the `.ail.md` file. Start at the highest level the
-change affects and refine downwards. A spec file holds one node: a new node
-gets its own file, named after it (`new-game-button.ail.md` for
-`NewGameButton`), in its parent's folder or a folder of its own. The post-edit hook lints the spec. Then
+change affects and refine downwards. A spec file holds one node, and a folder
+one spec file: a new node gets a folder of its own inside its parent's,
+named after it (`new-game-button/new-game-button.ail.md` for
+`NewGameButton`). Its screenshots go in that folder's `shots/`. The post-edit hook lints the spec. Then
 run `/ail:build`, which ends by checking everything.
 
 **A build verifies every check.** `ail build` passes only when the spec is

@@ -3,7 +3,7 @@
 The first screen: what AIL is, in one breath, and the one sentence the rest of
 the page follows.
 
-More nodes in this folder, each in a file of its own: [`HeroFigure`](hero-figure.ail.md).
+More nodes, each in a folder of its own: [`HeroFigure`](hero-figure/hero-figure.ail.md).
 
 ```ail
 node Hero : view   level: experience

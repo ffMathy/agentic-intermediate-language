@@ -1,10 +1,10 @@
 # Parts
 
 The building blocks every section shares: one owner here, many users. Code
-panels live in [`code.ail.md`](code.ail.md) and the small game board used by
-the figures in [`mini-board.ail.md`](mini-board.ail.md).
+panels live in [`code.ail.md`](code-block/code-block.ail.md) and the small game board used by
+the figures in [`mini-board.ail.md`](mini-board/mini-board.ail.md).
 
-More nodes in this folder, each in a file of its own: [`Stack`](stack.ail.md), [`Section`](section.ail.md), [`SectionHeading`](section-heading.ail.md).
+More nodes, each in a folder of its own: [`Stack`](stack/stack.ail.md), [`Section`](section/section.ail.md), [`SectionHeading`](section-heading/section-heading.ail.md).
 
 ```ail
 node Parts : library   level: experience

@@ -10,7 +10,7 @@ The sample is a real change to the Tic-Tac-Toe demo: the "Watch again"
 button. Its screens are the demo's committed screenshots, from the spec
 module, so they are always the current ones.
 
-More nodes in this folder, each in a file of its own: [`SamplePullRequest`](sample-pull-request.ail.md), [`PullRequestDiff`](pull-request-diff.ail.md).
+More nodes, each in a folder of its own: [`SamplePullRequest`](sample-pull-request/sample-pull-request.ail.md), [`PullRequestDiff`](sample-pull-request/pull-request-diff/pull-request-diff.ail.md).
 
 ```ail
 node ReviewSection : view   level: experience

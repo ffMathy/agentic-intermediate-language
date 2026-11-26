@@ -1,4 +1,4 @@
-More nodes in this folder, each in a file of its own: [`Price`](price.ail.md).
+More nodes, each in a folder of its own: [`Price`](price/price.ail.md).
 
 ```ail
 node Lib : library   level: system

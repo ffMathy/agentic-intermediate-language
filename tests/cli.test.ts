@@ -37,15 +37,15 @@ test("unknown commands fail with help", async () => {
 
 test("the context asks for a derived check when one is missing, and submit accepts it", () => {
   const dir = tempProject();
-  const f = join(dir, "pick.ail.md");
+  const f = join(dir, "pick/pick.ail.md");
   writeFileSync(f, readFileSync(f, "utf8").replace("    probes\n      pick([3, 3])", "    probes\n      pick([3, 3])\n  verify\n    empty input: pick([]) returns -1"));
   let p = load(dir);
-  expect(submit(p, p.nodes.get("Add")!, { "src/gen/add.ts": "export function add(a: number, b: number): number {\n  return a + b;\n}\n" }).ok).toBe(true);
+  expect(submit(p, p.nodes.get("Add")!, { "src/gen/add/add.ts": "export function add(a: number, b: number): number {\n  return a + b;\n}\n" }).ok).toBe(true);
   p = load(dir);
   const pick = p.nodes.get("Pick")!;
   expect(buildContext(p, pick)).toContain("## Derived check needed");
-  const check = `import { expect, test } from "bun:test";\nimport { pick } from "../src/gen/pick";\ntest("empty input", () => { expect(pick([])).toBe(-1); });\n`;
-  const r = submit(p, pick, { "src/gen/pick.ts": "export function pick(xs: number[]): number {\n  return xs.indexOf(Math.max(...xs));\n}\n", [checkPath(p, pick)]: check });
+  const check = `import { expect, test } from "bun:test";\nimport { pick } from "../../src/gen/pick/pick";\ntest("empty input", () => { expect(pick([])).toBe(-1); });\n`;
+  const r = submit(p, pick, { "src/gen/pick/pick.ts": "export function pick(xs: number[]): number {\n  return xs.indexOf(Math.max(...xs));\n}\n", [checkPath(p, pick)]: check });
   expect(r.ok).toBe(true);
   expect(readFileSync(join(dir, checkPath(p, pick)), "utf8")).toStartWith("// ail-derived-from: Pick@");
   expect(buildContext(load(dir), load(dir).nodes.get("Pick")!)).not.toContain("## Derived check needed");

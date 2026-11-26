@@ -4,7 +4,7 @@ AIL in reverse: for an app that already exists, write its spec from what is
 there, prove the spec describes it, and from then on build from the spec,
 on the same stack or a new one.
 
-More nodes in this folder, each in a file of its own: [`AdoptFigure`](adopt-figure.ail.md).
+More nodes, each in a folder of its own: [`AdoptFigure`](adopt-figure/adopt-figure.ail.md).
 
 ```ail
 node AdoptSection : view   level: experience

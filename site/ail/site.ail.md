@@ -10,16 +10,18 @@ The page tells one story: a single sentence from the real Tic-Tac-Toe spec,
 that keeps it, the check that proves it, and the game you can play.
 
 ```
-site.ail.md                              🟢 AIL (this file)
-home/home.ail.md                         🟡 HomePage: the one page, top to bottom
-home/sections/*.ail.md                   🟡 TopBar, GapStrip, SpecBrowser, GetStarted, Footer
-home/hero/hero.ail.md                    🟡 Hero, HeroFigure
-home/journey/journey.ail.md              🟡 Journey, JumpGauge, JourneyStop
-home/journey/stops/*.ail.md              🟡 the eight stops and their figures
-home/readers/readers.ail.md              🟡 Readers, ReadersTree
-home/build-loop/build-loop.ail.md        🟡 BuildLoop, LoopFigure
-home/review/review.ail.md                🟡 ReviewSection, SamplePullRequest
-parts/*.ail.md                           🟡 Parts (library): Stack, Section, SectionHeading, CodeBlock, CopyCommand, MiniBoard, SpecEditor, SpecShot
+site.ail.md               🟢 AIL (this file)
+home/                     🟡 HomePage: the one page, top to bottom
+  sections/               🟡 TopBar, GapStrip, SpecBrowser, GetStarted, Footer, each in its folder
+  hero/                   🟡 Hero, with hero-figure/
+  journey/                🟡 Journey, with jump-gauge/, journey-stop/ and stops/: the eight stops
+  watch/                  🟡 WatchSection, with walkthrough-player/ and its parts
+  readers/                🟡 Readers, with readers-tree/
+  build-loop/             🟡 BuildLoop
+  review/                 🟡 ReviewSection, with sample-pull-request/
+  adopt/                  🟡 AdoptSection, with adopt-figure/
+parts/                    🟡 Parts (library): stack/, section/, section-heading/, code-block/,
+                             copy-command/, mini-board/, spec-editor/, spec-shot/
 ```
 
 ## Target

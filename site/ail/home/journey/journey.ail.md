@@ -5,7 +5,7 @@ computer never loses.", followed from the product owner's requirements down to t
 code, the check and the running game. Each stop has its own file in
 [`stops/`](stops/).
 
-More nodes in this folder, each in a file of its own: [`JumpGauge`](jump-gauge.ail.md), [`JourneyStop`](journey-stop.ail.md).
+More nodes, each in a folder of its own: [`JumpGauge`](jump-gauge/jump-gauge.ail.md), [`JourneyStop`](journey-stop/journey-stop.ail.md).
 
 ```ail
 node Journey : view   level: experience

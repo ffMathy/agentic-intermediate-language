@@ -21,7 +21,7 @@ test("a dependency's how is encapsulated; its what is not", () => {
   const dir = tempProject();
   const before = compileHash(load(dir), load(dir).nodes.get("Pick")!);
 
-  const add = join(dir, "add.ail.md");
+  const add = join(dir, "add/add.ail.md");
   writeFileSync(add, readFileSync(add, "utf8").replace("rejected a lookup table because it is silly", "rejected a table because it is slow"));
   expect(compileHash(load(dir), load(dir).nodes.get("Pick")!)).toBe(before);
 

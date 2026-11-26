@@ -25,17 +25,14 @@ results that arrive later. How the target spells things is said once, in the
 - `;` after whitespace, outside double quotes, starts a comment that runs to
   the end of the line.
 - A spec file holds one node `[one-node-per-file]`, which may come with the
-  project's `target`, `catalog` and `glossary` blocks. A node's file is
-  usually named after it (`open-picker.ail.md` for `OpenPicker`).
-- Folders mirror the tree: a node lives in its parent's folder or below it
-  `[misplaced-node]`, and generated code mirrors the folders.
-- A node's proof screenshots are kept beside its file: in its folder's
-  `shots/` when the file is named like its folder
-  (`open-picker/open-picker.ail.md` → `open-picker/shots/`), else in
-  `shots/<file name>/` (`sections/footer.ail.md` → `sections/shots/footer/`),
-  with the end-to-end ones in that folder's `e2e/`. `ail build` writes them.
-  So no spec folder may be called `shots` `[reserved-folder]`, and no spec
-  file `e2e.ail.md` `[reserved-name]`.
+  project's `target`, `catalog` and `glossary` blocks, and a folder holds one
+  spec file `[one-file-per-folder]`. So every node has a folder of its own,
+  named after it: `open-picker/open-picker.ail.md` for `OpenPicker`.
+- Folders mirror the tree: a node's folder is in its parent's folder or below
+  it `[misplaced-node]`, and generated code mirrors the folders.
+- A node's proof screenshots are kept in its folder's `shots/`, the
+  end-to-end ones in `shots/e2e/`. `ail build` writes them. So no spec folder
+  may be called `shots` `[reserved-folder]`.
 
 ## 2. Statements
 

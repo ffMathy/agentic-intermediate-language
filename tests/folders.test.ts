@@ -12,23 +12,23 @@ import { verifyProject } from "../src/verify.ts";
 import { load, mockFile, reply, tempProject } from "./helpers.ts";
 
 const PRICE = `export function price(minor: number): number {\n  return Math.floor(minor / 100);\n}`;
-const A = `import { price } from "../lib/price";\n\nexport function basketTotal(items: number[]): number {\n  return price(items.reduce((sum, item) => sum + item, 0));\n}`;
+const A = `import { price } from "../lib/price/price";\n\nexport function basketTotal(items: number[]): number {\n  return price(items.reduce((sum, item) => sum + item, 0));\n}`;
 const B = (from: string) => `import { price } from "${from}";\n\nexport function receiptLine(minor: number): string {\n  return \`\${price(minor)} kr\`;\n}`;
 
 function compiled(dir = tempProject("areas")) {
   const provider = getProvider(`mock:${mockFile(dir, {
-    Price: [reply("src/gen/lib/price.ts", PRICE)],
+    Price: [reply("src/gen/lib/price/price.ts", PRICE)],
     AreaA: [reply("src/gen/a/area-a.ts", A)],
-    AreaB: [reply("src/gen/b/area-b.ts", B("../lib/price")), reply("src/gen/b/deep/area-b.ts", B("../../lib/price"))],
+    AreaB: [reply("src/gen/b/area-b.ts", B("../lib/price/price")), reply("src/gen/b/deep/area-b.ts", B("../../lib/price/price"))],
   })}`);
   return { dir, provider };
 }
 
 test("generated paths and imports mirror the spec's folders", () => {
   const p = load(tempProject("areas"));
-  expect(modulePath(p, p.nodes.get("Price")!)).toBe("src/gen/lib/price.ts");
+  expect(modulePath(p, p.nodes.get("Price")!)).toBe("src/gen/lib/price/price.ts");
   expect(modulePath(p, p.nodes.get("AreaA")!)).toBe("src/gen/a/area-a.ts");
-  expect(buildContext(p, p.nodes.get("AreaB")!)).toContain('### Price — built at src/gen/lib/price.ts, so import from "../lib/price"');
+  expect(buildContext(p, p.nodes.get("AreaB")!)).toContain('### Price — built at src/gen/lib/price/price.ts, so import from "../lib/price/price"');
 });
 
 test("a shared node has one owner and many users, and lints clean", () => {
@@ -84,14 +84,14 @@ test("nodes over the size budget are asked to split", () => {
   const dir = tempProject("areas");
   writeFileSync(join(dir, "ail.config.json"), JSON.stringify({ maxNodeLines: 5 }));
   const d = lint(load(dir)).find((x) => x.code === "node-too-large" && x.node === "Price")!;
-  expect(d.message).toContain("split it into children, e.g. in a lib/price/ folder");
+  expect(d.message).toContain("split it into children, each in a folder of its own inside lib/price/");
 });
 
 test("review shows every area a shared contract change reaches", () => {
   const dir = tempProject("areas");
   const git = (...args: string[]) => Bun.spawnSync(["git", "-c", "user.email=t@t", "-c", "user.name=t", ...args], { cwd: dir });
   git("init", "-q"); git("add", "-A"); git("commit", "-qm", "base");
-  writeFileSync(join(dir, "lib/price.ail.md"), readFileSync(join(dir, "lib/price.ail.md"), "utf8").replace("price(1999) => 19", "price(1999) => 19\n      price(0) => 0"));
+  writeFileSync(join(dir, "lib/price/price.ail.md"), readFileSync(join(dir, "lib/price/price.ail.md"), "utf8").replace("price(1999) => 19", "price(1999) => 19\n      price(0) => 0"));
   const r = renderReview(load(dir), "HEAD");
   expect(r).toContain("✎ Price");
   expect(r).toContain("**Contract changed** — this reaches AreaA (system, a/), AreaB (system, b/)");

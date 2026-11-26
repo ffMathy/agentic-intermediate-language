@@ -4,9 +4,9 @@ Two short walkthroughs of the real tools on the Tic-Tac-Toe demo: `ail build`
 compiling a small spec change into checked code, and `ail adopt` bringing an
 old app under a spec. Nothing moves until the visitor presses Play. The
 contents of the walkthroughs are data, in [`walkthrough/`](walkthrough/); the
-pieces of the player are in [`stage.ail.md`](stage.ail.md).
+pieces of the player are in [`stage.ail.md`](walkthrough-player/walk-title-bar/walk-title-bar.ail.md).
 
-More nodes in this folder, each in a file of its own: [`WalkthroughPlayer`](walkthrough-player.ail.md).
+More nodes, each in a folder of its own: [`WalkthroughPlayer`](walkthrough-player/walkthrough-player.ail.md).
 
 ```ail
 node WatchSection : view   level: experience

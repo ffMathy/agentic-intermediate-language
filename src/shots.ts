@@ -131,24 +131,18 @@ export async function takeShots(p: Project, outDir: string, names?: string[], lo
 // --- the committed proof screenshots ------------------------------------------
 //
 // Every node with a look keeps the screenshots of its proofs beside its spec
-// file (a spec file holds one node), with a shots.json index: in its folder's
-// shots/ when the file is named like its folder (open-picker/open-picker.ail.md),
-// else in shots/<file name>/ (sections/footer.ail.md → sections/shots/footer/).
-// A flow's end-to-end screenshots are in that folder's e2e/. So a spec folder holds the spec and
+// file, in its folder's shots/, with a shots.json index: a spec file holds one
+// node, and a folder one spec file, so there is always room for them.
+// A flow's end-to-end screenshots are in shots/e2e/. So a spec folder holds the spec and
 // the proof of how it looks, and a pull request shows both together. They are
 // part of what a build produces, like the generated code: reviewed in pull
 // requests, shown on pages through the spec module, and judged against the
 // look. A build retakes them when it builds the node; the lock records which
 // build they were taken from, so a check can tell when they are out of date.
-// There is no other place for them: `shots` is a reserved folder name in a
-// spec, and `e2e` a reserved file name.
+// There is no other place for them: `shots` is a reserved folder name in a spec.
 
 export { SHOTS };
-export function nodeShotsDir(p: Project, n: AilNode): string {
-  const folder = dirname(join(p.root, n.file));
-  const name = basename(n.file).replace(/\.ail\.md$/, "");
-  return name === basename(folder) ? join(folder, SHOTS) : join(folder, SHOTS, name);
-}
+export const nodeShotsDir = (p: Project, n: AilNode) => join(dirname(join(p.root, n.file)), SHOTS);
 /** Where a flow's end-to-end screenshots go, handed to its check as AIL_SHOTS_DIR. */
 export const e2eShotsDir = (p: Project, n: AilNode) => join(nodeShotsDir(p, n), "e2e");
 /** Where proof screenshots were kept before they moved beside the spec: moved by a build. */

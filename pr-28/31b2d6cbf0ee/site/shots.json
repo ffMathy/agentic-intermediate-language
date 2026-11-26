@@ -1,0 +1,97 @@
+[
+  {
+    "node": "HomePage",
+    "test": "one story, in order",
+    "file": "home/home-page/01-one-story-in-order.png"
+  },
+  {
+    "node": "HomePage",
+    "test": "every top bar link has a place to land",
+    "file": "home/home-page/02-every-top-bar-link-has-a-place-to-land.png"
+  },
+  {
+    "node": "Journey",
+    "test": "eight stops in order",
+    "file": "home/journey/journey/01-eight-stops-in-order.png"
+  },
+  {
+    "node": "Journey",
+    "test": "the thread is explained",
+    "file": "home/journey/journey/02-the-thread-is-explained.png"
+  },
+  {
+    "node": "StopProof",
+    "test": "the proof",
+    "file": "home/journey/stops/stop-proof/01-the-proof.png"
+  },
+  {
+    "node": "ProofScreens",
+    "test": "the screens",
+    "file": "home/journey/stops/proof-screens/01-the-screens.png"
+  },
+  {
+    "node": "ReviewSection",
+    "test": "what a reviewer reads",
+    "file": "home/review/review-section/01-what-a-reviewer-reads.png"
+  },
+  {
+    "node": "SamplePullRequest",
+    "test": "the parts to review are open",
+    "file": "home/review/sample-pull-request/01-the-parts-to-review-are-open.png"
+  },
+  {
+    "node": "SamplePullRequest",
+    "test": "what the build wrote is collapsed",
+    "file": "home/review/sample-pull-request/02-what-the-build-wrote-is-collapsed.png"
+  },
+  {
+    "node": "PullRequestDiff",
+    "test": "the spec change",
+    "file": "home/review/pull-request-diff/01-the-spec-change.png"
+  },
+  {
+    "node": "SpecBrowser",
+    "test": "the demo's spec is shown first",
+    "file": "home/sections/spec-browser/01-the-demo-s-spec-is-shown-first.png"
+  },
+  {
+    "node": "SpecBrowser",
+    "test": "picking another file",
+    "file": "home/sections/spec-browser/02-picking-another-file.png"
+  },
+  {
+    "node": "SpecBrowser",
+    "test": "showing this website's spec",
+    "file": "home/sections/spec-browser/03-showing-this-website-s-spec.png"
+  },
+  {
+    "node": "SpecBrowser",
+    "test": "a screenshot beside its spec",
+    "file": "home/sections/spec-browser/04-a-screenshot-beside-its-spec.png"
+  },
+  {
+    "node": "SpecBrowser",
+    "test": "opened from a link",
+    "file": "home/sections/spec-browser/05-opened-from-a-link.png"
+  },
+  {
+    "node": "SpecBrowser",
+    "test": "the language is defined",
+    "file": "home/sections/spec-browser/06-the-language-is-defined.png"
+  },
+  {
+    "node": "SpecBrowser",
+    "test": "following the same link twice",
+    "file": "home/sections/spec-browser/07-following-the-same-link-twice.png"
+  },
+  {
+    "node": "SpecTree",
+    "test": "screenshots beside their spec",
+    "file": "home/sections/spec-tree/01-screenshots-beside-their-spec.png"
+  },
+  {
+    "node": "SpecShot",
+    "test": "a screenshot is shown",
+    "file": "parts/spec-shot/01-a-screenshot-is-shown.png"
+  }
+]

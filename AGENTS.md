@@ -5,6 +5,7 @@
 - The `*.ail.md` files are the source of truth. Generated code (the target's
   `generated` globs, e.g. `src/gen/**`) is never edited by hand: hooks block
   it, and `ail build` reports it.
+- A spec file holds one node. A new node gets its own file, named after it.
 - To change behaviour, change the spec, then build: the plugin's `build`
   command (`/ail:build` in Claude Code), or `ail build` in a terminal.
 - If the spec leaves something open and it isn't in `free`, stop and ask for a
@@ -17,7 +18,8 @@
   its description, for what the change affects only: build with
   `--since <base branch>` (`ail_build` with `since`), push, and put
   `ail show checks` (`ail_show` with `checks`) between its `<!-- ail-checks:<project> -->` markers, or add it at
-  the end, and leave the rest of the description alone.
+  the end, and leave the rest of the description alone. Paste it exactly as
+  it comes, its screenshot images included: never shorten or summarize it.
 
 ## In this repository (the toolchain)
 

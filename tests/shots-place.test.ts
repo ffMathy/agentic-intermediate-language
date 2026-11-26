@@ -1,11 +1,12 @@
-// Where proof screenshots live: beside the spec, in each spec folder's shots/<node>/
-// (end-to-end ones in its e2e/). There is no other place, and no setting for one.
+// Where proof screenshots live: beside the node's spec file (a spec file holds one node). A file named like its
+// folder keeps them in that folder's shots/, any other file in shots/<file name>/, end-to-end ones in an e2e/ inside.
+// There is no other place, and no setting for one.
 import { expect, test } from "bun:test";
 import { existsSync, mkdirSync, readdirSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
 import { preHook } from "../src/hooks.ts";
 import { lint } from "../src/lint.ts";
-import { clearShots, e2eShotsDir, isShotFile, legacyShotsDir, moveLegacyShots, nodeShotsDir, shotFolders } from "../src/shots.ts";
+import { clearShots, e2eShotsDir, isShotFile, legacyShotsDir, nodeShotsDir, relocateShots, shotFolders } from "../src/shots.ts";
 import { projectShots, specModule } from "../src/compile.ts";
 import { KATA, load, tempProject } from "./helpers.ts";
 
@@ -15,57 +16,86 @@ const shotsIn = (dir: string, node: string, files: string[]) => {
   writeFileSync(join(dir, "shots.json"), JSON.stringify({ node, shots: files.map((f) => ({ test: f.replace(".png", ""), file: f })) }));
 };
 
-test("a node's screenshots sit beside its spec file, its end-to-end ones in their e2e/", () => {
+test("a file named like its folder keeps its screenshots in shots/, any other file in shots/<file name>/", () => {
   const dir = tempProject("areas");
   const p = load(dir);
-  const price = p.nodes.get("Price")!;
-  expect(nodeShotsDir(p, price)).toBe(join(dir, price.dir, "shots", "price"));
-  expect(e2eShotsDir(p, price)).toBe(join(dir, price.dir, "shots", "price", "e2e"));
-  // The kata: BoardView is in ail/board/board.ail.md.
+  // lib/lib.ail.md holds Lib, lib/price.ail.md holds Price.
+  expect(nodeShotsDir(p, p.nodes.get("Lib")!)).toBe(join(dir, "lib", "shots"));
+  expect(nodeShotsDir(p, p.nodes.get("Price")!)).toBe(join(dir, "lib", "shots", "price"));
+  expect(e2eShotsDir(p, p.nodes.get("Lib")!)).toBe(join(dir, "lib", "shots", "e2e"));
+  expect(e2eShotsDir(p, p.nodes.get("Price")!)).toBe(join(dir, "lib", "shots", "price", "e2e"));
+  // The kata: BoardView is in ail/board/board-view.ail.md, PlayAGame in ail/app/play/play.ail.md.
   const kata = load(KATA);
   expect(nodeShotsDir(kata, kata.nodes.get("BoardView")!)).toBe(join(KATA, "ail", "board", "shots", "board-view"));
+  expect(e2eShotsDir(kata, kata.nodes.get("PlayAGame")!)).toBe(join(KATA, "ail", "app", "play", "shots", "e2e"));
   expect(existsSync(join(nodeShotsDir(kata, kata.nodes.get("BoardView")!), "shots.json"))).toBe(true);
   expect(existsSync(join(KATA, "checks", "shots"))).toBe(false);
 });
 
-test("screenshots kept in checks/shots/ are moved beside the spec, and those of nodes that are gone are dropped", () => {
+test("a spec file holds one node", () => {
+  const dir = tempProject("areas");
+  writeFileSync(join(dir, "lib", "lib.ail.md"), "```ail\nnode Lib : library   level: system\n  why   Shared.   <- Shop\n  children  Price, Tax\n```\n\n```ail\nnode Tax : fn   level: system\n  why   Tax.   <- Lib\n```\n");
+  const d = lint(load(dir)).filter((x) => x.code === "one-node-per-file");
+  expect(d.map((x) => [x.node, x.file])).toEqual([["Tax", "lib/lib.ail.md"]]);
+  expect(d[0]!.message).toContain("lib/tax.ail.md");
+});
+
+test("screenshots kept in checks/shots/ move to their place, and those of nodes that are gone are dropped", () => {
   const dir = tempProject("areas");
   const p = load(dir);
   const price = p.nodes.get("Price")!;
   const old = legacyShotsDir(p);
-  shotsIn(join(old, price.dir, "price"), "Price", ["01-a.png"]);
-  shotsIn(join(old, "e2e", price.dir, "price"), "Price", ["b.png"]);
+  shotsIn(join(old, "lib", "price"), "Price", ["01-a.png"]);
+  shotsIn(join(old, "e2e", "lib", "price"), "Price", ["b.png"]);
   shotsIn(join(old, "gone", "gone"), "Gone", ["c.png"]);
-  expect(moveLegacyShots(p)).toBe(true);
+  expect(relocateShots(p)).toBe(true);
   expect(existsSync(old)).toBe(false);
   expect(readdirSync(nodeShotsDir(p, price)).sort()).toEqual(["01-a.png", "e2e", "shots.json"]);
   expect(readdirSync(e2eShotsDir(p, price)).sort()).toEqual(["b.png", "shots.json"]);
   expect(shotFolders(p)).toEqual([nodeShotsDir(p, price), e2eShotsDir(p, price)]);
-  expect(moveLegacyShots(p)).toBe(false);
+  expect(relocateShots(p)).toBe(false);
 });
 
-test("screenshots already retaken beside the spec are not replaced by old ones from checks/shots/", () => {
+test("screenshots in the older shots/<node>/ layout move to their place, the node's own folder among them", () => {
+  const dir = tempProject("areas");
+  const p = load(dir);
+  const lib = p.nodes.get("Lib")!;
+  // lib/shots/lib/ (the node name repeated) and its e2e/ belong in lib/shots/ and lib/shots/e2e/.
+  shotsIn(join(dir, "lib", "shots", "lib"), "Lib", ["01-a.png"]);
+  shotsIn(join(dir, "lib", "shots", "lib", "e2e"), "Lib", ["b.png"]);
+  shotsIn(join(dir, "lib", "shots", "price"), "Price", ["01-c.png"]); // already in its place
+  expect(relocateShots(p)).toBe(true);
+  expect(readdirSync(nodeShotsDir(p, lib)).sort()).toEqual(["01-a.png", "e2e", "price", "shots.json"]);
+  expect(readdirSync(e2eShotsDir(p, lib)).sort()).toEqual(["b.png", "shots.json"]);
+  expect(readdirSync(join(dir, "lib", "shots", "price")).sort()).toEqual(["01-c.png", "shots.json"]);
+  expect(existsSync(join(dir, "lib", "shots", "lib"))).toBe(false);
+  expect(relocateShots(p)).toBe(false);
+});
+
+test("screenshots already in their place are not replaced by old ones from checks/shots/", () => {
   const dir = tempProject("areas");
   const p = load(dir);
   const price = p.nodes.get("Price")!;
   shotsIn(nodeShotsDir(p, price), "Price", ["01-new.png"]);
-  shotsIn(join(legacyShotsDir(p), price.dir, "price"), "Price", ["01-old.png"]);
-  expect(moveLegacyShots(p)).toBe(true);
+  shotsIn(join(legacyShotsDir(p), "lib", "price"), "Price", ["01-old.png"]);
+  expect(relocateShots(p)).toBe(true);
   expect(readdirSync(nodeShotsDir(p, price)).sort()).toEqual(["01-new.png", "shots.json"]);
   expect(existsSync(legacyShotsDir(p))).toBe(false);
 });
 
-test("clearing a node's screenshots keeps its end-to-end ones, and removes the shots/ folder once empty", () => {
+test("clearing a node's screenshots keeps its end-to-end ones and other files' folders, and removes shots/ once empty", () => {
   const dir = tempProject("areas");
   const p = load(dir);
-  const price = p.nodes.get("Price")!;
-  shotsIn(nodeShotsDir(p, price), "Price", ["01-a.png"]);
-  shotsIn(e2eShotsDir(p, price), "Price", ["b.png"]);
+  const lib = p.nodes.get("Lib")!, price = p.nodes.get("Price")!;
+  shotsIn(nodeShotsDir(p, lib), "Lib", ["01-a.png"]);
+  shotsIn(e2eShotsDir(p, lib), "Lib", ["b.png"]);
+  shotsIn(nodeShotsDir(p, price), "Price", ["01-c.png"]);
+  clearShots(nodeShotsDir(p, lib));
+  expect(readdirSync(nodeShotsDir(p, lib)).sort()).toEqual(["e2e", "price"]);
+  clearShots(e2eShotsDir(p, lib));
   clearShots(nodeShotsDir(p, price));
-  expect(readdirSync(nodeShotsDir(p, price))).toEqual(["e2e"]);
-  clearShots(e2eShotsDir(p, price));
-  expect(existsSync(join(dir, price.dir, "shots"))).toBe(false);
-  expect(existsSync(join(dir, price.dir))).toBe(true);
+  expect(existsSync(join(dir, "lib", "shots"))).toBe(false);
+  expect(existsSync(join(dir, "lib"))).toBe(true);
 });
 
 test("the site's spec module finds a project's screenshots beside its spec, end-to-end ones last", () => {
@@ -82,24 +112,25 @@ test("the spec module gives each screenshot its path, beside its spec, so a page
   const mod = specModule(site);
   expect(mod).toContain("export type SpecShot = { node: string; test: string; path: string; src: string };");
   expect(mod).toContain(`"path": "board/shots/board-view/01-picking-an-empty-square.png"`);
-  expect(mod).toContain(`"path": "home/review/shots/review-section/01-what-a-reviewer-reads.png"`);
+  expect(mod).toContain(`"path": "home/review/shots/01-what-a-reviewer-reads.png"`);
 });
 
 test("screenshots are written by ail build only: the hook refuses edits to them", () => {
   const p = load(KATA);
   expect(isShotFile(p, "ail/board/shots/board-view/01-picking-an-empty-square.png")).toBe(true);
   expect(isShotFile(p, "ail/board/shots/board-view/shots.json")).toBe(true);
-  expect(isShotFile(p, "ail/board/board.ail.md")).toBe(false);
+  expect(isShotFile(p, "ail/board/board-view.ail.md")).toBe(false);
   expect(isShotFile(p, "src/gen/shots/x.png")).toBe(false);
   expect(preHook({ tool_input: { file_path: "ail/board/shots/board-view/shots.json" } }, KATA).code).toBe(2);
-  expect(preHook({ tool_input: { file_path: "ail/board/board.ail.md" } }, KATA).code).toBe(0);
+  expect(preHook({ tool_input: { file_path: "ail/board/board-view.ail.md" } }, KATA).code).toBe(0);
 });
 
-test("no spec folder may be called shots", () => {
+test("no spec folder may be called shots, and no spec file e2e.ail.md", () => {
   const dir = tempProject("areas");
   mkdirSync(join(dir, "a", "shots"), { recursive: true });
   writeFileSync(join(dir, "a", "shots", "shots.ail.md"), "```ail\nnode Snap : fn   level: system\n  why   A snap.   <- AreaA\n```\n");
-  const d = lint(load(dir)).filter((x) => x.code === "reserved-folder");
-  expect(d.length).toBe(1);
-  expect(d[0]!.file).toBe("a/shots/shots.ail.md");
+  writeFileSync(join(dir, "a", "e2e.ail.md"), "```ail\nnode Endless : fn   level: system\n  why   Ends.   <- AreaA\n```\n");
+  const d = lint(load(dir));
+  expect(d.filter((x) => x.code === "reserved-folder").map((x) => x.file)).toEqual(["a/shots/shots.ail.md"]);
+  expect(d.filter((x) => x.code === "reserved-name").map((x) => x.file)).toEqual(["a/e2e.ail.md"]);
 });

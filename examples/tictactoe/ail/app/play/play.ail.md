@@ -2,6 +2,8 @@
 
 Two people, or one person and the computer, play a game.
 
+More nodes in this folder, each in a file of its own: [`NewGameButton`](new-game-button.ail.md), [`ChooseOpponent`](choose-opponent.ail.md).
+
 ```ail
 node PlayAGame : flow   level: experience
   why   Make the game understandable without instructions.   <- App
@@ -56,41 +58,4 @@ node PlayAGame : flow   level: experience
     NewGameButton   onPress() = dispatch newGame
   uses      ChooseOpponent, StatusLine, BoardView, NewGameButton, GameState, GameReducer, ComputerPlayer, Stack
   children  NewGameButton, ChooseOpponent
-```
-
-```ail
-node NewGameButton : view   level: experience
-  why   Starting over must always be one press away.   <- PlayAGame
-  what
-    Scenario: pressing it
-      When the player presses "New game"
-      Then a new game is asked for, once
-  look
-    button   Button.secondary, width auto
-  copy
-    newgame.label  "New game"
-  binds
-    props    onPress()
-  uses  Button
-```
-
-```ail
-node ChooseOpponent : view   level: experience
-  why   Let someone playing alone still have fun.   <- PlayAGame
-  what
-    two options, "Friend" and "Computer", named together as "Opponent"
-    you are always X; the computer is always O
-    Scenario: switching to the computer
-      Given the opponent is a friend
-      When the player chooses "Computer"
-      Then the computer is asked for as the new opponent
-  look
-    control  Segmented, which fills the width by itself (no wrapper)
-  copy
-    opponent.label     "Opponent"
-    opponent.friend    "Friend"
-    opponent.computer  "Computer"
-  binds
-    props   opponent: Opponent, onChange(opponent: Opponent)
-  uses  GameState, Segmented
 ```

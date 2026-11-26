@@ -1,7 +1,8 @@
 // `ail lint`: structural, traceability and readability rules.
+import { posix } from "node:path";
 import { specFilesIn, specModuleProjects } from "./compile.ts";
 import { itemsOf, LEVELS, NODE_SECTIONS, sectionLines, stripComment, type AilNode, type Level } from "./parse.ts";
-import { ancestors, dependencies, descendants, isCompilable, isExisting, modulePath, PATH_PLACEHOLDERS, SHOTS, type Project } from "./project.ts";
+import { ancestors, dependencies, descendants, isCompilable, isExisting, kebab, modulePath, PATH_PLACEHOLDERS, SHOTS, type Project } from "./project.ts";
 
 export type Severity = "error" | "warning";
 export interface Diagnostic { severity: Severity; code: string; message: string; node?: string; file: string; line: number }
@@ -77,6 +78,12 @@ export function lint(p: Project): Diagnostic[] {
   // Each spec folder's shots/ holds its proof screenshots, so a spec can't live in one.
   for (const f of p.files) if (f.file.split(/[\\/]/).slice(0, -1).includes(SHOTS))
     push("error", "reserved-folder", null, `a spec file can't be in a folder called "${SHOTS}": that name is where each spec folder keeps its proof screenshots. Rename the folder`, 1, f.file);
+  // A file named like its folder keeps its screenshots in shots/ itself, and their end-to-end ones in shots/e2e/.
+  for (const f of p.files) if (/(^|[\\/])e2e\.ail\.md$/.test(f.file))
+    push("error", "reserved-name", null, `a spec file can't be called e2e.ail.md: shots/e2e/ is where the node of the file named like its folder keeps its end-to-end screenshots. Rename the file`, 1, f.file);
+  // One node per file: the file is the node's place, beside which its screenshots are kept.
+  for (const f of p.files) for (const n of f.nodes.slice(1))
+    push("error", "one-node-per-file", n, `${n.name} is not the only node in ${f.file}: a spec file holds one node. Move it into its own file, ${posix.join(posix.dirname(f.file), kebab(n.name) + ".ail.md")}`);
 
   if (p.config.specModule) for (const q of specModuleProjects(p))
     if (!specFilesIn(q.dir).length) push("error", "spec-module-empty", null, `specModule project "${q.key}": no *.ail.md files in ${q.configDir}, so the page would show an empty project`, 1, "ail.config.json");

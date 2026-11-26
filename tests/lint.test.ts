@@ -3,14 +3,13 @@ import { readFileSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
 import { lint } from "../src/lint.ts";
 import { loadProject } from "../src/project.ts";
-import { KATA, load, tempProject } from "./helpers.ts";
+import { KATA, load, specFileWith, tempProject } from "./helpers.ts";
 
 const codes = (dir: string) => lint(load(dir)).filter((d) => d.severity === "error").map((d) => d.code);
 
 function edit(dir: string, from: string, to: string) {
-  const f = join(dir, "mini.ail.md");
+  const f = specFileWith(dir, from);
   const s = readFileSync(f, "utf8");
-  if (!s.includes(from)) throw new Error(`fixture lacks: ${from}`);
   writeFileSync(f, s.replace(from, to));
 }
 

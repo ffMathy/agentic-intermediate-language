@@ -1,4 +1,4 @@
-import { cpSync, mkdtempSync, writeFileSync } from "node:fs";
+import { cpSync, mkdtempSync, readFileSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { loadProject } from "../src/project.ts";
@@ -21,6 +21,15 @@ export function mockFile(dir: string, responses: Record<string, string[]>): stri
 export const reply = (path: string, body: string) => `=== FILE: ${path} ===\n${body}\n=== END ===`;
 
 export const load = (dir: string) => loadProject(dir);
+
+/** The spec file under `dir` that holds `text` (a spec file holds one node, so a test edits the one that has it). */
+export function specFileWith(dir: string, text: string): string {
+  for (const f of new Bun.Glob("**/*.ail.md").scanSync({ cwd: dir })) {
+    const path = join(dir, f);
+    if (readFileSync(path, "utf8").includes(text)) return path;
+  }
+  throw new Error(`no spec file in ${dir} holds: ${text}`);
+}
 
 /** A TCP port that is free right now, chosen by the OS. A random port in a fixed range can collide with the local
  * end of any outgoing connection (Linux hands those out from 32768-60999). */

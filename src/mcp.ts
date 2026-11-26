@@ -17,7 +17,7 @@ const obj = (properties: Json, required: string[] = []) => ({ type: "object", pr
 export const TOOLS: Tool[] = [
   {
     name: "ail_show",
-    description: 'Look at the AIL spec. target: "" for the tree with each node\'s build status, a node name for its source and who uses it, "stakeholder" | "design" | "engineer" | "specialist" (with optional tag) for an audience\'s view, "changes" (optional since: git ref) for a review of what changed, or "checks" for the last build\'s checks as a section for a pull request\'s description (one collapsible section per check, each test with ✅ or ❌ and the screen it ended on), between markers that say where it goes.',
+    description: 'Look at the AIL spec. target: "" for the tree with each node\'s build status, a node name for its source and who uses it, "stakeholder" | "design" | "engineer" | "specialist" (with optional tag) for an audience\'s view, "changes" (optional since: git ref) for a review of what changed, or "checks" for the last build\'s checks as a section for a pull request\'s description (one collapsible section per check with screens or a failure, each test with ✅ or ❌ and the screen it ended on as an image; one line for the checks that passed without screens), between markers that say where it goes. Put it in the description exactly as returned, every image included: never shorten or summarize it.',
     inputSchema: obj({ target: str, since: str }),
     run: (p, a) => ({ text: show(p, (a.target as string) ?? "", { since: a.since as string | undefined }) }),
   },

@@ -37,7 +37,7 @@ test("unknown commands fail with help", async () => {
 
 test("the context asks for a derived check when one is missing, and submit accepts it", () => {
   const dir = tempProject();
-  const f = join(dir, "mini.ail.md");
+  const f = join(dir, "pick.ail.md");
   writeFileSync(f, readFileSync(f, "utf8").replace("    probes\n      pick([3, 3])", "    probes\n      pick([3, 3])\n  verify\n    empty input: pick([]) returns -1"));
   let p = load(dir);
   expect(submit(p, p.nodes.get("Add")!, { "src/gen/add.ts": "export function add(a: number, b: number): number {\n  return a + b;\n}\n" }).ok).toBe(true);

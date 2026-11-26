@@ -91,7 +91,7 @@ test("review shows every area a shared contract change reaches", () => {
   const dir = tempProject("areas");
   const git = (...args: string[]) => Bun.spawnSync(["git", "-c", "user.email=t@t", "-c", "user.name=t", ...args], { cwd: dir });
   git("init", "-q"); git("add", "-A"); git("commit", "-qm", "base");
-  writeFileSync(join(dir, "lib/lib.ail.md"), readFileSync(join(dir, "lib/lib.ail.md"), "utf8").replace("price(1999) => 19", "price(1999) => 19\n      price(0) => 0"));
+  writeFileSync(join(dir, "lib/price.ail.md"), readFileSync(join(dir, "lib/price.ail.md"), "utf8").replace("price(1999) => 19", "price(1999) => 19\n      price(0) => 0"));
   const r = renderReview(load(dir), "HEAD");
   expect(r).toContain("✎ Price");
   expect(r).toContain("**Contract changed** — this reaches AreaA (system, a/), AreaB (system, b/)");

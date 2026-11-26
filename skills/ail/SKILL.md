@@ -105,7 +105,9 @@ or `binds`, or move it one level down. Define domain words once in the
 
 ## Workflows
 **Change behaviour.** Edit the `.ail.md` file. Start at the highest level the
-change affects and refine downwards. The post-edit hook lints the spec. Then
+change affects and refine downwards. A spec file holds one node: a new node
+gets its own file, named after it (`new-game-button.ail.md` for
+`NewGameButton`), in its parent's folder or a folder of its own. The post-edit hook lints the spec. Then
 run `/ail:build`, which ends by checking everything.
 
 **A build verifies every check.** `ail build` passes only when the spec is
@@ -145,13 +147,17 @@ Action:
    everything. Commit what it wrote, the screenshots in each spec folder's
    `shots/` included, and push.
 2. Call `ail_show` with `checks`. It returns the section: one collapsible
-   block per check, each test with ✅ or ❌ and, under it, the screen it ended
-   on, linked at the pushed commit. Lines starting with `!` come first when
-   something is off (say, the commit isn't pushed). Fix that and run it again.
-   Never put those lines in the description.
+   block per check with screens or a failure, each test with ✅ or ❌ and,
+   under it, the screen it ended on (an `<img>` linked at the pushed commit),
+   and one line for the checks that passed without screens. Lines starting
+   with `!` come first when something is off (say, the commit isn't pushed).
+   Fix that and run it again. Never put those lines in the description.
 3. In the description, replace the block between
    `<!-- ail-checks:<project> -->` and `<!-- /ail-checks:<project> -->` with
-   the section, or add it at the end if it isn't there. Leave the rest of the
+   the section exactly as `ail_show` returned it, or add it at the end if it
+   isn't there. Copy it whole: every line and every `<img>` tag. Never
+   shorten, summarize or rewrite it, and never drop the images: the screens
+   are the proof a reviewer looks at, and a count of screens proves nothing. Leave the rest of the
    description as it is, the other projects' sections included. The GitHub
    Action writes the same block, so whichever runs last wins.
 

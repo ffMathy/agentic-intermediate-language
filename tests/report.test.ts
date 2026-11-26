@@ -39,11 +39,14 @@ test.skipIf(!installed)("a test run names every test, passed or failed", () => {
   ]);
 });
 
-test("every check is a collapsible section, each test with a check mark or a cross", () => {
-  const md = renderChecks(loadProject(KATA), report());
-  expect(md).toContain("❌ **2 of 3 test(s) passed in 2 check(s)**");
-  expect(md).toContain("<details><summary>✅ <b>BoardView</b> — 2/2 passed");
-  expect(md).toContain("- ✅ a win &lt;3");
+test("a failed check, or one with screens, is a collapsible section; one that passed with nothing to show is named on one line", () => {
+  const r = report();
+  r.check!.verify.results.push({ node: "GameReducer", ok: true, checks: [{ kind: "tests", ok: true, severity: "error", detail: "2 passed", tests: [{ name: "a", ok: true }, { name: "b", ok: true }] }] });
+  const md = renderChecks(loadProject(KATA), r);
+  expect(md).toContain("❌ **4 of 5 test(s) passed in 3 check(s)**");
+  expect(md).toContain("<details><summary>✅ <b>BoardView</b> — 2/2 passed · 3 screen(s)</summary>"); // its committed screens
+  expect(md).not.toContain("<b>GameReducer</b>");
+  expect(md).toContain("✅ Also passed, with no screens: GameReducer 2/2");
   expect(md).toContain("<details><summary>❌ <b>Rules</b> — 0/1 passed</summary>");
   expect(md).toContain("- ❌ a draw");
   expect(md).toContain("expected 1");
@@ -57,6 +60,7 @@ test("each test's screen sits under it: the one just taken, else the committed o
   mkdirSync(join(out, "board/board-view"), { recursive: true });
   writeFileSync(join(out, "board/board-view/02-a-win.png"), "");
   const md = renderChecks(p, report(), { outDir: out, base: "https://x.test/s/", shots: [{ node: "BoardView", test: "a win <3", file: join(out, "board/board-view/02-a-win.png") }] });
+  expect(md).toContain("<details><summary>✅ <b>BoardView</b> — 2/2 passed · ");
   expect(md).toContain(`- ✅ a win &lt;3\n\n  <img src="https://x.test/s/board/board-view/02-a-win.png"`);
   // No fresh screen for this one: the build's committed screenshot, copied next to the fresh ones.
   expect(existsSync(join(KATA, "ail/board/shots/board-view/shots.json"))).toBe(true);

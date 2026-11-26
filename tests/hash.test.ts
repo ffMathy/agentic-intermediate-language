@@ -19,12 +19,12 @@ test("whitespace inside string literals is significant", () => {
 
 test("a dependency's how is encapsulated; its what is not", () => {
   const dir = tempProject();
-  const file = join(dir, "mini.ail.md");
   const before = compileHash(load(dir), load(dir).nodes.get("Pick")!);
 
-  writeFileSync(file, readFileSync(file, "utf8").replace("rejected a lookup table because it is silly", "rejected a table because it is slow"));
+  const add = join(dir, "add.ail.md");
+  writeFileSync(add, readFileSync(add, "utf8").replace("rejected a lookup table because it is silly", "rejected a table because it is slow"));
   expect(compileHash(load(dir), load(dir).nodes.get("Pick")!)).toBe(before);
 
-  writeFileSync(file, readFileSync(file, "utf8").replace("add(-1, 1) => 0", "add(-1, 1) => 0\n      add(2, 2) => 4"));
+  writeFileSync(add, readFileSync(add, "utf8").replace("add(-1, 1) => 0", "add(-1, 1) => 0\n      add(2, 2) => 4"));
   expect(compileHash(load(dir), load(dir).nodes.get("Pick")!)).not.toBe(before);
 });

@@ -45,6 +45,8 @@ export async function build(p: Project, o: BuildOptions = {}): Promise<BuildResu
   if (errors.length) return { ok: false, text: formatDiagnostics(errors) + "\n\nfix the spec before building", outcomes: [], check: null, stopped: false };
   const jobs = o.jobs ?? 4;
   if (!Number.isInteger(jobs) || jobs < 1) throw new Error(`--jobs must be a whole number of at least 1, got "${jobs}"`);
+  // Screenshots still in checks/shots/ move beside the spec first, so anything retaken below replaces them.
+  if (moveLegacyShots(p)) log("proof screenshots moved beside the spec, into each spec folder's shots/");
   // A project's first build is the moment to set up review of what it generates.
   const firstBuild = Object.keys(readLock(p).nodes).length === 0;
   const specs = resolveModels(o.models ?? [], p.config.models);
@@ -120,7 +122,6 @@ export async function build(p: Project, o: BuildOptions = {}): Promise<BuildResu
 /** Retake the committed screenshots that are out of date and remove orphaned ones. True when anything changed. */
 async function refreshShots(p: Project, log: (s: string) => void): Promise<boolean> {
   let changed = moveLegacyShots(p);
-  if (changed) log("proof screenshots moved beside the spec, into each spec folder's shots/");
   for (const dir of orphanShots(p)) { clearShots(dir); changed = true; }
   for (const n of staleShots(p)) {
     try {

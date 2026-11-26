@@ -203,8 +203,9 @@ export function orphanShots(p: Project): string[] {
 
 /**
  * Move screenshots from where they used to be kept (checks/shots/) to beside
- * the spec, by the node each index names. Those of nodes that are gone are
- * dropped. True when there was anything to move.
+ * the spec, by the node each index names. Those of nodes that are gone, and
+ * those already retaken beside the spec, are dropped. True when there was
+ * anything to move.
  */
 export function moveLegacyShots(p: Project): boolean {
   const old = legacyShotsDir(p);
@@ -215,7 +216,8 @@ export function moveLegacyShots(p: Project): boolean {
     const n = p.nodes.get(idx.node);
     if (!n) continue;
     const to = f.split("/")[0] === "e2e" ? e2eShotsDir(p, n) : nodeShotsDir(p, n);
-    clearShots(to);
+    // Screenshots already beside the spec are newer: they are kept.
+    if (existsSync(join(to, "shots.json"))) continue;
     mkdirSync(to, { recursive: true });
     for (const file of readdirSync(from)) if (!statSync(join(from, file)).isDirectory()) renameSync(join(from, file), join(to, file));
   }

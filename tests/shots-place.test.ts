@@ -44,6 +44,17 @@ test("screenshots kept in checks/shots/ are moved beside the spec, and those of 
   expect(moveLegacyShots(p)).toBe(false);
 });
 
+test("screenshots already retaken beside the spec are not replaced by old ones from checks/shots/", () => {
+  const dir = tempProject("areas");
+  const p = load(dir);
+  const price = p.nodes.get("Price")!;
+  shotsIn(nodeShotsDir(p, price), "Price", ["01-new.png"]);
+  shotsIn(join(legacyShotsDir(p), price.dir, "price"), "Price", ["01-old.png"]);
+  expect(moveLegacyShots(p)).toBe(true);
+  expect(readdirSync(nodeShotsDir(p, price)).sort()).toEqual(["01-new.png", "shots.json"]);
+  expect(existsSync(legacyShotsDir(p))).toBe(false);
+});
+
 test("clearing a node's screenshots keeps its end-to-end ones, and removes the shots/ folder once empty", () => {
   const dir = tempProject("areas");
   const p = load(dir);

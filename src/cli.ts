@@ -6,7 +6,9 @@ import { getProvider, modelUnavailable, resolveModels } from "./providers/index.
 import { AGENTS, agentOf, postHook, preHook, respond, type Agent } from "./hooks.ts";
 import { changedNodes } from "./lens.ts";
 import { loadProject, type Project } from "./project.ts";
-import { changedScreens, renderShots, takeShots } from "./shots.ts";
+import { changedScreens, renderShots, takeShots, type Shot } from "./shots.ts";
+import { readReport, renderChecks, writeReport } from "./report.ts";
+import { writeFileSync } from "node:fs";
 import { defaultBase, show } from "./show.ts";
 
 const HELP = `ail — write the spec, let agents build the code.
@@ -26,6 +28,7 @@ const HELP = `ail — write the spec, let agents build the code.
                         --shots DIR   also screenshot the final screen of every scenario of
                                       nodes with a look (needs Playwright)
                         --samples N   also compile N times per model and compare behaviour
+                        --report FILE write every check's results, test by test, as JSON
   ail adopt [Node…]     Does the app behave as the spec says? Starts it as ail.config.json's
                         run says (run.legacy while you write the spec of an existing app,
                         else run.app), runs each flow's end-to-end check, and stops it.
@@ -33,6 +36,9 @@ const HELP = `ail — write the spec, let agents build the code.
   ail show [what]       The tree (default), a <Node>, or changes [--since <ref>]
                         --shots DIR   add screenshots of the node shown, or for changes,
                                       of the changed nodes and the nodes that use them
+                        --report FILE --checks OUT   also write the checks of a build's
+                                      --report to OUT as Markdown, one collapsible section
+                                      per check, with each test's screen
 
 Run it anywhere inside a project that has an ail.config.json.
 For the agent plugins (Claude Code, Cursor, GitHub Copilot):
@@ -93,6 +99,8 @@ async function main(argv: string[]): Promise<number> {
         temperature: flag(a, "temperature") ? Number(flag(a, "temperature")) : undefined,
         samples: Number(flag(a, "samples") ?? 0), shots: flag(a, "shots"), log,
       });
+      const report = flag(a, "report");
+      if (report) writeReport(report, { ok: r.ok, check: r.check, e2e: r.e2e ?? null, text: r.text });
       print(r.text, { outcomes: r.outcomes, check: r.check });
       return r.ok ? 0 : 1;
     }
@@ -109,11 +117,15 @@ async function main(argv: string[]): Promise<number> {
       const since = flag(a, "since") ?? defaultBase(p);
       let text = show(p, target, { since });
       const dir = flag(a, "shots");
+      let shots: Shot[] = [];
       if (dir) {
         const names = target === "changes" ? (() => { const c = changedNodes(p, since); return changedScreens(p, [...c.changed, ...c.added]); })()
           : p.nodes.has(target) ? [target] : undefined;
-        if (!names || names.length) text += renderShots(await takeShots(p, dir, names, (m) => console.error(m)), dir, flag(a, "shots-url"));
+        if (!names || names.length) text += renderShots(shots = await takeShots(p, dir, names, (m) => console.error(m)), dir, flag(a, "shots-url"));
       }
+      // The build's checks, one section each, with the screens just taken (else the committed ones).
+      const report = flag(a, "report"), checksOut = flag(a, "checks");
+      if (report && checksOut) writeFileSync(checksOut, renderChecks(p, readReport(report), { shots, outDir: dir, base: flag(a, "shots-url") }));
       process.stdout.write(text);
       return 0;
     }

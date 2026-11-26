@@ -1,7 +1,9 @@
 #!/usr/bin/env bash
 # Used by action.yml, from inside the project. Writes the spec review (with
-# screenshots on pull requests) to the job summary, pushes the screenshots to
-# the `ail-shots` branch, and keeps one PR comment per project up to date.
+# screenshots on pull requests) and every check of the build to the job
+# summary, pushes the screenshots to the `ail-shots` branch, keeps one PR
+# comment per project up to date with the review, and one section per project
+# in the PR description with every check, test by test, and its screens.
 # Pushing and commenting are best effort: a fork's read-only token only warns.
 set -uo pipefail
 cli="$1"
@@ -14,7 +16,12 @@ fi
 slug=$(echo "$AIL_PROJECT" | tr -c 'A-Za-z0-9_-' '-' | sed 's/^-*//; s/-*$//')
 slug=${slug:-root}
 review="$RUNNER_TEMP/ail-review-$slug.md"
+checks="$RUNNER_TEMP/ail-checks-$slug.md"
+report="$RUNNER_TEMP/ail-report-$slug.json"   # written by action.yml's ail build step
+rm -f "$checks"
 args=(show changes --since "$AIL_BASE")
+# The build's results (action.yml has `ail build` write them), one section per check.
+if [ -f "$report" ]; then args+=(--report "$report" --checks "$checks"); fi
 if [ "$AIL_SHOTS" = "true" ]; then
   shots="$RUNNER_TEMP/ail-shots-$slug"
   rm -rf "$shots"
@@ -23,6 +30,7 @@ if [ "$AIL_SHOTS" = "true" ]; then
 fi
 bun "$cli" "${args[@]}" > "$review" || { echo "::warning::ail show changes failed"; exit 0; }
 cat "$review" >> "$GITHUB_STEP_SUMMARY"
+if [ -f "$checks" ]; then { echo; echo "## Checks"; echo; cat "$checks"; } >> "$GITHUB_STEP_SUMMARY"; fi
 
 if [ "$AIL_SHOTS" = "true" ] && [ -n "$(find "$shots" -name '*.png' 2>/dev/null | head -1)" ]; then
   work="$RUNNER_TEMP/ail-shots-branch-$slug"
@@ -58,5 +66,10 @@ if [ "$AIL_COMMENT" = "true" ]; then
   elif ! grep -q "^No semantic IL changes" "$review"; then
     gh api -X POST "repos/$AIL_REPO/issues/$AIL_PR/comments" -F "body=@$body" >/dev/null || echo "::warning::could not comment (does the job have pull-requests: write?)"
   fi
+fi
+
+if [ "$AIL_DESCRIPTION" = "true" ] && [ -f "$checks" ]; then
+  bun "$(dirname "$cli")/../scripts/pr-body.ts" "$AIL_REPO" "$AIL_PR" "$AIL_PROJECT" "$checks" \
+    || echo "::warning::could not update the pull request description (does the job have pull-requests: write?)"
 fi
 exit 0

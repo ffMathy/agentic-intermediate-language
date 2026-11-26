@@ -1,5 +1,5 @@
 name: AIL
-description: 'Run `ail build` on an AIL project (with nothing to compile it only checks that the spec is sound, the code is built from it, and every check passes), and review the spec changes in the job summary and, on pull requests, in a comment with screenshots.'
+description: 'Run `ail build` on an AIL project (with nothing to compile it only checks that the spec is sound, the code is built from it, and every check passes), and review the spec changes in the job summary and, on pull requests, in a comment with screenshots, with every check (test by test, with its screens) in the description.'
 inputs:
   project:
     description: 'Directory containing ail.config.json'
@@ -12,6 +12,9 @@ inputs:
     default: "true"
   comment:
     description: 'On pull requests, keep one comment per project up to date with the spec review and its screenshots. Needs `pull-requests: write`, and `contents: write` for screenshots (they are pushed to the `ail-shots` branch).'
+    default: "true"
+  description:
+    description: 'On pull requests, keep one section per project in the description with every check of the build: each test with a check mark or a cross, and under it the screen it ended on. Needs `pull-requests: write`, and `contents: write` for screenshots.'
     default: "true"
   token:
     description: 'Token used to push screenshots and comment'
@@ -41,7 +44,12 @@ runs:
     - name: ail build
       shell: bash
       working-directory: ${{ inputs.project }}
-      run: bun "${{ github.action_path }}/src/cli.ts" build
+      env:
+        AIL_PROJECT: ${{ inputs.project }}
+      run: |
+        # Every check's results, for the review step (scripts/review.sh names the file the same way).
+        slug=$(echo "$AIL_PROJECT" | tr -c 'A-Za-z0-9_-' '-' | sed 's/^-*//; s/-*$//')
+        bun "${{ github.action_path }}/src/cli.ts" build --report "$RUNNER_TEMP/ail-report-${slug:-root}.json"
     - name: Spec changes
       if: ${{ always() && inputs.base != '' }}
       shell: bash
@@ -52,6 +60,7 @@ runs:
         AIL_PROJECT: ${{ inputs.project }}
         AIL_SHOTS: ${{ inputs.screenshots == 'true' && github.event_name == 'pull_request' }}
         AIL_COMMENT: ${{ inputs.comment == 'true' && github.event_name == 'pull_request' }}
+        AIL_DESCRIPTION: ${{ inputs.description == 'true' && github.event_name == 'pull_request' }}
         AIL_PR: ${{ github.event.pull_request.number }}
         AIL_SHA: ${{ github.event.pull_request.head.sha }}
         AIL_REPO: ${{ github.repository }}

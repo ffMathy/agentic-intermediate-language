@@ -12,7 +12,7 @@ import { orphanShots, refreshNodeShots, staleShots, takeShots } from "./shots.ts
 import { rmSync } from "node:fs";
 import { existsSync } from "node:fs";
 import { join } from "node:path";
-import { adopt, formatAdopt, formatReview, reviewAttributes } from "./adopt.ts";
+import { adopt, formatAdopt, formatReview, reviewAttributes, type AdoptReport } from "./adopt.ts";
 import { readLock } from "./lock.ts";
 import { checksDir } from "./verify.ts";
 
@@ -33,7 +33,7 @@ export interface BuildOptions {
   log?: (msg: string) => void;
 }
 
-export interface BuildResult { ok: boolean; text: string; outcomes: CompileOutcome[]; check: CheckReport | null; stopped: boolean }
+export interface BuildResult { ok: boolean; text: string; outcomes: CompileOutcome[]; check: CheckReport | null; stopped: boolean; e2e?: AdoptReport }
 
 export async function build(p: Project, o: BuildOptions = {}): Promise<BuildResult> {
   const log = o.log ?? (() => {});
@@ -91,9 +91,10 @@ export async function build(p: Project, o: BuildOptions = {}): Promise<BuildResu
     sections.push(formatDiverge(reports));
   }
   // The end-to-end checks, against the app this build made, started as run.app says.
+  let e2e: AdoptReport | undefined;
   if (existsSync(join(checksDir(p), "e2e"))) {
     if (p.config.run?.app) {
-      const r = await adopt(p, { app: "app", names, log, judge: noModel || o.look === false ? undefined : getProvider(specs[0]!) });
+      const r = e2e = await adopt(p, { app: "app", names, log, judge: noModel || o.look === false ? undefined : getProvider(specs[0]!) });
       ok &&= r.ok;
       sections.push(formatAdopt(r));
     } else sections.push("! app      end-to-end checks not run: ail.config.json has no run.app saying how to start the app this project builds");
@@ -102,7 +103,7 @@ export async function build(p: Project, o: BuildOptions = {}): Promise<BuildResu
   if (firstBuild) { const tip = formatReview(reviewAttributes(p)); if (tip) sections.push(tip.trimStart()); }
   const stopped = out.some((x) => x.status === "stopped");
   if (stopped) sections.push("The spec doesn't decide the questions above. Answer them in the .ail.md files, then build again.");
-  return { ok, text: sections.filter(Boolean).join("\n\n"), outcomes: out, check: report, stopped };
+  return { ok, text: sections.filter(Boolean).join("\n\n"), outcomes: out, check: report, stopped, e2e };
 }
 
 /** Retake the committed screenshots that are out of date and remove orphaned ones. True when anything changed. */

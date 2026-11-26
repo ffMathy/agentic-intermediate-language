@@ -219,8 +219,18 @@ the final screen of every scenario of each changed node that has a `look`,
 and of the nodes that use it. They are rendered in Chromium from the derived
 checks, and the comment shows them through the `ail-shots` branch. Give the
 job `contents: write` and `pull-requests: write`, and check out with
-`fetch-depth: 0`. To take the same screenshots locally (this needs
-Playwright), run:
+`fetch-depth: 0`.
+
+It also keeps **every check of the build** in the pull request's
+description, one section per project between `<!-- ail-checks:… -->`
+markers (the rest of the description is left alone). Each check (a node's
+tests, a flow's end-to-end check) is a collapsible section: every test with
+✅ or ❌, and under it the screen it ended on, freshly taken for changed
+nodes and the committed one otherwise. Set `description: false` to turn it
+off. `ail build --report r.json` writes those results, and
+`ail show changes --report r.json --checks checks.md` renders them.
+
+To take the same screenshots locally (this needs Playwright), run:
 
 ```bash
 ail show changes --shots .ail/shots

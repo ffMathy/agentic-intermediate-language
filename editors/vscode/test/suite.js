@@ -35,11 +35,11 @@ async function run() {
 
   const cases = [
     // [what, line, word, the file and header it must land on]
-    ["uses, to another folder", /^\s+uses\s/, "GameReducer", "ail/engine/engine.ail.md", "node GameReducer "],
-    ["uses, to a library component", /^\s+uses\s/, "Stack", "ail/ui/ui.ail.md", "node Stack "],
+    ["uses, to another folder", /^\s+uses\s/, "GameReducer", "ail/engine/game-reducer.ail.md", "node GameReducer "],
+    ["uses, to a library component", /^\s+uses\s/, "Stack", "ail/ui/stack.ail.md", "node Stack "],
     ["why <- the parent, in another file", /<-\s*App/, "App", "ail/app/app.ail.md", "node App "],
-    ["a component in a look", /^\s+layout\s/, "BoardView", "ail/board/board.ail.md", "node BoardView "],
-    ["a node in the same file", /^\s+children\s/, "NewGameButton", "ail/app/play/play.ail.md", "node NewGameButton "],
+    ["a component in a look", /^\s+layout\s/, "BoardView", "ail/board/board-view.ail.md", "node BoardView "],
+    ["a child, in its own file in the same folder", /^\s+children\s/, "NewGameButton", "ail/app/play/new-game-button.ail.md", "node NewGameButton "],
   ];
   for (const [what, lineRe, word, file, header] of cases) {
     const found = await vscode.commands.executeCommand("vscode.executeDefinitionProvider", play.uri, at(play, lineRe, word));
@@ -55,7 +55,7 @@ async function run() {
 
   const refs = await vscode.commands.executeCommand("vscode.executeReferenceProvider", play.uri, at(play, /^\s+uses\s/, "GameReducer"));
   const files = [...new Set(refs.map((r) => vscode.workspace.asRelativePath(r.uri)))].sort();
-  assert.deepStrictEqual(files, ["ail/app/demo/demo.ail.md", "ail/app/play/play.ail.md", "ail/engine/engine.ail.md"], "GameReducer is used by both areas and defined in the engine");
+  assert.deepStrictEqual(files, ["ail/app/demo/demo.ail.md", "ail/app/play/play.ail.md", "ail/engine/engine.ail.md", "ail/engine/game-reducer.ail.md"], "GameReducer is used by both areas, is a child of the engine and is defined in its own file");
   console.log(`✓ Find All References: GameReducer in ${files.join(", ")} (${refs.length} places)`);
 }
 

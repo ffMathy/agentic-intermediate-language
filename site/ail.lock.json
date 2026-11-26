@@ -123,13 +123,13 @@
       "look": "1ed60cc7f8465896532d7a74ba701b7f661fbc6eb2c7a2537d6df359e9ca01b6"
     },
     "Footer": {
-      "hash": "ac62ba853c7a0cc3d5f251f8ecaf1ab69bf6bc521965d28156f177089d878ea3",
+      "hash": "b88fe01ee0871fd6908fc77c13af1e8065c5059d126ab9b8dac71bda741e0bb0",
       "files": {
-        "src/gen/home/sections/footer.tsx": "9351da038644cef91dd5a7458aa26c7a9bfdaed72e64b20ddc9bee10187fc591"
+        "src/gen/home/sections/footer.tsx": "a5e921663130bfa0981e3832f3e3acc35be99a5cf7d8b5c9176509fd65d7c90d"
       },
       "by": "claude-code",
-      "shots": "ac62ba853c7a0cc3d5f251f8ecaf1ab69bf6bc521965d28156f177089d878ea3",
-      "look": "ac62ba853c7a0cc3d5f251f8ecaf1ab69bf6bc521965d28156f177089d878ea3"
+      "shots": "b88fe01ee0871fd6908fc77c13af1e8065c5059d126ab9b8dac71bda741e0bb0",
+      "look": "b88fe01ee0871fd6908fc77c13af1e8065c5059d126ab9b8dac71bda741e0bb0"
     },
     "GapStrip": {
       "hash": "0cfa84361c9981f44b79d0cc6ebdf690a8669288d3a1b7a4d3543aff30730eb1",
@@ -168,13 +168,13 @@
       "look": "3b9f05780be80dc4813f0f459fb99921eddfe59bfa0c4719e95ac5d34dbdd3d3"
     },
     "HomePage": {
-      "hash": "c8d815e8f327e986b9fd1598e1adbe36de71546d8e40531971f8c2632b9e57b6",
+      "hash": "02538aa1d369d13c610921ce59a44262649af5fa9d8d6f50bec3e02bdca2208b",
       "files": {
         "src/gen/home/home-page.tsx": "7bd6ed9c5300c327dc32006ee999f5ffffe821a002e52e66278d4823593a137d"
       },
       "by": "claude-code",
-      "shots": "c8d815e8f327e986b9fd1598e1adbe36de71546d8e40531971f8c2632b9e57b6",
-      "look": "c8d815e8f327e986b9fd1598e1adbe36de71546d8e40531971f8c2632b9e57b6"
+      "shots": "02538aa1d369d13c610921ce59a44262649af5fa9d8d6f50bec3e02bdca2208b",
+      "look": "02538aa1d369d13c610921ce59a44262649af5fa9d8d6f50bec3e02bdca2208b"
     },
     "IdeaFigure": {
       "hash": "dc5b0e2600930ec3f1b8d7d3e0db55c995ffd13b14ad24b3514ec32b17e89887",
@@ -573,7 +573,7 @@
   },
   "glue": {
     "src/gen/assets.d.ts": "8b9044f3e94a4669ea033bbea49000ccc17e32622e282441d78862e4780ea0aa",
-    "src/gen/spec.ts": "8429641bda95329f81c2d013623ea537c696e7c88a2a6adff7953102d2f51850",
+    "src/gen/spec.ts": "1fab2da42a5909a18a545c4769b06ebb610b6e66fd823d488e9ab2db46783470",
     "src/gen/tokens.css": "7bbb97ebb74409b3ed971ac9b054588620ec3b1652e3b22ce61e0ae8ddbcff31"
   }
 }

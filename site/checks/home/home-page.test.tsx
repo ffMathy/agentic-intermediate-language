@@ -1,4 +1,4 @@
-// ail-derived-from: HomePage@b0de874712c6a741
+// ail-derived-from: HomePage@0f120dd5fcc62f95
 import { afterEach, expect, test } from "bun:test";
 import { cleanup, render, screen } from "@testing-library/react";
 import { HomePage } from "../../src/gen/home/home-page";
@@ -9,9 +9,8 @@ afterEach(() => {
 
 test("one story, in order", () => {
   render(<HomePage />);
-  const h1s = screen.getAllByRole("heading", { level: 1 });
-  expect(h1s.length).toBe(1);
-  expect((h1s[0]?.textContent ?? "").trim()).toBe(
+  const h1 = screen.getByRole("heading", { level: 1 });
+  expect((h1.textContent ?? "").trim()).toBe(
     "Write one sentence. Watch it become working software.",
   );
   const h2s = screen

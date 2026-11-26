@@ -1,6 +1,19 @@
+import type { CSSProperties } from "react";
 import { Stack } from "../../parts/stack";
 
-const linkStyle = {
+const textStyle: CSSProperties = {
+  lineHeight: 1.6,
+  maxWidth: "var(--width-prose)",
+  margin: 0,
+};
+
+const inlineStyle: CSSProperties = {
+  color: "var(--color-code-text)",
+  fontWeight: 600,
+  textDecoration: "underline",
+};
+
+const linkStyle: CSSProperties = {
   display: "inline-flex",
   alignItems: "center",
   minHeight: "44px",
@@ -9,7 +22,14 @@ const linkStyle = {
   textDecoration: "underline",
 };
 
-/** a strip of the four level colors, one sentence on where this page and the game came from, and seven links */
+const stripColors = [
+  "var(--color-level-product)",
+  "var(--color-level-experience)",
+  "var(--color-level-system)",
+  "var(--color-level-specialist)",
+];
+
+/** a strip of the four level colors, one sentence on where this page and the game came from, one sentence naming the other projects written in AIL, each name a link to its repository, and seven links */
 export function Footer() {
   return (
     <footer
@@ -20,10 +40,9 @@ export function Footer() {
       }}
     >
       <div style={{ height: "4px", display: "flex" }}>
-        <div style={{ flex: 1, background: "var(--color-level-product)" }} />
-        <div style={{ flex: 1, background: "var(--color-level-experience)" }} />
-        <div style={{ flex: 1, background: "var(--color-level-system)" }} />
-        <div style={{ flex: 1, background: "var(--color-level-specialist)" }} />
+        {stripColors.map((color) => (
+          <div key={color} style={{ flex: 1, background: color }} />
+        ))}
       </div>
       <Stack
         dir="v"
@@ -36,14 +55,19 @@ export function Footer() {
           padding: "clamp(24px, 6vw, 32px) var(--space-4)",
         }}
       >
-        <p
-          style={{
-            lineHeight: 1.6,
-            maxWidth: "var(--width-prose)",
-            margin: 0,
-          }}
-        >
+        <p style={textStyle}>
           Brewed in AIL. This page was compiled from the spec in site/ail/, and the game from the spec in examples/tictactoe/ail/. Apart from the spec and a short index.html, nothing in either was written by hand.
+        </p>
+        <p style={textStyle}>
+          {"Also written in AIL: "}
+          <a href="https://github.com/ffMathy/Shapeshifter" style={inlineStyle}>
+            Shapeshifter
+          </a>
+          {", a clipboard manager for Windows, macOS and Linux, and "}
+          <a href="https://github.com/ffMathy/valafind" style={inlineStyle}>
+            Valafind
+          </a>
+          {", semantic search for the files on your computer."}
         </p>
         <nav
           aria-label="More about AIL"

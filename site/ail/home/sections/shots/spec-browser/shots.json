@@ -14,16 +14,20 @@
       "file": "03-showing-this-website-s-spec.png"
     },
     {
+      "test": "a screenshot beside its spec",
+      "file": "04-a-screenshot-beside-its-spec.png"
+    },
+    {
       "test": "opened from a link",
-      "file": "04-opened-from-a-link.png"
+      "file": "05-opened-from-a-link.png"
     },
     {
       "test": "the language is defined",
-      "file": "05-the-language-is-defined.png"
+      "file": "06-the-language-is-defined.png"
     },
     {
       "test": "following the same link twice",
-      "file": "06-following-the-same-link-twice.png"
+      "file": "07-following-the-same-link-twice.png"
     }
   ]
 }

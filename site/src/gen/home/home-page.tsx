@@ -6,12 +6,13 @@ import { Journey } from "./journey/journey";
 import { WatchSection } from "./watch/watch-section";
 import { Readers } from "./readers/readers";
 import { BuildLoop } from "./build-loop/build-loop";
+import { ReviewSection } from "./review/review-section";
 import { AdoptSection } from "./adopt/adopt-section";
 import { SpecBrowser } from "./sections/spec-browser";
 import { GetStarted } from "./sections/get-started";
 import { Footer } from "./sections/footer";
 
-/** the parts appear in this order: TopBar, Hero, GapStrip, TreeSection, Journey, WatchSection, Readers, BuildLoop, AdoptSection, SpecBrowser, GetStarted, Footer */
+/** the parts appear in this order: TopBar, Hero, GapStrip, TreeSection, Journey, WatchSection, Readers, BuildLoop, ReviewSection, AdoptSection, SpecBrowser, GetStarted, Footer */
 export function HomePage() {
   return (
     <div
@@ -33,6 +34,7 @@ export function HomePage() {
         <WatchSection />
         <Readers />
         <BuildLoop />
+        <ReviewSection />
         <AdoptSection />
         <SpecBrowser />
         <GetStarted />

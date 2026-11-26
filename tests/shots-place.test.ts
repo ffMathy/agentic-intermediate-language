@@ -6,7 +6,7 @@ import { join } from "node:path";
 import { preHook } from "../src/hooks.ts";
 import { lint } from "../src/lint.ts";
 import { clearShots, e2eShotsDir, isShotFile, legacyShotsDir, moveLegacyShots, nodeShotsDir, shotFolders } from "../src/shots.ts";
-import { projectShots } from "../src/compile.ts";
+import { projectShots, specModule } from "../src/compile.ts";
 import { KATA, load, tempProject } from "./helpers.ts";
 
 const shotsIn = (dir: string, node: string, files: string[]) => {
@@ -75,6 +75,14 @@ test("the site's spec module finds a project's screenshots beside its spec, end-
   const firstE2e = shots.findIndex((s) => s.file.includes("/e2e/"));
   expect(firstE2e).toBeGreaterThan(0);
   expect(shots.slice(firstE2e).every((s) => s.file.includes("/e2e/"))).toBe(true);
+});
+
+test("the spec module gives each screenshot its path, beside its spec, so a page can show them in the spec's own tree", () => {
+  const site = load(join(KATA, "..", "..", "site"));
+  const mod = specModule(site);
+  expect(mod).toContain("export type SpecShot = { node: string; test: string; path: string; src: string };");
+  expect(mod).toContain(`"path": "board/shots/board-view/01-picking-an-empty-square.png"`);
+  expect(mod).toContain(`"path": "home/review/shots/review-section/01-what-a-reviewer-reads.png"`);
 });
 
 test("screenshots are written by ail build only: the hook refuses edits to them", () => {

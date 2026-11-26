@@ -18,7 +18,8 @@ home/journey/journey.ail.md              🟡 Journey, JumpGauge, JourneyStop
 home/journey/stops/*.ail.md              🟡 the eight stops and their figures
 home/readers/readers.ail.md              🟡 Readers, ReadersTree
 home/build-loop/build-loop.ail.md        🟡 BuildLoop, LoopFigure
-parts/*.ail.md                           🟡 Parts (library): Stack, Section, SectionHeading, CodeBlock, CopyCommand, MiniBoard, SpecEditor
+home/review/review.ail.md                🟡 ReviewSection, SamplePullRequest
+parts/*.ail.md                           🟡 Parts (library): Stack, Section, SectionHeading, CodeBlock, CopyCommand, MiniBoard, SpecEditor, SpecShot
 ```
 
 ## Target

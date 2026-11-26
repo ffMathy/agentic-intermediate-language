@@ -1,0 +1,9 @@
+{
+  "node": "ReviewSection",
+  "shots": [
+    {
+      "test": "what a reviewer reads",
+      "file": "01-what-a-reviewer-reads.png"
+    }
+  ]
+}

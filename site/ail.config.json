@@ -12,7 +12,8 @@
       {
         "key": "site",
         "name": "This website",
-        "dir": "ail"
+        "dir": "ail",
+        "shots": true
       }
     ]
   }

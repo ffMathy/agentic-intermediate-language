@@ -1,0 +1,9 @@
+{
+  "node": "SpecShot",
+  "shots": [
+    {
+      "test": "a screenshot is shown",
+      "file": "01-a-screenshot-is-shown.png"
+    }
+  ]
+}

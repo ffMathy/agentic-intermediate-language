@@ -1,4 +1,4 @@
-// ail-derived-from: HomePage@3a8190cd8d072ebe
+// ail-derived-from: HomePage@b0de874712c6a741
 import { afterEach, expect, test } from "bun:test";
 import { cleanup, render, screen } from "@testing-library/react";
 import { HomePage } from "../../src/gen/home/home-page";
@@ -11,12 +11,12 @@ test("one story, in order", () => {
   render(<HomePage />);
   const h1s = screen.getAllByRole("heading", { level: 1 });
   expect(h1s.length).toBe(1);
-  expect((h1s[0].textContent ?? "").replace(/\s+/g, " ").trim()).toBe(
+  expect((h1s[0]?.textContent ?? "").trim()).toBe(
     "Write one sentence. Watch it become working software.",
   );
   const h2s = screen
     .getAllByRole("heading", { level: 2 })
-    .map((h) => (h.textContent ?? "").replace(/\s+/g, " ").trim());
+    .map((h) => (h.textContent ?? "").trim());
   expect(h2s).toEqual([
     "Between a prompt and the code, there is nothing to review.",
     "A tree of tasks, the same all the way down",
@@ -24,6 +24,7 @@ test("one story, in order", () => {
     "Watch AIL build, and adopt",
     "One spec, four readers",
     "How a spec becomes code you can trust",
+    "Review the spec and the screens. That's all.",
     "Already have an app? Adopt it.",
     "Browse the specs",
     "Start in two minutes",
@@ -31,8 +32,18 @@ test("one story, in order", () => {
 });
 
 test("every top bar link has a place to land", () => {
-  render(<HomePage />);
-  for (const id of ["tree", "journey", "watch", "readers", "loop", "adopt", "specs", "start"]) {
-    expect(document.getElementById(id)).not.toBeNull();
+  const { container } = render(<HomePage />);
+  for (const id of [
+    "tree",
+    "journey",
+    "watch",
+    "readers",
+    "loop",
+    "review",
+    "adopt",
+    "specs",
+    "start",
+  ]) {
+    expect(container.querySelector(`[id="${id}"]`)).not.toBeNull();
   }
 });

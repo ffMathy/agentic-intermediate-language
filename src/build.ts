@@ -80,8 +80,10 @@ export async function build(p: Project, o: BuildOptions = {}): Promise<BuildResu
     });
     for (const [node, q] of stopped) out.push({ node, status: "stopped", attempts: 0, detail: q });
     for (const [node, why] of failed) out.push({ node, status: "failed", attempts: 0, detail: why });
-    // The proof screenshots of every node built since they were last taken, then the glue that shows them.
-    if (await refreshShots(p, log)) writeGlue(p);
+    // The proof screenshots of every node built since they were last taken, then the glue that shows them
+    // (always: compiling a node with a look retakes its screenshots too, and the spec module imports them).
+    await refreshShots(p, log);
+    for (const g of writeGlue(p)) log(`glue: wrote ${g}`);
   }
 
   // Then the check: spec, build, behaviour, and anything asked for on top.

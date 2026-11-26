@@ -7,7 +7,7 @@ the figures in [`mini-board.ail.md`](mini-board.ail.md).
 ```ail
 node Parts : library   level: experience
   why   Every section is built from the same few pieces, so the page looks consistent from top to bottom.   <- AIL
-  children  Stack, Section, SectionHeading, CodeBlock, CopyCommand, MiniBoard, SpecEditor
+  children  Stack, Section, SectionHeading, CodeBlock, CopyCommand, MiniBoard, SpecEditor, SpecShot
 ```
 
 ```ail

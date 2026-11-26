@@ -122,7 +122,7 @@ test("an @existing node is never compiled, and its dependants see its contract a
   expect(ctx).toContain("### Clock — existing code, written by hand");
   expect(ctx).toContain("now() -> time");
   // ...and it is not reported as a leaf without a path.
-  expect(lint(p).filter((d) => d.node === "Clock").map((d) => d.code)).toEqual([]);
+  expect(lint(p).filter((d) => d.node === "Clock" && d.code !== "one-node-per-file").map((d) => d.code)).toEqual([]);
 });
 
 test("lint: an @existing node without a contract, an unknown path placeholder, half a checks setting", () => {

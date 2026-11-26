@@ -1,7 +1,7 @@
-import { useEffect, useRef } from "react";
-import type { ChangeEvent, ReactElement } from "react";
+import { Fragment, useEffect, useRef } from "react";
+import type { ChangeEvent, CSSProperties } from "react";
 
-export type SpecTreeProps = {
+type SpecTreeProps = {
   files: string[];
   shots: string[];
   picked: string;
@@ -13,49 +13,124 @@ type Group = {
   paths: string[];
 };
 
-const compareNames = (a: string, b: string): number => (a < b ? -1 : a > b ? 1 : 0);
+function compareNames(a: string, b: string): number {
+  if (a < b) {
+    return -1;
+  }
+  if (a > b) {
+    return 1;
+  }
+  return 0;
+}
 
-const comparePaths = (a: string, b: string): number => {
+function compareEntries(a: string, b: string): number {
   const pa = a.split("/");
   const pb = b.split("/");
   const n = Math.min(pa.length, pb.length);
-  for (let i = 0; i < n; i += 1) {
+  for (let i = 0; i < n; i++) {
+    const lastA = i === pa.length - 1;
+    const lastB = i === pb.length - 1;
+    if (lastA !== lastB) {
+      return lastA ? -1 : 1;
+    }
     if (pa[i] === pb[i]) {
+      if (lastA) {
+        return 0;
+      }
       continue;
     }
-    const aDirect = i === pa.length - 1;
-    const bDirect = i === pb.length - 1;
-    if (aDirect && !bDirect) {
+    if (lastA) {
+      return compareNames(pa[i], pb[i]);
+    }
+    if (pa[i] === "shots") {
       return -1;
     }
-    if (!aDirect && bDirect) {
+    if (pb[i] === "shots") {
       return 1;
-    }
-    if (!aDirect && !bDirect) {
-      if (pa[i] === "shots") {
-        return -1;
-      }
-      if (pb[i] === "shots") {
-        return 1;
-      }
     }
     return compareNames(pa[i], pb[i]);
   }
-  return pa.length - pb.length;
+  return 0;
+}
+
+function folderOf(path: string): string {
+  const at = path.lastIndexOf("/");
+  return at < 0 ? "" : path.slice(0, at);
+}
+
+function nameOf(path: string): string {
+  return path.slice(path.lastIndexOf("/") + 1);
+}
+
+function slashes(path: string): number {
+  return path.split("/").length - 1;
+}
+
+const explorerStyle: CSSProperties = {
+  flex: "1 1 220px",
+  maxHeight: "clamp(200px, 40vw, 560px)",
+  overflowY: "auto",
+  background: "var(--color-code-side)",
+  padding: "var(--space-2) 0",
+  boxSizing: "border-box",
 };
 
-const folderOf = (path: string): string => {
-  const i = path.lastIndexOf("/");
-  return i < 0 ? "" : path.slice(0, i);
+const pickerStyle: CSSProperties = {
+  width: "100%",
+  minHeight: "44px",
+  boxSizing: "border-box",
+  fontFamily: "var(--font-mono)",
+  fontSize: "var(--font-small)",
+  color: "var(--color-code-text)",
+  background: "var(--color-code-side)",
+  border: "none",
+  borderBottom: "1px solid var(--color-code-border)",
+  padding: "var(--space-2) var(--space-3)",
 };
 
-const nameOf = (path: string): string => path.slice(path.lastIndexOf("/") + 1);
+function folderStyle(folder: string): CSSProperties {
+  const depth = slashes(folder) + 1;
+  return {
+    fontFamily: "var(--font-mono)",
+    fontSize: "var(--font-tiny)",
+    color: "var(--color-code-muted)",
+    padding: `var(--space-1) var(--space-3) var(--space-1) calc(var(--space-3) + ${12 * (depth - 1)}px)`,
+  };
+}
 
-const slashes = (path: string): number => path.split("/").length - 1;
+function fileStyle(path: string, isPicked: boolean): CSSProperties {
+  const depth = slashes(path);
+  return {
+    display: "block",
+    width: "100%",
+    textAlign: "left",
+    fontFamily: "var(--font-mono)",
+    fontSize: "var(--font-tiny)",
+    color: "var(--color-code-text)",
+    background: isPicked ? "var(--color-code-pick)" : "transparent",
+    borderTop: "none",
+    borderRight: "none",
+    borderBottom: "none",
+    borderLeft: isPicked
+      ? "2px solid var(--color-accent)"
+      : "2px solid transparent",
+    padding: `var(--space-1) var(--space-3) var(--space-1) calc(var(--space-3) + ${12 * depth}px)`,
+    cursor: "pointer",
+  };
+}
 
-const groupsOf = (paths: string[]): Group[] => {
+const markStyle: CSSProperties = {
+  color: "var(--color-thread)",
+};
+
+/** "the spec files and the screenshots together, grouped by folder, the picked one marked" */
+export function SpecTree({ files, shots, picked, onPick }: SpecTreeProps) {
+  const explorerRef = useRef<HTMLElement>(null);
+  const shotSet = new Set(shots);
+  const entries = [...files, ...shots].sort(compareEntries);
+
   const groups: Group[] = [];
-  for (const path of paths) {
+  for (const path of entries) {
     const folder = folderOf(path);
     const last = groups[groups.length - 1];
     if (last !== undefined && last.folder === folder) {
@@ -64,67 +139,49 @@ const groupsOf = (paths: string[]): Group[] => {
       groups.push({ folder, paths: [path] });
     }
   }
-  return groups;
-};
-
-/** "the spec files and the screenshots together, grouped by folder, the picked one marked" */
-export function SpecTree({ files, shots, picked, onPick }: SpecTreeProps): ReactElement {
-  const navRef = useRef<HTMLElement | null>(null);
-  const buttonsRef = useRef<Map<string, HTMLButtonElement>>(new Map());
-  const shotSet = new Set(shots);
-  const entries = [...files, ...shots].sort(comparePaths);
-  const groups = groupsOf(entries);
 
   useEffect(() => {
-    const nav = navRef.current;
-    const el = buttonsRef.current.get(picked);
-    if (nav === null || el === undefined) {
+    const explorer = explorerRef.current;
+    if (explorer === null) {
       return;
     }
-    const n = nav.getBoundingClientRect();
-    const r = el.getBoundingClientRect();
-    if (r.top < n.top) {
-      nav.scrollTop += r.top - n.top;
-    } else if (r.bottom > n.bottom) {
-      nav.scrollTop += r.bottom - n.bottom;
+    const entry = Array.from(explorer.querySelectorAll("button")).find(
+      (button) => button.title === picked,
+    );
+    if (entry === undefined) {
+      return;
+    }
+    const box = explorer.getBoundingClientRect();
+    const rect = entry.getBoundingClientRect();
+    if (rect.top < box.top) {
+      explorer.scrollTop += rect.top - box.top;
+    } else if (rect.bottom > box.bottom) {
+      explorer.scrollTop += rect.bottom - box.bottom;
     }
   }, [picked]);
-
-  const onChange = (e: ChangeEvent<HTMLSelectElement>): void => {
-    onPick(e.target.value);
-  };
 
   return (
     <>
       <select
         className="ail-narrow"
         aria-label="Spec files"
+        style={pickerStyle}
         value={picked}
-        onChange={onChange}
-        style={{
-          width: "100%",
-          minHeight: "44px",
-          boxSizing: "border-box",
-          fontFamily: "var(--font-mono)",
-          fontSize: "var(--font-small)",
-          color: "var(--color-code-text)",
-          background: "var(--color-code-side)",
-          borderTop: "none",
-          borderRight: "none",
-          borderLeft: "none",
-          borderBottom: "1px solid var(--color-code-border)",
-          padding: "var(--space-2) var(--space-3)",
-        }}
+        onChange={(event: ChangeEvent<HTMLSelectElement>) =>
+          onPick(event.target.value)
+        }
       >
-        {groups.map((group, gi) =>
+        {groups.map((group, index) =>
           group.folder === "" ? (
-            group.paths.map((path) => (
-              <option key={path} value={path}>
-                {path}
-              </option>
-            ))
+            <Fragment key={index}>
+              {group.paths.map((path) => (
+                <option key={path} value={path}>
+                  {path}
+                </option>
+              ))}
+            </Fragment>
           ) : (
-            <optgroup key={`${gi}:${group.folder}`} label={`${group.folder}/`}>
+            <optgroup key={index} label={`${group.folder}/`}>
               {group.paths.map((path) => (
                 <option key={path} value={path}>
                   {path}
@@ -135,77 +192,35 @@ export function SpecTree({ files, shots, picked, onPick }: SpecTreeProps): React
         )}
       </select>
       <nav
-        ref={navRef}
+        ref={explorerRef}
         className="ail-wide"
         aria-label="Spec files"
-        style={{
-          flex: "1 1 220px",
-          maxHeight: "clamp(200px, 40vw, 560px)",
-          overflowY: "auto",
-          background: "var(--color-code-side)",
-          padding: "var(--space-2) 0",
-          boxSizing: "border-box",
-        }}
+        style={explorerStyle}
       >
-        {groups.map((group, gi) => (
-          <div key={`${gi}:${group.folder}`}>
+        {groups.map((group, index) => (
+          <Fragment key={index}>
             {group.folder === "" ? null : (
-              <div
-                style={{
-                  fontFamily: "var(--font-mono)",
-                  fontSize: "var(--font-tiny)",
-                  color: "var(--color-code-muted)",
-                  padding: `var(--space-1) var(--space-3) var(--space-1) calc(var(--space-3) + ${12 * slashes(group.folder)}px)`,
-                }}
-              >
-                {`${group.folder}/`}
-              </div>
+              <div style={folderStyle(group.folder)}>{`${group.folder}/`}</div>
             )}
-            {group.paths.map((path) => {
-              const isPicked = path === picked;
-              return (
-                <button
-                  key={path}
-                  type="button"
-                  ref={(el) => {
-                    if (el === null) {
-                      buttonsRef.current.delete(path);
-                    } else {
-                      buttonsRef.current.set(path, el);
-                    }
-                  }}
-                  aria-label={path}
-                  title={path}
-                  aria-pressed={isPicked}
-                  onClick={() => onPick(path)}
-                  style={{
-                    display: "block",
-                    width: "100%",
-                    textAlign: "left",
-                    fontFamily: "var(--font-mono)",
-                    fontSize: "var(--font-tiny)",
-                    color: "var(--color-code-text)",
-                    background: isPicked ? "var(--color-code-pick)" : "transparent",
-                    borderTop: "none",
-                    borderRight: "none",
-                    borderBottom: "none",
-                    borderLeft: isPicked
-                      ? "2px solid var(--color-accent)"
-                      : "2px solid transparent",
-                    padding: `var(--space-1) var(--space-3) var(--space-1) calc(var(--space-3) + ${12 * slashes(path)}px)`,
-                    cursor: "pointer",
-                  }}
-                >
-                  {shotSet.has(path) ? (
-                    <span aria-hidden="true" style={{ color: "var(--color-thread)" }}>
-                      {"▣ "}
-                    </span>
-                  ) : null}
-                  {nameOf(path)}
-                </button>
-              );
-            })}
-          </div>
+            {group.paths.map((path) => (
+              <button
+                key={path}
+                type="button"
+                aria-label={path}
+                title={path}
+                aria-pressed={path === picked}
+                style={fileStyle(path, path === picked)}
+                onClick={() => onPick(path)}
+              >
+                {shotSet.has(path) ? (
+                  <span aria-hidden="true" style={markStyle}>
+                    {"▣ "}
+                  </span>
+                ) : null}
+                {nameOf(path)}
+              </button>
+            ))}
+          </Fragment>
         ))}
       </nav>
     </>

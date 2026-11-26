@@ -130,18 +130,25 @@ export async function takeShots(p: Project, outDir: string, names?: string[], lo
 
 // --- the committed proof screenshots ------------------------------------------
 //
-// Every node with a look keeps the screenshots of its proofs beside its spec,
-// in <spec folder>/shots/<node>/, with a shots.json index; a flow's end-to-end
-// screenshots are in that folder's e2e/. So a spec folder holds the spec and
+// Every node with a look keeps the screenshots of its proofs beside its spec
+// file (a spec file holds one node), with a shots.json index: in its folder's
+// shots/ when the file is named like its folder (open-picker/open-picker.ail.md),
+// else in shots/<file name>/ (sections/footer.ail.md → sections/shots/footer/).
+// A flow's end-to-end screenshots are in that folder's e2e/. So a spec folder holds the spec and
 // the proof of how it looks, and a pull request shows both together. They are
 // part of what a build produces, like the generated code: reviewed in pull
 // requests, shown on pages through the spec module, and judged against the
 // look. A build retakes them when it builds the node; the lock records which
 // build they were taken from, so a check can tell when they are out of date.
-// There is no other place for them: `shots` is a reserved folder name in a spec.
+// There is no other place for them: `shots` is a reserved folder name in a
+// spec, and `e2e` a reserved file name.
 
 export { SHOTS };
-export const nodeShotsDir = (p: Project, n: AilNode) => join(p.specRoot, n.dir, SHOTS, kebab(n.name));
+export function nodeShotsDir(p: Project, n: AilNode): string {
+  const folder = dirname(join(p.root, n.file));
+  const name = basename(n.file).replace(/\.ail\.md$/, "");
+  return name === basename(folder) ? join(folder, SHOTS) : join(folder, SHOTS, name);
+}
 /** Where a flow's end-to-end screenshots go, handed to its check as AIL_SHOTS_DIR. */
 export const e2eShotsDir = (p: Project, n: AilNode) => join(nodeShotsDir(p, n), "e2e");
 /** Where proof screenshots were kept before they moved beside the spec: moved by a build. */
@@ -216,26 +223,54 @@ export function orphanShots(p: Project): string[] {
 }
 
 /**
- * Move screenshots from where they used to be kept (checks/shots/) to beside
- * the spec, by the node each index names. Those of nodes that are gone, and
- * those already retaken beside the spec, are dropped. True when there was
- * anything to move.
+ * Move screenshots that are not where they belong (in checks/shots/, where
+ * they used to be kept, or in an older layout beside the spec) to their
+ * node's place, by the node each index names. Those of nodes that are gone
+ * from checks/shots/ are dropped; screenshots already in their place are
+ * newer and are kept. True when anything moved.
  */
-export function moveLegacyShots(p: Project): boolean {
+export function relocateShots(p: Project): boolean {
   const old = legacyShotsDir(p);
-  if (!existsSync(old)) return false;
-  for (const f of new Bun.Glob("**/shots.json").scanSync({ cwd: old })) {
-    const from = join(old, dirname(f));
-    const idx = JSON.parse(readFileSync(join(from, "shots.json"), "utf8")) as { node: string };
-    const n = p.nodes.get(idx.node);
-    if (!n) continue;
-    const to = f.split("/")[0] === "e2e" ? e2eShotsDir(p, n) : nodeShotsDir(p, n);
-    // Screenshots already beside the spec are newer: they are kept.
-    if (existsSync(join(to, "shots.json"))) continue;
-    mkdirSync(to, { recursive: true });
-    for (const file of readdirSync(from)) if (!statSync(join(from, file)).isDirectory()) renameSync(join(from, file), join(to, file));
+  const moves: { from: string; to: string; legacy: boolean }[] = [];
+  const target = (node: string, e2e: boolean) => {
+    const n = p.nodes.get(node);
+    return n ? (e2e ? e2eShotsDir(p, n) : nodeShotsDir(p, n)) : null;
+  };
+  const nodeOf = (dir: string) => (JSON.parse(readFileSync(join(dir, "shots.json"), "utf8")) as { node: string }).node;
+  for (const dir of shotFolders(p)) {
+    const to = target(nodeOf(dir), basename(dir) === "e2e");
+    if (to && to !== dir) moves.push({ from: dir, to, legacy: false });
   }
-  rmSync(old, { recursive: true, force: true });
+  if (existsSync(old)) for (const f of new Bun.Glob("**/shots.json").scanSync({ cwd: old })) {
+    const from = join(old, dirname(f));
+    const to = target(nodeOf(from), f.split("/")[0] === "e2e");
+    if (to) moves.push({ from, to, legacy: true });
+  }
+  if (!moves.length) {
+    if (!existsSync(old)) return false;
+    rmSync(old, { recursive: true, force: true });
+    return true;
+  }
+  // Staged first: one folder's place can be another's old place (shots/<node>/ → shots/).
+  const stage = mkdtempSync(join(tmpdir(), "ail-relocate-"));
+  try {
+    const staged = moves.map((m, i) => {
+      const at = join(stage, String(i));
+      mkdirSync(at);
+      for (const file of readdirSync(m.from)) if (!statSync(join(m.from, file)).isDirectory()) copyFileSync(join(m.from, file), join(at, file));
+      return { ...m, at };
+    });
+    for (const m of staged) clearShots(m.from);
+    rmSync(old, { recursive: true, force: true });
+    // Those beside the spec first: they are newer than any left in checks/shots/.
+    for (const m of [...staged.filter((x) => !x.legacy), ...staged.filter((x) => x.legacy)]) {
+      if (existsSync(join(m.to, "shots.json"))) continue;
+      mkdirSync(m.to, { recursive: true });
+      for (const file of readdirSync(m.at)) copyFileSync(join(m.at, file), join(m.to, file));
+    }
+  } finally {
+    rmSync(stage, { recursive: true, force: true });
+  }
   return true;
 }
 

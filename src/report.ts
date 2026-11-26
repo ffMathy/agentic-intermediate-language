@@ -106,7 +106,10 @@ export function renderChecks(p: Project, r: BuildReport, opts: { shots?: Shot[];
     : a.nodes.length ? `<sub>Only the checks of what changed since \`${esc(a.since)}\` and what uses it: ${a.nodes.length} node(s).</sub>`
     : `<sub>Nothing changed since \`${esc(a.since)}\` reaches a node, so no tests ran; the spec and the build were still checked.</sub>`, "");
   if (!r.check) out.push("```", r.text.trim(), "```", "");
-  for (const s of sections) {
+  // A check that passed with nothing to look at needs no block of its own: those are named on one line, so the
+  // section stays short enough to paste whole, screens included.
+  const plain = (s: Section) => s.ok && !s.shots.length && !s.problems.length && !s.note;
+  for (const s of sections.filter((x) => !plain(x))) {
     const ran = s.tests.length ? ` — ${s.tests.filter((t) => t.ok).length}/${s.tests.length} passed` : "";
     const pics = s.shots.length ? ` · ${s.shots.length} screen(s)` : "";
     out.push(`<details><summary>${s.ok ? OK : FAIL} <b>${esc(s.title)}</b>${ran}${pics}</summary>`, "");
@@ -126,6 +129,8 @@ export function renderChecks(p: Project, r: BuildReport, opts: { shots?: Shot[];
     }
     out.push("", "</details>");
   }
+  const rest = sections.filter(plain);
+  if (rest.length) out.push("", `${OK} Also passed, with no screens: ${rest.map((s) => `${esc(s.title)}${s.tests.length ? ` ${s.tests.length}/${s.tests.length}` : ""}`).join(" · ")}`);
   if (r.e2e?.error) out.push("", `${FAIL} end-to-end checks (${esc(r.e2e.app)}): ${esc(r.e2e.error)}`);
   const tc = r.check?.verify.typecheck;
   if (tc) out.push("", `${tc.ok ? OK : FAIL} typecheck`, ...(tc.ok ? [] : ["", "```", tc.detail.trim(), "```"]));

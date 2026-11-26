@@ -8,7 +8,7 @@ import { formatDiagnostics, lint } from "./lint.ts";
 import { plan } from "./plan.ts";
 import { isCompilable, type Project } from "./project.ts";
 import { getProvider, modelUnavailable, resolveModels } from "./providers/index.ts";
-import { clearShots, moveLegacyShots, orphanShots, refreshNodeShots, staleShots, takeShots } from "./shots.ts";
+import { clearShots, relocateShots, orphanShots, refreshNodeShots, staleShots, takeShots } from "./shots.ts";
 import { existsSync } from "node:fs";
 import { join } from "node:path";
 import { adopt, e2eCheckPath, formatAdopt, formatReview, reviewAttributes, type AdoptReport } from "./adopt.ts";
@@ -48,7 +48,7 @@ export async function build(p: Project, o: BuildOptions = {}): Promise<BuildResu
   const jobs = o.jobs ?? 4;
   if (!Number.isInteger(jobs) || jobs < 1) throw new Error(`--jobs must be a whole number of at least 1, got "${jobs}"`);
   // Screenshots still in checks/shots/ move beside the spec first, so anything retaken below replaces them.
-  if (moveLegacyShots(p)) log("proof screenshots moved beside the spec, into each spec folder's shots/");
+  if (relocateShots(p)) log("proof screenshots moved to their place beside each spec file");
   // A project's first build is the moment to set up review of what it generates.
   const firstBuild = Object.keys(readLock(p).nodes).length === 0;
   const specs = resolveModels(o.models ?? [], p.config.models);
@@ -129,7 +129,7 @@ export async function build(p: Project, o: BuildOptions = {}): Promise<BuildResu
 
 /** Retake the committed screenshots that are out of date and remove orphaned ones. True when anything changed. */
 async function refreshShots(p: Project, log: (s: string) => void): Promise<boolean> {
-  let changed = moveLegacyShots(p);
+  let changed = relocateShots(p);
   for (const dir of orphanShots(p)) { clearShots(dir); changed = true; }
   for (const n of staleShots(p)) {
     try {

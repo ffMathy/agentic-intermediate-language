@@ -81,7 +81,7 @@ test("spec edits make exactly the affected nodes stale", async () => {
   const dir = tempProject();
   const provider = getProvider(`mock:${mockFile(dir, { Add: [reply(ADD, goodAdd)], Pick: [reply(PICK, goodPick)] })}`);
   await compile(load(dir), [], { provider });
-  const f = join(dir, "mini.ail.md");
+  const f = join(dir, "pick.ail.md");
   writeFileSync(f, readFileSync(f, "utf8").replace("pick([1, 5, 2]) => 1", "pick([1, 5, 2]) => 1\n      pick([7]) => 0"));
   expect(plan(load(dir)).map((e) => [e.node, e.status])).toEqual([["Add", "fresh"], ["Pick", "stale"]]);
 });

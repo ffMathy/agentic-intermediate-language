@@ -96,18 +96,21 @@ writing the token CSS, taking the proof screenshots and cleaning up after
 moved or deleted nodes all happen inside `ail build`.
 
 Proof screenshots are committed too: every build keeps the final screen of
-each check for nodes with a `look` beside the node's spec, in `shots/<node>/`
-in the same folder as its `.ail.md` file (`shots/<node>/e2e/` for end-to-end
-checks). A model has compared each one with the spec's look, so a reviewer
-sees exactly what was proven, next to what it was proven against. `shots` is
-reserved: no spec folder may be called that.
+each check for nodes with a `look` beside the node's spec file (a spec file
+holds one node). A file named like its folder keeps them in that folder's
+`shots/`, any other file in `shots/<file name>/`, and end-to-end screens go
+in an `e2e/` folder inside. A model has compared each one with the spec's
+look, so a reviewer sees exactly what was proven, next to what it was proven
+against. `shots` is reserved: no spec folder may be called that.
 
 ```
-ail/board/
-├── board.ail.md               BoardView and StatusLine
+ail/app/play/
+├── play.ail.md                PlayAGame
+├── new-game-button.ail.md     NewGameButton
 └── shots/
-    ├── board-view/            01-picking-an-empty-square.png, …, shots.json
-    └── status-line/           01-whose-turn.png, …, shots.json
+    ├── 01-x-always-starts.png …, shots.json     PlayAGame
+    ├── e2e/                                     PlayAGame, end to end
+    └── new-game-button/                         NewGameButton
 ```
 
 ## One language, for every target
@@ -161,7 +164,7 @@ time:
    `ail adopt` starts the old app, runs the checks and stops it, which proves
    the spec describes the old app. Each check also saves a screenshot of the
    screen every scenario ends on, however its platform takes one. `ail adopt`
-   commits them beside the spec, in `shots/<node>/e2e/`, and has a model compare them with the
+   commits them beside the spec, in the `e2e/` folder of the node's `shots/`, and has a model compare them with the
    spec's `look`. Once everything passes, it records every node in the lock
    file as built by the existing app, so `ail build` only builds what changes
    from then on, and records `run.app` as a copy of `run.legacy`, so every

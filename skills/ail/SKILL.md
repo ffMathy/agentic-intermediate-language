@@ -130,8 +130,13 @@ posts the review with screenshots as a comment.
 change to an AIL project, or push more commits to one, its description gets
 every check of the build, whether or not the repository runs the GitHub
 Action:
-1. Run `ail_build` (`/ail:build`) and make sure it passes. Commit what it
-   wrote, the committed screenshots in `checks/shots/` included, and push.
+1. Run `ail_build` with `since` set to the branch the pull request merges
+   into (e.g. `origin/main`), and make sure it passes. It runs only the checks
+   of the nodes the change affects (changed in the spec, in their code or
+   checks, and every node that uses them), so the description lists only
+   those. A change no one node owns (the config, the root's target) runs
+   everything. Commit what it wrote, the screenshots in `checks/shots/`
+   included, and push.
 2. Call `ail_show` with `checks`. It returns the section: one collapsible
    block per check, each test with ✅ or ❌ and, under it, the screen it ended
    on, linked at the pushed commit. Lines starting with `!` come first when

@@ -130,3 +130,10 @@ test("for an agent, the last build's checks come between the markers the GitHub 
     if (before !== null) writeFileSync(file, before); else rmSync(file, { force: true });
   }
 });
+
+test("a build that ran only what a change affects says so", () => {
+  const p = loadProject(KATA);
+  expect(renderChecks(p, report({ affected: { since: "origin/main", nodes: ["BoardView", "Rules"] } }))).toContain("Only the checks of what changed since `origin/main` and what uses it: 2 node(s).");
+  expect(renderChecks(p, report({ affected: { since: "origin/main", nodes: [] } }))).toContain("so no tests ran");
+  expect(renderChecks(p, report({ affected: { since: "origin/main", nodes: ["Rules"], everything: ["package.json"] } }))).toContain("Every check ran");
+});

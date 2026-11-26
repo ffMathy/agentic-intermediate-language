@@ -13,6 +13,9 @@ inputs:
   comment:
     description: 'On pull requests, keep one comment per project up to date with the spec review and its screenshots. Needs `pull-requests: write`, and `contents: write` for screenshots (they are pushed to the `ail-shots` branch).'
     default: "true"
+  affected:
+    description: 'On pull requests, run and show only the checks of the nodes the change affects (changed since `base`, and every node that uses them). The spec and whether the code is built from it are still checked in full; pushes check everything.'
+    default: "true"
   description:
     description: 'On pull requests, keep one section per project in the description with every check of the build: each test with a check mark or a cross, and under it the screen it ended on. Needs `pull-requests: write`, and `contents: write` for screenshots.'
     default: "true"
@@ -46,10 +49,15 @@ runs:
       working-directory: ${{ inputs.project }}
       env:
         AIL_PROJECT: ${{ inputs.project }}
+        AIL_BASE: ${{ inputs.base }}
+        AIL_PR_RUN: ${{ inputs.affected == 'true' && inputs.base != '' && github.event_name == 'pull_request' }}
       run: |
         # Every check's results, for the review step (scripts/review.sh names the file the same way).
         slug=$(echo "$AIL_PROJECT" | tr -c 'A-Za-z0-9_-' '-' | sed 's/^-*//; s/-*$//')
-        bun "${{ github.action_path }}/src/cli.ts" build --report "$RUNNER_TEMP/ail-report-${slug:-root}.json"
+        # On pull requests, only the checks of what the change affects; on pushes, every check.
+        since=()
+        if [ "$AIL_PR_RUN" = "true" ] && git rev-parse --verify --quiet "$AIL_BASE" >/dev/null; then since=(--since "$AIL_BASE"); fi
+        bun "${{ github.action_path }}/src/cli.ts" build --report "$RUNNER_TEMP/ail-report-${slug:-root}.json" "${since[@]}"
     - name: Spec changes
       if: ${{ always() && inputs.base != '' }}
       shell: bash

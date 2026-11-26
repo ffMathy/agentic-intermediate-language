@@ -28,6 +28,9 @@ const HELP = `ail — write the spec, let agents build the code.
                         --shots DIR   also screenshot the final screen of every scenario of
                                       nodes with a look (needs Playwright)
                         --samples N   also compile N times per model and compare behaviour
+                        --since REF   run only the checks of nodes that what changed since
+                                      REF affects (and what uses them); the spec and
+                                      the build are still checked in full
                         --report FILE write every check's results, test by test, as JSON
   ail adopt [Node…]     Does the app behave as the spec says? Starts it as ail.config.json's
                         run says (run.legacy while you write the spec of an existing app,
@@ -99,7 +102,7 @@ async function main(argv: string[]): Promise<number> {
         names: nodesOrDie(p, rest), models: a.flags.model, force: flag(a, "force") === "true",
         jobs: Number(flag(a, "jobs") ?? 4), look: flag(a, "no-look") !== "true",
         temperature: flag(a, "temperature") ? Number(flag(a, "temperature")) : undefined,
-        samples: Number(flag(a, "samples") ?? 0), shots: flag(a, "shots"), log,
+        samples: Number(flag(a, "samples") ?? 0), shots: flag(a, "shots"), since: flag(a, "since"), log,
       });
       const report = flag(a, "report");
       if (report) writeReport(report, { ok: r.ok, check: r.check, e2e: r.e2e ?? null, text: r.text });

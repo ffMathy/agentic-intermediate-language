@@ -6,6 +6,7 @@
 import { copyFileSync, existsSync, mkdirSync, readFileSync, writeFileSync } from "node:fs";
 import { dirname, join, relative } from "node:path";
 import type { AdoptReport } from "./adopt.ts";
+import type { Affected } from "./affected.ts";
 import type { CheckReport } from "./check.ts";
 import type { Project } from "./project.ts";
 import { nodeShotsDir, readShotsIndex, shotsDir, type Shot } from "./shots.ts";
@@ -13,6 +14,8 @@ import type { TestResult } from "./verify.ts";
 
 export interface BuildReport {
   ok: boolean; check: CheckReport | null; e2e: AdoptReport | null; text: string;
+  /** When the build ran only what a change affects (`--since`): what that was. */
+  affected?: Affected;
   /** The commit the build ran on, and whether files were changed on top of it. */
   head?: string; dirty?: boolean;
 }
@@ -95,6 +98,11 @@ export function renderChecks(p: Project, r: BuildReport, opts: { shots?: Shot[];
   const passed = all.filter((t) => t.ok).length;
   const head = r.check ? `${passed} of ${all.length} test(s) passed in ${sections.length} check(s)` : "the spec has errors, so nothing was checked";
   out.push(`${r.ok ? OK : FAIL} **${head}**`, "");
+  const a = r.affected;
+  if (a) out.push(a.everything
+    ? `<sub>Every check ran: since \`${esc(a.since)}\`, files no one node owns changed (${a.everything.slice(0, 3).map((f) => `\`${esc(f)}\``).join(", ")}${a.everything.length > 3 ? ", …" : ""}).</sub>`
+    : a.nodes.length ? `<sub>Only the checks of what changed since \`${esc(a.since)}\` and what uses it: ${a.nodes.length} node(s).</sub>`
+    : `<sub>Nothing changed since \`${esc(a.since)}\` reaches a node, so no tests ran; the spec and the build were still checked.</sub>`, "");
   if (!r.check) out.push("```", r.text.trim(), "```", "");
   for (const s of sections) {
     const ran = s.tests.length ? ` — ${s.tests.filter((t) => t.ok).length}/${s.tests.length} passed` : "";

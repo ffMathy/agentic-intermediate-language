@@ -8,7 +8,8 @@ import { dirname, join, relative, resolve } from "node:path";
 import type { AilNode } from "./parse.ts";
 import { AIL_HOME, kebab, type Project } from "./project.ts";
 import { readLock, writeLock } from "./lock.ts";
-import { checksDir, derivedCheckFile } from "./verify.ts";
+import { checksDir, derivedCheckFile, junitResults } from "./verify.ts";
+export { junitResults, type TestResult } from "./verify.ts";
 
 export interface Shot { node: string; test: string; file: string }
 
@@ -18,15 +19,7 @@ export function visualNodes(p: Project, names?: string[]): AilNode[] {
 }
 
 /** Test names of a JUnit report, in run order, without skipped or todo tests. */
-export function junitTests(xml: string): string[] {
-  const out: string[] = [];
-  for (const m of xml.matchAll(/<testcase\b([^>]*?)(\/>|>([\s\S]*?)<\/testcase>)/g)) {
-    if (/<skipped\b/.test(m[3] ?? "")) continue;
-    const name = /\bname="([^"]*)"/.exec(m[1]!)?.[1] ?? "";
-    out.push(name.replace(/&quot;/g, '"').replace(/&apos;/g, "'").replace(/&lt;/g, "<").replace(/&gt;/g, ">").replace(/&amp;/g, "&"));
-  }
-  return out;
-}
+export const junitTests = (xml: string): string[] => junitResults(xml).map((t) => t.name);
 
 /** The final screen of each test in one check file, paired with its test name. */
 export function captureScreens(p: Project, checkFile: string): { test: string; html: string; head: string }[] {

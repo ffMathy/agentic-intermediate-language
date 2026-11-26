@@ -9,6 +9,12 @@ means every node that changed). It can take minutes. Then report, briefly:
   never answer it in code
 - the result of the check
 
+If this work is for a pull request, or will be (one is open for the branch,
+or you are about to open one), follow "Open or update a pull request" in the
+`ail` skill: build with `since` set to the branch it merges into, so only the
+checks of what the change affects run, then commit, push, and put
+`ail_show checks` in the description.
+
 If the result suggests `.gitattributes` lines (it does on a project's first
 build), ask the user whether to add them. They keep the generated code out of
 pull request diffs while it stays committed, so reviewers read the spec. If the

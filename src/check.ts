@@ -21,10 +21,16 @@ export interface CheckReport {
   verify: { results: VerifyResult[]; typecheck: Check | null; ok: boolean };
 }
 
-export function runCheck(p: Project, nodes: string[] = []): CheckReport {
+/**
+ * `scope`: run the tests of these nodes only (none when empty), say the nodes
+ * a change affects. The spec and whether the code is built from it are always
+ * checked in full: that is quick, and needs no tests.
+ */
+export function runCheck(p: Project, nodes: string[] = [], opts: { scope?: string[] } = {}): CheckReport {
   const l = lint(p);
   const pl = plan(p);
-  const v = verifyProject(p, nodes);
+  const scope = opts.scope;
+  const v = !scope ? verifyProject(p, nodes) : scope.length ? verifyProject(p, scope) : { results: [], typecheck: null, ok: true };
   // Model-free outputs: the glue, and the committed proof screenshots.
   const glue = [
     ...staleGlue(p),
@@ -32,7 +38,7 @@ export function runCheck(p: Project, nodes: string[] = []): CheckReport {
     ...orphanShots(p).map((d) => relative(p.root, d)),
   ];
   const ok = !l.some((d) => d.severity === "error") && pl.every((e) => e.status === "fresh") && !glue.length && v.ok;
-  const looks = unjudged(p).filter((n) => !nodes.length || nodes.includes(n));
+  const looks = unjudged(p).filter((n) => (!nodes.length || nodes.includes(n)) && (!scope || scope.includes(n)));
   return { ok, glue, unjudged: looks, lint: l, plan: pl, verify: v };
 }
 
@@ -54,7 +60,7 @@ export function formatCheck(r: CheckReport): string {
   if (failed.length || (tc && !tc.ok)) {
     out.push(`✗ behavior ${failed.length} node(s) failed${tc && !tc.ok ? ", typecheck failed" : ""}`);
     out.push(formatVerify({ results: failed, typecheck: tc && !tc.ok ? tc : null, ok: false }).split("\n").filter((l) => l && !/^(verification|all checks)/.test(l)).map((l) => "    " + l).join("\n"));
-  } else out.push(`✓ behavior ${tests} test(s) passed${tc ? ", typecheck ok" : ""}`);
+  } else out.push(!r.verify.results.length && !tc ? "✓ behavior no checks to run" : `✓ behavior ${tests} test(s) passed${tc ? ", typecheck ok" : ""}`);
   const warn = r.verify.results.flatMap((x) => x.checks.filter((c) => !c.ok && c.severity === "warning").map((c) => `    ! ${x.node} ${c.kind}: ${c.detail}`));
   out.push(...warn);
   if (r.unjudged.length) out.push(`! look     ${r.unjudged.length} node(s) whose screens were never compared with their look — \`ail build\` compares them: ${r.unjudged.join(", ")}`);

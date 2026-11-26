@@ -15,11 +15,11 @@ import { compileHash, oracleHash, specHash } from "./hash.ts";
 import { adoptedFresh } from "./plan.ts";
 import { hasLook, judgeShots, type LookResult } from "./look.ts";
 import type { Provider } from "./providers/index.ts";
-import { junitTests, shotsDir, slugOf, type Shot } from "./shots.ts";
+import { shotsDir, slugOf, type Shot } from "./shots.ts";
 import type { AilNode } from "./parse.ts";
 import { isCompilable, kebab, type Project, type RunSpec } from "./project.ts";
 import { lockPath, readLock, writeLock } from "./lock.ts";
-import { checkHeader, checksDir, errorExcerpt, runBunTest } from "./verify.ts";
+import { checkHeader, checksDir, errorExcerpt, runBunTest, type TestResult } from "./verify.ts";
 
 /** Where a node's end-to-end check lives: checks/e2e/<dir>/<kebab>.e2e.ts (not picked up by a plain `bun test`). */
 export const e2eCheckPath = (p: Project, n: AilNode) => join(checksDir(p), "e2e", n.dir, `${kebab(n.name)}.e2e.ts`);
@@ -27,7 +27,7 @@ export const e2eCheckPath = (p: Project, n: AilNode) => join(checksDir(p), "e2e"
 /** Nodes whose scenarios a person could play through in the app: its flows and the root. */
 export const observable = (n: AilNode) => n.scenarios.length > 0 && (n.kind === "flow" || n.kind === "system");
 
-export interface AdoptResult { node: string; file: string | null; status: "pass" | "fail" | "stale" | "missing"; detail: string; shots?: Shot[] }
+export interface AdoptResult { node: string; file: string | null; status: "pass" | "fail" | "stale" | "missing"; detail: string; shots?: Shot[]; tests?: TestResult[] }
 
 /** Where a flow's end-to-end screenshots go: checks/shots/e2e/<dir>/<kebab>/, handed to its check as AIL_SHOTS_DIR. */
 export const e2eShotsDir = (p: Project, n: AilNode) => join(shotsDir(p), "e2e", n.dir, kebab(n.name));
@@ -189,16 +189,15 @@ export async function adopt(p: Project, opts: {
       const shotsAt = e2eShotsDir(p, n);
       rmSync(shotsAt, { recursive: true, force: true });
       mkdirSync(shotsAt, { recursive: true });
-      const report = join(mkdtempSync(join(tmpdir(), "ail-e2e-")), "report.xml");
       // Run from outside the project, so its test setup (a simulated DOM) stays out of a real app's way.
-      const r = runBunTest(tmpdir(), [abs], { ...runEnv(spec), AIL_SHOTS_DIR: shotsAt }, ["--reporter=junit", `--reporter-outfile=${report}`]);
-      const tests = existsSync(report) ? junitTests(readFileSync(report, "utf8")) : [];
+      const r = runBunTest(tmpdir(), [abs], { ...runEnv(spec), AIL_SHOTS_DIR: shotsAt });
+      const tests = r.tests.map((t) => t.name);
       const { shots, missing: unpictured } = collectShots(shotsAt, n.name, tests);
       if (!shots.length) rmSync(shotsAt, { recursive: true, force: true });
       const pictured = !tests.length ? "" : !shots.length ? "; no screenshots saved (the check should save one per scenario into AIL_SHOTS_DIR)" : unpictured.length ? `; no screenshot for: ${unpictured.join(", ")}` : `, each with a screenshot`;
       results.push(r.ok
-        ? { node: n.name, file, status: "pass", detail: `${r.passes} scenario(s) behave as specified${pictured}`, shots }
-        : { node: n.name, file, status: "fail", detail: `${r.failures.length ? r.failures.join("; ") : "the check did not run"}\n${errorExcerpt(r.output, 20)}`, shots });
+        ? { node: n.name, file, status: "pass", detail: `${r.passes} scenario(s) behave as specified${pictured}`, shots, tests: r.tests }
+        : { node: n.name, file, status: "fail", detail: `${r.failures.length ? r.failures.join("; ") : "the check did not run"}\n${errorExcerpt(r.output, 20)}`, shots, tests: r.tests });
     }
   } finally { app.stop(); }
   // The screenshots are proof of the look too: a model compares them with it.

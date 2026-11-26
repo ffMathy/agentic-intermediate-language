@@ -17,16 +17,16 @@ const obj = (properties: Json, required: string[] = []) => ({ type: "object", pr
 export const TOOLS: Tool[] = [
   {
     name: "ail_show",
-    description: 'Look at the AIL spec. target: "" for the tree with each node\'s build status, a node name for its source and who uses it, "stakeholder" | "design" | "engineer" | "specialist" (with optional tag) for an audience\'s view, or "changes" (optional since: git ref) for a review of what changed.',
+    description: 'Look at the AIL spec. target: "" for the tree with each node\'s build status, a node name for its source and who uses it, "stakeholder" | "design" | "engineer" | "specialist" (with optional tag) for an audience\'s view, "changes" (optional since: git ref) for a review of what changed, or "checks" for the last build\'s checks as a section for a pull request\'s description (one collapsible section per check, each test with ✅ or ❌ and the screen it ended on), between markers that say where it goes.',
     inputSchema: obj({ target: str, since: str }),
     run: (p, a) => ({ text: show(p, (a.target as string) ?? "", { since: a.since as string | undefined }) }),
   },
   {
     name: "ail_build",
-    description: "Build the project, exactly like `ail build`: compile every node that changed (each with only its own slice of the spec, through the login of the agent's CLI (Claude Code, Cursor or Copilot) unless the project names other models), have a model compare each screen with its look, then check everything: the spec is sound, the code is built from it, and every check passes. With nothing to compile it only checks. Can take minutes. Reports STOP questions the spec must answer.",
-    inputSchema: obj({ nodes: { type: "array", items: str }, force: { type: "boolean" } }),
+    description: "Build the project, exactly like `ail build`: compile every node that changed (each with only its own slice of the spec, through the login of the agent's CLI (Claude Code, Cursor or Copilot) unless the project names other models), have a model compare each screen with its look, then check everything: the spec is sound, the code is built from it, and every check passes. With nothing to compile it only checks. Can take minutes. Reports STOP questions the spec must answer. since (a git ref, e.g. origin/main): run only the checks of the nodes what changed since then affects, and the nodes that use them, as for a pull request.",
+    inputSchema: obj({ nodes: { type: "array", items: str }, force: { type: "boolean" }, since: str }),
     run: async (p, a, progress) => {
-      const r = await build(p, { names: (a.nodes as string[]) ?? [], force: a.force === true, log: progress });
+      const r = await build(p, { names: (a.nodes as string[]) ?? [], force: a.force === true, since: a.since as string | undefined, log: progress });
       return { text: r.text, isError: !r.ok };
     },
   },

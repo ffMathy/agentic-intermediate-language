@@ -12,9 +12,11 @@ import { orphanShots, refreshNodeShots, staleShots, takeShots } from "./shots.ts
 import { rmSync } from "node:fs";
 import { existsSync } from "node:fs";
 import { join } from "node:path";
-import { adopt, formatAdopt, formatReview, reviewAttributes } from "./adopt.ts";
+import { adopt, formatAdopt, formatReview, reviewAttributes, type AdoptReport } from "./adopt.ts";
 import { readLock } from "./lock.ts";
 import { checksDir, foreignChecks } from "./verify.ts";
+import { buildHead, lastReportPath, writeReport } from "./report.ts";
+import { affectedNodes, formatAffected } from "./affected.ts";
 
 export interface BuildOptions {
   /** Only these nodes (default: all). */
@@ -28,12 +30,14 @@ export interface BuildOptions {
   temperature?: number;
   /** Also compile N times per model and compare behaviour. */
   samples?: number;
+  /** Run only the checks of nodes that what changed since this git ref affects (the spec is still checked in full). */
+  since?: string;
   /** Also write screenshots of the proofs here. */
   shots?: string;
   log?: (msg: string) => void;
 }
 
-export interface BuildResult { ok: boolean; text: string; outcomes: CompileOutcome[]; check: CheckReport | null; stopped: boolean }
+export interface BuildResult { ok: boolean; text: string; outcomes: CompileOutcome[]; check: CheckReport | null; stopped: boolean; e2e?: AdoptReport }
 
 export async function build(p: Project, o: BuildOptions = {}): Promise<BuildResult> {
   const log = o.log ?? (() => {});
@@ -80,12 +84,14 @@ export async function build(p: Project, o: BuildOptions = {}): Promise<BuildResu
   }
 
   // Then the check: spec, build, behaviour, and anything asked for on top.
-  const report = runCheck(p, names);
+  const affected = o.since ? affectedNodes(p, o.since) : undefined;
+  const scope = affected && (names.length ? affected.nodes.filter((n) => names.includes(n)) : affected.nodes);
+  const report = runCheck(p, names, { scope });
   let ok = report.ok && out.every((x) => x.status === "fresh" || x.status === "compiled");
   const icon = { fresh: "✓", compiled: "✓", stopped: "?", failed: "✗", skipped: "…" };
   const sections = [
     out.filter((x) => x.status !== "fresh").map((x) => `${icon[x.status]} ${x.node.padEnd(18)} ${x.status}${x.status === "stopped" || x.status === "skipped" || x.status === "failed" ? `: ${x.detail}` : ""}`).join("\n"),
-    formatCheck(report),
+    [affected && formatAffected(affected), formatCheck(report)].filter(Boolean).join("\n"),
   ];
   if (o.samples && o.samples > 0) {
     const reports = [];
@@ -94,9 +100,10 @@ export async function build(p: Project, o: BuildOptions = {}): Promise<BuildResu
     sections.push(formatDiverge(reports));
   }
   // The end-to-end checks, against the app this build made, started as run.app says.
-  if (existsSync(join(checksDir(p), "e2e"))) {
+  let e2e: AdoptReport | undefined;
+  if (existsSync(join(checksDir(p), "e2e")) && (!scope || scope.length)) {
     if (p.config.run?.app) {
-      const r = await adopt(p, { app: "app", names, log, judge: noModel || o.look === false ? undefined : getProvider(specs[0]!) });
+      const r = e2e = await adopt(p, { app: "app", names: scope ?? names, log, judge: noModel || o.look === false ? undefined : getProvider(specs[0]!) });
       ok &&= r.ok;
       sections.push(formatAdopt(r));
     } else sections.push("! app      end-to-end checks not run: ail.config.json has no run.app saying how to start the app this project builds");
@@ -105,7 +112,10 @@ export async function build(p: Project, o: BuildOptions = {}): Promise<BuildResu
   if (firstBuild) { const tip = formatReview(reviewAttributes(p)); if (tip) sections.push(tip.trimStart()); }
   const stopped = out.some((x) => x.status === "stopped");
   if (stopped) sections.push("The spec doesn't decide the questions above. Answer them in the .ail.md files, then build again.");
-  return { ok, text: sections.filter(Boolean).join("\n\n"), outcomes: out, check: report, stopped };
+  const text = sections.filter(Boolean).join("\n\n");
+  // Saved for `ail show checks`, which puts them in a pull request's description.
+  writeReport(lastReportPath(p), { ok, check: report, e2e: e2e ?? null, text, affected, ...buildHead(p) });
+  return { ok, text, outcomes: out, check: report, stopped, e2e };
 }
 
 /** Retake the committed screenshots that are out of date and remove orphaned ones. True when anything changed. */

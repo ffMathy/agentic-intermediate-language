@@ -121,8 +121,11 @@ jobs:
 
 On pull requests, the action comments with the review of the spec changes
 and screenshots of the proofs: the final screen of each scenario of every
-changed node with a `look`, and of the nodes that use it. Set
-`screenshots: false` or `comment: false` to turn either off. On forks, whose
+changed node with a `look`, and of the nodes that use it. It also keeps
+every check of the build in the description: one collapsible section per
+check, each test with ✅ or ❌ and the screen it ended on. Set
+`screenshots: false`, `comment: false` or `description: false` to turn
+any of them off. On forks, whose
 token can't push or comment, those steps only warn.
 
 ## Starting a new project

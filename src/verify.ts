@@ -13,7 +13,8 @@
 // a node's check file goes and `checks.run` how to run it (e.g. xUnit and
 // `dotnet test`). Its examples are then written into that check alongside the
 // scenarios, since they can't be translated mechanically into its language.
-import { existsSync, mkdirSync, readFileSync, readdirSync, writeFileSync } from "node:fs";
+import { existsSync, mkdirSync, mkdtempSync, readFileSync, readdirSync, rmSync, writeFileSync } from "node:fs";
+import { tmpdir } from "node:os";
 import { dirname, join, normalize, relative, resolve } from "node:path";
 import { oracleHash } from "./hash.ts";
 
@@ -21,7 +22,11 @@ import { fileHash, readLock } from "./lock.ts";
 import type { AilNode } from "./parse.ts";
 import { AIL_HOME, expandPath, isCompilable, kebab, modulePath, specModulePath, topoByUses, type Project } from "./project.ts";
 
-export interface Check { kind: string; ok: boolean; severity: "error" | "warning"; detail: string }
+export interface Check {
+  kind: string; ok: boolean; severity: "error" | "warning"; detail: string;
+  /** For `tests`: every test that ran, passed or failed. */
+  tests?: TestResult[];
+}
 export interface VerifyResult { node: string; ok: boolean; checks: Check[] }
 
 const pass = (kind: string, detail = ""): Check => ({ kind, ok: true, severity: "error", detail });
@@ -54,14 +59,37 @@ export function errorExcerpt(output: string, maxLines = 60): string {
   return out.slice(0, maxLines).join("\n");
 }
 
-export function runBunTest(cwd: string, files: string[], env: Record<string, string> = {}, args: string[] = []): { ok: boolean; failures: string[]; passes: number; output: string } {
-  const r = Bun.spawnSync(["bun", "test", ...args, ...files.map((f) => (f.startsWith("/") ? f : "./" + f))], {
-    cwd, env: { ...process.env, NO_COLOR: "1", FORCE_COLOR: "0", ...env }, stdout: "pipe", stderr: "pipe",
-  });
-  const output = r.stdout.toString() + r.stderr.toString();
-  const failures = [...output.matchAll(/^\(fail\)\s+(.*)$/gm)].map((m) => m[1]!.trim());
-  const passes = Number(/^\s*(\d+) pass/m.exec(output)?.[1] ?? 0);
-  return { ok: r.exitCode === 0, failures, passes, output };
+export interface TestResult { name: string; ok: boolean }
+
+const unescapeXml = (s: string) => s.replace(/&quot;/g, '"').replace(/&apos;/g, "'").replace(/&lt;/g, "<").replace(/&gt;/g, ">").replace(/&amp;/g, "&");
+
+/** The tests of a JUnit report, in run order, each passed or failed, without skipped or todo tests. */
+export function junitResults(xml: string): TestResult[] {
+  const out: TestResult[] = [];
+  for (const m of xml.matchAll(/<testcase\b([^>]*?)(\/>|>([\s\S]*?)<\/testcase>)/g)) {
+    const inner = m[3] ?? "";
+    if (/<skipped\b/.test(inner)) continue;
+    out.push({ name: unescapeXml(/\bname="([^"]*)"/.exec(m[1]!)?.[1] ?? ""), ok: !/<(failure|error)\b/.test(inner) });
+  }
+  return out;
+}
+
+export function runBunTest(cwd: string, files: string[], env: Record<string, string> = {}, args: string[] = []): { ok: boolean; failures: string[]; passes: number; output: string; tests: TestResult[] } {
+  // A JUnit report alongside the usual output: it names every test, passed or failed.
+  const tmp = mkdtempSync(join(tmpdir(), "ail-test-"));
+  const report = join(tmp, "report.xml");
+  try {
+    const r = Bun.spawnSync(["bun", "test", "--reporter=junit", `--reporter-outfile=${report}`, ...args, ...files.map((f) => (f.startsWith("/") ? f : "./" + f))], {
+      cwd, env: { ...process.env, NO_COLOR: "1", FORCE_COLOR: "0", ...env }, stdout: "pipe", stderr: "pipe",
+    });
+    const output = r.stdout.toString() + r.stderr.toString();
+    const failures = [...output.matchAll(/^\(fail\)\s+(.*)$/gm)].map((m) => m[1]!.trim());
+    const passes = Number(/^\s*(\d+) pass/m.exec(output)?.[1] ?? 0);
+    const tests = existsSync(report) ? junitResults(readFileSync(report, "utf8")) : [];
+    return { ok: r.exitCode === 0, failures, passes, output, tests };
+  } finally {
+    rmSync(tmp, { recursive: true, force: true });
+  }
 }
 
 /** Modules a node may import, as normalized paths without extension. */
@@ -227,8 +255,8 @@ export function verifyNode(p: Project, n: AilNode, opts: { checkDrift?: boolean 
     checks.push(r.ok ? pass("tests", tail.split("\n").filter(Boolean).at(-1) ?? "passed") : fail("tests", tail));
   } else if (testFiles.length) {
     const r = runBunTest(p.root, testFiles);
-    if (r.ok) checks.push(pass("tests", `${r.passes} passed`));
-    else checks.push(fail("tests", r.failures.length ? `${r.failures.map((f) => "✗ " + f).join("\n")}\n${errorExcerpt(r.output)}` : r.output.trim().split("\n").slice(-25).join("\n")));
+    if (r.ok) checks.push({ ...pass("tests", `${r.passes} passed`), tests: r.tests });
+    else checks.push({ ...fail("tests", r.failures.length ? `${r.failures.map((f) => "✗ " + f).join("\n")}\n${errorExcerpt(r.output)}` : r.output.trim().split("\n").slice(-25).join("\n")), tests: r.tests });
   }
   return { node: n.name, ok: checks.every((c) => c.ok || c.severity === "warning"), checks };
 }

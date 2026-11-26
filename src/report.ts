@@ -9,6 +9,7 @@ import type { AdoptReport } from "./adopt.ts";
 import type { Affected } from "./affected.ts";
 import type { CheckReport } from "./check.ts";
 import type { Project } from "./project.ts";
+import { lockPath } from "./lock.ts";
 import { nodeShotsDir, readShotsIndex, shotsDir, type Shot } from "./shots.ts";
 import type { TestResult } from "./verify.ts";
 
@@ -28,7 +29,8 @@ const git = (cwd: string, ...args: string[]) => {
   return r.exitCode === 0 ? r.stdout.toString().trim() : null;
 };
 
-/** The commit a build runs on: HEAD, and whether the working tree differs from it. */
+/** The commit a build runs on: HEAD, and whether the working tree differs from it. Taken before the build writes
+ * anything, so its own output (proof screenshots, the lock file) never counts as a change it ran on. */
 export function buildHead(p: Project): { head?: string; dirty?: boolean } {
   const head = git(p.root, "rev-parse", "HEAD");
   return head ? { head, dirty: !!git(p.root, "status", "--porcelain", "--", ".") } : {};
@@ -179,16 +181,35 @@ export function projectKey(p: Project): string {
  * replace the other's). Screens link to the committed screenshots at the
  * commit the build ran on, which must be pushed for them to show.
  */
+/** What a build writes and the person then commits: the proof screenshots and the lock file. */
+const buildOutputs = (p: Project) => [shotsDir(p), lockPath(p)];
+
+/**
+ * The commit that holds the screenshots of a build that ran on `head`: HEAD itself once the only commits since `head`
+ * are the build's own output, committed as the skill says, else `head`.
+ */
+export function screensCommit(p: Project, head: string): string {
+  const now = git(p.root, "rev-parse", "HEAD");
+  if (!now || now === head || git(p.root, "merge-base", "--is-ancestor", head, now) === null) return head;
+  const changed = git(p.root, "diff", "--name-only", "--relative", head, now, "--", ".");
+  if (changed === null) return head;
+  const outputs = buildOutputs(p).map((f) => relative(p.root, f).split("\\").join("/"));
+  const ours = (file: string) => outputs.some((o) => file === o || file.startsWith(o + "/"));
+  return changed.split("\n").filter(Boolean).every(ours) ? now : head;
+}
+
 export function prSection(p: Project): string {
   const file = lastReportPath(p);
   if (!existsSync(file)) throw new Error("no build to show: run `ail build` first (`/ail:build`); its results are what this shows");
   const r = readReport(file);
   const notes: string[] = [];
-  const link = r.head ? githubLink(p, r.head) : null;
+  const at = r.head ? screensCommit(p, r.head) : undefined;
+  const link = at ? githubLink(p, at) : null;
   if (!r.head) notes.push("not a git repository, so screens are not linked");
   else if (!link) notes.push("origin is not on GitHub, so screens are not linked");
   if (r.dirty) notes.push("the build ran on uncommitted changes: commit them, push, and build again, so the screens linked are the ones checked");
-  else if (r.head && !git(p.root, "branch", "-r", "--contains", r.head)) notes.push(`commit ${r.head.slice(0, 12)} is not pushed yet: push it, or its screens won't show`);
+  else if (r.head && git(p.root, "status", "--porcelain", "--", ...buildOutputs(p))) notes.push("the screenshots the build took are not committed: commit and push them, or their links won't show");
+  else if (at && !git(p.root, "branch", "-r", "--contains", at)) notes.push(`commit ${at.slice(0, 12)} is not pushed yet: push it, or its screens won't show`);
   const key = projectKey(p);
   const body = renderChecks(p, r, { link: link ?? (() => null) });
   const section = upsertSection("", key, sectionFor(key, body)).trim();

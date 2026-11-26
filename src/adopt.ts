@@ -20,14 +20,14 @@ import { e2eCheckPath, failureText, ownRunner, pinOf, prepareChecks, runCheckFil
 import type { AilNode } from "./parse.ts";
 import { isCompilable, kebab, type Project, type RunSpec } from "./project.ts";
 import { lockPath, readLock, writeLock } from "./lock.ts";
-import { errorExcerpt } from "./verify.ts";
+import { errorExcerpt, type TestResult } from "./verify.ts";
 
 export { e2eCheckPath } from "./tests.ts";
 
 /** Nodes whose scenarios a person could play through in the app: its flows and the root. */
 export const observable = (n: AilNode) => n.scenarios.length > 0 && (n.kind === "flow" || n.kind === "system");
 
-export interface AdoptResult { node: string; file: string | null; status: "pass" | "fail" | "stale" | "missing"; detail: string; shots?: Shot[] }
+export interface AdoptResult { node: string; file: string | null; status: "pass" | "fail" | "stale" | "missing"; detail: string; shots?: Shot[]; tests?: TestResult[] }
 
 /** Where a flow's end-to-end screenshots go: checks/shots/e2e/<dir>/<kebab>/, handed to its check as AIL_SHOTS_DIR. */
 export const e2eShotsDir = (p: Project, n: AilNode) => join(shotsDir(p), "e2e", n.dir, kebab(n.name));
@@ -187,8 +187,8 @@ export async function adopt(p: Project, opts: {
       if (!shots.length) rmSync(shotsAt, { recursive: true, force: true });
       const pictured = !tests.length ? "" : !shots.length ? "; no screenshots saved (the check should save one per scenario into AIL_SHOTS_DIR)" : unpictured.length ? `; no screenshot for: ${unpictured.join(", ")}` : `, each with a screenshot`;
       results.push(r.ok
-        ? { node: n.name, file, status: "pass", detail: `${r.passes} scenario(s) behave as specified${pictured}`, shots }
-        : { node: n.name, file, status: "fail", detail: `${r.failures.length ? r.failures.join("; ") : "the check did not run"}\n${ownRunner(p) ? failureText(r) : errorExcerpt(r.output, 20)}`, shots });
+        ? { node: n.name, file, status: "pass", detail: `${r.passes} scenario(s) behave as specified${pictured}`, shots, tests: r.tests }
+        : { node: n.name, file, status: "fail", detail: `${r.failures.length ? r.failures.join("; ") : "the check did not run"}\n${ownRunner(p) ? failureText(r) : errorExcerpt(r.output, 20)}`, shots, tests: r.tests });
     }
   } finally { app.stop(); }
   // The screenshots are proof of the look too: a model compares them with it.

@@ -8,7 +8,8 @@ import { dirname, join, relative, resolve } from "node:path";
 import type { AilNode } from "./parse.ts";
 import { AIL_HOME, kebab, type Project } from "./project.ts";
 import { readLock, writeLock } from "./lock.ts";
-import { checksDir, derivedCheckFile } from "./verify.ts";
+import { checksDir, derivedCheckFile, junitResults } from "./verify.ts";
+export { junitResults, type TestResult } from "./verify.ts";
 import { e2eCheckPath, reportTests } from "./tests.ts";
 
 export interface Shot { node: string; test: string; file: string }

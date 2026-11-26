@@ -2,8 +2,9 @@
 import { renderNode, renderReview, renderTree } from "./lens.ts";
 import { plan } from "./plan.ts";
 import type { Project } from "./project.ts";
+import { prSection } from "./report.ts";
 
-export const SHOW_TARGETS = ["", "changes", "<Node>"];
+export const SHOW_TARGETS = ["", "changes", "checks", "<Node>"];
 
 /** origin/main when it exists, otherwise HEAD. */
 export function defaultBase(p: Project): string {
@@ -15,7 +16,8 @@ export function show(p: Project, target = "", opts: { since?: string } = {}): st
   const status = new Map(plan(p).map((e) => [e.node, e.status as string]));
   if (!target || target === "tree") return renderTree(p, status);
   if (target === "changes") return renderReview(p, opts.since ?? defaultBase(p));
+  if (target === "checks") return prSection(p);
   const n = p.nodes.get(target);
   if (n) return renderNode(p, n, status.get(n.name));
-  throw new Error(`nothing called "${target}". Show the tree (no argument), changes, or a node: ${[...p.nodes.keys()].join(", ")}`);
+  throw new Error(`nothing called "${target}". Show the tree (no argument), changes, checks, or a node: ${[...p.nodes.keys()].join(", ")}`);
 }

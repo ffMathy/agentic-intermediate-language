@@ -9,7 +9,8 @@ does observably, and **how** its key decisions were made. Detail is delegated
 to children. People review the spec; generated code (the target's `generated`
 paths) is never edited by hand, and hooks block attempts to.
 
-Tools: `ail_show` looks at the spec (the tree, a node, or what changed); `ail_build` builds it, then checks everything (the `build`
+Tools: `ail_show` looks at the spec (the tree, a node, or what changed) and
+at the last build's checks (`checks`, for a pull request's description); `ail_build` builds it, then checks everything (the `build`
 command calls it: `/ail:build` in Claude Code); `ail_adopt` checks a running app against the spec.
 
 ## Node shape
@@ -123,8 +124,31 @@ Screens are compared too: every build has a model check the final screen of
 each scenario against the node's `look` and `copy`, and the screenshots it
 judged are in `.ail/look/`. A screen that is wrong while every check passes
 means the `look` is missing something. On pull requests, the GitHub Action
-posts the review with screenshots as a comment, so there is nothing to attach
-by hand.
+posts the review with screenshots as a comment.
+
+**Open or update a pull request.** Whenever you open a pull request for a
+change to an AIL project, or push more commits to one, its description gets
+every check of the build, whether or not the repository runs the GitHub
+Action:
+1. Run `ail_build` with `since` set to the branch the pull request merges
+   into (e.g. `origin/main`), and make sure it passes. It runs only the checks
+   of the nodes the change affects (changed in the spec, in their code or
+   checks, and every node that uses them), so the description lists only
+   those. A change no one node owns (the config, the root's target) runs
+   everything. Commit what it wrote, the screenshots in `checks/shots/`
+   included, and push.
+2. Call `ail_show` with `checks`. It returns the section: one collapsible
+   block per check, each test with ✅ or ❌ and, under it, the screen it ended
+   on, linked at the pushed commit. Lines starting with `!` come first when
+   something is off (say, the commit isn't pushed). Fix that and run it again.
+   Never put those lines in the description.
+3. In the description, replace the block between
+   `<!-- ail-checks:<project> -->` and `<!-- /ail-checks:<project> -->` with
+   the section, or add it at the end if it isn't there. Leave the rest of the
+   description as it is, the other projects' sections included. The GitHub
+   Action writes the same block, so whichever runs last wins.
+
+Do this for every AIL project the pull request changes.
 
 Don't review generated code. If it's wrong, the spec is missing something.
 

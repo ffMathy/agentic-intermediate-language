@@ -226,8 +226,26 @@ the final screen of every scenario of each changed node that has a `look`,
 and of the nodes that use it. They are rendered in Chromium from the derived
 checks, and the comment shows them through the `ail-shots` branch. Give the
 job `contents: write` and `pull-requests: write`, and check out with
-`fetch-depth: 0`. To take the same screenshots locally (this needs
-Playwright), run:
+`fetch-depth: 0`.
+
+It also keeps **every check of the build** in the pull request's
+description, one section per project between `<!-- ail-checks:… -->`
+markers (the rest of the description is left alone). Each check (a node's
+tests, a flow's end-to-end check) is a collapsible section: every test with
+✅ or ❌, and under it the screen it ended on, freshly taken for changed
+nodes and the committed one otherwise. Only what the change affects is run
+and shown: the nodes changed since `base` (in the spec, their code or their
+checks) and every node that uses them, while the spec and the build are still
+checked in full. A change no one node owns (the config, the root's target)
+runs everything. That is `ail build --since <ref>`; set `affected: false` to
+run every check. Set `description: false` to turn the section off. `ail build --report r.json` writes those results, and
+`ail show changes --report r.json --checks checks.md` renders them. Without the
+action, the agent plugins do the same: after a build, `ail show checks`
+(`ail_show` with `checks`) gives that section with screens linked at the
+pushed commit, and the `ail` skill tells the agent to put it in the
+description whenever it opens or updates a pull request.
+
+To take the same screenshots locally (this needs Playwright), run:
 
 ```bash
 ail show changes --shots .ail/shots

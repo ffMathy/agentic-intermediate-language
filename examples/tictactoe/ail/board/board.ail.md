@@ -3,7 +3,7 @@
 Shared UI. One owner (this library) and two users: the play area and the
 watch area.
 
-More nodes in this folder, each in a file of its own: [`BoardView`](board-view.ail.md), [`StatusLine`](status-line.ail.md).
+More nodes, each in a folder of its own: [`BoardView`](board-view/board-view.ail.md), [`StatusLine`](status-line/status-line.ail.md).
 
 ```ail
 node BoardKit : library   level: experience

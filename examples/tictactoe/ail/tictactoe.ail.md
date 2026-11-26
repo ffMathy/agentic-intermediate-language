@@ -8,18 +8,19 @@ The folders mirror the tree. Shared parts sit in `library` nodes with one
 owner, and each area lists them under `uses`:
 
 ```
-tictactoe.ail.md                         🟢 TicTacToe (this file)
-app/app.ail.md                           🟡 App: switches between the two areas
-ui/ui.ail.md                             🟡 UiKit (library): Stack, Text, Button, Segmented
-app/play/play.ail.md                     🟡 PlayAGame, NewGameButton, ChooseOpponent
-app/demo/demo.ail.md                     🟡 WatchADemo
-board/board.ail.md                       🟡 BoardKit (library): BoardView, StatusLine
-engine/engine.ail.md                     🟠 Engine (library): GameState, Rules, GameReducer
-engine/computer-player/computer-player.ail.md   🔴 ComputerPlayer
+tictactoe.ail.md          🟢 TicTacToe (this file)
+app/                      🟡 App: switches between the two areas
+  play/                   🟡 PlayAGame, with new-game-button/ and choose-opponent/
+  demo/                   🟡 WatchADemo
+ui/                       🟡 UiKit (library), with stack/, text/, button/, segmented/
+board/                    🟡 BoardKit (library), with board-view/ and status-line/
+engine/                   🟠 Engine (library), with game-state/, rules/, game-reducer/
+  computer-player/        🔴 ComputerPlayer
 ```
 
 Both areas, play and watch, reuse the same board, status line, rules and
-computer player. Generated code mirrors these folders under `src/gen/`.
+computer player. Every node has a folder of its own, with its proof
+screenshots in `shots/`. Generated code mirrors these folders under `src/gen/`.
 
 ## Target
 

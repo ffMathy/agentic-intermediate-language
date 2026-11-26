@@ -255,6 +255,13 @@ export interface CompileOptions {
   /** Compare each built node's screens with its look (default true; skipped without Playwright). */
   look?: boolean;
   log?: (msg: string) => void;
+  /**
+   * Derive each node's check just before compiling it, instead of all up front (the default for a target that
+   * checks in its own language). In a compiled language every check shares one test project, so a node's
+   * check is written only when that node is built, re-derived when it doesn't build, and taken back when
+   * the node isn't built: a check that doesn't build would fail every other node's checks too.
+   */
+  derive?: boolean;
 }
 
 export interface CompileOutcome { node: string; status: "fresh" | "compiled" | "stopped" | "failed" | "skipped"; attempts: number; detail: string }
@@ -348,7 +355,19 @@ export async function compile(p: Project, names: string[], opts: CompileOptions)
       if (!feedback) return { node: n.name, status: "fresh", attempts: 0, detail: "cache hit" };
       log(`${n.name}: its screens don't match its look; rebuilding\n${feedback}`);
     }
-    return limit(async () => {
+    const rel = checkPath(p, n), abs = join(p.root, rel);
+    let derived = false, before: string | null = null;
+    const attempts = async (): Promise<CompileOutcome> => {
+      if (opts.derive && checksToDerive(p, [n]).length) {
+        before = existsSync(abs) ? readFileSync(abs, "utf8") : null;
+        log(`${n.name}: deriving checks from its examples and scenarios`);
+        let r: { file: string; stop?: string };
+        try { r = await derive(p, n, opts.provider); }
+        catch (e) { return { node: n.name, status: "failed" as const, attempts: 0, detail: `deriving its checks failed: ${(e as Error).message}` }; }
+        if (r.stop) return { node: n.name, status: "stopped" as const, attempts: 0, detail: r.stop };
+        derived = true;
+        log(`${n.name}: wrote ${r.file}; review it, since it now defines "correct"`);
+      }
       let prompt = feedback ? `${compileTask(p, n)}\n\n## The current build was rejected\n${feedback}\n\nScreenshots of its tests were compared with the look and copy above.` : compileTask(p, n);
       const max = opts.maxAttempts ?? 3;
       let lastLook: string | null = null;
@@ -368,11 +387,25 @@ export async function compile(p: Project, names: string[], opts: CompileOptions)
         lastLook = mismatch;
         const failures = mismatch ?? (res.verify ? res.verify.checks.filter((c) => !c.ok).map((c) => `- ${c.kind}: ${c.detail}`).join("\n") : `- ${res.error}`);
         log(`${n.name}: attempt ${attempt} rejected\n${failures}`);
+        // A check derived in this build that doesn't itself build is derived again, with its build errors.
+        if (derived && attempt < max && checkBuildErrors(failures, rel, abs)) {
+          log(`${n.name}: its check ${rel} does not build; deriving it again`);
+          try { await derive(p, n, opts.provider, { errors: checkBuildErrors(failures, rel, abs)!, previous: readFileSync(abs, "utf8") }); }
+          catch (e) { log(`${n.name}: deriving its check again failed: ${(e as Error).message}`); }
+        }
         prompt = `${compileTask(p, n)}\n\n## Your previous attempt was rejected\n${failures}\n\nPrevious attempt:\n${raw}`;
       }
       if (lastLook) return { node: n.name, status: "failed" as const, attempts: max, detail: `it passes its checks, but its screens still don't match its look (the last attempt is kept; see .ail/look/). Either the look is ambiguous, or the judge is wrong:\n${lastLook}` };
       const check = needsDerivedCheck(n, p) ? derivedCheckFile(p, n).file : null;
       return { node: n.name, status: "failed" as const, attempts: max, detail: `no attempt passed verification: the node may be under-specified or infeasible${check ? `, or its derived check ${relative(p.root, check)} may itself be wrong (it was generated, so review it)` : ""}` };
+    };
+    return limit(async () => {
+      const o = await attempts();
+      if (derived && o.status !== "compiled") {
+        if (before === null) rmSync(abs, { force: true }); else writeFileSync(abs, before);
+        log(`${n.name}: took back its new check ${rel}, which would otherwise break the other nodes' checks`);
+      }
+      return o;
     });
   };
   // Targets are in dependency order, so every dependency's promise exists before its dependants start.
@@ -388,7 +421,13 @@ export async function compile(p: Project, names: string[], opts: CompileOptions)
  * to the oracle hash, committed, and reviewed like any other code that
  * decides what "correct" means.
  */
-export async function derive(p: Project, n: AilNode, provider: Provider): Promise<{ file: string; stop?: string }> {
+/** The lines of a failed run that are build errors in the check itself, or null when there are none. */
+export function checkBuildErrors(output: string, rel: string, abs: string): string | null {
+  const lines = output.split("\n").filter((l) => (l.includes(abs) || l.includes(rel)) && /\berror\b/i.test(l));
+  return lines.length ? [...new Set(lines)].join("\n") : null;
+}
+
+export async function derive(p: Project, n: AilNode, provider: Provider, retry?: { errors: string; previous: string }): Promise<{ file: string; stop?: string }> {
   if (!needsDerivedCheck(n, p)) throw new Error(`${n.name} has no scenarios or verify section to derive checks from`);
   const rel = checkPath(p, n);
   const header = checkHeader(p, n);
@@ -403,6 +442,7 @@ export async function derive(p: Project, n: AilNode, provider: Provider): Promis
       "Reply with exactly one block:",
       `=== FILE: ${rel} ===`, "<complete file contents>", "=== END ===",
       "If a scenario cannot be checked without guessing, reply instead with: STOP: <question>",
+      ...(retry ? ["", "## Your previous check does not build", retry.errors, "", "Fix only what keeps it from building; test the same things.", "Previous check:", retry.previous] : []),
     ].join("\n"),
     meta: { node: n.name, purpose: "derive" },
   });

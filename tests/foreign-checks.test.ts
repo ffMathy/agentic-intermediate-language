@@ -8,12 +8,13 @@ import { join } from "node:path";
 import { recordAdopted } from "../src/adopt.ts";
 import { buildContext } from "../src/context.ts";
 import { compileHash, specHash } from "../src/hash.ts";
-import { prune, submit } from "../src/compile.ts";
+import { checkBuildErrors, compile, prune, submit } from "../src/compile.ts";
+import { getProvider } from "../src/providers/index.ts";
 import { lint } from "../src/lint.ts";
 import { plan } from "../src/plan.ts";
 import { isCompilable, modulePath } from "../src/project.ts";
 import { checkHeader, checkPath, needsDerivedCheck, verifyNode } from "../src/verify.ts";
-import { load } from "./helpers.ts";
+import { load, mockFile, reply } from "./helpers.ts";
 
 const TARGET = `\`\`\`ail
 target
@@ -174,4 +175,29 @@ test("a lock written before spec hashes were kept gets them filled in, without r
   writeFileSync(join(dir, "ail.lock.json"), JSON.stringify({ version: 1, nodes: { Add: { hash: compileHash(p, add), files: {}, by: "adopted", adopted: true } }, glue: {} }));
   expect(recordAdopted(load(dir))).toEqual([]);
   expect(JSON.parse(readFileSync(join(dir, "ail.lock.json"), "utf8")).nodes.Add.spec).toBe(specHash(p, add));
+});
+
+test("a foreign check is derived as its node is built, derived again when it doesn't build, and kept once the node is built", async () => {
+  const dir = project();
+  const broken = `. ./src/Add.sh\nif [ "$(add 1 2)" = 3 ] then exit 0; fi\n`; // no ";" before then: the shell can't parse it
+  const provider = getProvider(`mock:${mockFile(dir, { "Add#derive": [reply(CHECK, broken), reply(CHECK, check)], Add: [reply(MODULE, goodAdd)] })}`);
+  const logs: string[] = [];
+  const [o] = await compile(load(dir), ["Add"], { provider, derive: true, log: (m) => logs.push(m) });
+  expect(o).toMatchObject({ node: "Add", status: "compiled", attempts: 2 });
+  expect(logs.some((l) => l.includes("does not build; deriving it again"))).toBe(true);
+  expect(readFileSync(join(dir, CHECK), "utf8")).toContain('[ "$(add 1 2)" = 3 ] ||');
+});
+
+test("the new check of a node that isn't built is taken back, so it can't break the other nodes' checks", async () => {
+  const dir = project();
+  const provider = getProvider(`mock:${mockFile(dir, { "Add#derive": [reply(CHECK, check)], Add: [reply(MODULE, badAdd)] })}`);
+  const [o] = await compile(load(dir), ["Add"], { provider, derive: true, maxAttempts: 2 });
+  expect(o!.status).toBe("failed");
+  expect(existsSync(join(dir, CHECK))).toBe(false);
+});
+
+test("checkBuildErrors finds the check's own build errors, not a test failure's stack line", () => {
+  const abs = "/p/tests/AddTests.cs";
+  expect(checkBuildErrors(`${abs}(72,87): error CS0200: read only [x.csproj]\n  at AddTests.Example1() in ${abs}:line 9`, "tests/AddTests.cs", abs)).toBe(`${abs}(72,87): error CS0200: read only [x.csproj]`);
+  expect(checkBuildErrors(`Assert.Equal() Failure\n  at AddTests.Example1() in ${abs}:line 9`, "tests/AddTests.cs", abs)).toBeNull();
 });

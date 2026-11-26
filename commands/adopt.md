@@ -101,8 +101,8 @@ Follow the `ail` skill for how nodes are written. On top of it:
      `{dir}`, `{name}` and `{kebab}` are the node's folder and name; the
      command also gets `{file}` (the check) and `{report}`, where it writes a
      JUnit or TRX report, from which ail reads each test's name and outcome.
-     `prepare` builds the checks once before they run. `check` is the same
-     for the derived checks `ail build` writes.
+     `prepare` builds the checks once before they run. (The derived checks
+     `ail build` writes follow the target's `checks.path` and `checks.run`.)
 
    - at the end of every test it saves visual proof: a screenshot of the screen
      the scenario ends on, as a PNG in the folder `process.env.AIL_SHOTS_DIR`,

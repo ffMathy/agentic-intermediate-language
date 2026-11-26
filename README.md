@@ -146,8 +146,8 @@ time:
    and a 499 kr rug, Then the total reads 698 kr"). Each test creates its
    own through the app's own API, never directly in its database, so it is
    made the way users make it.
-   The checks are written in the target's language (xUnit for a C# app),
-   and `tests` in `ail.config.json` says how to run one.
+   The checks are written in the target's language (xUnit for a C# app);
+   `tests` in `ail.config.json` says where they live and how to run one.
    `ail adopt` starts the old app, runs the checks and stops it, which proves
    the spec describes the old app. Each check also saves a screenshot of the
    screen every scenario ends on, however its platform takes one. `ail adopt`
@@ -156,7 +156,12 @@ time:
    file as built by the existing app, so `ail build` only builds what changes
    from then on.
 
-Then change the `target` to the new technology and run `ail build`. Once
+Then change the `target` to the new technology and run `ail build`. To move
+one node at a time instead, set `"migrate": "node-by-node"` in
+`ail.config.json`: an adopted node then stays built by the existing app until
+its own spec changes, or until `ail build <Node> --force` builds it, and the
+`target` only shapes the code ail generates. Hand-written code that
+generated code uses is described by nodes tagged `@existing`. Once
 `run.app` says how the new app starts, every build runs the same checks
 against it, which proves it behaves like the old one. Each node's `sources` section records where its
 claims came from, for review.

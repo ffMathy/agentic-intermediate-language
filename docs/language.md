@@ -38,6 +38,20 @@ every compiler to follow (naming, exports, state, effects, comments,
 formatting). This is the only place a programming language, a framework or a
 library is named. A project has one target `[no-target]`.
 
+A path may use `{dir}` (the node's folder), `{kebab}` and `{name}` (the
+node's name as written, in UpperCamelCase) `[unknown-placeholder]`.
+
+Checks are bun tests in TypeScript unless the target says otherwise. A target
+in another language names its own `[checks-incomplete]`:
+- `checks.path`: where a node's check goes, e.g.
+  `tests/App.Tests/{dir}/{name}Tests.cs`
+- `checks.run`: the command that runs it, from the project folder; `{files}`,
+  `{name}`, `{kebab}` and `{dir}` are filled in, and exit code 0 passes, e.g.
+  `dotnet test --project tests/App.Tests -- --filter-class "*.{name}Tests"`
+
+Its examples are then written into that check alongside the scenarios (see
+Checks), since they can't be translated mechanically into its language.
+
 ### `catalog`
 `tokens` followed by `name=value` pairs: the design tokens, the only values a
 `look` may use `[unknown-token]`.
@@ -60,6 +74,11 @@ node Name : kind   level: product|experience|system|specialist   @tag …
   - `library`: groups shared nodes and is never compiled
 - `level` says who reads the node `[missing-level]`. A child is never less
   detailed than its parent `[level-order]`.
+- The tag `@existing` marks a node that describes code written by hand, not
+  by ail: a framework's types, platform code, the parts of an adopted app that
+  stay as they are. It is never compiled. The nodes that `use` it see its
+  `what`, like any dependency's, and use the code it describes, so it states
+  one `[existing-without-contract]`.
 
 | level | reader | language |
 |---|---|---|
@@ -221,20 +240,22 @@ what sits inside a view, `children`). Other keys name a hook
 into the platform (`svg`, `hash`, `tablist`) and say what it does in words.
 
 ## 7. Checks
-- An example is compiled into a test for the node.
+- An example is compiled into a test for the node. For a target with its own
+  `checks.path`, it is written into the node's derived check instead, one
+  test per example.
 - Each scenario and each `verify` item becomes a test in `checks/`, derived
   once and pinned to the spec's hash.
 - A view with a `look` gets screenshots of each test's final screen, judged
   against the `look` and `copy`.
 - A flow may also have an end-to-end check in `checks/e2e/` that drives the
   running app.
-- Checks are written in the target's language, with its test framework. For
-  TypeScript they are bun tests. For any other language, `tests` in
-  `ail.config.json` gives where each node's checks live (`check`, `e2e`,
-  with `{dir}`, `{name}` and `{kebab}`), the command that runs one
-  (`command`, with `{file}` and `{report}`: a JUnit or TRX report it writes)
-  and, optionally, a command that builds them first (`prepare`). The
-  `ail-derived-from` pin is written in the language's comment syntax.
+- End-to-end checks are written in the target's language too. For TypeScript
+  they are bun tests. For any other language, `tests` in `ail.config.json`
+  gives where a flow's check lives (`e2e`, with `{dir}`, `{name}` and
+  `{kebab}`), the command that runs one (`command`, with `{file}` and
+  `{report}`: a JUnit or TRX report it writes, from which ail reads each
+  scenario's name and outcome) and, optionally, a command that builds them
+  first (`prepare`). Its pin is written in the language's comment syntax.
 
 ## 8. Editors
 

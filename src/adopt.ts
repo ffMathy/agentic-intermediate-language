@@ -11,7 +11,8 @@ import { existsSync, mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync
 import { spawn } from "node:child_process";
 import { tmpdir } from "node:os";
 import { join, relative, resolve } from "node:path";
-import { compileHash, oracleHash } from "./hash.ts";
+import { compileHash, oracleHash, specHash } from "./hash.ts";
+import { adoptedFresh } from "./plan.ts";
 import { hasLook, judgeShots, type LookResult } from "./look.ts";
 import type { Provider } from "./providers/index.ts";
 import { collectShots, shotsDir, type Shot } from "./shots.ts";
@@ -113,15 +114,18 @@ export interface AdoptReport { ok: boolean; app: string; results: AdoptResult[];
 export function recordAdopted(p: Project): string[] {
   const lock = readLock(p);
   const done: string[] = [];
+  let backfilled = false;
   for (const n of p.ordered.filter((x) => isCompilable(p, x))) {
     const e = lock.nodes[n.name];
     const hash = compileHash(p, n);
     if (e && !e.adopted) continue; // built by ail: leave it
-    if (e?.hash === hash) continue;
-    lock.nodes[n.name] = { hash, files: {}, by: "adopted", adopted: true };
+    // Still adopted at this spec: only fill in the spec hash of a lock written before it was kept.
+    if (e?.adopted && e.hash === hash) { if (!e.spec) { e.spec = specHash(p, n); backfilled = true; } continue; }
+    if (adoptedFresh(p, n, e)) continue;
+    lock.nodes[n.name] = { hash, spec: specHash(p, n), files: {}, by: "adopted", adopted: true };
     done.push(n.name);
   }
-  if (done.length) writeLock(p, lock);
+  if (done.length || backfilled) writeLock(p, lock);
   return done;
 }
 

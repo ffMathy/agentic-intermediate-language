@@ -4,8 +4,6 @@ import { expect, test } from "bun:test";
 import { existsSync, mkdirSync, readFileSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
 import { adopt, e2eCheckPath, e2eShotsDir } from "../src/adopt.ts";
-import { prune } from "../src/compile.ts";
-import { checkPath, needsDerivedCheck, stampCheck } from "../src/verify.ts";
 import { pinOf, reportTests, withPin } from "../src/tests.ts";
 import { load, tempProject } from "./helpers.ts";
 
@@ -85,19 +83,20 @@ test("a TRX report is read as well as JUnit", () => {
   expect(reportTests(trx)).toEqual([{ name: "paying", ok: true }, { name: "paying & leaving", ok: false, message: "no receipt" }]);
 });
 
-test("derived checks follow the target's language: their path, their pin, and examples go in them", () => {
-  const dir = tempProject("areas");
-  writeFileSync(join(dir, "ail.config.json"), JSON.stringify({ tests: { check: "tests/{dir}/test_{kebab}.py", command: "pytest {file} --junitxml={report}" } }));
-  const p = load(dir);
-  const price = p.nodes.get("Price")!;
-  expect(checkPath(p, price)).toBe(`tests/${price.dir}/test_price.py`);
-  expect(needsDerivedCheck(price, p)).toBe(price.examples.length > 0);
-  expect(stampCheck(p, price, "import pytest\n")).toMatch(/^# ail-derived-from: Price@[0-9a-f]{16}\nimport pytest\n$/);
-  expect(pinOf(withPin("x.py", "# ail-derived-from: Price@00\nx = 1\n", "Price", "ab"))).toEqual({ node: "Price", hash: "ab" });
+test("a pin is read and written in any language's comment syntax", () => {
+  expect(withPin("x.py", "import pytest\n", "Price", "ab")).toBe("# ail-derived-from: Price@ab\nimport pytest\n");
+  expect(pinOf(withPin("X.cs", "// ail-derived-from: Price@00\nclass X {}\n", "Price", "ab"))).toEqual({ node: "Price", hash: "ab" });
+  expect(pinOf("-- ail-derived-from: Q@cd\n")).toEqual({ node: "Q", hash: "cd" });
 });
 
-test("pruning removes derived checks of nodes that are gone, but keeps end-to-end checks", () => {
-  const { dir, p, file } = project("# ail-derived-from: Checkout@00\necho\n", { check: "checks/{dir}/{name}Tests.sh" });
+
+test("pruning a foreign target's derived checks keeps the end-to-end checks beside them", async () => {
+  const { prune } = await import("../src/compile.ts");
+  const { dir, file } = project("// ail-derived-from: Checkout@00\n");
+  const root = join(dir, "root.ail.md");
+  writeFileSync(root, readFileSync(root, "utf8").replace(/target\n/, "target\n  checks.path  checks/{dir}/{name}Tests.sh\n  checks.run   sh {files}\n"));
+  const p = load(dir);
+  expect(p.target?.settings["checks.path"]).toBe("checks/{dir}/{name}Tests.sh");
   mkdirSync(join(dir, "checks/a"), { recursive: true });
   writeFileSync(join(dir, "checks/a/GoneTests.sh"), "# ail-derived-from: Gone@00\n");
   const r = prune(p);

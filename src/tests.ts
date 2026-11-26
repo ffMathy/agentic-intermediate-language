@@ -1,11 +1,13 @@
-// How a project's checks are written and run. By default they are bun tests
-// in TypeScript, but checks follow the target's language: a C# app's checks
-// are xUnit tests, a Python app's are pytest tests. `tests` in ail.config.json
-// says where each node's checks live and which command runs one of them; ail
-// reads the outcome from the JUnit (or TRX) report that command writes.
+// How the end-to-end checks are written and run. By default they are bun tests
+// in TypeScript, but they follow the target's language, like its derived
+// checks (the target's `checks.path` and `checks.run`): a C# app's are xUnit
+// tests, a Python app's pytest tests. `tests` in ail.config.json says where a
+// flow's end-to-end check lives and which command runs it; ail reads each
+// scenario's outcome from the JUnit (or TRX) report that command writes, and
+// pairs it with the screenshot the scenario saved.
 import { existsSync, mkdtempSync, readFileSync, rmSync } from "node:fs";
 import { tmpdir } from "node:os";
-import { join, posix, relative, resolve } from "node:path";
+import { join, relative, resolve } from "node:path";
 import type { AilNode } from "./parse.ts";
 import { kebab, type Project } from "./project.ts";
 
@@ -16,16 +18,8 @@ export function fillNode(tpl: string, n: AilNode): string {
 
 const checksRoot = (p: Project) => join(p.root, p.config.checksDir ?? "checks");
 
-/** Whether the project runs its checks with its own command (in the target's language) rather than bun. */
+/** Whether the end-to-end checks are run by the project's own command (in the target's language) rather than bun. */
 export const ownRunner = (p: Project) => !!p.config.tests?.command;
-
-/** Where a node's derived check lives, relative to the project: `tests.check`, else checks/<dir>/<kebab>.test.ts(x). */
-export function checkPath(p: Project, n: AilNode): string {
-  const tpl = p.config.tests?.check;
-  if (tpl) return posix.normalize(fillNode(tpl, n));
-  const ext = n.kind === "view" || n.kind === "flow" ? "tsx" : "ts";
-  return relative(p.root, join(checksRoot(p), n.dir, `${kebab(n.name)}.test.${ext}`));
-}
 
 /** Where a flow's end-to-end check lives (absolute): `tests.e2e`, else checks/e2e/<dir>/<kebab>.e2e.ts (not picked up by a plain `bun test`). */
 export function e2eCheckPath(p: Project, n: AilNode): string {
@@ -97,7 +91,7 @@ export function reportTests(xml: string): TestOutcome[] {
 export interface RunResult { ok: boolean; tests: TestOutcome[]; failures: string[]; passes: number; output: string }
 
 /**
- * Run one check file. With `tests.command`, that shell command runs from the
+ * Run one end-to-end check file. With `tests.command`, that shell command runs from the
  * project with {file} (relative to the project), {node}, {dir}, {kebab},
  * {name} and {report} (where to write its JUnit or TRX report) filled in, and
  * the same values in AIL_CHECK_FILE, AIL_CHECK_NODE and AIL_TEST_REPORT.
@@ -127,7 +121,7 @@ export function runCheckFile(p: Project, n: AilNode, abs: string, env: Record<st
   }
 }
 
-/** Run `tests.prepare` (building the checks), once before checks run. Null when it passes or there is none. */
+/** Run `tests.prepare` (building the end-to-end checks), once before they run. Null when it passes or there is none. */
 export function prepareChecks(p: Project, env: Record<string, string> = {}): string | null {
   const cmd = p.config.tests?.prepare;
   if (!cmd) return null;

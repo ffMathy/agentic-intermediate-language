@@ -15,6 +15,8 @@ export interface LockEntry {
   shots?: string;
   /** Built by the existing app, not by ail: recorded by `ail adopt` once the spec was proven on it. No generated files. */
   adopted?: boolean;
+  /** For an adopted node: the hash of its spec alone, without the target (hash.ts, specHash). */
+  spec?: string;
 }
 export interface Lock { version: 1; nodes: Record<string, LockEntry>; glue: Record<string, string> }
 

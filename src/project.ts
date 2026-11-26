@@ -29,20 +29,19 @@ export interface RunSpec {
 }
 
 /**
- * How the checks are written and run, in the target's language. Paths and
- * commands may use {dir} (the node's folder), {kebab} and {name}; the
- * command also gets {file} (the check, relative to the project), {node} and
- * {report}, where it must write a JUnit or TRX report of the tests it ran.
- * Without it, checks are bun tests in TypeScript.
+ * How the end-to-end checks are written and run, in the target's language
+ * (its derived checks are the target's `checks.path` and `checks.run`). The
+ * path and commands may use {dir} (the node's folder), {kebab} and {name};
+ * the command also gets {file} (the check, relative to the project), {node}
+ * and {report}, where it must write a JUnit or TRX report of the scenarios it
+ * ran. Without it, end-to-end checks are bun tests in TypeScript.
  */
 export interface TestsSpec {
-  /** Where a node's derived check lives, relative to the project (e.g. "checks/{dir}/{name}Tests.cs"). */
-  check?: string;
   /** Where a flow's end-to-end check lives, relative to the project (e.g. "checks/e2e/{dir}/{name}Checks.cs"). */
   e2e?: string;
-  /** Shell command, from the project, that runs one check file and writes its report to {report}. */
+  /** Shell command, from the project, that runs one end-to-end check and writes its report to {report}. */
   command?: string;
-  /** Shell command, from the project, run once before any check runs: builds the checks. */
+  /** Shell command, from the project, run once before the end-to-end checks run: builds them. */
   prepare?: string;
 }
 
@@ -59,13 +58,17 @@ export interface Config {
    * with a key, a display name and its spec folder (relative to this project). */
   specModule?: string | { path: string; projects: { key: string; name: string; dir: string; shots?: boolean }[] };
   checksDir?: string;
-  /** How the checks are written and run, when not as bun tests: see TestsSpec. */
+  /** How the end-to-end checks are written and run, when not as bun tests: see TestsSpec. */
   tests?: TestsSpec;
   /** How to run apps for the end-to-end checks, found out by the agent that adopts or builds the project:
    * "legacy" is the existing app a spec is written from, "app" the one `ail build` makes. */
   run?: Record<string, RunSpec>;
   lockFile?: string;
   models?: string[];
+  /** How an adopted app moves to generated code. "all-at-once" (the default): changing the target rebuilds
+   * every adopted node. "node-by-node": an adopted node stays built by the existing app until its own spec
+   * changes or it is built by name with `ail build <Node> --force`; the target only shapes generated code. */
+  migrate?: "all-at-once" | "node-by-node";
 }
 
 /** What the code is generated for: the project's own conventions, written in its spec. */
@@ -174,14 +177,29 @@ export const specModulePath = (p: { config: Config }): string | null =>
 export const kebab = (name: string) =>
   name.replace(/([a-z0-9])([A-Z])/g, "$1-$2").replace(/([A-Z])([A-Z][a-z])/g, "$1-$2").toLowerCase();
 
+/** The placeholders a path template in the target may use. */
+export const PATH_PLACEHOLDERS = ["dir", "kebab", "name"] as const;
+
+/** A path template with a node's placeholders filled in. */
+export const expandPath = (tpl: string, n: AilNode) =>
+  posix.normalize(tpl.replace("{dir}", n.dir).replace("{kebab}", kebab(n.name)).replace("{name}", n.name));
+
+/**
+ * A node tagged `@existing` describes code that is written by hand, not by
+ * ail: a framework's types, platform code, the parts of an adopted app that
+ * stay as they are. It is never compiled. Dependants see its contract, like
+ * any other dependency's, and use the code it describes.
+ */
+export const isExisting = (n: AilNode) => n.tags.includes("existing");
+
 /** The module path a node compiles to, per the target's `path.<kind>`. */
 export function modulePath(p: Project, n: AilNode): string | null {
   const tpl = p.target?.settings[`path.${n.kind}`];
-  if (!tpl) return null;
-  return posix.normalize(tpl.replace("{dir}", n.dir).replace("{kebab}", kebab(n.name)).replace("{name}", n.name));
+  if (!tpl || isExisting(n)) return null;
+  return expandPath(tpl, n);
 }
 
-/** Nodes a model compiles: every node whose kind has a path in the target. */
+/** Nodes a model compiles: every node whose kind has a path in the target, unless it is `@existing`. */
 export function isCompilable(p: Project, n: AilNode): boolean {
   return modulePath(p, n) !== null;
 }

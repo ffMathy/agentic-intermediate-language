@@ -9,7 +9,7 @@ import type { AilNode } from "./parse.ts";
 import { AIL_HOME, kebab, type Project } from "./project.ts";
 import { readLock, writeLock } from "./lock.ts";
 import { checksDir, derivedCheckFile } from "./verify.ts";
-import { e2eCheckPath, ownRunner, reportTests, runCheckFile } from "./tests.ts";
+import { e2eCheckPath, reportTests } from "./tests.ts";
 
 export interface Shot { node: string; test: string; file: string }
 
@@ -143,17 +143,8 @@ export const nodeShotsDir = (p: Project, n: AilNode) => join(shotsDir(p), n.dir,
 export async function refreshNodeShots(p: Project, n: AilNode, log: (s: string) => void = () => {}): Promise<Shot[]> {
   const dir = nodeShotsDir(p, n);
   rmSync(dir, { recursive: true, force: true });
-  let shots: Shot[];
-  if (ownRunner(p)) {
-    // Checks in the target's language save their own screenshots, as end-to-end checks do.
-    mkdirSync(dir, { recursive: true });
-    const file = derivedCheckFile(p, n).file;
-    const r = file ? runCheckFile(p, n, file, { AIL_SHOTS_DIR: dir }) : null;
-    shots = r ? collectShots(dir, n.name, r.tests.map((t) => t.name)).shots : [];
-    log(`· ${n.name}: ${shots.length} screen(s)`);
-    if (!shots.length) rmSync(dir, { recursive: true, force: true });
-  } else shots = await takeShots(p, shotsDir(p), [n.name], log, { scale: 1, manifest: false });
-  if (shots.length && !ownRunner(p)) writeFileSync(join(dir, "shots.json"), JSON.stringify({ node: n.name, shots: shots.map((s) => ({ test: s.test, file: relative(dir, s.file) })) }, null, 2) + "\n");
+  const shots = await takeShots(p, shotsDir(p), [n.name], log, { scale: 1, manifest: false });
+  if (shots.length) writeFileSync(join(dir, "shots.json"), JSON.stringify({ node: n.name, shots: shots.map((s) => ({ test: s.test, file: relative(dir, s.file) })) }, null, 2) + "\n");
   const lock = readLock(p);
   const entry = lock.nodes[n.name];
   if (entry) { entry.shots = entry.hash; writeLock(p, lock); }

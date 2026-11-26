@@ -9,24 +9,31 @@ import type { AilNode } from "./parse.ts";
 import { AIL_HOME, kebab, type Project } from "./project.ts";
 import { readLock, writeLock } from "./lock.ts";
 import { checksDir, derivedCheckFile } from "./verify.ts";
+import { e2eCheckPath, ownRunner, reportTests, runCheckFile } from "./tests.ts";
 
 export interface Shot { node: string; test: string; file: string }
+
+/** The file name a check saves a scenario's screenshot under: the test's name as a slug, plus ".png". */
+export const shotFileName = (test: string) => `${slugOf(test)}.png`;
+
+/** Pair the screenshots a check saved with its tests (in run order), and write the folder's index. */
+export function collectShots(dir: string, node: string, tests: string[]): { shots: Shot[]; missing: string[] } {
+  const shots: Shot[] = [], missing: string[] = [];
+  for (const t of tests) {
+    const f = join(dir, shotFileName(t));
+    if (existsSync(f)) shots.push({ node, test: t, file: f }); else missing.push(t);
+  }
+  if (shots.length) writeFileSync(join(dir, "shots.json"), JSON.stringify({ node, shots: shots.map((s) => ({ test: s.test, file: relative(dir, s.file) })) }, null, 2) + "\n");
+  return { shots, missing };
+}
 
 /** Nodes whose proofs can be pictured: they have a look, and a derived check. */
 export function visualNodes(p: Project, names?: string[]): AilNode[] {
   return p.ordered.filter((n) => (!names || names.includes(n.name)) && n.sections.some((s) => s.key === "look") && derivedCheckFile(p, n).file);
 }
 
-/** Test names of a JUnit report, in run order, without skipped or todo tests. */
-export function junitTests(xml: string): string[] {
-  const out: string[] = [];
-  for (const m of xml.matchAll(/<testcase\b([^>]*?)(\/>|>([\s\S]*?)<\/testcase>)/g)) {
-    if (/<skipped\b/.test(m[3] ?? "")) continue;
-    const name = /\bname="([^"]*)"/.exec(m[1]!)?.[1] ?? "";
-    out.push(name.replace(/&quot;/g, '"').replace(/&apos;/g, "'").replace(/&lt;/g, "<").replace(/&gt;/g, ">").replace(/&amp;/g, "&"));
-  }
-  return out;
-}
+/** Test names of a JUnit (or TRX) report, in run order, without skipped or todo tests. */
+export const junitTests = (xml: string): string[] => reportTests(xml).map((t) => t.name);
 
 /** The final screen of each test in one check file, paired with its test name. */
 export function captureScreens(p: Project, checkFile: string): { test: string; html: string; head: string }[] {
@@ -136,8 +143,17 @@ export const nodeShotsDir = (p: Project, n: AilNode) => join(shotsDir(p), n.dir,
 export async function refreshNodeShots(p: Project, n: AilNode, log: (s: string) => void = () => {}): Promise<Shot[]> {
   const dir = nodeShotsDir(p, n);
   rmSync(dir, { recursive: true, force: true });
-  const shots = await takeShots(p, shotsDir(p), [n.name], log, { scale: 1, manifest: false });
-  if (shots.length) writeFileSync(join(dir, "shots.json"), JSON.stringify({ node: n.name, shots: shots.map((s) => ({ test: s.test, file: relative(dir, s.file) })) }, null, 2) + "\n");
+  let shots: Shot[];
+  if (ownRunner(p)) {
+    // Checks in the target's language save their own screenshots, as end-to-end checks do.
+    mkdirSync(dir, { recursive: true });
+    const file = derivedCheckFile(p, n).file;
+    const r = file ? runCheckFile(p, n, file, { AIL_SHOTS_DIR: dir }) : null;
+    shots = r ? collectShots(dir, n.name, r.tests.map((t) => t.name)).shots : [];
+    log(`· ${n.name}: ${shots.length} screen(s)`);
+    if (!shots.length) rmSync(dir, { recursive: true, force: true });
+  } else shots = await takeShots(p, shotsDir(p), [n.name], log, { scale: 1, manifest: false });
+  if (shots.length && !ownRunner(p)) writeFileSync(join(dir, "shots.json"), JSON.stringify({ node: n.name, shots: shots.map((s) => ({ test: s.test, file: relative(dir, s.file) })) }, null, 2) + "\n");
   const lock = readLock(p);
   const entry = lock.nodes[n.name];
   if (entry) { entry.shots = entry.hash; writeLock(p, lock); }
@@ -156,7 +172,7 @@ export function orphanShots(p: Project): string[] {
   if (!existsSync(root)) return [];
   const keep = new Set(visualNodes(p).map((n) => nodeShotsDir(p, n)));
   // A flow's end-to-end screenshots stay while it has an end-to-end check.
-  for (const n of p.ordered) if (existsSync(join(checksDir(p), "e2e", n.dir, `${kebab(n.name)}.e2e.ts`))) keep.add(join(root, "e2e", n.dir, kebab(n.name)));
+  for (const n of p.ordered) if (existsSync(e2eCheckPath(p, n))) keep.add(join(root, "e2e", n.dir, kebab(n.name)));
   return [...new Bun.Glob("**/shots.json").scanSync({ cwd: root })].map((f) => join(root, dirname(f))).filter((d) => !keep.has(d));
 }
 

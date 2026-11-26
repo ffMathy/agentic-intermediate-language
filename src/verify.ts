@@ -15,6 +15,8 @@ import { oracleHash } from "./hash.ts";
 import { fileHash, readLock } from "./lock.ts";
 import type { AilNode } from "./parse.ts";
 import { AIL_HOME, isCompilable, kebab, modulePath, specModulePath, topoByUses, type Project } from "./project.ts";
+import { checkPath, commentFor, failureText, ownRunner, pinOf, runCheckFile, withPin } from "./tests.ts";
+export { checkPath } from "./tests.ts";
 
 export interface Check { kind: string; ok: boolean; severity: "error" | "warning"; detail: string }
 export interface VerifyResult { node: string; ok: boolean; checks: Check[] }
@@ -134,17 +136,26 @@ export function examplesTestSource(p: Project, n: AilNode): string {
 export const checksDir = (p: Project) => join(p.root, p.config.checksDir ?? "checks");
 
 export function derivedCheckFile(p: Project, n: AilNode): { file: string | null; pinned: string | null } {
-  const dir = join(checksDir(p), n.dir);
-  if (!existsSync(dir)) return { file: null, pinned: null };
-  const name = readdirSync(dir).find((f) => f === `${kebab(n.name)}.test.ts` || f === `${kebab(n.name)}.test.tsx`);
-  if (!name) return { file: null, pinned: null };
-  const file = join(dir, name);
-  const pinned = /ail-derived-from:\s*\w+@([0-9a-f]+)/.exec(readFileSync(file, "utf8"))?.[1] ?? null;
-  return { file, pinned };
+  let file: string | null = null;
+  if (p.config.tests?.check) {
+    const abs = join(p.root, checkPath(p, n));
+    if (existsSync(abs)) file = abs;
+  } else {
+    const dir = join(checksDir(p), n.dir);
+    const name = existsSync(dir) ? readdirSync(dir).find((f) => f === `${kebab(n.name)}.test.ts` || f === `${kebab(n.name)}.test.tsx`) : undefined;
+    if (name) file = join(dir, name);
+  }
+  if (!file) return { file: null, pinned: null };
+  return { file, pinned: pinOf(readFileSync(file, "utf8"))?.hash ?? null };
 }
 
-export function needsDerivedCheck(n: AilNode): boolean {
-  return n.scenarios.length > 0 || n.sections.some((s) => s.key === "verify");
+/**
+ * Whether a node needs a derived check: it has scenarios or verify items. With
+ * the project's own test command, examples also go in it, since ail runs
+ * them mechanically only as bun tests.
+ */
+export function needsDerivedCheck(n: AilNode, p?: Project): boolean {
+  return n.scenarios.length > 0 || n.sections.some((s) => s.key === "verify") || (!!p && ownRunner(p) && n.examples.length > 0);
 }
 
 export function verifyNode(p: Project, n: AilNode, opts: { checkDrift?: boolean } = {}): VerifyResult {
@@ -168,21 +179,28 @@ export function verifyNode(p: Project, n: AilNode, opts: { checkDrift?: boolean 
   checks.push(checkImports(p, n, readFileSync(abs, "utf8")));
 
   const testFiles: string[] = [];
-  if (n.examples.length) {
+  const own = ownRunner(p);
+  if (n.examples.length && !own) {
     const dir = join(p.root, ".ail", "verify");
     mkdirSync(dir, { recursive: true });
     const f = join(dir, `${kebab(n.name)}.examples.test.ts`);
     writeFileSync(f, examplesTestSource(p, n));
     testFiles.push(f);
   }
-  if (needsDerivedCheck(n)) {
+  if (needsDerivedCheck(n, p)) {
     const { file, pinned } = derivedCheckFile(p, n);
     const want = oracleHash(p, n).slice(0, 16);
     if (!file) checks.push(fail("derived", `scenarios/verify have no derived check; \`ail build\` derives it`, "warning"));
     else if (pinned !== want) checks.push(fail("derived", `${file.slice(p.root.length + 1)} was derived from an older spec (${pinned} ≠ ${want}); re-derive and review`));
     else testFiles.push(file);
   }
-  if (testFiles.length) {
+  if (own) {
+    for (const f of testFiles) {
+      const r = runCheckFile(p, n, f);
+      if (r.ok) checks.push(pass("tests", `${r.passes} passed`));
+      else checks.push(fail("tests", failureText(r, 40)));
+    }
+  } else if (testFiles.length) {
     const r = runBunTest(p.root, testFiles);
     if (r.ok) checks.push(pass("tests", `${r.passes} passed`));
     else checks.push(fail("tests", r.failures.length ? `${r.failures.map((f) => "✗ " + f).join("\n")}\n${errorExcerpt(r.output)}` : r.output.trim().split("\n").slice(-25).join("\n")));
@@ -224,16 +242,10 @@ export function loadPrompt(name: string): string {
   return readFileSync(join(AIL_HOME, "prompts", `${name}.md`), "utf8").trim();
 }
 
-/** Where a node's derived check lives: checks/<dir>/<kebab>.test.ts(x). */
-export function checkPath(p: Project, n: AilNode): string {
-  const ext = n.kind === "view" || n.kind === "flow" ? "tsx" : "ts";
-  return relative(p.root, join(checksDir(p), n.dir, `${kebab(n.name)}.test.${ext}`));
-}
+/** The comment that pins a check to the node's current spec, in the check file's language. */
+export const checkHeader = (p: Project, n: AilNode, file = checkPath(p, n)) => `${commentFor(file)} ail-derived-from: ${n.name}@${oracleHash(p, n).slice(0, 16)}`;
 
-export const checkHeader = (p: Project, n: AilNode) => `// ail-derived-from: ${n.name}@${oracleHash(p, n).slice(0, 16)}`;
-
-/** Make sure a derived check starts with the header pinning it to the current spec. */
-export function stampCheck(p: Project, n: AilNode, body: string): string {
-  const header = checkHeader(p, n);
-  return body.startsWith("// ail-derived-from:") ? body.replace(/^.*\n/, header + "\n") : `${header}\n${body}`;
+/** Make sure a derived check carries the comment pinning it to the current spec. */
+export function stampCheck(p: Project, n: AilNode, body: string, file = checkPath(p, n)): string {
+  return withPin(file, body, n.name, oracleHash(p, n).slice(0, 16));
 }

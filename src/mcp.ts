@@ -32,7 +32,7 @@ export const TOOLS: Tool[] = [
   },
   {
     name: "ail_adopt",
-    description: "Does the app behave as the spec says? Starts the app as ail.config.json's `run` says (`app`: which entry; default run.legacy while adopting an existing app, else run.app), runs each flow's end-to-end check (checks/e2e/<folder>/<node>.e2e.ts, which drives the app however suits it: a browser, a simulator, a process) and stops it. Use it while bringing an existing app under AIL, to prove the spec describes it, and after building, to prove the new app behaves the same. Lists the flows that have no end-to-end check yet.",
+    description: "Does the app behave as the spec says? Starts the app as ail.config.json's `run` says (`app`: which entry; default run.legacy while adopting an existing app, else run.app), runs each flow's end-to-end check (checks/e2e/<folder>/<node>.e2e.ts, or where ail.config.json's `tests.e2e` says, in the target's language, run by `tests.command`; it drives the app however suits it: a browser, a simulator, a process) and stops it. Use it while bringing an existing app under AIL, to prove the spec describes it, and after building, to prove the new app behaves the same. Lists the flows that have no end-to-end check yet.",
     inputSchema: obj({ app: str, nodes: { type: "array", items: str } }),
     run: async (p, a, progress) => { const spec = resolveModels([], p.config.models)[0]!;
       const r = await adopt(p, { app: a.app as string | undefined, names: (a.nodes as string[]) ?? [], log: progress, suggestReview: true, record: true, judge: modelUnavailable(spec) ? undefined : getProvider(spec) }); return { text: formatAdopt(r), isError: !r.ok }; },

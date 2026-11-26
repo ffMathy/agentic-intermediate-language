@@ -7,6 +7,7 @@
 import { dirname, relative } from "node:path";
 import { specText, type AilNode } from "./parse.ts";
 import { ancestors, modulePath, specModulePath, type Project } from "./project.ts";
+import { ownRunner } from "./tests.ts";
 import { checkHeader, checkPath, derivedCheckFile, loadPrompt, needsDerivedCheck } from "./verify.ts";
 import { oracleHash } from "./hash.ts";
 
@@ -28,6 +29,11 @@ export function whatOnly(n: AilNode): string {
 /** Where a derived check imports from: its paths differ from the module's, since it lives elsewhere. */
 export function checkImports(p: Project, n: AilNode, check: string): string {
   const mp = modulePath(p, n), sm = specModulePath(p);
+  if (ownRunner(p)) return [
+    `Write it in the target's language with the test tools its \`tests\` setting names, never as a bun or TypeScript test; ail runs it with \`${p.config.tests!.command}\`.`,
+    mp ? `The module under test is built at ${mp}; reach it the way the target's own tests reach its code.` : "",
+    n.examples.length ? "Also write one test per example, named after it." : "",
+  ].filter(Boolean).join(" ");
   return [
     mp ? `From ${check}, import the module under test from "${importSpecifier(check, mp)}".` : "",
     sm ? `Import spec files, if needed, from "${importSpecifier(check, sm)}" (not the module's own path to it).` : "",
@@ -81,7 +87,7 @@ export function buildContext(p: Project, n: AilNode): string {
       out.push(fence(whatOnly(d)));
     }
   }
-  if (needsDerivedCheck(n)) {
+  if (needsDerivedCheck(n, p)) {
     const { file, pinned } = derivedCheckFile(p, n);
     if (!file || pinned !== oracleHash(p, n).slice(0, 16)) {
       const rel = checkPath(p, n);

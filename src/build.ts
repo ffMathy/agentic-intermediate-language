@@ -12,7 +12,7 @@ import { orphanShots, refreshNodeShots, staleShots, takeShots } from "./shots.ts
 import { rmSync } from "node:fs";
 import { existsSync } from "node:fs";
 import { join } from "node:path";
-import { adopt, formatAdopt, formatReview, reviewAttributes } from "./adopt.ts";
+import { adopt, e2eCheckPath, formatAdopt, formatReview, reviewAttributes } from "./adopt.ts";
 import { readLock } from "./lock.ts";
 import { checksDir } from "./verify.ts";
 
@@ -91,7 +91,7 @@ export async function build(p: Project, o: BuildOptions = {}): Promise<BuildResu
     sections.push(formatDiverge(reports));
   }
   // The end-to-end checks, against the app this build made, started as run.app says.
-  if (existsSync(join(checksDir(p), "e2e"))) {
+  if (p.ordered.some((n) => existsSync(e2eCheckPath(p, n)))) {
     if (p.config.run?.app) {
       const r = await adopt(p, { app: "app", names, log, judge: noModel || o.look === false ? undefined : getProvider(specs[0]!) });
       ok &&= r.ok;

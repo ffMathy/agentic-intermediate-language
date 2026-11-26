@@ -13,6 +13,7 @@ import { parseFile, type AilNode } from "./parse.ts";
 import { plan } from "./plan.ts";
 import { AIL_HOME, isCompilable, kebab, modulePath, specModulePath, topoByUses, type Project } from "./project.ts";
 import type { Provider } from "./providers/index.ts";
+import { e2eCheckPath, pinOf } from "./tests.ts";
 import { checkHeader, checkPath, checksDir, derivedCheckFile, loadPrompt, needsDerivedCheck, stampCheck, verifyNode, type VerifyResult } from "./verify.ts";
 export { checkPath, loadPrompt } from "./verify.ts";
 
@@ -176,7 +177,7 @@ export interface SubmitResult { ok: boolean; node: string; error?: string; verif
 export function submit(p: Project, n: AilNode, files: Record<string, string>, by = "agent"): SubmitResult {
   const path = modulePath(p, n);
   if (!path || !isCompilable(p, n)) return { ok: false, node: n.name, error: `${n.name} is not a compilable node` };
-  const check = needsDerivedCheck(n) ? checkPath(p, n) : null;
+  const check = needsDerivedCheck(n, p) ? checkPath(p, n) : null;
   const extra = Object.keys(files).filter((f) => f !== path && f !== check);
   if (extra.length) return { ok: false, node: n.name, error: `${n.name} may only write ${path}${check ? ` and ${check}` : ""}; refused ${extra.join(", ")}` };
   if (!(path in files)) return { ok: false, node: n.name, error: `no content for ${path}` };
@@ -221,15 +222,18 @@ export function prune(p: Project): { removed: string[]; kept: string[] } {
     delete lock.nodes[name];
   }
   writeLock(p, lock);
-  // Derived checks of nodes that are gone, or that moved to another folder.
+  // Derived checks of nodes that are gone, or that moved to another folder. End-to-end checks stay.
   const dir = checksDir(p);
-  if (existsSync(dir)) for (const rel of new Bun.Glob("**/*.test.{ts,tsx}").scanSync({ cwd: dir })) {
+  const glob = p.config.tests?.check ? "**/*" : "**/*.test.{ts,tsx}";
+  if (existsSync(dir)) for (const rel of new Bun.Glob(glob).scanSync({ cwd: dir })) {
     const abs = join(dir, rel);
-    const name = /^\/\/ ail-derived-from:\s*(\w+)@/.exec(readFileSync(abs, "utf8"))?.[1];
+    if (/(^|\/)(node_modules|bin|obj|shots|\.[^/]+)\//.test(rel) || /\.(png|json|xml|dll|exe|pdb)$/i.test(rel)) continue;
+    const name = pinOf(readFileSync(abs, "utf8").slice(0, 2000))?.node;
     if (!name) continue;
     const n = p.nodes.get(name);
     const file = relative(p.root, abs);
-    if (!n || !needsDerivedCheck(n) || checkPath(p, n) !== file) { rmSync(abs); removed.push(file); }
+    if (n && e2eCheckPath(p, n) === abs) continue;
+    if (!n || !needsDerivedCheck(n, p) || checkPath(p, n) !== file) { rmSync(abs); removed.push(file); }
   }
   return { removed, kept };
 }
@@ -362,7 +366,7 @@ export async function compile(p: Project, names: string[], opts: CompileOptions)
         prompt = `${compileTask(p, n)}\n\n## Your previous attempt was rejected\n${failures}\n\nPrevious attempt:\n${raw}`;
       }
       if (lastLook) return { node: n.name, status: "failed" as const, attempts: max, detail: `it passes its checks, but its screens still don't match its look (the last attempt is kept; see .ail/look/). Either the look is ambiguous, or the judge is wrong:\n${lastLook}` };
-      const check = needsDerivedCheck(n) ? derivedCheckFile(p, n).file : null;
+      const check = needsDerivedCheck(n, p) ? derivedCheckFile(p, n).file : null;
       return { node: n.name, status: "failed" as const, attempts: max, detail: `no attempt passed verification: the node may be under-specified or infeasible${check ? `, or its derived check ${relative(p.root, check)} may itself be wrong (it was generated, so review it)` : ""}` };
     });
   };
@@ -380,7 +384,7 @@ export async function compile(p: Project, names: string[], opts: CompileOptions)
  * decides what "correct" means.
  */
 export async function derive(p: Project, n: AilNode, provider: Provider): Promise<{ file: string; stop?: string }> {
-  if (!needsDerivedCheck(n)) throw new Error(`${n.name} has no scenarios or verify section to derive checks from`);
+  if (!needsDerivedCheck(n, p)) throw new Error(`${n.name} has no scenarios or verify section to derive checks from`);
   const rel = checkPath(p, n);
   const header = checkHeader(p, n);
   const raw = await provider.complete({
@@ -412,7 +416,7 @@ export async function derive(p: Project, n: AilNode, provider: Provider): Promis
 export function checksToDerive(p: Project, nodes: AilNode[]): AilNode[] {
   const lock = readLock(p);
   return nodes.filter((n) => {
-    if (!needsDerivedCheck(n)) return false;
+    if (!needsDerivedCheck(n, p)) return false;
     // An adopted node has no generated module to test: its end-to-end checks prove it.
     const e = lock.nodes[n.name];
     if (e?.adopted && e.hash === compileHash(p, n)) return false;

@@ -33,7 +33,9 @@ const HELP = `ail — write the spec, let agents build the code.
                         run says (run.legacy while you write the spec of an existing app,
                         else run.app), runs each flow's end-to-end check, and stops it.
                         --app NAME    another entry of run
-  ail show [what]       The tree (default), a <Node>, or changes [--since <ref>]
+  ail show [what]       The tree (default), a <Node>, changes [--since <ref>], or checks:
+                        the last build's checks as a section for a pull request's
+                        description, each test with ✅ or ❌ and its screen
                         --shots DIR   add screenshots of the node shown, or for changes,
                                       of the changed nodes and the nodes that use them
                         --report FILE --checks OUT   also write the checks of a build's

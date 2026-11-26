@@ -11,7 +11,25 @@ import type { Project } from "./project.ts";
 import { nodeShotsDir, readShotsIndex, shotsDir, type Shot } from "./shots.ts";
 import type { TestResult } from "./verify.ts";
 
-export interface BuildReport { ok: boolean; check: CheckReport | null; e2e: AdoptReport | null; text: string }
+export interface BuildReport {
+  ok: boolean; check: CheckReport | null; e2e: AdoptReport | null; text: string;
+  /** The commit the build ran on, and whether files were changed on top of it. */
+  head?: string; dirty?: boolean;
+}
+
+/** Every build saves its results here, for `ail show checks`. */
+export const lastReportPath = (p: Project) => join(p.root, ".ail", "last-build.json");
+
+const git = (cwd: string, ...args: string[]) => {
+  const r = Bun.spawnSync(["git", ...args], { cwd, stdout: "pipe", stderr: "pipe" });
+  return r.exitCode === 0 ? r.stdout.toString().trim() : null;
+};
+
+/** The commit a build runs on: HEAD, and whether the working tree differs from it. */
+export function buildHead(p: Project): { head?: string; dirty?: boolean } {
+  const head = git(p.root, "rev-parse", "HEAD");
+  return head ? { head, dirty: !!git(p.root, "status", "--porcelain", "--", ".") } : {};
+}
 
 export function writeReport(file: string, r: BuildReport) {
   mkdirSync(dirname(file), { recursive: true });
@@ -32,8 +50,9 @@ interface Section { title: string; ok: boolean; tests: TestResult[]; problems: s
  * `base` they are copied under `outDir` and linked as `<base>/<path>`, and
  * without them only the tests are listed.
  */
-export function renderChecks(p: Project, r: BuildReport, opts: { shots?: Shot[]; outDir?: string; base?: string } = {}): string {
+export function renderChecks(p: Project, r: BuildReport, opts: { shots?: Shot[]; outDir?: string; base?: string; link?: (file: string) => string | null } = {}): string {
   const link = (file: string): string | null => {
+    if (opts.link) return existsSync(file) ? opts.link(file) : null;
     if (!opts.outDir || !opts.base || !existsSync(file)) return null;
     let rel = relative(opts.outDir, file);
     if (rel.startsWith("..")) {
@@ -127,4 +146,43 @@ export function sectionFor(project: string, checks: string, max = 30000): string
   let text = `### AIL checks · \`${project}\`\n\n${checks.trim()}`;
   if (text.length > max) text = text.slice(0, max).replace(/<details>(?![\s\S]*<\/details>)[\s\S]*$/, "") + "\n\n_Cut short; every check is in the job summary._";
   return text;
+}
+
+// --- for agents: the section, from the last build, linked to the pushed commit ---
+
+/** Where a committed file can be seen on GitHub, at a commit; null when origin isn't on GitHub. */
+export function githubLink(p: Project, sha: string): ((file: string) => string) | null {
+  const origin = git(p.root, "remote", "get-url", "origin") ?? "";
+  const m = /github\.com[:/]([^/]+)\/(.+?)(?:\.git)?\/?$/.exec(origin.replace(/^https?:\/\/[^@/]*@/, "https://"));
+  const top = git(p.root, "rev-parse", "--show-toplevel");
+  if (!m || !top) return null;
+  return (file) => `https://github.com/${m[1]}/${m[2]}/blob/${sha}/${relative(top, file).split("\\").join("/")}?raw=true`;
+}
+
+/** The project's name in a description's markers: its folder in the repository, as the GitHub Action names it. */
+export function projectKey(p: Project): string {
+  const top = git(p.root, "rev-parse", "--show-toplevel");
+  return (top && relative(top, p.root).split("\\").join("/")) || ".";
+}
+
+/**
+ * The checks of the last build, as a section for a pull request's
+ * description, between the markers the GitHub Action uses (so either can
+ * replace the other's). Screens link to the committed screenshots at the
+ * commit the build ran on, which must be pushed for them to show.
+ */
+export function prSection(p: Project): string {
+  const file = lastReportPath(p);
+  if (!existsSync(file)) throw new Error("no build to show: run `ail build` first (`/ail:build`); its results are what this shows");
+  const r = readReport(file);
+  const notes: string[] = [];
+  const link = r.head ? githubLink(p, r.head) : null;
+  if (!r.head) notes.push("not a git repository, so screens are not linked");
+  else if (!link) notes.push("origin is not on GitHub, so screens are not linked");
+  if (r.dirty) notes.push("the build ran on uncommitted changes: commit them, push, and build again, so the screens linked are the ones checked");
+  else if (r.head && !git(p.root, "branch", "-r", "--contains", r.head)) notes.push(`commit ${r.head.slice(0, 12)} is not pushed yet: push it, or its screens won't show`);
+  const key = projectKey(p);
+  const body = renderChecks(p, r, { link: link ?? (() => null) });
+  const section = upsertSection("", key, sectionFor(key, body)).trim();
+  return (notes.length ? notes.map((n) => `! ${n}`).join("\n") + "\n\n" : "") + section + "\n";
 }

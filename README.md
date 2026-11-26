@@ -233,7 +233,11 @@ tests, a flow's end-to-end check) is a collapsible section: every test with
 ✅ or ❌, and under it the screen it ended on, freshly taken for changed
 nodes and the committed one otherwise. Set `description: false` to turn it
 off. `ail build --report r.json` writes those results, and
-`ail show changes --report r.json --checks checks.md` renders them.
+`ail show changes --report r.json --checks checks.md` renders them. Without the
+action, the agent plugins do the same: after a build, `ail show checks`
+(`ail_show` with `checks`) gives that section with screens linked at the
+pushed commit, and the `ail` skill tells the agent to put it in the
+description whenever it opens or updates a pull request.
 
 To take the same screenshots locally (this needs Playwright), run:
 

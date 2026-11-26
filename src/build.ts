@@ -15,6 +15,7 @@ import { join } from "node:path";
 import { adopt, formatAdopt, formatReview, reviewAttributes, type AdoptReport } from "./adopt.ts";
 import { readLock } from "./lock.ts";
 import { checksDir, foreignChecks } from "./verify.ts";
+import { buildHead, lastReportPath, writeReport } from "./report.ts";
 
 export interface BuildOptions {
   /** Only these nodes (default: all). */
@@ -106,7 +107,10 @@ export async function build(p: Project, o: BuildOptions = {}): Promise<BuildResu
   if (firstBuild) { const tip = formatReview(reviewAttributes(p)); if (tip) sections.push(tip.trimStart()); }
   const stopped = out.some((x) => x.status === "stopped");
   if (stopped) sections.push("The spec doesn't decide the questions above. Answer them in the .ail.md files, then build again.");
-  return { ok, text: sections.filter(Boolean).join("\n\n"), outcomes: out, check: report, stopped, e2e };
+  const text = sections.filter(Boolean).join("\n\n");
+  // Saved for `ail show checks`, which puts them in a pull request's description.
+  writeReport(lastReportPath(p), { ok, check: report, e2e: e2e ?? null, text, ...buildHead(p) });
+  return { ok, text, outcomes: out, check: report, stopped, e2e };
 }
 
 /** Retake the committed screenshots that are out of date and remove orphaned ones. True when anything changed. */

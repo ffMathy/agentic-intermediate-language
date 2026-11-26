@@ -11,6 +11,10 @@
   spec change. Never guess in code.
 - Before finishing, `ail build` (or `/ail:build`) must pass: it compiles what
   changed and then checks everything.
+- A pull request for a change to an AIL project carries the build's checks in
+  its description. After pushing, put `ail show checks` (`ail_show` with
+  `checks`) between its `<!-- ail-checks:<project> -->` markers, or add it at
+  the end, and leave the rest of the description alone.
 
 ## In this repository (the toolchain)
 

@@ -1,10 +1,10 @@
 // Every check of a build, for a pull request's description.
 import { expect, test } from "bun:test";
-import { existsSync, mkdirSync, mkdtempSync, writeFileSync } from "node:fs";
+import { existsSync, mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { loadProject } from "../src/project.ts";
-import { hasSection, renderChecks, sectionFor, upsertSection, type BuildReport } from "../src/report.ts";
+import { githubLink, hasSection, lastReportPath, prSection, projectKey, renderChecks, sectionFor, upsertSection, writeReport, type BuildReport } from "../src/report.ts";
 import { junitResults } from "../src/shots.ts";
 import { runBunTest } from "../src/verify.ts";
 import { KATA } from "./helpers.ts";
@@ -104,4 +104,29 @@ test("a long section is cut short at a whole check", () => {
   expect(s.length).toBeLessThan(1100);
   expect(s.match(/<details>/g)!.length).toBe(s.match(/<\/details>/g)!.length);
   expect(s).toContain("Cut short");
+});
+
+test("screens link to the committed screenshot on GitHub, at the commit the build ran on", () => {
+  const p = loadProject(KATA);
+  const link = githubLink(p, "abc123");
+  if (!link) return; // a checkout without a GitHub origin
+  expect(link(join(KATA, "checks/shots/ui/text/01-content-is-shown.png"))).toMatch(/^https:\/\/github\.com\/[^/]+\/[^/]+\/blob\/abc123\/examples\/tictactoe\/checks\/shots\/ui\/text\/01-content-is-shown\.png\?raw=true$/);
+  expect(projectKey(p)).toBe("examples/tictactoe");
+});
+
+test("for an agent, the last build's checks come between the markers the GitHub Action uses", () => {
+  const p = loadProject(KATA);
+  const file = lastReportPath(p);
+  const before = existsSync(file) ? readFileSync(file, "utf8") : null;
+  try {
+    writeReport(file, { ...report(), head: "abc123", dirty: true });
+    const out = prSection(p);
+    expect(out).toStartWith("! the build ran on uncommitted changes");
+    const section = out.slice(out.indexOf("<!--"));
+    expect(section).toStartWith("<!-- ail-checks:examples/tictactoe -->\n### AIL checks · `examples/tictactoe`");
+    expect(section.trimEnd()).toEndWith("<!-- /ail-checks:examples/tictactoe -->");
+    expect(upsertSection(upsertSection("Intro", "examples/tictactoe", "old"), "examples/tictactoe", section.split("\n").slice(1, -2).join("\n"))).toContain("Intro");
+  } finally {
+    if (before !== null) writeFileSync(file, before); else rmSync(file, { force: true });
+  }
 });

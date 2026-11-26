@@ -106,7 +106,11 @@ export async function build(p: Project, o: BuildOptions = {}): Promise<BuildResu
       const r = e2e = await adopt(p, { app: "app", names: scope ?? names, log, judge: noModel || o.look === false ? undefined : getProvider(specs[0]!) });
       ok &&= r.ok;
       sections.push(formatAdopt(r));
-    } else sections.push("! app      end-to-end checks not run: ail.config.json has no run.app saying how to start the app this project builds");
+    } else {
+      // A build proves the app behaves as its spec says; checks that can't run prove nothing, so the build fails.
+      ok = false;
+      sections.push("✗ app      end-to-end checks could not run: ail.config.json has no run.app saying how to start the app this project builds. Add it (for an adopted app, the same as run.legacy) and build again");
+    }
   }
   if (o.shots) sections.push(`📷 ${(await takeShots(p, o.shots, names.length ? names : undefined, log)).length} screenshot(s) in ${o.shots}`);
   if (firstBuild) { const tip = formatReview(reviewAttributes(p)); if (tip) sections.push(tip.trimStart()); }

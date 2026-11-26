@@ -154,7 +154,9 @@ time:
    commits them in `checks/shots/e2e/` and has a model compare them with the
    spec's `look`. Once everything passes, it records every node in the lock
    file as built by the existing app, so `ail build` only builds what changes
-   from then on.
+   from then on, and records `run.app` as a copy of `run.legacy`, so every
+   build runs the end-to-end checks against the app. A build whose checks
+   can't run fails.
 
 Then change the `target` to the new technology and run `ail build`. To move
 one node at a time instead, set `"migrate": "node-by-node"` in

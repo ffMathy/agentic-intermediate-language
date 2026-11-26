@@ -6,8 +6,8 @@
 // `how` or code. Encapsulation is enforced by construction.
 import { dirname, relative } from "node:path";
 import { specText, type AilNode } from "./parse.ts";
-import { ancestors, modulePath, specModulePath, type Project } from "./project.ts";
-import { checkHeader, checkPath, derivedCheckFile, loadPrompt, needsDerivedCheck } from "./verify.ts";
+import { ancestors, isExisting, modulePath, specModulePath, type Project } from "./project.ts";
+import { checkHeader, checkPath, derivedCheckFile, foreignChecks, loadPrompt, needsDerivedCheck } from "./verify.ts";
 import { oracleHash } from "./hash.ts";
 
 function importSpecifier(fromPath: string, toPath: string): string {
@@ -27,6 +27,8 @@ export function whatOnly(n: AilNode): string {
 
 /** Where a derived check imports from: its paths differ from the module's, since it lives elsewhere. */
 export function checkImports(p: Project, n: AilNode, check: string): string {
+  const foreign = foreignChecks(p);
+  if (foreign) return `Write it in the target's language and test framework (see the target's \`tests\`); it is run with \`${foreign.run}\`, so it must build and run there.`;
   const mp = modulePath(p, n), sm = specModulePath(p);
   return [
     mp ? `From ${check}, import the module under test from "${importSpecifier(check, mp)}".` : "",
@@ -77,16 +79,18 @@ export function buildContext(p: Project, n: AilNode): string {
     out.push(`They are compiled before you, at exactly the import specifiers shown. Use their names and props as written; never re-create them.`);
     for (const d of deps) {
       const dp = modulePath(p, d);
-      out.push(`\n### ${d.name}${dp && path ? ` — built at ${dp}, so import from "${importSpecifier(path, dp)}"` : ""}`);
+      const where = isExisting(d) ? " — existing code, written by hand: use it as its contract says; never re-create it"
+        : dp && path ? ` — built at ${dp}, ${foreignChecks(p) ? "and reached the way the target's conventions say" : `so import from "${importSpecifier(path, dp)}"`}` : "";
+      out.push(`\n### ${d.name}${where}`);
       out.push(fence(whatOnly(d)));
     }
   }
-  if (needsDerivedCheck(n)) {
+  if (needsDerivedCheck(n, p)) {
     const { file, pinned } = derivedCheckFile(p, n);
     if (!file || pinned !== oracleHash(p, n).slice(0, 16)) {
       const rel = checkPath(p, n);
       out.push(`\n## Derived check needed`);
-      out.push(`This node's scenarios / verify items have no current derived check. Write ${rel} as well, and submit it together with the module. ${checkImports(p, n, rel)} It starts with the line:\n${checkHeader(p, n)}\n\n${loadPrompt("derive-checks")}`);
+      out.push(`This node's ${foreignChecks(p) ? "examples / " : ""}scenarios / verify items have no current derived check. Write ${rel} as well, and submit it together with the module. ${checkImports(p, n, rel)} It starts with the line:\n${checkHeader(p, n)}\n\n${loadPrompt("derive-checks")}`);
     }
   }
 

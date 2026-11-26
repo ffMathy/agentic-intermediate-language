@@ -154,7 +154,12 @@ time:
    file as built by the existing app, so `ail build` only builds what changes
    from then on.
 
-Then change the `target` to the new technology and run `ail build`. Once
+Then change the `target` to the new technology and run `ail build`. To move
+one node at a time instead, set `"migrate": "node-by-node"` in
+`ail.config.json`: an adopted node then stays built by the existing app until
+its own spec changes, or until `ail build <Node> --force` builds it, and the
+`target` only shapes the code ail generates. Hand-written code that
+generated code uses is described by nodes tagged `@existing`. Once
 `run.app` says how the new app starts, every build runs the same checks
 against it, which proves it behaves like the old one. Each node's `sources` section records where its
 claims came from, for review.

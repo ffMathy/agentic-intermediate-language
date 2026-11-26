@@ -1,7 +1,7 @@
 // `ail lint`: structural, traceability and readability rules.
 import { specFilesIn, specModuleProjects } from "./compile.ts";
 import { itemsOf, LEVELS, NODE_SECTIONS, sectionLines, stripComment, type AilNode, type Level } from "./parse.ts";
-import { ancestors, dependencies, descendants, isCompilable, modulePath, type Project } from "./project.ts";
+import { ancestors, dependencies, descendants, isCompilable, isExisting, modulePath, PATH_PLACEHOLDERS, type Project } from "./project.ts";
 
 export type Severity = "error" | "warning";
 export interface Diagnostic { severity: Severity; code: string; message: string; node?: string; file: string; line: number }
@@ -79,6 +79,16 @@ export function lint(p: Project): Diagnostic[] {
     if (!specFilesIn(q.dir).length) push("error", "spec-module-empty", null, `specModule project "${q.key}": no *.ail.md files in ${q.configDir}, so the page would show an empty project`, 1, "ail.config.json");
 
   if (!p.target && p.nodes.size) push("error", "no-target", null, "no `target` block: nothing says what to generate, so nothing can be built", 1, p.files[0]?.file);
+  if (p.target) {
+    const t = p.target;
+    // A placeholder ail doesn't fill would end up in a file name.
+    for (const key of t.order.filter((k) => k.startsWith("path.") || k === "checks.path"))
+      for (const m of t.settings[key]!.matchAll(/\{(\w+)\}/g))
+        if (!(PATH_PLACEHOLDERS as readonly string[]).includes(m[1]!))
+          push("error", "unknown-placeholder", null, `${key} uses {${m[1]}}, which ail does not fill in; a path may use ${PATH_PLACEHOLDERS.map((x) => `{${x}}`).join(", ")} ({name} is the node's name, in UpperCamelCase)`, t.line, t.file);
+    if (!!t.settings["checks.path"] !== !!t.settings["checks.run"])
+      push("error", "checks-incomplete", null, "a target that checks in its own language needs both `checks.path` (where a node's check goes) and `checks.run` (the command that runs it)", t.line, t.file);
+  }
 
   const nodeNames = new Set(p.nodes.keys());
   const tokenFamilies = new Set(Object.keys(p.tokens).map((t) => t.split(".")[0]!));
@@ -205,7 +215,9 @@ export function lint(p: Project): Diagnostic[] {
     for (const e of n.examples) if (!e.expected) push("error", "example-syntax", n, `example "${e.expr}" needs "=> expected"`, e.line);
     for (const dec of n.decisions) if (!dec.because) push("warning", "decision-without-because", n, `decision "${dec.what}" has no \`because\``, dec.line);
 
-    if (p.target && n.children.length === 0 && n.kind !== "library" && !modulePath(p, n))
+    if (isExisting(n) && !n.sections.some((s) => s.key === "what" || s.key === "binds"))
+      push("warning", "existing-without-contract", n, `${n.name} is @existing but states no \`what\`: the nodes that use it would see nothing of it`);
+    if (p.target && n.children.length === 0 && n.kind !== "library" && !isExisting(n) && !modulePath(p, n))
       push("warning", "no-path", n, `leaf ${n.name} (kind ${n.kind}) has no path.${n.kind} in the target; it will not be built`);
     if (p.target && isCompilable(p, n) && n.examples.length === 0 && n.scenarios.length === 0 && !n.sections.some((s) => s.key === "verify") && n.kind !== "data" && n.kind !== "system")
       push("warning", "unverifiable", n, `${n.name} has no examples, scenarios or verify section; nothing proves the generated code right`);

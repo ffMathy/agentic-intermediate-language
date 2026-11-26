@@ -8,8 +8,7 @@ import { formatDiagnostics, lint } from "./lint.ts";
 import { plan } from "./plan.ts";
 import { isCompilable, type Project } from "./project.ts";
 import { getProvider, modelUnavailable, resolveModels } from "./providers/index.ts";
-import { orphanShots, refreshNodeShots, staleShots, takeShots } from "./shots.ts";
-import { rmSync } from "node:fs";
+import { clearShots, moveLegacyShots, orphanShots, refreshNodeShots, staleShots, takeShots } from "./shots.ts";
 import { existsSync } from "node:fs";
 import { join } from "node:path";
 import { adopt, e2eCheckPath, formatAdopt, formatReview, reviewAttributes, type AdoptReport } from "./adopt.ts";
@@ -48,6 +47,8 @@ export async function build(p: Project, o: BuildOptions = {}): Promise<BuildResu
   if (errors.length) return { ok: false, text: formatDiagnostics(errors) + "\n\nfix the spec before building", outcomes: [], check: null, stopped: false };
   const jobs = o.jobs ?? 4;
   if (!Number.isInteger(jobs) || jobs < 1) throw new Error(`--jobs must be a whole number of at least 1, got "${jobs}"`);
+  // Screenshots still in checks/shots/ move beside the spec first, so anything retaken below replaces them.
+  if (moveLegacyShots(p)) log("proof screenshots moved beside the spec, into each spec folder's shots/");
   // A project's first build is the moment to set up review of what it generates.
   const firstBuild = Object.keys(readLock(p).nodes).length === 0;
   const specs = resolveModels(o.models ?? [], p.config.models);
@@ -81,8 +82,10 @@ export async function build(p: Project, o: BuildOptions = {}): Promise<BuildResu
     });
     for (const [node, q] of stopped) out.push({ node, status: "stopped", attempts: 0, detail: q });
     for (const [node, why] of failed) out.push({ node, status: "failed", attempts: 0, detail: why });
-    // The proof screenshots of every node built since they were last taken, then the glue that shows them.
-    if (await refreshShots(p, log)) writeGlue(p);
+    // The proof screenshots of every node built since they were last taken, then the glue that shows them
+    // (always: compiling a node with a look retakes its screenshots too, and the spec module imports them).
+    await refreshShots(p, log);
+    for (const g of writeGlue(p)) log(`glue: wrote ${g}`);
   }
 
   // Then the check: spec, build, behaviour, and anything asked for on top.
@@ -126,8 +129,8 @@ export async function build(p: Project, o: BuildOptions = {}): Promise<BuildResu
 
 /** Retake the committed screenshots that are out of date and remove orphaned ones. True when anything changed. */
 async function refreshShots(p: Project, log: (s: string) => void): Promise<boolean> {
-  let changed = false;
-  for (const dir of orphanShots(p)) { rmSync(dir, { recursive: true, force: true }); changed = true; }
+  let changed = moveLegacyShots(p);
+  for (const dir of orphanShots(p)) { clearShots(dir); changed = true; }
   for (const n of staleShots(p)) {
     try {
       await refreshNodeShots(p, n);

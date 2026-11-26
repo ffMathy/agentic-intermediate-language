@@ -96,9 +96,19 @@ writing the token CSS, taking the proof screenshots and cleaning up after
 moved or deleted nodes all happen inside `ail build`.
 
 Proof screenshots are committed too: every build keeps the final screen of
-each check for nodes with a `look`, in `checks/shots/`, next to the checks.
-A model has compared each one with the spec's look, so a reviewer sees
-exactly what was proven.
+each check for nodes with a `look` beside the node's spec, in `shots/<node>/`
+in the same folder as its `.ail.md` file (`shots/<node>/e2e/` for end-to-end
+checks). A model has compared each one with the spec's look, so a reviewer
+sees exactly what was proven, next to what it was proven against. `shots` is
+reserved: no spec folder may be called that.
+
+```
+ail/board/
+├── board.ail.md               BoardView and StatusLine
+└── shots/
+    ├── board-view/            01-picking-an-empty-square.png, …, shots.json
+    └── status-line/           01-whose-turn.png, …, shots.json
+```
 
 ## One language, for every target
 
@@ -151,7 +161,7 @@ time:
    `ail adopt` starts the old app, runs the checks and stops it, which proves
    the spec describes the old app. Each check also saves a screenshot of the
    screen every scenario ends on, however its platform takes one. `ail adopt`
-   commits them in `checks/shots/e2e/` and has a model compare them with the
+   commits them beside the spec, in `shots/<node>/e2e/`, and has a model compare them with the
    spec's `look`. Once everything passes, it records every node in the lock
    file as built by the existing app, so `ail build` only builds what changes
    from then on, and records `run.app` as a copy of `run.legacy`, so every

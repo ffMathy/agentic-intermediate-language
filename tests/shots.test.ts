@@ -71,3 +71,21 @@ test("images a test imported from disk are inlined, so the screenshot shows them
   expect(html).toContain('src="data:image/png;base64,');
   expect(html).toContain('src="/nope.png"');
 });
+
+test.skipIf(!installed || !chromium)("retaking a node's screenshots keeps the old ones in place while its tests run, since a page can import them", async () => {
+  const { cpSync, readdirSync, symlinkSync, writeFileSync } = await import("node:fs");
+  const { refreshNodeShots, nodeShotsDir } = await import("../src/shots.ts");
+  const dir = mkdtempSync(join(tmpdir(), "ail-retake-test-"));
+  cpSync(KATA, dir, { recursive: true, filter: (f) => !f.includes("node_modules") });
+  symlinkSync(join(KATA, "node_modules"), join(dir, "node_modules"));
+  const p = loadProject(dir);
+  const n = p.nodes.get("StatusLine")!;
+  const shotsDir = nodeShotsDir(p, n);
+  const own = readdirSync(shotsDir).find((f) => f.endsWith(".png"))!;
+  // The check imports one of the node's own screenshots, as a page that shows them (through the spec module) does.
+  const check = derivedCheckFile(p, n).file!;
+  writeFileSync(check, `import ownShot from ${JSON.stringify(join(shotsDir, own))};\nvoid ownShot;\n` + readFileSync(check, "utf8"));
+  const shots = await refreshNodeShots(p, n);
+  expect(shots.length).toBe(3);
+  expect(readdirSync(shotsDir).filter((f) => f.endsWith(".png")).length).toBe(3);
+});

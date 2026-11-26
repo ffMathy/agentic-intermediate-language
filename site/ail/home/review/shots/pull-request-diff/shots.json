@@ -1,0 +1,9 @@
+{
+  "node": "PullRequestDiff",
+  "shots": [
+    {
+      "test": "the spec change",
+      "file": "01-the-spec-change.png"
+    }
+  ]
+}

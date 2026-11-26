@@ -71,7 +71,7 @@ export const ADOPT_SECOND_HALF: Beat[] = [
       lines: [
         "// ail-derived-from: PlayAGame@5445e0669a18e44c",
         "a temp folder gets only AIL_APP_URL, AIL_API_URL and AIL_SHOTS_DIR",
-        "✓ 7 tests, 7 screenshots in checks/shots/e2e/app/play/play-a-game/",
+        "✓ 7 tests, 7 screenshots in ail/app/play/shots/play-a-game/e2e/",
         "everything stops, the app first",
       ],
     },

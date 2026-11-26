@@ -13,6 +13,7 @@ import { existsSync } from "node:fs";
 import { dirname, isAbsolute, join, relative, resolve } from "node:path";
 import { formatDiagnostics, lint } from "./lint.ts";
 import { findRoot, loadProject } from "./project.ts";
+import { isShotFile } from "./shots.ts";
 
 export interface HookResult { code: 0 | 2; message: string }
 
@@ -82,6 +83,10 @@ export function preHook(payload: unknown, cwd = process.cwd()): HookResult {
   const { root, globs } = generatedGlobs(project);
   const rel = relative(root, abs);
   if (rel.startsWith("..")) return { code: 0, message: "" };
+  if (isShotFile(loadProject(root), rel)) return {
+    code: 2,
+    message: `${rel} is a proof screenshot, taken by \`ail build\` from the checks and kept beside the spec. Do not edit it directly: change the .ail.md source and run \`ail build\` (or the plugin's build command, /ail:build in Claude Code).`,
+  };
   const hit = globs.find((g) => new Bun.Glob(g).match(rel));
   if (!hit) return { code: 0, message: "" };
   return {

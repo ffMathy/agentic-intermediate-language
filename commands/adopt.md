@@ -119,7 +119,7 @@ Follow the `ail` skill for how nodes are written. On top of it:
    Add any driver it needs to the checks' own dependencies. Call `ail_adopt`:
    it starts the app's services and the app as `run.legacy` says, runs its
    baseline seed, runs the checks, collects their
-   screenshots into `checks/shots/e2e/` (committed, like the other proof), has
+   screenshots beside the spec, in `shots/<node>/e2e/` (committed, like the other proof), has
    a model compare them with each node's `look`, and stops the app. A failing
    check, or a screenshot that doesn't match its `look`, means the spec or the
    check is wrong about the app: fix that, never the app. When everything

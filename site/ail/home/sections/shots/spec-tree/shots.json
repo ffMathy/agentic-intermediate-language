@@ -1,0 +1,9 @@
+{
+  "node": "SpecTree",
+  "shots": [
+    {
+      "test": "screenshots beside their spec",
+      "file": "01-screenshots-beside-their-spec.png"
+    }
+  ]
+}

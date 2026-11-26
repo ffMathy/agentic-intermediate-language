@@ -13,7 +13,7 @@ generated, in the same folders.
 | `src/gen/tokens.css` | the design tokens as CSS variables | `ail build`, straight from the catalog; no model involved |
 | `index.html` | the page that loads the app | people |
 | `checks/**/*.test.ts(x)` | derived checks for scenarios and `verify` items, pinned to a spec hash | generated once, then reviewed |
-| `checks/shots/**/*.png` | the final screen of each check of a node with a `look`, judged against the look by a model | `ail build`, no editing |
+| `ail/**/shots/**/*.png` | the final screen of each check of a node with a `look`, beside its spec, judged against the look by a model | `ail build`, no editing |
 | `checks/e2e/**/*.e2e.ts` | end-to-end checks that play each flow in a browser, against the app `run.app` starts | written once, then reviewed |
 | `ail.lock.json` | which compile hash produced which file | `ail` |
 

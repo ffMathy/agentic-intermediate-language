@@ -10,7 +10,7 @@ import type { Affected } from "./affected.ts";
 import type { CheckReport } from "./check.ts";
 import type { Project } from "./project.ts";
 import { lockPath } from "./lock.ts";
-import { nodeShotsDir, readShotsIndex, shotsDir, type Shot } from "./shots.ts";
+import { isShotFile, legacyShotsDir, nodeShotsDir, readShotsIndex, type Shot } from "./shots.ts";
 import type { TestResult } from "./verify.ts";
 
 export interface BuildReport {
@@ -62,7 +62,7 @@ export function renderChecks(p: Project, r: BuildReport, opts: { shots?: Shot[];
     let rel = relative(opts.outDir, file);
     if (rel.startsWith("..")) {
       // A committed screenshot: published next to the fresh ones.
-      rel = join("checks", relative(shotsDir(p), file));
+      rel = relative(p.root, file);
       const dest = join(opts.outDir, rel);
       mkdirSync(dirname(dest), { recursive: true });
       copyFileSync(file, dest);
@@ -181,8 +181,15 @@ export function projectKey(p: Project): string {
  * replace the other's). Screens link to the committed screenshots at the
  * commit the build ran on, which must be pushed for them to show.
  */
-/** What a build writes and the person then commits: the proof screenshots and the lock file. */
-const buildOutputs = (p: Project) => [shotsDir(p), lockPath(p)];
+/**
+ * What a build writes and the person then commits: the proof screenshots (beside the spec, and the old
+ * checks/shots/ they move out of) and the lock file. `file` is relative to the project.
+ */
+function isBuildOutput(p: Project, file: string): boolean {
+  const rel = (f: string) => relative(p.root, f).split("\\").join("/");
+  const lock = rel(lockPath(p)), legacy = rel(legacyShotsDir(p));
+  return file === lock || file.startsWith(legacy + "/") || isShotFile(p, file);
+}
 
 /**
  * The commit that holds the screenshots of a build that ran on `head`: HEAD itself once the only commits since `head`
@@ -193,9 +200,24 @@ export function screensCommit(p: Project, head: string): string {
   if (!now || now === head || git(p.root, "merge-base", "--is-ancestor", head, now) === null) return head;
   const changed = git(p.root, "diff", "--name-only", "--relative", head, now, "--", ".");
   if (changed === null) return head;
-  const outputs = buildOutputs(p).map((f) => relative(p.root, f).split("\\").join("/"));
-  const ours = (file: string) => outputs.some((o) => file === o || file.startsWith(o + "/"));
-  return changed.split("\n").filter(Boolean).every(ours) ? now : head;
+  return changed.split("\n").filter(Boolean).every((f) => isBuildOutput(p, f)) ? now : head;
+}
+
+/** Whether any of the build's own output is not committed yet. */
+function uncommittedOutputs(p: Project): boolean {
+  // -z: paths as they are, never quoted; a rename lists both paths.
+  const r = Bun.spawnSync(["git", "status", "--porcelain", "-z", "--untracked-files=all", "--", "."], { cwd: p.root, stdout: "pipe", stderr: "pipe" });
+  if (r.exitCode !== 0) return false;
+  const base = relative(git(p.root, "rev-parse", "--show-toplevel") ?? p.root, p.root).split("\\").join("/");
+  const entries = r.stdout.toString().split("\0");
+  const paths: string[] = [];
+  for (let i = 0; i < entries.length; i++) {
+    const e = entries[i]!;
+    if (e.length < 4) continue;
+    paths.push(e.slice(3));
+    if (e[0] === "R" || e[0] === "C") paths.push(entries[++i] ?? ""); // the path it was renamed or copied from
+  }
+  return paths.filter(Boolean).some((f) => isBuildOutput(p, base && f.startsWith(base + "/") ? f.slice(base.length + 1) : f));
 }
 
 export function prSection(p: Project): string {
@@ -208,7 +230,7 @@ export function prSection(p: Project): string {
   if (!r.head) notes.push("not a git repository, so screens are not linked");
   else if (!link) notes.push("origin is not on GitHub, so screens are not linked");
   if (r.dirty) notes.push("the build ran on uncommitted changes: commit them, push, and build again, so the screens linked are the ones checked");
-  else if (r.head && git(p.root, "status", "--porcelain", "--", ...buildOutputs(p))) notes.push("the screenshots the build took are not committed: commit and push them, or their links won't show");
+  else if (r.head && uncommittedOutputs(p)) notes.push("the screenshots the build took are not committed: commit and push them, or their links won't show");
   else if (at && !git(p.root, "branch", "-r", "--contains", at)) notes.push(`commit ${at.slice(0, 12)} is not pushed yet: push it, or its screens won't show`);
   const key = projectKey(p);
   const body = renderChecks(p, r, { link: link ?? (() => null) });

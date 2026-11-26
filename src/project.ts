@@ -5,6 +5,8 @@ import { dirname, join, posix, relative, resolve } from "node:path";
 import { parseFile, type AilNode, type ParsedFile, type Term } from "./parse.ts";
 
 export const AIL_HOME = resolve(import.meta.dir, "..");
+/** The folder, in each spec folder, that holds its nodes' proof screenshots (so no spec folder may have this name). */
+export const SHOTS = "shots";
 
 /** How to start an app and tell that it is ready. Any platform: a web server, a simulator, a CLI. */
 export interface RunSpec {

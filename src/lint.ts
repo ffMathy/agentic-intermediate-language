@@ -1,7 +1,7 @@
 // `ail lint`: structural, traceability and readability rules.
 import { specFilesIn, specModuleProjects } from "./compile.ts";
 import { itemsOf, LEVELS, NODE_SECTIONS, sectionLines, stripComment, type AilNode, type Level } from "./parse.ts";
-import { ancestors, dependencies, descendants, isCompilable, isExisting, modulePath, PATH_PLACEHOLDERS, type Project } from "./project.ts";
+import { ancestors, dependencies, descendants, isCompilable, isExisting, modulePath, PATH_PLACEHOLDERS, SHOTS, type Project } from "./project.ts";
 
 export type Severity = "error" | "warning";
 export interface Diagnostic { severity: Severity; code: string; message: string; node?: string; file: string; line: number }
@@ -74,6 +74,9 @@ export function lint(p: Project): Diagnostic[] {
     d.push({ severity, code, message, node: n?.name, file: file ?? n?.file ?? "", line: line ?? n?.line ?? 0 });
 
   for (const e of p.errors) d.push({ severity: "error", code: "parse", message: e.message, file: e.file, line: e.line });
+  // Each spec folder's shots/ holds its proof screenshots, so a spec can't live in one.
+  for (const f of p.files) if (f.file.split(/[\\/]/).slice(0, -1).includes(SHOTS))
+    push("error", "reserved-folder", null, `a spec file can't be in a folder called "${SHOTS}": that name is where each spec folder keeps its proof screenshots. Rename the folder`, 1, f.file);
 
   if (p.config.specModule) for (const q of specModuleProjects(p))
     if (!specFilesIn(q.dir).length) push("error", "spec-module-empty", null, `specModule project "${q.key}": no *.ail.md files in ${q.configDir}, so the page would show an empty project`, 1, "ail.config.json");

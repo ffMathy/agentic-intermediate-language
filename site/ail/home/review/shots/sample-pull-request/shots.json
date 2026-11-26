@@ -1,0 +1,13 @@
+{
+  "node": "SamplePullRequest",
+  "shots": [
+    {
+      "test": "the parts to review are open",
+      "file": "01-the-parts-to-review-are-open.png"
+    },
+    {
+      "test": "what the build wrote is collapsed",
+      "file": "02-what-the-build-wrote-is-collapsed.png"
+    }
+  ]
+}

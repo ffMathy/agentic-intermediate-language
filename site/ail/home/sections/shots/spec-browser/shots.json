@@ -1,0 +1,33 @@
+{
+  "node": "SpecBrowser",
+  "shots": [
+    {
+      "test": "the demo's spec is shown first",
+      "file": "01-the-demo-s-spec-is-shown-first.png"
+    },
+    {
+      "test": "picking another file",
+      "file": "02-picking-another-file.png"
+    },
+    {
+      "test": "showing this website's spec",
+      "file": "03-showing-this-website-s-spec.png"
+    },
+    {
+      "test": "a screenshot beside its spec",
+      "file": "04-a-screenshot-beside-its-spec.png"
+    },
+    {
+      "test": "opened from a link",
+      "file": "05-opened-from-a-link.png"
+    },
+    {
+      "test": "the language is defined",
+      "file": "06-the-language-is-defined.png"
+    },
+    {
+      "test": "following the same link twice",
+      "file": "07-following-the-same-link-twice.png"
+    }
+  ]
+}

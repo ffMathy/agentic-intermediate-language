@@ -1,91 +1,95 @@
-// ail-derived-from: SpecBrowser@f8842ef1e833024b
+// ail-derived-from: SpecBrowser@8838cacf10d65b22
 import { afterEach, beforeEach, expect, test } from "bun:test";
 import { act, cleanup, fireEvent, render, screen, within } from "@testing-library/react";
 import { SpecBrowser } from "../../../src/gen/home/sections/spec-browser";
 import { specProjects } from "../../../src/gen/spec";
 
-const clearHash = (): void => {
-  window.history.replaceState(null, "", window.location.pathname + window.location.search);
-};
-
 beforeEach(() => {
-  clearHash();
   if (typeof Element.prototype.scrollIntoView !== "function") {
     Element.prototype.scrollIntoView = () => {};
   }
+  window.location.hash = "";
 });
 
 afterEach(() => {
   cleanup();
-  clearHash();
+  window.location.hash = "";
 });
 
-const pressed = (el: HTMLElement): string | null => el.getAttribute("aria-pressed");
+function isPicked(name: string): boolean {
+  return screen.getByRole("button", { name }).getAttribute("aria-pressed") === "true";
+}
 
-const fileButton = (path: string): HTMLElement => screen.getByRole("button", { name: path });
+function regionContains(name: string, text: string): boolean {
+  return screen
+    .getAllByRole("region", { name })
+    .some((region) => (region.textContent ?? "").includes(text));
+}
 
-const folderRow = (folder: string): HTMLElement => {
-  const matches = screen.getAllByText((_content, el) => {
-    if (!el) return false;
-    const tag = el.tagName.toLowerCase();
-    if (tag === "option" || tag === "optgroup" || tag === "select") return false;
-    if (el.textContent !== folder) return false;
-    return !Array.from(el.children).some((child) => child.textContent === folder);
-  });
-  return matches[0];
-};
+function deepestWithText(text: string): Element[] {
+  return Array.from(document.body.querySelectorAll("*")).filter(
+    (el) =>
+      (el.textContent ?? "").trim() === text &&
+      !Array.from(el.children).some((child) => (child.textContent ?? "").trim() === text),
+  );
+}
 
 test("the demo's spec is shown first", () => {
   render(<SpecBrowser />);
-  expect(pressed(screen.getByRole("button", { name: "Tic-Tac-Toe demo" }))).toBe("true");
-  expect(pressed(fileButton("tictactoe.ail.md"))).toBe("true");
-  const region = screen.getByRole("region", { name: "Source of tictactoe.ail.md" });
-  expect(region.textContent ?? "").toContain("node TicTacToe : system");
+  expect(isPicked("Tic-Tac-Toe demo")).toBe(true);
+  expect(isPicked("tictactoe.ail.md")).toBe(true);
+  expect(regionContains("Source of tictactoe.ail.md", "node TicTacToe : system")).toBe(true);
 });
 
 test("picking another file", () => {
   render(<SpecBrowser />);
-  fireEvent.click(fileButton("board/board.ail.md"));
-  expect(pressed(fileButton("board/board.ail.md"))).toBe("true");
-  expect(pressed(fileButton("tictactoe.ail.md"))).not.toBe("true");
-  const region = screen.getByRole("region", { name: "Source of board/board.ail.md" });
-  expect(region.textContent ?? "").toContain("node BoardView : view");
+  fireEvent.click(screen.getByRole("button", { name: "board/board-view.ail.md" }));
+  expect(isPicked("board/board-view.ail.md")).toBe(true);
+  expect(isPicked("tictactoe.ail.md")).toBe(false);
+  expect(regionContains("Source of board/board-view.ail.md", "node BoardView : view")).toBe(true);
 });
 
 test("showing this website's spec", () => {
-  const { container } = render(<SpecBrowser />);
-  fireEvent.click(screen.getByRole("button", { name: "This website" }));
-  expect(pressed(screen.getByRole("button", { name: "This website" }))).toBe("true");
-  expect(pressed(screen.getByRole("button", { name: "Tic-Tac-Toe demo" }))).not.toBe("true");
   const site = specProjects.find((p) => p.key === "site");
   expect(site).toBeDefined();
   if (!site) return;
-  expect(pressed(fileButton(site.files[0].path))).toBe("true");
-  expect(container.textContent ?? "").toContain(
-    `${site.nodeCount} nodes in ${site.files.length} files`,
+  render(<SpecBrowser />);
+  fireEvent.click(screen.getByRole("button", { name: "This website" }));
+  expect(isPicked("This website")).toBe(true);
+  expect(isPicked(site.files[0].path)).toBe(true);
+  const sizeText = `${site.nodeCount} nodes in ${site.files.length} files`;
+  const sizeLines = Array.from(document.body.querySelectorAll("p")).filter((p) =>
+    (p.textContent ?? "").trim().startsWith(sizeText),
   );
+  expect(sizeLines.length).toBeGreaterThan(0);
 });
 
 test("a screenshot beside its spec", () => {
   render(<SpecBrowser />);
   const shotPath = "board/shots/board-view/01-picking-an-empty-square.png";
-  fireEvent.click(fileButton(shotPath));
-  expect(pressed(fileButton(shotPath))).toBe("true");
+  fireEvent.click(screen.getByRole("button", { name: shotPath }));
+  expect(isPicked(shotPath)).toBe(true);
   expect(
     screen.getByRole("img", {
       name: "Screenshot at the end of the check “picking an empty square”",
     }),
   ).toBeTruthy();
-  const boardFile = fileButton("board/board.ail.md");
-  const folder = folderRow("board/shots/board-view/");
-  expect(boardFile.compareDocumentPosition(folder) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
+  const fileButton = screen.getByRole("button", { name: "board/board-view.ail.md" });
+  const folders = deepestWithText("board/shots/board-view/");
+  expect(folders.length).toBeGreaterThan(0);
+  expect(
+    folders.some(
+      (folder) =>
+        (fileButton.compareDocumentPosition(folder) & Node.DOCUMENT_POSITION_FOLLOWING) !== 0,
+    ),
+  ).toBe(true);
 });
 
 test("opened from a link", () => {
   window.location.hash = "#spec/tictactoe/app/play/play.ail.md";
   render(<SpecBrowser />);
-  expect(pressed(screen.getByRole("button", { name: "Tic-Tac-Toe demo" }))).toBe("true");
-  expect(pressed(fileButton("app/play/play.ail.md"))).toBe("true");
+  expect(isPicked("Tic-Tac-Toe demo")).toBe(true);
+  expect(isPicked("app/play/play.ail.md")).toBe(true);
 });
 
 test("the language is defined", () => {
@@ -102,18 +106,15 @@ test("the language is defined", () => {
 test("following the same link twice", () => {
   window.location.hash = "#spec/tictactoe/app/play/play.ail.md";
   render(<SpecBrowser />);
-  fireEvent.click(fileButton("tictactoe.ail.md"));
-  expect(pressed(fileButton("tictactoe.ail.md"))).toBe("true");
-  const anchor = document.createElement("a");
-  anchor.setAttribute("href", "#spec/tictactoe/app/play/play.ail.md");
-  anchor.textContent = "Open play";
-  document.body.appendChild(anchor);
-  try {
-    act(() => {
-      fireEvent.click(anchor);
-    });
-    expect(pressed(fileButton("app/play/play.ail.md"))).toBe("true");
-  } finally {
-    anchor.remove();
-  }
+  fireEvent.click(screen.getByRole("button", { name: "tictactoe.ail.md" }));
+  expect(isPicked("tictactoe.ail.md")).toBe(true);
+  const link = document.createElement("a");
+  link.setAttribute("href", "#spec/tictactoe/app/play/play.ail.md");
+  link.textContent = "Open play";
+  document.body.appendChild(link);
+  act(() => {
+    fireEvent.click(link);
+  });
+  expect(isPicked("app/play/play.ail.md")).toBe(true);
+  link.remove();
 });

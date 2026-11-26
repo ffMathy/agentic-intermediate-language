@@ -12,8 +12,8 @@ node SpecTree : flow   level: experience
     at 600px viewport width or more, a list of folders and files; below it, a drop-down of the same files
     whenever the picked path changes, the list scrolls so the picked file is in view, without moving the page
     Scenario: screenshots beside their spec
-      Given the files "app/app.ail.md", "app/play/play.ail.md" and "board/board.ail.md", the shots "app/shots/app/01-a.png" and "board/shots/board-view/01-b.png", and the picked path "board/board.ail.md"
-      Then the list reads, in order: the folder "app/", "app.ail.md", the folder "app/shots/app/", "01-a.png", the folder "app/play/", "play.ail.md", the folder "board/", "board.ail.md", the folder "board/shots/board-view/", "01-b.png"
+      Given the files "app/app.ail.md", "app/play/play.ail.md" and "board/board.ail.md", the shots "app/shots/01-a.png" and "board/shots/board-view/01-b.png", and the picked path "board/board.ail.md"
+      Then the list reads, in order: the folder "app/", "app.ail.md", the folder "app/shots/", "01-a.png", the folder "app/play/", "play.ail.md", the folder "board/", "board.ail.md", the folder "board/shots/board-view/", "01-b.png"
       And "board/board.ail.md" is shown as picked
   look
     explorer  a nav with class "ail-wide" named by tree.files: flex 1 1 220px, max-height clamp(200px, 40vw, 560px), overflow-y auto, background color.code.side, pad space.2 0, box-sizing border-box

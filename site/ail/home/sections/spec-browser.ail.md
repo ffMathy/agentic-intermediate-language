@@ -25,9 +25,9 @@ node SpecBrowser : flow   level: experience
       And the region named "Source of tictactoe.ail.md" contains "node TicTacToe : system"
     Scenario: picking another file
       Given the page is open
-      When the visitor picks the file "board/board.ail.md"
-      Then "board/board.ail.md" is shown as picked and "tictactoe.ail.md" is not
-      And the region named "Source of board/board.ail.md" contains "node BoardView : view"
+      When the visitor picks the file "board/board-view.ail.md"
+      Then "board/board-view.ail.md" is shown as picked and "tictactoe.ail.md" is not
+      And the region named "Source of board/board-view.ail.md" contains "node BoardView : view"
     Scenario: showing this website's spec
       Given the page is open
       When the visitor picks the project "This website"
@@ -38,7 +38,7 @@ node SpecBrowser : flow   level: experience
       When the visitor picks the file "board/shots/board-view/01-picking-an-empty-square.png"
       Then that file is shown as picked
       And the image named "Screenshot at the end of the check “picking an empty square”" is shown
-      And the folder "board/shots/board-view/" is listed after the file "board/board.ail.md"
+      And the folder "board/shots/board-view/" is listed after the file "board/board-view.ail.md"
     Scenario: opened from a link
       Given the page address ends with "#spec/tictactoe/app/play/play.ail.md"
       When the page opens

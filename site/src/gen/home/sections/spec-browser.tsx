@@ -7,7 +7,10 @@ import { SpecShot } from "../../parts/spec-shot";
 import { Stack } from "../../parts/stack";
 import { SpecTree } from "./spec-tree";
 
-/** Reading real specs is the fastest way to learn AIL, so both example specs can be browsed the way developers read code. */
+const languageHref =
+  "https://github.com/ffMathy/agentic-intermediate-language/blob/main/docs/language.md";
+
+/** "both example specs can be browsed the way developers read code" */
 export function SpecBrowser() {
   const [project, setProject] = useState<string>("tictactoe");
   const [file, setFile] = useState<string>("tictactoe.ail.md");
@@ -24,13 +27,13 @@ export function SpecBrowser() {
       }
       const key = rest.slice(0, slash);
       const path = rest.slice(slash + 1);
-      const target = specProjects.find((p) => p.key === key);
-      if (!target) {
+      const entry = specProjects.find((p) => p.key === key);
+      if (!entry) {
         return;
       }
       const known =
-        target.files.some((f) => f.path === path) ||
-        target.shots.some((s) => s.path === path);
+        entry.files.some((f) => f.path === path) ||
+        entry.shots.some((s) => s.path === path);
       if (!known) {
         return;
       }
@@ -47,10 +50,7 @@ export function SpecBrowser() {
         return;
       }
       const anchor = target.closest("a");
-      if (!anchor) {
-        return;
-      }
-      const href = anchor.getAttribute("href");
+      const href = anchor ? anchor.getAttribute("href") : null;
       if (href !== null && href.startsWith("#spec/")) {
         open(href);
       }
@@ -68,13 +68,24 @@ export function SpecBrowser() {
   const files = shown ? shown.files : [];
   const shots = shown ? shown.shots : [];
   const pickedFile = files.find((f) => f.path === file);
-  const pickedShot = shots.find((s) => s.path === file);
+  const pickedShot = pickedFile ? undefined : shots.find((s) => s.path === file);
 
   const showProject = (key: string) => {
-    const next = specProjects.find((p) => p.key === key);
+    if (key === project) {
+      return;
+    }
+    const entry = specProjects.find((p) => p.key === key);
+    if (!entry) {
+      return;
+    }
     setProject(key);
-    setFile(next?.files[0]?.path ?? "");
+    setFile(entry.files.length > 0 ? entry.files[0].path : "");
   };
+
+  const sizeText = "{nodes} nodes in {files} files, {shots} screenshots"
+    .replace("{nodes}", String(shown ? shown.nodeCount : 0))
+    .replace("{files}", String(files.length))
+    .replace("{shots}", String(shots.length));
 
   return (
     <Section id="specs" tone="raised">
@@ -145,11 +156,7 @@ export function SpecBrowser() {
                     key={p.key}
                     type="button"
                     aria-pressed={picked}
-                    onClick={() => {
-                      if (!picked) {
-                        showProject(p.key);
-                      }
-                    }}
+                    onClick={() => showProject(p.key)}
                     style={{
                       fontSize: "var(--font-small)",
                       fontWeight: 600,
@@ -176,7 +183,7 @@ export function SpecBrowser() {
                 color: "var(--color-code-muted)",
               }}
             >
-              {`${shown ? shown.nodeCount : 0} nodes in ${files.length} files, ${shots.length} screenshots`}
+              {sizeText}
             </p>
           </div>
           <div style={{ display: "flex", flexWrap: "wrap" }}>
@@ -198,8 +205,8 @@ export function SpecBrowser() {
               {pickedFile ? (
                 <SpecEditor
                   text={pickedFile.text}
-                  path={`${project}/${file}`}
-                  label={`Source of ${file}`}
+                  path={project + "/" + file}
+                  label={"Source of {path}".replace("{path}", file)}
                 />
               ) : pickedShot ? (
                 <SpecShot
@@ -223,7 +230,7 @@ export function SpecBrowser() {
         >
           {"Every section, the notation for types and values, and the rules ail build enforces are in "}
           <a
-            href="https://github.com/ffMathy/agentic-intermediate-language/blob/main/docs/language.md"
+            href={languageHref}
             style={{
               color: "var(--color-accent)",
               fontWeight: 600,

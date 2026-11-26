@@ -42,6 +42,8 @@ export interface BuildResult { ok: boolean; text: string; outcomes: CompileOutco
 export async function build(p: Project, o: BuildOptions = {}): Promise<BuildResult> {
   const log = o.log ?? (() => {});
   const names = o.names ?? [];
+  // The commit this build runs on, before it writes anything of its own.
+  const head = buildHead(p);
   const errors = lint(p).filter((d) => d.severity === "error");
   if (errors.length) return { ok: false, text: formatDiagnostics(errors) + "\n\nfix the spec before building", outcomes: [], check: null, stopped: false };
   const jobs = o.jobs ?? 4;
@@ -118,7 +120,7 @@ export async function build(p: Project, o: BuildOptions = {}): Promise<BuildResu
   if (stopped) sections.push("The spec doesn't decide the questions above. Answer them in the .ail.md files, then build again.");
   const text = sections.filter(Boolean).join("\n\n");
   // Saved for `ail show checks`, which puts them in a pull request's description.
-  writeReport(lastReportPath(p), { ok, check: report, e2e: e2e ?? null, text, affected, ...buildHead(p) });
+  writeReport(lastReportPath(p), { ok, check: report, e2e: e2e ?? null, text, affected, ...head });
   return { ok, text, outcomes: out, check: report, stopped, e2e };
 }
 

@@ -1,13 +1,13 @@
 import { useRef, useState } from "react";
 import type { KeyboardEvent } from "react";
-import { Section } from "../../parts/section";
-import { SectionHeading } from "../../parts/section-heading";
-import { Stack } from "../../parts/stack";
-import { ReadersTree } from "./readers-tree";
+import { Section } from "../../parts/section/section";
+import { SectionHeading } from "../../parts/section-heading/section-heading";
+import { Stack } from "../../parts/stack/stack";
+import { ReadersTree } from "./readers-tree/readers-tree";
 
 type Reader = "stakeholder" | "design" | "engineer" | "specialist";
 
-const readers: Reader[] = ["stakeholder", "design", "engineer", "specialist"];
+const order: Reader[] = ["stakeholder", "design", "engineer", "specialist"];
 
 const names: Record<Reader, string> = {
   stakeholder: "Stakeholder",
@@ -41,22 +41,28 @@ const colors: Record<Reader, string> = {
   specialist: "var(--color-level-specialist)",
 };
 
-/** "four tabs, "Stakeholder", "Design", "Engineer" and "Specialist", named together as "Readers"; "Stakeholder" is picked first" */
+/** Four tabs, "Stakeholder", "Design", "Engineer" and "Specialist", named together as "Readers"; "Stakeholder" is picked first. */
 export function Readers() {
   const [reader, setReader] = useState<Reader>("stakeholder");
-  const tabRefs = useRef<(HTMLButtonElement | null)[]>([]);
+  const tabRefs = useRef<Record<Reader, HTMLButtonElement | null>>({
+    stakeholder: null,
+    design: null,
+    engineer: null,
+    specialist: null,
+  });
 
-  const onKeyDown = (event: KeyboardEvent<HTMLButtonElement>, index: number) => {
-    let next: number;
+  const onKeyDown = (event: KeyboardEvent<HTMLButtonElement>, key: Reader) => {
+    const index = order.indexOf(key);
+    let next: Reader | null = null;
     if (event.key === "ArrowRight") {
-      next = (index + 1) % readers.length;
+      next = order[(index + 1) % order.length];
     } else if (event.key === "ArrowLeft") {
-      next = (index - 1 + readers.length) % readers.length;
-    } else {
-      return;
+      next = order[(index - 1 + order.length) % order.length];
     }
-    setReader(readers[next]);
-    tabRefs.current[next]?.focus();
+    if (next !== null) {
+      setReader(next);
+      tabRefs.current[next]?.focus();
+    }
   };
 
   return (
@@ -75,22 +81,22 @@ export function Readers() {
           maxWidth: "640px",
         }}
       >
-        {readers.map((key, index) => {
+        {order.map((key) => {
           const picked = key === reader;
           return (
             <button
               key={key}
-              ref={(element) => {
-                tabRefs.current[index] = element;
-              }}
               type="button"
               role="tab"
               id={`reader-tab-${key}`}
               aria-selected={picked}
               aria-controls="reader-panel"
               tabIndex={picked ? 0 : -1}
+              ref={(element) => {
+                tabRefs.current[key] = element;
+              }}
               onClick={() => setReader(key)}
-              onKeyDown={(event) => onKeyDown(event, index)}
+              onKeyDown={(event) => onKeyDown(event, key)}
               style={{
                 height: "44px",
                 padding: "0 var(--space-4)",

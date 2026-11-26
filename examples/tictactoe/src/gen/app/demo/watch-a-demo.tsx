@@ -1,11 +1,11 @@
 import { useEffect, useReducer } from "react";
-import { StatusLine } from "../../board/status-line";
-import { BoardView } from "../../board/board-view";
-import { initial } from "../../engine/game-state";
-import { reduce } from "../../engine/game-reducer";
+import { StatusLine } from "../../board/status-line/status-line";
+import { BoardView } from "../../board/board-view/board-view";
+import { initial } from "../../engine/game-state/game-state";
+import { reduce } from "../../engine/game-reducer/game-reducer";
 import { choose } from "../../engine/computer-player/computer-player";
-import { Stack } from "../../ui/stack";
-import { Button } from "../../ui/button";
+import { Stack } from "../../ui/stack/stack";
+import { Button } from "../../ui/button/button";
 
 /** the computer plays both marks, one move every 600 ms, starting with X */
 export function WatchADemo() {

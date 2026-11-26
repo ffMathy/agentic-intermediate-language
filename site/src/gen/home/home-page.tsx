@@ -1,6 +1,6 @@
-import { TopBar } from "./sections/top-bar";
+import { TopBar } from "./sections/top-bar/top-bar";
 import { Hero } from "./hero/hero";
-import { GapStrip } from "./sections/gap-strip";
+import { GapStrip } from "./sections/gap-strip/gap-strip";
 import { TreeSection } from "./tree/tree-section";
 import { Journey } from "./journey/journey";
 import { WatchSection } from "./watch/watch-section";
@@ -8,9 +8,9 @@ import { Readers } from "./readers/readers";
 import { BuildLoop } from "./build-loop/build-loop";
 import { ReviewSection } from "./review/review-section";
 import { AdoptSection } from "./adopt/adopt-section";
-import { SpecBrowser } from "./sections/spec-browser";
-import { GetStarted } from "./sections/get-started";
-import { Footer } from "./sections/footer";
+import { SpecBrowser } from "./sections/spec-browser/spec-browser";
+import { GetStarted } from "./sections/get-started/get-started";
+import { Footer } from "./sections/footer/footer";
 
 /** the parts appear in this order: TopBar, Hero, GapStrip, TreeSection, Journey, WatchSection, Readers, BuildLoop, ReviewSection, AdoptSection, SpecBrowser, GetStarted, Footer */
 export function HomePage() {

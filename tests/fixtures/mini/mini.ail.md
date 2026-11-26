@@ -10,7 +10,7 @@ target
   generated  src/gen/**
 ```
 
-More nodes in this folder, each in a file of its own: [`Add`](add.ail.md), [`Pick`](pick.ail.md).
+More nodes, each in a folder of its own: [`Add`](add/add.ail.md), [`Pick`](pick/pick.ail.md).
 
 ```ail
 node Calc : system   level: product

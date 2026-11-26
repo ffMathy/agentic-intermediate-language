@@ -4,7 +4,7 @@ The few building blocks every screen is made of. They are ordinary nodes,
 specified and compiled like the rest of the game. Only the variants the game
 actually uses exist.
 
-More nodes in this folder, each in a file of its own: [`Stack`](stack.ail.md), [`Text`](text.ail.md), [`Button`](button.ail.md), [`Segmented`](segmented.ail.md).
+More nodes, each in a folder of its own: [`Stack`](stack/stack.ail.md), [`Text`](text/text.ail.md), [`Button`](button/button.ail.md), [`Segmented`](segmented/segmented.ail.md).
 
 ```ail
 node UiKit : library   level: experience

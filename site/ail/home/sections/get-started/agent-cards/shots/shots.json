@@ -1,0 +1,13 @@
+{
+  "node": "AgentCards",
+  "shots": [
+    {
+      "test": "in Cursor",
+      "file": "01-in-cursor.png"
+    },
+    {
+      "test": "in GitHub Copilot",
+      "file": "02-in-github-copilot.png"
+    }
+  ]
+}

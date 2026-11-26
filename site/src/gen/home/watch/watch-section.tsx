@@ -1,8 +1,8 @@
-import { Section } from "../../parts/section";
-import { SectionHeading } from "../../parts/section-heading";
-import { WalkthroughPlayer } from "./walkthrough-player";
+import { Section } from "../../parts/section/section";
+import { SectionHeading } from "../../parts/section-heading/section-heading";
+import { WalkthroughPlayer } from "./walkthrough-player/walkthrough-player";
 
-/** an eyebrow, a heading and one sentence on what the two walkthroughs show, then the walkthrough player */
+/** the section has the id "watch", so the page can link to it */
 export function WatchSection() {
   return (
     <Section id="watch" tone="raised">

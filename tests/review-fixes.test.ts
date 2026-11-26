@@ -15,7 +15,7 @@ const edit = (dir: string, file: string, from: string, to: string) => {
   if (!s.includes(from)) throw new Error(`fixture lacks: ${from}`);
   writeFileSync(f, s.replace(from, to));
 };
-const ADD = "src/gen/add.ts";
+const ADD = "src/gen/add/add.ts";
 const goodAdd = "export function add(a: number, b: number): number {\n  return a + b;\n}";
 
 test("--jobs that isn't a positive integer is treated as 1, never as 'hang' or 'no limit'", () => {

@@ -70,7 +70,7 @@ test("a review across a spec move only shows what really changed", async () => {
   const git = (...a: string[]) => Bun.spawnSync(["git", "-c", "user.email=t@t", "-c", "user.name=t", ...a], { cwd: dir });
   git("init", "-q"); git("add", "-A"); git("commit", "-qm", "base");
   moveSpecInto(dir, "ail");
-  const f = join(dir, "ail/lib/price.ail.md");
+  const f = join(dir, "ail/lib/price/price.ail.md");
   writeFileSync(f, readFileSync(f, "utf8").replace("price(1999) => 19", "price(1999) => 19\n      price(0) => 0"));
   const r = renderReview(load(dir), "HEAD");
   expect(r).toContain("✎ Price");
@@ -111,7 +111,7 @@ test("a review prefers the project's own files over a same-named node elsewhere"
   const dir = tempProject("areas");
   moveSpecInto(dir, "spec");
   mkdirSync(join(dir, "fixtures"));
-  const lib = readFileSync(join(dir, "spec/lib/price.ail.md"), "utf8");
+  const lib = readFileSync(join(dir, "spec/lib/price/price.ail.md"), "utf8");
   writeFileSync(join(dir, "fixtures/price.ail.md"), lib.replace("price(1999) => 19", "price(1999) => 20"));
   const git = (...a: string[]) => Bun.spawnSync(["git", "-c", "user.email=t@t", "-c", "user.name=t", ...a], { cwd: dir });
   git("init", "-q"); git("add", "-A"); git("commit", "-qm", "base");

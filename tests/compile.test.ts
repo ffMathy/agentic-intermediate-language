@@ -7,8 +7,8 @@ import { getProvider } from "../src/providers/index.ts";
 import { verifyNode } from "../src/verify.ts";
 import { load, mockFile, reply, tempProject } from "./helpers.ts";
 
-const ADD = "src/gen/add.ts";
-const PICK = "src/gen/pick.ts";
+const ADD = "src/gen/add/add.ts";
+const PICK = "src/gen/pick/pick.ts";
 const goodAdd = `/** add(a, b) */\nexport function add(a: number, b: number): number {\n  return a + b;\n}`;
 const badAdd = `export function add(a: number, b: number): number {\n  return a - b;\n}`;
 const goodPick = `/** pick(xs) */\nexport function pick(xs: number[]): number {\n  return xs.indexOf(Math.max(...xs));\n}`;
@@ -53,7 +53,7 @@ test("submit: a node may only write its own file", () => {
   const p = load(dir);
   const r = submit(p, p.nodes.get("Add")!, { [ADD]: goodAdd, "src/gen/evil.ts": "x" });
   expect(r.ok).toBe(false);
-  expect(r.error).toContain("may only write src/gen/add.ts");
+  expect(r.error).toContain("may only write src/gen/add/add.ts");
 });
 
 test("submit: importing outside `uses` is rejected (encapsulation)", () => {
@@ -81,7 +81,7 @@ test("spec edits make exactly the affected nodes stale", async () => {
   const dir = tempProject();
   const provider = getProvider(`mock:${mockFile(dir, { Add: [reply(ADD, goodAdd)], Pick: [reply(PICK, goodPick)] })}`);
   await compile(load(dir), [], { provider });
-  const f = join(dir, "pick.ail.md");
+  const f = join(dir, "pick/pick.ail.md");
   writeFileSync(f, readFileSync(f, "utf8").replace("pick([1, 5, 2]) => 1", "pick([1, 5, 2]) => 1\n      pick([7]) => 0"));
   expect(plan(load(dir)).map((e) => [e.node, e.status])).toEqual([["Add", "fresh"], ["Pick", "stale"]]);
 });

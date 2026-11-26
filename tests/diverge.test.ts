@@ -4,13 +4,13 @@ import { diverge } from "../src/diverge.ts";
 import { getProvider } from "../src/providers/index.ts";
 import { load, mockFile, reply, tempProject } from "./helpers.ts";
 
-const PICK = "src/gen/pick.ts";
+const PICK = "src/gen/pick/pick.ts";
 const first = `export function pick(xs: number[]): number {\n  return xs.indexOf(Math.max(...xs));\n}`;
 /** Pick uses Add, so Add's module must exist before Pick can be verified. */
 function withAdd(): string {
   const dir = tempProject();
   const p = load(dir);
-  if (!submit(p, p.nodes.get("Add")!, { "src/gen/add.ts": "export function add(a: number, b: number): number {\n  return a + b;\n}\n" }).ok) throw new Error("setup");
+  if (!submit(p, p.nodes.get("Add")!, { "src/gen/add/add.ts": "export function add(a: number, b: number): number {\n  return a + b;\n}\n" }).ok) throw new Error("setup");
   return dir;
 }
 const last = `export function pick(xs: number[]): number {\n  return xs.lastIndexOf(Math.max(...xs));\n}`;

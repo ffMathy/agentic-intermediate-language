@@ -4,7 +4,7 @@ Why the spec is a tree, and why that matters for building it: every node is
 the same kind of task, and each is compiled on its own. The idea comes from
 Recursive Language Models (Zhang, Kraska and Khattab, MIT CSAIL).
 
-More nodes in this folder, each in a file of its own: [`TreeFigure`](tree-figure.ail.md).
+More nodes, each in a folder of its own: [`TreeFigure`](tree-figure/tree-figure.ail.md).
 
 ```ail
 node TreeSection : view   level: experience

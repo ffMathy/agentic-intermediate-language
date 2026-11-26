@@ -1,9 +1,9 @@
 // ail-derived-from: ComputerPlayer@882d0c5467192c53
 import { expect, test } from "bun:test";
 import { choose } from "../../../src/gen/engine/computer-player/computer-player";
-import { boardFrom } from "../../../src/gen/engine/game-state";
-import type { Board, Mark } from "../../../src/gen/engine/game-state";
-import { evaluate } from "../../../src/gen/engine/rules";
+import { boardFrom } from "../../../src/gen/engine/game-state/game-state";
+import type { Board, Mark } from "../../../src/gen/engine/game-state/game-state";
+import { evaluate } from "../../../src/gen/engine/rules/rules";
 
 function isEmpty(board: Board, index: number): boolean {
   const cell = board[index];

@@ -1,8 +1,8 @@
-import { Section } from "../../parts/section";
-import { Stack } from "../../parts/stack";
-import { HeroFigure } from "./hero-figure";
+import { Section } from "../../parts/section/section";
+import { Stack } from "../../parts/stack/stack";
+import { HeroFigure } from "./hero-figure/hero-figure";
 
-/** "an eyebrow, the page's only level 1 heading, a short explanation, three links and a note, beside a picture of the sentence sinking through the levels" */
+/** an eyebrow, the page's only level 1 heading, a short explanation, three links and a note, beside a picture of the sentence sinking through the levels */
 export function Hero() {
   return (
     <Section tone="plain">

@@ -3,7 +3,7 @@
 The same tree serves four audiences. Picking a reader shows what that reader
 reads and lights up the level written for them in the Tic-Tac-Toe tree.
 
-More nodes in this folder, each in a file of its own: [`ReadersTree`](readers-tree.ail.md).
+More nodes, each in a folder of its own: [`ReadersTree`](readers-tree/readers-tree.ail.md).
 
 ```ail
 node Readers : flow   level: experience

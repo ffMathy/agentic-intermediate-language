@@ -44,20 +44,20 @@ Each scenario becomes a test, and the screen the test ends on is committed besid
 
 ## A spec is a tree of small tasks
 
-![The Tic-Tac-Toe spec as a tree: TicTacToe, its App, BoardKit, Engine and UiKit, and their nodes](site/ail/home/tree/shots/tree-figure/01-the-picture.png)
+![The Tic-Tac-Toe spec as a tree: TicTacToe, its App, BoardKit, Engine and UiKit, and their nodes](site/ail/home/tree/tree-figure/shots/01-the-picture.png)
 
-One node per file, and folders mirror the tree. Screens sit beside the file they prove:
+Every node has a folder of its own, with its screens in `shots/`. Folders mirror the tree:
 
 ```
 ail/app/play/
-├── play.ail.md                  PlayAGame
-├── new-game-button.ail.md       NewGameButton
-├── choose-opponent.ail.md       ChooseOpponent
-└── shots/
-    ├── 01-x-always-starts.png …   PlayAGame (its file is named like the folder)
-    ├── e2e/                       PlayAGame, end to end
-    ├── new-game-button/           NewGameButton
-    └── choose-opponent/           ChooseOpponent
+├── play.ail.md                    PlayAGame
+├── shots/                         its screens: 01-x-always-starts.png …, e2e/
+├── new-game-button/
+│   ├── new-game-button.ail.md     NewGameButton
+│   └── shots/
+└── choose-opponent/
+    ├── choose-opponent.ail.md     ChooseOpponent
+    └── shots/
 ```
 
 ## How it builds
@@ -66,7 +66,7 @@ ail/app/play/
 
 ## What you review
 
-![A sample pull request: the spec diff and the screens are open, the generated code, checks and lock are collapsed](site/ail/home/review/shots/sample-pull-request/01-the-parts-to-review-are-open.png)
+![A sample pull request: the spec diff and the screens are open, the generated code, checks and lock are collapsed](site/ail/home/review/sample-pull-request/shots/01-the-parts-to-review-are-open.png)
 
 The spec and the screens. Generated code is committed but collapsed: mark it in `.gitattributes`.
 
@@ -99,7 +99,7 @@ Then ask for features in plain words. The agent changes the spec, never the code
 
 ## Adopt an existing app
 
-![An existing app is described by an AIL spec, which builds a new app; the same checks pass on both](site/ail/home/adopt/shots/adopt-figure/01-the-picture.png)
+![An existing app is described by an AIL spec, which builds a new app; the same checks pass on both](site/ail/home/adopt/adopt-figure/shots/01-the-picture.png)
 
 | | from |
 |---|---|

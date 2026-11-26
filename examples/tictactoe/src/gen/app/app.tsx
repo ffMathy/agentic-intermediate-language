@@ -1,12 +1,12 @@
 import { useState } from "react";
 import { PlayAGame } from "./play/play-a-game";
 import { WatchADemo } from "./demo/watch-a-demo";
-import { Stack } from "../ui/stack";
-import { Segmented } from "../ui/segmented";
+import { Stack } from "../ui/stack/stack";
+import { Segmented } from "../ui/segmented/segmented";
 
 type Area = "play" | "watch";
 
-const options: { value: Area; label: string }[] = [
+const modeOptions: { value: Area; label: string }[] = [
   { value: "play", label: "Play" },
   { value: "watch", label: "Watch" },
 ];
@@ -29,7 +29,7 @@ export function App() {
     >
       <Segmented
         label="Mode"
-        options={options}
+        options={modeOptions}
         value={area}
         onChange={(a: Area) => setArea(a)}
       />

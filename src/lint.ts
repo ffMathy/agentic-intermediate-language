@@ -78,9 +78,22 @@ export function lint(p: Project): Diagnostic[] {
   // Each spec folder's shots/ holds its proof screenshots, so a spec can't live in one.
   for (const f of p.files) if (f.file.split(/[\\/]/).slice(0, -1).includes(SHOTS))
     push("error", "reserved-folder", null, `a spec file can't be in a folder called "${SHOTS}": that name is where each spec folder keeps its proof screenshots. Rename the folder`, 1, f.file);
-  // A file named like its folder keeps its screenshots in shots/ itself, and their end-to-end ones in shots/e2e/.
-  for (const f of p.files) if (/(^|[\\/])e2e\.ail\.md$/.test(f.file))
-    push("error", "reserved-name", null, `a spec file can't be called e2e.ail.md: shots/e2e/ is where the node of the file named like its folder keeps its end-to-end screenshots. Rename the file`, 1, f.file);
+  // One spec file per folder: the folder is the node's place, with room beside it for its screenshots (shots/).
+  const byFolder = new Map<string, string[]>();
+  for (const f of p.files) {
+    const dir = posix.dirname(f.file.split("\\").join("/"));
+    byFolder.set(dir, [...(byFolder.get(dir) ?? []), f.file]);
+  }
+  for (const [dir, files] of byFolder) {
+    if (files.length < 2) continue;
+    // The file named like its folder may stay; any other moves into a folder of its own.
+    const own = files.find((f) => posix.basename(f, ".ail.md") === posix.basename(dir)) ?? files[0]!;
+    for (const f of files.filter((x) => x !== own)) {
+      const node = p.files.find((x) => x.file === f)?.nodes[0];
+      const name = node ? kebab(node.name) : posix.basename(f, ".ail.md");
+      push("error", "one-file-per-folder", node ?? null, `${f} shares its folder with ${own}: a folder holds one spec file, so each node has room for its screenshots. Move it into a folder of its own, ${posix.join(dir, name, name + ".ail.md")}`, 1, f);
+    }
+  }
   // One node per file: the file is the node's place, beside which its screenshots are kept.
   for (const f of p.files) for (const n of f.nodes.slice(1))
     push("error", "one-node-per-file", n, `${n.name} is not the only node in ${f.file}: a spec file holds one node. Move it into its own file, ${posix.join(posix.dirname(f.file), kebab(n.name) + ".ail.md")}`);
@@ -146,7 +159,7 @@ export function lint(p: Project): Diagnostic[] {
       if (/confirm with the owner/i.test(l)) push("warning", "open-question", n, `${n.name} has a reason nobody has confirmed yet: ${l.trim()}`, sec.line + i);
     const maxLines = p.config.maxNodeLines ?? 80;
     const size = n.raw.filter((l) => l.trim() !== "").length;
-    if (size > maxLines) push("warning", "node-too-large", n, `${n.name} spans ${size} lines (budget ${maxLines}); split it into children, e.g. in a ${n.dir ? n.dir + "/" : ""}${kebabName(n.name)}/ folder`);
+    if (size > maxLines) push("warning", "node-too-large", n, `${n.name} spans ${size} lines (budget ${maxLines}); split it into children, each in a folder of its own inside ${n.dir ? n.dir + "/" : "the spec root"}`);
 
     // --- why traceability -------------------------------------------------
     if (!n.why) push(lvl <= 1 ? "error" : "warning", "missing-why", n, `${n.name} has no \`why\``);

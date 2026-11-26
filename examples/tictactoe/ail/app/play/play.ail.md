@@ -2,7 +2,7 @@
 
 Two people, or one person and the computer, play a game.
 
-More nodes in this folder, each in a file of its own: [`NewGameButton`](new-game-button.ail.md), [`ChooseOpponent`](choose-opponent.ail.md).
+More nodes, each in a folder of its own: [`NewGameButton`](new-game-button/new-game-button.ail.md), [`ChooseOpponent`](choose-opponent/choose-opponent.ail.md).
 
 ```ail
 node PlayAGame : flow   level: experience

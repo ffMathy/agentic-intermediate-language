@@ -8,13 +8,18 @@
 //              from AIL notation (ailToJs)
 //   derived    tests derived once from scenarios/verify, pinned by oracle hash
 //   typecheck  tsc over the project, when TypeScript is installed
+//
+// A target in another language names its own checks: `checks.path` says where
+// a node's check file goes and `checks.run` how to run it (e.g. xUnit and
+// `dotnet test`). Its examples are then written into that check alongside the
+// scenarios, since they can't be translated mechanically into its language.
 import { existsSync, mkdirSync, readFileSync, readdirSync, writeFileSync } from "node:fs";
 import { dirname, join, normalize, relative, resolve } from "node:path";
 import { oracleHash } from "./hash.ts";
 
 import { fileHash, readLock } from "./lock.ts";
 import type { AilNode } from "./parse.ts";
-import { AIL_HOME, isCompilable, kebab, modulePath, specModulePath, topoByUses, type Project } from "./project.ts";
+import { AIL_HOME, expandPath, isCompilable, kebab, modulePath, specModulePath, topoByUses, type Project } from "./project.ts";
 
 export interface Check { kind: string; ok: boolean; severity: "error" | "warning"; detail: string }
 export interface VerifyResult { node: string; ok: boolean; checks: Check[] }
@@ -72,6 +77,8 @@ function allowedImports(p: Project, n: AilNode): { relative: Set<string>; packag
 }
 
 export function checkImports(p: Project, n: AilNode, source: string): Check {
+  // Imports are read in JavaScript's syntax; a target in another language relies on its own compiler.
+  if (foreignChecks(p)) return pass("imports", "not read for this target's language");
   const path = modulePath(p, n)!;
   const allowed = allowedImports(p, n);
   const bad: string[] = [];
@@ -133,7 +140,28 @@ export function examplesTestSource(p: Project, n: AilNode): string {
 
 export const checksDir = (p: Project) => join(p.root, p.config.checksDir ?? "checks");
 
+/**
+ * How a target in another language checks its nodes: `checks.path`, where a
+ * node's check goes, and `checks.run`, the command that runs it. Null for the
+ * default, bun tests in TypeScript.
+ */
+export function foreignChecks(p: Project): { path: string; run: string } | null {
+  const s = p.target?.settings ?? {};
+  return s["checks.path"] && s["checks.run"] ? { path: s["checks.path"], run: s["checks.run"] } : null;
+}
+
+/** The comment that starts a line in a check file, by its extension. */
+export const commentPrefix = (file: string) => (/\.(py|rb|sh|ps1|ya?ml|toml|r|pl|ex|exs|jl)$/i.test(file) ? "#" : "//");
+
+/** The `ail-derived-from` header line in any check file, whatever its comment syntax. */
+export const DERIVED_HEADER = /^(?:\/\/|#) ail-derived-from:\s*(\w+)@([0-9a-f]+)/;
+
 export function derivedCheckFile(p: Project, n: AilNode): { file: string | null; pinned: string | null } {
+  if (foreignChecks(p)) {
+    const file = join(p.root, checkPath(p, n));
+    if (!existsSync(file)) return { file: null, pinned: null };
+    return { file, pinned: DERIVED_HEADER.exec(readFileSync(file, "utf8"))?.[2] ?? null };
+  }
   const dir = join(checksDir(p), n.dir);
   if (!existsSync(dir)) return { file: null, pinned: null };
   const name = readdirSync(dir).find((f) => f === `${kebab(n.name)}.test.ts` || f === `${kebab(n.name)}.test.tsx`);
@@ -143,8 +171,18 @@ export function derivedCheckFile(p: Project, n: AilNode): { file: string | null;
   return { file, pinned };
 }
 
-export function needsDerivedCheck(n: AilNode): boolean {
-  return n.scenarios.length > 0 || n.sections.some((s) => s.key === "verify");
+/** Does the node need a derived check? With foreign checks, its examples go in it too. */
+export function needsDerivedCheck(n: AilNode, p?: Project): boolean {
+  return n.scenarios.length > 0 || n.sections.some((s) => s.key === "verify") || (!!p && !!foreignChecks(p) && n.examples.length > 0);
+}
+
+/** Run a target's own checks: `checks.run`, with {files}, {name}, {kebab} and {dir} filled in. Exit code 0 passes. */
+export function runForeignCheck(p: Project, n: AilNode, files: string[]): { ok: boolean; output: string } {
+  const cmd = foreignChecks(p)!.run
+    .replace(/\{files\}/g, files.map((f) => JSON.stringify(relative(p.root, f))).join(" "))
+    .replace(/\{name\}/g, n.name).replace(/\{kebab\}/g, kebab(n.name)).replace(/\{dir\}/g, n.dir);
+  const r = Bun.spawnSync(["sh", "-c", cmd], { cwd: p.root, env: { ...process.env, NO_COLOR: "1", FORCE_COLOR: "0" }, stdout: "pipe", stderr: "pipe" });
+  return { ok: r.exitCode === 0, output: (r.stdout.toString() + r.stderr.toString()).trim() };
 }
 
 export function verifyNode(p: Project, n: AilNode, opts: { checkDrift?: boolean } = {}): VerifyResult {
@@ -168,21 +206,26 @@ export function verifyNode(p: Project, n: AilNode, opts: { checkDrift?: boolean 
   checks.push(checkImports(p, n, readFileSync(abs, "utf8")));
 
   const testFiles: string[] = [];
-  if (n.examples.length) {
+  const foreign = foreignChecks(p);
+  if (n.examples.length && !foreign) {
     const dir = join(p.root, ".ail", "verify");
     mkdirSync(dir, { recursive: true });
     const f = join(dir, `${kebab(n.name)}.examples.test.ts`);
     writeFileSync(f, examplesTestSource(p, n));
     testFiles.push(f);
   }
-  if (needsDerivedCheck(n)) {
+  if (needsDerivedCheck(n, p)) {
     const { file, pinned } = derivedCheckFile(p, n);
     const want = oracleHash(p, n).slice(0, 16);
-    if (!file) checks.push(fail("derived", `scenarios/verify have no derived check; \`ail build\` derives it`, "warning"));
+    if (!file) checks.push(fail("derived", `${foreign ? "examples/" : ""}scenarios/verify have no derived check; \`ail build\` derives it`, foreign ? "error" : "warning"));
     else if (pinned !== want) checks.push(fail("derived", `${file.slice(p.root.length + 1)} was derived from an older spec (${pinned} ≠ ${want}); re-derive and review`));
     else testFiles.push(file);
   }
-  if (testFiles.length) {
+  if (testFiles.length && foreign) {
+    const r = runForeignCheck(p, n, testFiles);
+    const tail = r.output.split("\n").slice(-40).join("\n");
+    checks.push(r.ok ? pass("tests", tail.split("\n").filter(Boolean).at(-1) ?? "passed") : fail("tests", tail));
+  } else if (testFiles.length) {
     const r = runBunTest(p.root, testFiles);
     if (r.ok) checks.push(pass("tests", `${r.passes} passed`));
     else checks.push(fail("tests", r.failures.length ? `${r.failures.map((f) => "✗ " + f).join("\n")}\n${errorExcerpt(r.output)}` : r.output.trim().split("\n").slice(-25).join("\n")));
@@ -224,16 +267,18 @@ export function loadPrompt(name: string): string {
   return readFileSync(join(AIL_HOME, "prompts", `${name}.md`), "utf8").trim();
 }
 
-/** Where a node's derived check lives: checks/<dir>/<kebab>.test.ts(x). */
+/** Where a node's derived check lives: checks/<dir>/<kebab>.test.ts(x), or the target's `checks.path`. */
 export function checkPath(p: Project, n: AilNode): string {
+  const foreign = foreignChecks(p);
+  if (foreign) return expandPath(foreign.path, n);
   const ext = n.kind === "view" || n.kind === "flow" ? "tsx" : "ts";
   return relative(p.root, join(checksDir(p), n.dir, `${kebab(n.name)}.test.${ext}`));
 }
 
-export const checkHeader = (p: Project, n: AilNode) => `// ail-derived-from: ${n.name}@${oracleHash(p, n).slice(0, 16)}`;
+export const checkHeader = (p: Project, n: AilNode) => `${commentPrefix(checkPath(p, n))} ail-derived-from: ${n.name}@${oracleHash(p, n).slice(0, 16)}`;
 
 /** Make sure a derived check starts with the header pinning it to the current spec. */
 export function stampCheck(p: Project, n: AilNode, body: string): string {
   const header = checkHeader(p, n);
-  return body.startsWith("// ail-derived-from:") ? body.replace(/^.*\n/, header + "\n") : `${header}\n${body}`;
+  return DERIVED_HEADER.test(body) ? body.replace(/^.*\n/, header + "\n") : `${header}\n${body}`;
 }

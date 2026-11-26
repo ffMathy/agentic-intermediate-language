@@ -81,6 +81,9 @@ or `binds`, or move it one level down. Define domain words once in the
   tree. Generated code mirrors the folders.
 - A node over the size budget gets split into children in a subfolder named
   after it.
+- Code that stays hand-written (a framework's types, platform code, the parts
+  of an adopted app that aren't rebuilt) gets a node tagged `@existing` with
+  its `what`: never compiled, but the nodes that `use` it see its contract.
 - To share a node, give it one owner (a `library` node, e.g. `board/`) and
   list it under `uses` everywhere it's needed. Never give it two parents.
 

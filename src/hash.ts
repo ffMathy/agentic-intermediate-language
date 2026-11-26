@@ -71,6 +71,23 @@ export function compileHash(p: Project, n: AilNode): string {
   ].join("\n---\n"));
 }
 
+/**
+ * The hash of a node's spec alone: its compile hash without the target and the
+ * output paths. An adopted node has no generated code, so the target's
+ * conventions for generated code don't concern it; only this decides when it
+ * is out of date.
+ */
+export function specHash(p: Project, n: AilNode): string {
+  const deps = n.uses.map((u) => p.nodes.get(u)).filter(Boolean) as AilNode[];
+  return sha256([
+    "ail-spec-v1",
+    JSON.stringify(p.glossary.map((t) => [t.term, t.plain, t.formal])),
+    ...ancestors(p, n.name).map((a) => canonicalNode(a, ["why"])),
+    canonicalNode(n),
+    ...deps.map(contractOf).sort(),
+  ].join("\n---\n"));
+}
+
 /** Hash of what a node's derived checks were generated from. */
 export function oracleHash(p: Project, n: AilNode): string {
   const deps = n.uses.map((u) => p.nodes.get(u)).filter(Boolean) as AilNode[];

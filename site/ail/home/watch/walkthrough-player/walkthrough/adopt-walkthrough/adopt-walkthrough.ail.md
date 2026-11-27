@@ -2,7 +2,8 @@
 
 A team has an old Tic-Tac-Toe web app with no spec. Someone opens a new AIL
 project folder, `tictactoe-ail/`, next to it in Claude Code and asks
-`/ail:adopt` to bring its play screen under AIL, prove that the spec describes
+`/ail:adopt` to bring the whole app under AIL, one slice at a time starting
+with its play screen, prove that the spec describes
 the app, and then rebuild it on a new stack. Every output line is a real
 format of the tools; the old app, its folder, its start command and its
 `api` service are made up for the story. The screenshots are the demo's own,
@@ -14,7 +15,7 @@ More nodes, each in a folder of its own: [`AdoptFirstHalf`](adopt-first-half/ado
 node AdoptWalkthrough : data   level: system
   why   Show how an existing app comes under AIL, chapter by chapter, from the first request to the proof and a new stack.   <- WalkthroughPlayer
   what
-    ADOPT: Walkthrough = { command: "/ail:adopt ../legacy-tictactoe \"the play screen\"", place: "Claude Code · tictactoe-ail/", picture: "tictactoe-ail/ spec, written node by node", rest: "unwritten", beats: the five beats of ADOPT_FIRST_HALF, then the five of ADOPT_SECOND_HALF, in their order }
+    ADOPT: Walkthrough = { command: "/ail:adopt ../legacy-tictactoe", place: "Claude Code · tictactoe-ail/", picture: "tictactoe-ail/ spec, written node by node", rest: "unwritten", beats: the five beats of ADOPT_FIRST_HALF, then the five of ADOPT_SECOND_HALF, in their order }
     examples
       ADOPT.beats.length => 10
       totalSeconds(ADOPT) => 98

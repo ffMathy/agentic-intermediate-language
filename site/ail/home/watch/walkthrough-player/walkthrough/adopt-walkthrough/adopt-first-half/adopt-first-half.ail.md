@@ -6,8 +6,8 @@ node AdoptFirstHalf : data   level: system
   what
     ADOPT_FIRST_HALF: list of Beat = [
         { id: "ask", seconds: 6, branch: false, title: "An old app, no spec",
-          caption: "The app works, but nobody wrote down what it does or why. You point /ail:adopt at its code and name one slice to start with, never the whole app.",
-          lines: ["> /ail:adopt ../legacy-tictactoe \"the play screen\""],
+          caption: "The app works, but nobody wrote down what it does or why. You point /ail:adopt at its code. Name no part, and it adopts the whole app, one slice at a time, starting with the play screen.",
+          lines: ["> /ail:adopt ../legacy-tictactoe"],
           states: { "PlayAGame": "slice" },
           inset: { kind: "shot", node: "PlayAGame", test: "X always starts", label: "Your app today · localhost:3000" } },
         { id: "run-legacy", seconds: 11, branch: false, title: "Find out how it starts",

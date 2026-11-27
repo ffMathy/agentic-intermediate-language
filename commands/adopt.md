@@ -1,11 +1,14 @@
 ---
 description: Bring an existing app under AIL - write its spec from its people, its tickets, the running app and its code, then prove the spec describes it
-argument-hint: "[where the app's code is] [what to start with]"
+argument-hint: "[where the app's code is] [a part to adopt, or none for the whole app]"
 ---
 Bring an existing app under AIL, in reverse: the app exists, and you write
-the spec that describes it. Work on one slice at a time (a screen, a flow or a
-rule), never the whole app at once. Arguments: "$ARGUMENTS". Ask where the
-app's code is if that's missing.
+the spec that describes it. Adopt the whole app, unless the arguments or the
+user name a part of it: then adopt only that part. Either way, work through it
+one slice at a time (a screen, a flow or a rule), taking each slice through the
+steps below and proving it before starting the next, and keep going until
+every part is covered. Arguments: "$ARGUMENTS": where the app's code is, and
+optionally the part to adopt. Ask where the app's code is if that's missing.
 
 Follow the `ail` skill for how nodes are written. On top of it:
 

@@ -7,17 +7,24 @@ export const ADOPT_FIRST_HALF: Beat[] = [
     seconds: 6,
     branch: false,
     title: "An old app, no spec",
-    caption: "The app works, but nobody wrote down what it does or why. You point /ail:adopt at its code and name one slice to start with, never the whole app.",
-    lines: ["> /ail:adopt ../legacy-tictactoe \"the play screen\""],
+    caption:
+      "The app works, but nobody wrote down what it does or why. You point /ail:adopt at its code. Name no part, and it adopts the whole app, one slice at a time, starting with the play screen.",
+    lines: ["> /ail:adopt ../legacy-tictactoe"],
     states: { PlayAGame: "slice" },
-    inset: { kind: "shot", node: "PlayAGame", test: "X always starts", label: "Your app today · localhost:3000" },
+    inset: {
+      kind: "shot",
+      node: "PlayAGame",
+      test: "X always starts",
+      label: "Your app today · localhost:3000",
+    },
   },
   {
     id: "run-legacy",
     seconds: 11,
     branch: false,
     title: "Find out how it starts",
-    caption: "The agent works out how the app starts from its README, scripts, compose files and CI, and writes run.legacy. Services start first; each test makes its own data through the app.",
+    caption:
+      "The agent works out how the app starts from its README, scripts, compose files and CI, and writes run.legacy. Services start first; each test makes its own data through the app.",
     lines: [
       "  \"legacy\": {",
       "    \"cwd\": \"../legacy-tictactoe\",",
@@ -46,7 +53,8 @@ export const ADOPT_FIRST_HALF: Beat[] = [
     seconds: 9,
     branch: false,
     title: "Why, from people and tickets",
-    caption: "The reasons come from tickets, PRs, commit messages, and questions the agent asks you as if you owned the app. A reason nobody can confirm is written as unknown, never made up.",
+    caption:
+      "The reasons come from tickets, PRs, commit messages, and questions the agent asks you as if you owned the app. A reason nobody can confirm is written as unknown, never made up.",
     lines: [
       "  why   Make the game understandable without instructions.   <- App",
       "  how",
@@ -70,7 +78,8 @@ export const ADOPT_FIRST_HALF: Beat[] = [
     seconds: 10,
     branch: false,
     title: "What, from the running app",
-    caption: "The agent plays the app with Playwright. What it sees becomes scenarios with the exact on-screen text, quirks included. Text a part owns, like a button's label, goes in its node.",
+    caption:
+      "The agent plays the app with Playwright. What it sees becomes scenarios with the exact on-screen text, quirks included. Text a part owns, like a button's label, goes in its node.",
     lines: [
       "node PlayAGame : flow   level: experience",
       "  what",
@@ -88,14 +97,20 @@ export const ADOPT_FIRST_HALF: Beat[] = [
       BoardView: "writing",
       ChooseOpponent: "writing",
     },
-    inset: { kind: "shot", node: "PlayAGame", test: "winning", label: "Your app today · localhost:3000" },
+    inset: {
+      kind: "shot",
+      node: "PlayAGame",
+      test: "winning",
+      label: "Your app today · localhost:3000",
+    },
   },
   {
     id: "how",
     seconds: 9,
     branch: false,
     title: "How, from the code",
-    caption: "The code tells what the screen can't: data shapes, rules, edge cases and timing. Written in AIL, not the old language, it compiles to any stack. Each node lists its sources.",
+    caption:
+      "The code tells what the screen can't: data shapes, rules, edge cases and timing. Written in AIL, not the old language, it compiles to any stack. Each node lists its sources.",
     lines: [
       "  how",
       "    decide squares can't be picked while the computer is thinking",

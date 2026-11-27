@@ -1,4 +1,3 @@
-import { useId } from "react";
 import type { CSSProperties } from "react";
 import { Section } from "../../parts/section/section";
 import { SectionHeading } from "../../parts/section-heading/section-heading";
@@ -6,30 +5,43 @@ import { Stack } from "../../parts/stack/stack";
 import { CopyCommand } from "../../parts/copy-command/copy-command";
 import { AdoptFigure } from "./adopt-figure/adopt-figure";
 
-const steps = [
+const steps: { n: string; title: string; text: string; color: string }[] = [
   {
     n: "1",
-    color: "var(--color-level-product)",
     title: "Why, from people and tickets",
     text: "The reasons come from the task tracker (Asana, Jira, Linear) and from interviewing the people who own the app. A reason nobody can confirm is written down as unknown, and every build lists it until someone answers.",
+    color: "var(--color-level-product)",
   },
   {
     n: "2",
-    color: "var(--color-level-experience)",
     title: "What, from the running app",
     text: "An agent finds out how to start the app, whatever it is (a website, a mobile app on a simulator, a command-line tool), along with the backend or database it needs. Each scenario's test data is created through the app's own API, never straight into its database. Then it drives every screen and error path, and writes down what it sees, quirks included.",
+    color: "var(--color-level-experience)",
   },
   {
     n: "3",
-    color: "var(--color-level-system)",
     title: "How, from the code",
     text: "The code tells what the screen can't: data shapes, rules, edge cases and timing. Real inputs and outputs become examples, and every claim records where it came from.",
+    color: "var(--color-level-system)",
   },
   {
     n: "4",
-    color: "var(--color-pass)",
     title: "Proof, on the old app",
     text: "Every flow gets an end-to-end check that plays its scenarios on any platform. ail adopt starts the old app, runs them, and records the app as built, so the first build only builds what changes. Then each node with a look gets a derived check that renders the old app's own code and screenshots the screen each scenario ends on.",
+    color: "var(--color-pass)",
+  },
+];
+
+const cards: { title: string; cmd: string; text: string }[] = [
+  {
+    title: "In Claude Code, Cursor or Copilot",
+    cmd: "/ail:adopt",
+    text: "The agent writes the spec for the whole app, unless you name a part, one slice at a time: a screen, a flow or a rule. It asks you what only the owners know. In Cursor and Copilot, pick adopt from the / menu.",
+  },
+  {
+    title: "In a terminal",
+    cmd: "ail adopt",
+    text: "Starts the app as ail.config.json says, runs every end-to-end check against it, and stops it.",
   },
 ];
 
@@ -67,7 +79,7 @@ const numberStyle: CSSProperties = {
   lineHeight: 1,
 };
 
-const stepTitleStyle: CSSProperties = {
+const titleStyle: CSSProperties = {
   fontSize: "var(--font-lead)",
   fontWeight: 700,
   color: "var(--color-text)",
@@ -95,13 +107,6 @@ const cardStyle: CSSProperties = {
   minWidth: 0,
 };
 
-const cardTitleStyle: CSSProperties = {
-  fontSize: "var(--font-lead)",
-  fontWeight: 700,
-  color: "var(--color-text)",
-  margin: 0,
-};
-
 const cardTextStyle: CSSProperties = {
   fontSize: "var(--font-small)",
   lineHeight: 1.6,
@@ -116,21 +121,6 @@ const noteStyle: CSSProperties = {
   maxWidth: "var(--width-prose)",
   margin: 0,
 };
-
-function CommandCard(props: { title: string; command: string; text: string }) {
-  const titleId = useId();
-  return (
-    <section aria-labelledby={titleId} style={cardStyle}>
-      <Stack dir="v" gap="space.3" align="stretch">
-        <h3 id={titleId} style={cardTitleStyle}>
-          {props.title}
-        </h3>
-        <CopyCommand command={props.command} />
-        <p style={cardTextStyle}>{props.text}</p>
-      </Stack>
-    </section>
-  );
-}
 
 /** "a heading, a picture of an old app and a new app checked against the same spec, four steps that write and prove the spec, and the two commands that do it" */
 export function AdoptSection() {
@@ -149,22 +139,26 @@ export function AdoptSection() {
           {steps.map((step) => (
             <li key={step.n} style={stepStyle}>
               <span style={{ ...numberStyle, color: step.color }}>{step.n}</span>
-              <h3 style={stepTitleStyle}>{step.title}</h3>
+              <h3 style={titleStyle}>{step.title}</h3>
               <p style={stepTextStyle}>{step.text}</p>
             </li>
           ))}
         </ol>
         <div style={commandsStyle}>
-          <CommandCard
-            title="In Claude Code, Cursor or Copilot"
-            command="/ail:adopt"
-            text="The agent writes the spec one slice at a time: a screen, a flow or a rule. It asks you what only the owners know. In Cursor and Copilot, pick adopt from the / menu."
-          />
-          <CommandCard
-            title="In a terminal"
-            command="ail adopt"
-            text="Starts the app as ail.config.json says, runs every end-to-end check against it, and stops it."
-          />
+          {cards.map((card) => (
+            <div
+              key={card.cmd}
+              role="region"
+              aria-label={card.title}
+              style={cardStyle}
+            >
+              <Stack dir="v" gap="space.3" align="stretch">
+                <h3 style={titleStyle}>{card.title}</h3>
+                <CopyCommand command={card.cmd} />
+                <p style={cardTextStyle}>{card.text}</p>
+              </Stack>
+            </div>
+          ))}
         </div>
         <p style={noteStyle}>
           To move to another technology, change the spec's target and build. Every build then runs the same end-to-end checks against the new app, so it is proven to behave like the old one.

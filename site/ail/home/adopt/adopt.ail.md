@@ -51,7 +51,7 @@ node AdoptSection : view   level: experience
     adopt.4.text      "Every flow gets an end-to-end check that plays its scenarios on any platform. ail adopt starts the old app, runs them, and records the app as built, so the first build only builds what changes. Then each node with a look gets a derived check that renders the old app's own code and screenshots the screen each scenario ends on."
     adopt.claude.title  "In Claude Code, Cursor or Copilot"
     adopt.claude.cmd    "/ail:adopt"
-    adopt.claude.text   "The agent writes the spec one slice at a time: a screen, a flow or a rule. It asks you what only the owners know. In Cursor and Copilot, pick adopt from the / menu."
+    adopt.claude.text   "The agent writes the spec for the whole app, unless you name a part, one slice at a time: a screen, a flow or a rule. It asks you what only the owners know. In Cursor and Copilot, pick adopt from the / menu."
     adopt.cli.title     "In a terminal"
     adopt.cli.cmd       "ail adopt"
     adopt.cli.text      "Starts the app as ail.config.json says, runs every end-to-end check against it, and stops it."

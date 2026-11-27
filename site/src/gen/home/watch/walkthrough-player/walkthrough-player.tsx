@@ -1,7 +1,6 @@
 import { useEffect, useState } from "react";
 import type { CSSProperties } from "react";
 import { chapterStart, clock, linesShown, totalSeconds } from "./walkthrough/walkthrough";
-import type { Walkthrough } from "./walkthrough/walkthrough";
 import { BUILD } from "./walkthrough/build-walkthrough/build-walkthrough";
 import { ADOPT } from "./walkthrough/adopt-walkthrough/adopt-walkthrough";
 import { WalkTitleBar } from "./walk-title-bar/walk-title-bar";
@@ -10,6 +9,8 @@ import { WalkPicture } from "./walk-picture/walk-picture";
 import { WalkCaption } from "./walk-caption/walk-caption";
 import { WalkControls } from "./walk-controls/walk-controls";
 import { WalkTimeline } from "./walk-timeline/walk-timeline";
+
+type Tab = "build" | "adopt";
 
 const windowStyle: CSSProperties = {
   borderRadius: "var(--radius-lg)",
@@ -66,38 +67,38 @@ const timelineStyle: CSSProperties = {
 
 /** "a dark player window with two walkthroughs as tabs, "ail build" and "ail adopt"; "ail build" is shown first" */
 export function WalkthroughPlayer() {
-  const [tab, setTab] = useState<"build" | "adopt">("build");
+  const [tab, setTab] = useState<Tab>("build");
   const [chapter, setChapter] = useState<number>(0);
   const [elapsed, setElapsed] = useState<number>(0);
   const [playing, setPlaying] = useState<boolean>(false);
   const [started, setStarted] = useState<boolean>(false);
 
-  const w: Walkthrough = tab === "build" ? BUILD : ADOPT;
+  const w = tab === "build" ? BUILD : ADOPT;
   const beat = w.beats[chapter];
   const last = w.beats.length - 1;
-  const limit = beat.seconds * 1000;
+  const length = beat.seconds * 1000;
   const complete = !playing && elapsed === 0;
-  const ended = !playing && chapter === last && elapsed === limit;
-
-  if (playing && elapsed >= limit) {
-    if (chapter !== last) {
-      setChapter(chapter + 1);
-      setElapsed(0);
-    } else {
-      setElapsed(limit);
-      setPlaying(false);
-    }
-  }
+  const ended = !playing && chapter === last && elapsed === length;
 
   useEffect(() => {
     if (!playing) {
       return;
     }
     const id = setInterval(() => {
-      setElapsed((e) => Math.min(e + 100, limit));
+      setElapsed((e) => e + 100);
     }, 100);
     return () => clearInterval(id);
-  }, [playing, tab, chapter, limit]);
+  }, [playing]);
+
+  if (playing && elapsed >= length) {
+    if (chapter !== last) {
+      setChapter(chapter + 1);
+      setElapsed(0);
+    } else {
+      setElapsed(length);
+      setPlaying(false);
+    }
+  }
 
   const go = (k: number) => {
     setChapter(Math.min(Math.max(k, 0), last));
@@ -105,7 +106,7 @@ export function WalkthroughPlayer() {
     setStarted(true);
   };
 
-  const onPickTab = (t: "build" | "adopt") => {
+  const pickTab = (t: Tab) => {
     if (t === tab) {
       return;
     }
@@ -116,7 +117,7 @@ export function WalkthroughPlayer() {
     setStarted(false);
   };
 
-  const onPlay = () => {
+  const play = () => {
     setStarted(true);
     if (playing) {
       setPlaying(false);
@@ -129,30 +130,32 @@ export function WalkthroughPlayer() {
     }
   };
 
-  const onBig = () => {
+  const playBig = () => {
     setPlaying(true);
     setStarted(true);
     document.getElementById("walk-play")?.focus();
   };
 
   const start = chapterStart(w, chapter);
-  const now = complete ? clock(start + beat.seconds) : clock(start + Math.floor(elapsed / 1000));
+  const now = complete
+    ? clock(start + beat.seconds)
+    : clock(start + Math.floor(Math.min(elapsed, length) / 1000));
   const total = clock(totalSeconds(w));
-  const mode: "play" | "pause" | "replay" = playing ? "pause" : ended ? "replay" : "play";
+  const mode = playing ? "pause" : ended ? "replay" : "play";
   const lines = playing
-    ? beat.lines.slice(0, linesShown(beat.lines.length, beat.seconds, elapsed))
+    ? beat.lines.slice(0, linesShown(beat.lines.length, beat.seconds, Math.min(elapsed, length)))
     : beat.lines;
-  const played = complete ? 1 : elapsed / limit;
+  const played = complete ? 1 : Math.min(elapsed, length) / length;
 
   return (
     <div role="region" aria-label="Walkthrough player" style={windowStyle}>
-      <WalkTitleBar tab={tab} now={now} total={total} onPick={onPickTab} />
+      <WalkTitleBar tab={tab} now={now} total={total} onPick={pickTab} />
       <div role="tabpanel" id="walk-panel" aria-labelledby={`walk-tab-${tab}`}>
         <div style={stageStyle}>
           <div style={terminalPaneStyle}>
             <WalkTerminal place={w.place} lines={lines} caret={playing} />
             {!started && (
-              <button type="button" style={bigStyle} onClick={onBig}>
+              <button type="button" style={bigStyle} onClick={playBig}>
                 {`Play the walkthrough (${total})`}
               </button>
             )}
@@ -173,11 +176,16 @@ export function WalkthroughPlayer() {
           first={chapter === 0}
           last={chapter === last}
           onPrevious={() => go(chapter - 1)}
-          onPlay={onPlay}
+          onPlay={play}
           onNext={() => go(chapter + 1)}
         />
         <div style={timelineStyle}>
-          <WalkTimeline beats={w.beats} chapter={chapter} played={played} onPick={(k: number) => go(k)} />
+          <WalkTimeline
+            beats={w.beats}
+            chapter={chapter}
+            played={played}
+            onPick={(k: number) => go(k)}
+          />
         </div>
       </div>
     </div>

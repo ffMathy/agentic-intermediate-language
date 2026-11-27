@@ -42,10 +42,32 @@ export function handBuilt(p: Project, n: AilNode): boolean {
   return !isCompilable(p, n) || adoptedFresh(p, n, readLock(p).nodes[n.name]);
 }
 
-/** What a node's screenshots and look verdict are keyed to: its build (compile hash), or, built by hand, its derived check's pin. */
+/** What a node's screenshots are keyed to: its build (compile hash), or, built by hand, its derived check's pin. */
 export function shotKey(p: Project, n: AilNode): string | null {
   return handBuilt(p, n) ? derivedCheckFile(p, n).pinned : readLock(p).nodes[n.name]?.hash ?? null;
 }
+
+/**
+ * What a node's look verdict is keyed to. A build of ail's: its compile hash. Built by hand: the screens themselves,
+ * since the app's own code can change them without changing the spec or the check; a model compares them again
+ * exactly when they change.
+ */
+export function lookKey(p: Project, n: AilNode): string | null {
+  return handBuilt(p, n) ? screensHash(p, n) : shotKey(p, n);
+}
+
+/** A hash of a node's committed screenshots and their index, or null when it has none. */
+export function screensHash(p: Project, n: AilNode): string | null {
+  const dir = nodeShotsDir(p, n);
+  if (!existsSync(dir)) return null;
+  const files = readdirSync(dir).filter((f) => !statSync(join(dir, f)).isDirectory()).sort();
+  if (!files.length) return null;
+  const h = new Bun.CryptoHasher("sha256");
+  for (const f of files) h.update(f).update(readFileSync(join(dir, f)));
+  return h.digest("hex");
+}
+
+const keyOf = (p: Project, n: AilNode, what: "shots" | "look") => (what === "look" ? lookKey(p, n) : shotKey(p, n));
 
 /** The key the committed screenshots (`shots`) or the look verdict (`look`) were recorded for. */
 export function recordedFor(p: Project, n: AilNode, what: "shots" | "look"): string | undefined {
@@ -55,7 +77,7 @@ export function recordedFor(p: Project, n: AilNode, what: "shots" | "look"): str
 
 /** Record that a node's screenshots, or its look verdict, are those of its current key. */
 export function recordFor(p: Project, n: AilNode, what: "shots" | "look"): void {
-  const key = shotKey(p, n);
+  const key = keyOf(p, n, what);
   if (!key) return;
   const lock = readLock(p);
   if (handBuilt(p, n)) (((lock.hand ??= {})[n.name] ??= {})[what] = key);

@@ -1,4 +1,4 @@
-// ail-derived-from: AdoptSection@ff71d2a4a590a538
+// ail-derived-from: AdoptSection@4c91c0cdbc017c04
 import { afterEach, expect, test } from "bun:test";
 import { cleanup, render, within } from "@testing-library/react";
 import { AdoptSection } from "../../../src/gen/home/adopt/adopt-section";
@@ -14,24 +14,26 @@ test("adopting is explained", () => {
   expect(section).not.toBeNull();
   const scope = within(section as HTMLElement);
 
-  expect(
-    scope.getByRole("heading", {
-      level: 2,
-      name: "Already have an app? Adopt it.",
-    }),
-  ).toBeTruthy();
+  const heading = scope.getByRole("heading", {
+    level: 2,
+    name: "Already have an app? Adopt it.",
+  });
+  expect(heading).toBeTruthy();
 
-  const expected = [
+  const expectedSteps = [
     "Why, from people and tickets",
     "What, from the running app",
     "How, from the code",
     "Proof, on the old app",
   ];
-  const names = scope
+  for (const name of expectedSteps) {
+    expect(scope.getByRole("heading", { level: 3, name })).toBeTruthy();
+  }
+  const levelThreeNames = scope
     .getAllByRole("heading", { level: 3 })
     .map((h) => (h.textContent ?? "").trim())
-    .filter((name) => expected.includes(name));
-  expect(names).toEqual(expected);
+    .filter((name) => expectedSteps.includes(name));
+  expect(levelThreeNames).toEqual(expectedSteps);
 
   expect(scope.getByRole("button", { name: "Copy /ail:adopt" })).toBeTruthy();
   expect(scope.getByRole("button", { name: "Copy ail adopt" })).toBeTruthy();

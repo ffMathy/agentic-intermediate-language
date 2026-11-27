@@ -168,7 +168,9 @@ Do this for every AIL project the pull request changes.
 Don't review generated code. If it's wrong, the spec is missing something.
 
 **Bring an existing app under AIL** (`/ail:adopt`). Write the spec in reverse,
-one slice at a time: the why from tickets and the people who own it, the what
+for the whole app unless the user names a part, working through it one slice
+(a screen, a flow or a rule) after another, each proven before the next, until
+every part is covered: the why from tickets and the people who own it, the what
 from driving the running app, the how from its code, each node with
 `sources`. Trace real values into examples. When nobody can confirm a reason,
 write `because "unknown, confirm with the owner"`; never invent one. Find out

@@ -85,7 +85,9 @@ export async function build(p: Project, o: BuildOptions = {}): Promise<BuildResu
         failed.set(n.name, `deriving its checks failed: ${(e as Error).message}`);
       }
     });
-    await mapLimit(handToDerive, jobs, async (n) => {
+    // In a language of its own, every check of a kind usually lives in one test project: deriving them side by side
+    // would build it at once, and a check that doesn't build yet would fail the others'. So one at a time.
+    await mapLimit(handToDerive, foreignChecks(p) ? 1 : jobs, async (n) => {
       const r = await deriveHandCheck(p, n, provider, log);
       if (r.stop) stopped.set(n.name, r.stop);
       else if (r.failed) failed.set(n.name, r.failed);

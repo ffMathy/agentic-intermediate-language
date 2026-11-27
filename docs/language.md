@@ -57,6 +57,11 @@ in another language names its own `[checks-incomplete]`:
 - `checks.path.<kind>` and `checks.run.<kind>`, optionally: the same for the
   nodes of one kind, e.g. `checks.path.view` in a test project that can
   render the UI toolkit's views
+- any other `checks.` setting, such as `checks.harness`: what the checks
+  are given to work with, e.g. a harness that runs the app's views
+
+A `checks.` setting describes the checks only: changing it rebuilds no
+module, and checks are re-derived only when their node's spec changes.
 
 Its examples are then written into that check alongside the scenarios (see
 Checks), since they can't be translated mechanically into its language.

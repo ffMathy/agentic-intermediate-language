@@ -28,3 +28,15 @@ test("a dependency's how is encapsulated; its what is not", () => {
   writeFileSync(add, readFileSync(add, "utf8").replace("add(-1, 1) => 0", "add(-1, 1) => 0\n      add(2, 2) => 4"));
   expect(compileHash(load(dir), load(dir).nodes.get("Pick")!)).not.toBe(before);
 });
+
+test("settings about the checks change no node's compile hash", () => {
+  const dir = tempProject("areas");
+  const before = load(dir);
+  const root = join(dir, "root.ail.md");
+  writeFileSync(root, readFileSync(root, "utf8").replace(/target\n/, "target\n  checks.harness  a harness that runs the app\n"));
+  const after = load(dir);
+  expect(after.target?.settings["checks.harness"]).toBe("a harness that runs the app");
+  for (const n of before.ordered) expect(compileHash(after, after.nodes.get(n.name)!)).toBe(compileHash(before, n));
+  writeFileSync(root, readFileSync(root, "utf8").replace(/target\n/, "target\n  naming  camelCase\n"));
+  expect(compileHash(load(dir), load(dir).nodes.get("Price")!)).not.toBe(compileHash(before, before.nodes.get("Price")!));
+});

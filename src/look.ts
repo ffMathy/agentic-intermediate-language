@@ -9,7 +9,7 @@ import { readLock, writeLock } from "./lock.ts";
 import { specText, type AilNode } from "./parse.ts";
 import { ancestors, type Project } from "./project.ts";
 import type { Provider } from "./providers/index.ts";
-import { handBuilt, recordedFor, recordFor, refreshNodeShots, shotKey, visualNodes, type Shot } from "./shots.ts";
+import { handBuilt, lookKey, recordedFor, recordFor, refreshNodeShots, visualNodes, type Shot } from "./shots.ts";
 import { loadPrompt } from "./verify.ts";
 
 export interface LookResult { node: string; ok: boolean; problems: string[]; shots: Shot[]; skipped?: string }
@@ -85,7 +85,7 @@ export function recordLook(p: Project, node: string) {
 
 /** Nodes with a look whose screens were not compared for their current build (or, built by hand, derived check). */
 export function unjudged(p: Project): string[] {
-  return visualNodes(p).filter((n) => { const key = shotKey(p, n); return !!key && recordedFor(p, n, "look") !== key; }).map((n) => n.name);
+  return visualNodes(p).filter((n) => { const key = lookKey(p, n); return !!key && recordedFor(p, n, "look") !== key; }).map((n) => n.name);
 }
 
 export const formatLook = (r: LookResult) =>

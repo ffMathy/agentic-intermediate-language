@@ -64,6 +64,9 @@ test("its check is told where to save each scenario's screen, and ail numbers th
   expect(unjudged(q)).toEqual(["Receipt"]);
   recordLook(q, "Receipt");
   expect(unjudged(q)).toEqual([]);
+  // The app's own code changed what the screen shows: its spec and check did not change, but the look is compared again.
+  writeFileSync(join(nodeShotsDir(q, r), "01-paying.png"), "another png");
+  expect(unjudged(q)).toEqual(["Receipt"]);
 });
 
 test("a check that fails takes no screens", async () => {

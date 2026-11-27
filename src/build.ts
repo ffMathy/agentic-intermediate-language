@@ -8,7 +8,7 @@ import { formatDiagnostics, lint } from "./lint.ts";
 import { plan } from "./plan.ts";
 import { isCompilable, type Project } from "./project.ts";
 import { getProvider, modelUnavailable, resolveModels } from "./providers/index.ts";
-import { clearShots, handBuilt, nodeShotsDir, readShotsIndex, relocateShots, orphanShots, refreshNodeShots, staleShots, takeShots } from "./shots.ts";
+import { clearShots, handBuilt, nodeShotsDir, readShotsIndex, relocateShots, orphanShots, refreshNodeShots, staleShots, takeShots, visualNodes } from "./shots.ts";
 import { judgeShots, recordLook, unjudged } from "./look.ts";
 import type { Provider } from "./providers/index.ts";
 import type { AilNode } from "./parse.ts";
@@ -198,7 +198,10 @@ async function judgeHandLooks(p: Project, nodes: AilNode[], provider: Provider, 
 async function refreshShots(p: Project, log: (s: string) => void): Promise<boolean> {
   let changed = relocateShots(p);
   for (const dir of orphanShots(p)) { clearShots(dir); changed = true; }
-  for (const n of staleShots(p)) {
+  // Screens of nodes built by hand are retaken every build: the app's own code can change them without changing the
+  // spec or the check. Their look is compared again only when they did change (look.ts, lookKey).
+  const retake = [...staleShots(p), ...visualNodes(p).filter((n) => handBuilt(p, n))];
+  for (const n of [...new Set(retake)]) {
     try {
       await refreshNodeShots(p, n);
       log(`${n.name}: proof screenshots taken`);

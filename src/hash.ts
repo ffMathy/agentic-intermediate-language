@@ -43,10 +43,14 @@ export function canonicalNode(n: AilNode, only?: string[]): string {
  * observable behaviour, and (for views and flows) the props it binds. */
 export const contractOf = (n: AilNode) => canonicalNode(n, ["what", "binds"]);
 
+/** Target settings that describe the checks only (`checks.path`, `checks.run`, `checks.harness`, …): no module depends on them. */
+export const isCheckSetting = (key: string) => key.startsWith("checks.");
+
 export function targetHash(p: Project): string {
   const t = p.target;
   return sha256(JSON.stringify({
-    target: t ? t.order.map((k) => [k, t.settings[k]]) : null,
+    // Settings about the checks are left out: changing how checks are written or run rebuilds no module.
+    target: t ? t.order.filter((k) => !isCheckSetting(k)).map((k) => [k, t.settings[k]]) : null,
     tokens: Object.entries(p.tokens).sort(),
   }));
 }

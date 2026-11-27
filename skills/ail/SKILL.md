@@ -131,9 +131,10 @@ change reaches. For each node, ask:
 - Is every product claim still refined?
 
 Screens are compared too: every build has a model check the final screen of
-each scenario against the node's `look` and `copy`, and the screenshots it
-judged are in `.ail/look/`. A screen that is wrong while every check passes
-means the `look` is missing something. On pull requests, the GitHub Action
+each scenario of a node's derived check against the node's `look` and `copy`.
+The screenshots are beside the spec, in `shots/`. End-to-end checks take none:
+they prove behaviour. A screen that is wrong while every check passes means
+the `look` is missing something. On pull requests, the GitHub Action
 posts the review with screenshots as a comment.
 
 **Open or update a pull request.** Whenever you open a pull request for a
@@ -179,3 +180,6 @@ a process), written in the target's language and test framework; for a
 language other than TypeScript, `tests` in `ail.config.json` says where the
 checks live and the command that runs one and writes a JUnit report, and `ail_adopt` proves the spec describes the app. Then it records `run.app` (a copy of
 `run.legacy`, until the target changes), so every build runs the same checks against the app.
+End-to-end checks take no screenshots: every node with a `look` is pictured by
+its derived check, which renders the app's own code (as the target's
+`test harness` says) when ail doesn't build it.

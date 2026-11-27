@@ -29,7 +29,7 @@ node WalkInset : view   level: experience
     walk.shot.alt  "Screenshot of the app at the end of the check “{test}”"
   binds
     props    inset: Inset
-    data     specProjects from the spec module: of the project with key "tictactoe", the last shot whose node and test are the inset's (the end-to-end one when there is one)
+    data     specProjects from the spec module: of the project with key "tictactoe", the last shot whose node and test are the inset's
     img      src the shot's src; alt from walk.shot.alt with {test} filled in
   uses      Walkthrough
 ```

@@ -1,35 +1,36 @@
-// ail-derived-from: WalkPicture@c268106725103a6c
+// ail-derived-from: WalkPicture@7cc6f47c62d5f4ec
 import { afterEach, expect, test } from "bun:test";
 import { cleanup, render, screen } from "@testing-library/react";
 import { WalkPicture } from "../../../../../src/gen/home/watch/walkthrough-player/walk-picture/walk-picture";
-import { NODES } from "../../../../../src/gen/home/watch/walkthrough-player/walkthrough/walkthrough";
-import type {
-  Beat,
-  NodeState,
-  Walkthrough,
-} from "../../../../../src/gen/home/watch/walkthrough-player/walkthrough/walkthrough";
+import type { Walkthrough } from "../../../../../src/gen/home/watch/walkthrough-player/walkthrough/walkthrough";
 
 afterEach(() => {
   cleanup();
 });
 
-function beat(id: string, states: Record<string, NodeState>): Beat {
-  return {
-    id,
-    title: id,
-    caption: id,
-    seconds: 10,
-    branch: false,
-    lines: [],
-    states,
-    inset: { kind: "none" },
-  };
-}
+const DRAWING_ORDER = [
+  "TicTacToe",
+  "App",
+  "PlayAGame",
+  "WatchADemo",
+  "ChooseOpponent",
+  "NewGameButton",
+  "Stack",
+  "Text",
+  "Button",
+  "Segmented",
+  "BoardView",
+  "StatusLine",
+  "GameState",
+  "Rules",
+  "GameReducer",
+  "ComputerPlayer",
+];
 
-function boxOf(container: HTMLElement, name: string): Element {
+function boxTexts(container: HTMLElement, name: string): string[] {
   const box = container.querySelector(`g[data-node="${name}"]`);
-  if (box === null) throw new Error(`no box for ${name}`);
-  return box;
+  expect(box).not.toBeNull();
+  return Array.from(box?.querySelectorAll("text") ?? []).map((t) => (t.textContent ?? "").trim());
 }
 
 test("a stale chapter", () => {
@@ -39,49 +40,66 @@ test("a stale chapter", () => {
     picture: "Tic-Tac-Toe spec · 16 nodes",
     rest: "fresh",
     beats: [
-      beat("start", {}),
-      beat("stale", { App: "stale", WatchADemo: "stale" }),
+      {
+        id: "start",
+        title: "Start",
+        caption: "The build starts.",
+        seconds: 5,
+        branch: false,
+        lines: ["$ ail build"],
+        states: {},
+        inset: { kind: "none" },
+      },
+      {
+        id: "stale",
+        title: "Stale",
+        caption: "Two nodes are out of date.",
+        seconds: 5,
+        branch: false,
+        lines: ["2 nodes stale"],
+        states: { App: "stale", WatchADemo: "stale" },
+        inset: { kind: "none" },
+      },
     ],
   };
-  const { container } = render(
-    <WalkPicture walkthrough={walkthrough} chapter={1} />,
-  );
+  const { container } = render(<WalkPicture walkthrough={walkthrough} chapter={1} />);
 
-  const meanings: Record<string, string> = {
-    App: "out of date",
-    WatchADemo: "out of date",
-  };
-  const nodes = NODES.map(
-    (name) => `${name}: ${meanings[name] ?? "up to date"}`,
+  const nodes = DRAWING_ORDER.map(
+    (name) => `${name}: ${name === "App" || name === "WatchADemo" ? "out of date" : "up to date"}`,
   ).join("; ");
-  const label = `Tic-Tac-Toe spec · 16 nodes: ${nodes}`;
-  expect(
-    label.startsWith(
-      "Tic-Tac-Toe spec · 16 nodes: TicTacToe: up to date; App: out of date; ",
-    ),
-  ).toBe(true);
-  expect(screen.getByRole("img", { name: label })).toBeTruthy();
+  const expectedName = `Tic-Tac-Toe spec · 16 nodes: ${nodes}`;
+  expect(expectedName.startsWith("Tic-Tac-Toe spec · 16 nodes: TicTacToe: up to date; App: out of date; ")).toBe(true);
+  expect(screen.getByRole("img", { name: expectedName })).toBeTruthy();
 
-  expect(boxOf(container, "WatchADemo").textContent).toBe("WatchADemostale");
-  expect(boxOf(container, "App").textContent).toBe("Appstale");
-  expect(boxOf(container, "Rules").textContent).toBe("Rules✓ fresh");
+  expect(boxTexts(container, "WatchADemo")).toEqual(["WatchADemo", "stale"]);
+  expect(boxTexts(container, "App")).toEqual(["App", "stale"]);
+  expect(boxTexts(container, "Rules")).toEqual(["Rules", "✓ fresh"]);
 });
 
 test("nodes with no spec yet", () => {
   const walkthrough: Walkthrough = {
     command: "ail adopt",
     place: "terminal",
-    picture: "Tic-Tac-Toe spec · 16 nodes",
+    picture: "Tic-Tac-Toe app · 16 nodes",
     rest: "unwritten",
-    beats: [beat("slice", { PlayAGame: "slice" })],
+    beats: [
+      {
+        id: "slice",
+        title: "Pick a slice",
+        caption: "Adoption starts with one slice.",
+        seconds: 5,
+        branch: false,
+        lines: ["$ ail adopt"],
+        states: { PlayAGame: "slice" },
+        inset: { kind: "none" },
+      },
+    ],
   };
-  const { container } = render(
-    <WalkPicture walkthrough={walkthrough} chapter={0} />,
-  );
+  const { container } = render(<WalkPicture walkthrough={walkthrough} chapter={0} />);
 
-  expect(boxOf(container, "PlayAGame").textContent).toBe("PlayAGamethe slice");
-  expect(boxOf(container, "App").textContent).toBe("App");
+  expect(boxTexts(container, "PlayAGame")).toEqual(["PlayAGame", "the slice"]);
+  expect(boxTexts(container, "App")).toEqual(["App"]);
 
-  const items = screen.getAllByRole("listitem");
-  expect(items.some((li) => li.textContent === "no spec yet")).toBe(true);
+  const items = screen.getAllByRole("listitem").map((li) => (li.textContent ?? "").trim());
+  expect(items).toContain("no spec yet");
 });

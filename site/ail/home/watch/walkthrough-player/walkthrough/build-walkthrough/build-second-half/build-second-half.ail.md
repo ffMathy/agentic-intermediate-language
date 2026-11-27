@@ -29,10 +29,10 @@ node BuildSecondHalf : data   level: system
           states: {},
           inset: { kind: "card", label: "ail.lock.json", lines: ["\"WatchADemo\": {", "  \"hash\": \"<new 64-hex>\",", "  \"files\": { \"src/gen/app/demo/watch-a-demo.tsx\": \"<sha256>\" },", "  \"by\": \"claude-code\",", "  \"shots\": \"<same as hash>\",", "  \"look\": \"<same as hash>\"", "}"] } },
         { id: "e2e", seconds: 9, branch: false, title: "Checked, then run for real",
-          caption: "First, a check with no model: sound spec, current nodes, passing tests and typecheck. Then the app runs PlayAGame's scenarios in a browser, and a model judges the screenshots.",
-          lines: ["· starting the app: bun --port=4173 ./index.html", "· PlayAGame: comparing its screenshots with its look"],
+          caption: "First, a check with no model: sound spec, current nodes, passing tests and typecheck. Then the app runs PlayAGame's scenarios in a browser. That proves behaviour only: the screens come from the derived checks.",
+          lines: ["· starting the app: bun --port=4173 ./index.html"],
           states: { "PlayAGame": "checking" },
-          inset: { kind: "card", label: "Check with no model, then the real app", lines: ["✓ spec", "✓ build", "✓ behavior: all tests plus the typecheck", "localhost:4173: play-a-game.e2e.ts, 7 scenarios", "the app stops, then a model judges the 7 screenshots"] } },
+          inset: { kind: "card", label: "Check with no model, then the real app", lines: ["✓ spec", "✓ build", "✓ behavior: all tests plus the typecheck", "localhost:4173: play-a-game.e2e.ts, 7 scenarios", "the app stops; no screenshots, only behaviour"] } },
         { id: "summary", seconds: 8, branch: false, title: "Everything checks out",
           caption: "The report prints last: what was built, then the model-free check, then the real app. The model-free part is the same check CI runs.",
           lines: [
@@ -42,8 +42,7 @@ node BuildSecondHalf : data   level: system
             "✓ build    16 node(s) up to date",
             "✓ behavior 50 test(s) passed, typecheck ok",
             "✓ app      1 of 1 flow(s) behave as their spec says (run.app)",
-            "    · 2 node(s) with scenarios have no end-to-end check yet: App, WatchADemo",
-            "    ✓ PlayAGame: 7 screenshot(s) match its look"],
+            "    · 2 node(s) with scenarios have no end-to-end check yet: App, WatchADemo"],
           states: { "PlayAGame": "proven" },
           inset: { kind: "shot", node: "WatchADemo", test: "the computer plays both sides", label: "WatchADemo at the end of “the computer plays both sides”" } }
       ]

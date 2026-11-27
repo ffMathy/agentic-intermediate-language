@@ -1,4 +1,4 @@
-// ail-derived-from: AdoptSection@0e3ae409730c3ca3
+// ail-derived-from: AdoptSection@ff71d2a4a590a538
 import { afterEach, expect, test } from "bun:test";
 import { cleanup, render, within } from "@testing-library/react";
 import { AdoptSection } from "../../../src/gen/home/adopt/adopt-section";
@@ -15,7 +15,10 @@ test("adopting is explained", () => {
   const scope = within(section as HTMLElement);
 
   expect(
-    scope.getByRole("heading", { level: 2, name: "Already have an app? Adopt it." }),
+    scope.getByRole("heading", {
+      level: 2,
+      name: "Already have an app? Adopt it.",
+    }),
   ).toBeTruthy();
 
   const expected = [
@@ -24,15 +27,15 @@ test("adopting is explained", () => {
     "How, from the code",
     "Proof, on the old app",
   ];
-  for (const name of expected) {
-    expect(scope.getByRole("heading", { level: 3, name })).toBeTruthy();
-  }
-  const h3Texts = scope
+  const names = scope
     .getAllByRole("heading", { level: 3 })
     .map((h) => (h.textContent ?? "").trim())
-    .filter((t) => expected.includes(t));
-  expect(h3Texts).toEqual(expected);
+    .filter((name) => expected.includes(name));
+  expect(names).toEqual(expected);
 
-  expect(scope.getAllByText("/ail:adopt").length).toBeGreaterThan(0);
-  expect(scope.getAllByText("ail adopt").length).toBeGreaterThan(0);
+  expect(scope.getByRole("button", { name: "Copy /ail:adopt" })).toBeTruthy();
+  expect(scope.getByRole("button", { name: "Copy ail adopt" })).toBeTruthy();
+  const text = section?.textContent ?? "";
+  expect(text).toContain("/ail:adopt");
+  expect(text).toContain("ail adopt");
 });

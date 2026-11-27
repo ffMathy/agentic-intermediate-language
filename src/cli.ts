@@ -2,7 +2,6 @@
 // ail — the Agentic Intermediate Language toolchain.
 import { adopt, formatAdopt } from "./adopt.ts";
 import { build } from "./build.ts";
-import { getProvider, modelUnavailable, resolveModels } from "./providers/index.ts";
 import { AGENTS, agentOf, postHook, preHook, respond, type Agent } from "./hooks.ts";
 import { changedNodes } from "./lens.ts";
 import { loadProject, type Project } from "./project.ts";
@@ -112,8 +111,7 @@ async function main(argv: string[]): Promise<number> {
     }
 
     case "adopt": {
-      const spec = resolveModels(a.flags.model ?? [], p.config.models)[0]!;
-      const r = await adopt(p, { app: flag(a, "app"), names: nodesOrDie(p, rest), log, suggestReview: true, record: true, judge: modelUnavailable(spec) ? undefined : getProvider(spec) });
+      const r = await adopt(p, { app: flag(a, "app"), names: nodesOrDie(p, rest), log, suggestReview: true, record: true });
       print(formatAdopt(r), r);
       return r.ok ? 0 : 1;
     }

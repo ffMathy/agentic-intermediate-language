@@ -105,12 +105,18 @@ export function lint(p: Project): Diagnostic[] {
   if (p.target) {
     const t = p.target;
     // A placeholder ail doesn't fill would end up in a file name.
-    for (const key of t.order.filter((k) => k.startsWith("path.") || k === "checks.path"))
+    for (const key of t.order.filter((k) => k.startsWith("path.") || k === "checks.path" || k.startsWith("checks.path.")))
       for (const m of t.settings[key]!.matchAll(/\{(\w+)\}/g))
         if (!(PATH_PLACEHOLDERS as readonly string[]).includes(m[1]!))
           push("error", "unknown-placeholder", null, `${key} uses {${m[1]}}, which ail does not fill in; a path may use ${PATH_PLACEHOLDERS.map((x) => `{${x}}`).join(", ")} ({name} is the node's name, in UpperCamelCase)`, t.line, t.file);
     if (!!t.settings["checks.path"] !== !!t.settings["checks.run"])
       push("error", "checks-incomplete", null, "a target that checks in its own language needs both `checks.path` (where a node's check goes) and `checks.run` (the command that runs it)", t.line, t.file);
+    // A kind's own checks come in pairs too, and only on top of the target's own.
+    for (const key of t.order.filter((k) => /^checks\.(path|run)\./.test(k))) {
+      const kind = key.split(".").slice(2).join("."), other = key.startsWith("checks.path.") ? `checks.run.${kind}` : `checks.path.${kind}`;
+      if (!t.settings[other] || !t.settings["checks.path"])
+        push("error", "checks-incomplete", null, `\`${key}\` needs \`${other}\`, and the target's own \`checks.path\` and \`checks.run\`: a kind's checks (where its check goes, and the command that runs it) come in pairs`, t.line, t.file);
+    }
   }
 
   const nodeNames = new Set(p.nodes.keys());

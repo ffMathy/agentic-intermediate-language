@@ -1,6 +1,6 @@
 import type { Beat } from "../../walkthrough";
 
-/** ADOPT_SECOND_HALF: list of Beat */
+/** ADOPT_SECOND_HALF: list of Beat — the last five chapters of the adopt walkthrough: from the end-to-end check to the new stack. */
 export const ADOPT_SECOND_HALF: Beat[] = [
   {
     id: "checks",
@@ -8,14 +8,12 @@ export const ADOPT_SECOND_HALF: Beat[] = [
     branch: false,
     title: "A check for every scenario",
     caption:
-      "Each flow gets an end-to-end check: one test per scenario, only what a user can see and do, so it works on the rebuilt app. Tests end with screenshots.",
+      "Each flow gets an end-to-end check: one test per scenario, only what a user can see and do, so it works on the rebuilt app. It proves behaviour: it takes no screenshots.",
     lines: [
       "checks/e2e/app/play/play-a-game.e2e.ts",
       "test(\"X always starts\", async () => {",
       "  await expect(status(\"X's turn\").isVisible()).resolves.toBe(true);",
-      "  await proof(\"X always starts\");",
       "});",
-      "→ x-always-starts.png",
     ],
     states: {
       PlayAGame: "writing",
@@ -30,15 +28,15 @@ export const ADOPT_SECOND_HALF: Beat[] = [
     },
     inset: {
       kind: "card",
-      label: "One screenshot per test",
+      label: "One test per scenario",
       lines: [
-        "→ x-always-starts.png",
-        "→ taking-turns.png",
-        "→ a-taken-square-can-t-be-picked.png",
-        "→ winning.png",
-        "→ draw.png",
-        "→ new-game.png",
-        "→ the-computer-answers.png",
+        "X always starts",
+        "taking turns",
+        "a taken square can't be picked",
+        "winning",
+        "draw",
+        "new game",
+        "the computer answers",
       ],
     },
   },
@@ -70,8 +68,8 @@ export const ADOPT_SECOND_HALF: Beat[] = [
       label: "Run from outside the project",
       lines: [
         "// ail-derived-from: PlayAGame@5445e0669a18e44c",
-        "a temp folder gets only AIL_APP_URL, AIL_API_URL and AIL_SHOTS_DIR",
-        "✓ 7 tests, 7 screenshots in ail/app/play/shots/e2e/",
+        "a temp folder gets only AIL_APP_URL and AIL_API_URL",
+        "✓ 7 tests pass against the old app",
         "everything stops, the app first",
       ],
     },
@@ -82,16 +80,16 @@ export const ADOPT_SECOND_HALF: Beat[] = [
     branch: false,
     title: "A model checks the look",
     caption:
-      "One model call judges all the flow's screenshots together. Once everything has passed, every node ail hasn't built is recorded in the lock as built by the existing app.",
+      "Once the checks pass, every node is recorded as built by the old app. Then /ail:build pictures each node with a look: its derived check renders the old app's own code, and one model call judges the screens together.",
     lines: [
-      "· PlayAGame: comparing its screenshots with its look",
       "✓ app      1 of 1 flow(s) behave as their spec says (run.legacy)",
-      "    · 2 node(s) with scenarios have no end-to-end check yet: App, WatchADemo",
-      "    ✓ PlayAGame: 7 screenshot(s) match its look",
       "    ✓ recorded 16 node(s) as built by the existing app in the lock file, so ail build only builds what changes from now on",
-      "    · to keep generated code out of pull request diffs (it stays committed, and GitHub collapses it), add to /…/tictactoe-ail/.gitattributes:",
-      "        src/gen/** linguist-generated=true",
-      "        ail.lock.json linguist-generated=true",
+      "/ail:build",
+      "· PlayAGame: deriving the check that tests and pictures its hand-written code",
+      "· PlayAGame: proof screenshots taken",
+      "· PlayAGame: comparing its screens with its look",
+      "· PlayAGame: 7 screen(s) match its look",
+      "✓ behavior 7 test(s) passed",
     ],
     states: {
       TicTacToe: "adopted",
@@ -165,12 +163,12 @@ export const ADOPT_SECOND_HALF: Beat[] = [
     lines: [
       "· PlayAGame: deriving checks from its scenarios",
       "· PlayAGame: attempt 1 with claude-code",
+      "· PlayAGame: 7 screen(s) match its look",
       "✓ PlayAGame          compiled",
       "! app      end-to-end checks not run: ail.config.json has no run.app saying how to start the app this project builds",
       "\"app\": { \"start\": \"bun --port=4173 ./index.html\", \"ready\": \"http://localhost:4173\", \"env\": { \"AIL_APP_URL\": \"http://localhost:4173\" } }",
       "· starting the app: bun --port=4173 ./index.html",
       "✓ app      1 of 1 flow(s) behave as their spec says (run.app)",
-      "    ✓ PlayAGame: 7 screenshot(s) match its look",
     ],
     states: {
       TicTacToe: "fresh",

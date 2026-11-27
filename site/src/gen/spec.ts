@@ -24,104 +24,97 @@ import shot21 from "../../../examples/tictactoe/ail/ui/button/shots/01-pressing.
 import shot22 from "../../../examples/tictactoe/ail/ui/segmented/shots/01-picking-another-option.png";
 import shot23 from "../../../examples/tictactoe/ail/ui/stack/shots/01-children-keep-their-order.png";
 import shot24 from "../../../examples/tictactoe/ail/ui/text/shots/01-content-is-shown.png";
-import shot25 from "../../../examples/tictactoe/ail/app/play/shots/e2e/x-always-starts.png";
-import shot26 from "../../../examples/tictactoe/ail/app/play/shots/e2e/taking-turns.png";
-import shot27 from "../../../examples/tictactoe/ail/app/play/shots/e2e/a-taken-square-can-t-be-picked.png";
-import shot28 from "../../../examples/tictactoe/ail/app/play/shots/e2e/winning.png";
-import shot29 from "../../../examples/tictactoe/ail/app/play/shots/e2e/draw.png";
-import shot30 from "../../../examples/tictactoe/ail/app/play/shots/e2e/new-game.png";
-import shot31 from "../../../examples/tictactoe/ail/app/play/shots/e2e/the-computer-answers.png";
-import shot32 from "../../ail/home/adopt/adopt-figure/shots/01-the-picture.png";
-import shot33 from "../../ail/home/adopt/shots/01-adopting-is-explained.png";
-import shot34 from "../../ail/home/build-loop/shots/01-four-steps.png";
-import shot35 from "../../ail/home/hero/hero-figure/shots/01-the-picture-is-described.png";
-import shot36 from "../../ail/home/hero/shots/01-the-links-go-to-the-right-places.png";
-import shot37 from "../../ail/home/journey/journey-stop/shots/01-a-stop.png";
-import shot38 from "../../ail/home/journey/journey-stop/shots/02-a-stop-with-a-file-to-browse.png";
-import shot39 from "../../ail/home/journey/jump-gauge/shots/01-every-pill-leads-to-its-stop.png";
-import shot40 from "../../ail/home/journey/jump-gauge/shots/02-the-gauge-shows-which-stops-are-the-spec.png";
-import shot41 from "../../ail/home/journey/shots/01-eight-stops-in-order.png";
-import shot42 from "../../ail/home/journey/shots/02-the-thread-is-explained.png";
-import shot43 from "../../ail/home/journey/stops/stop-build/build-figure/shots/01-the-picture.png";
-import shot44 from "../../ail/home/journey/stops/stop-build/shots/01-the-build.png";
-import shot45 from "../../ail/home/journey/stops/stop-experience/experience-figure/shots/01-the-picture.png";
-import shot46 from "../../ail/home/journey/stops/stop-experience/shots/01-the-experience-level.png";
-import shot47 from "../../ail/home/journey/stops/stop-idea/idea-figure/shots/01-the-picture.png";
-import shot48 from "../../ail/home/journey/stops/stop-idea/shots/01-the-idea.png";
-import shot49 from "../../ail/home/journey/stops/stop-product/product-figure/shots/01-the-picture.png";
-import shot50 from "../../ail/home/journey/stops/stop-product/shots/01-the-product-level.png";
-import shot51 from "../../ail/home/journey/stops/stop-proof/proof-screens/shots/01-the-screens.png";
-import shot52 from "../../ail/home/journey/stops/stop-proof/shots/01-the-proof.png";
-import shot53 from "../../ail/home/journey/stops/stop-result/result-frame/shots/01-the-game-is-embedded.png";
-import shot54 from "../../ail/home/journey/stops/stop-result/result-frame/shots/02-the-game-fits-a-phone.png";
-import shot55 from "../../ail/home/journey/stops/stop-result/shots/01-the-result.png";
-import shot56 from "../../ail/home/journey/stops/stop-specialist/shots/01-the-specialist-level.png";
-import shot57 from "../../ail/home/journey/stops/stop-specialist/specialist-figure/shots/01-the-picture.png";
-import shot58 from "../../ail/home/journey/stops/stop-system/shots/01-the-system-level.png";
-import shot59 from "../../ail/home/journey/stops/stop-system/system-figure/shots/01-the-picture.png";
-import shot60 from "../../ail/home/readers/readers-tree/shots/01-the-stakeholder-s-level.png";
-import shot61 from "../../ail/home/readers/shots/01-the-first-reader.png";
-import shot62 from "../../ail/home/readers/shots/02-picking-another-reader.png";
-import shot63 from "../../ail/home/readers/shots/03-arrow-keys.png";
-import shot64 from "../../ail/home/review/sample-pull-request/pull-request-diff/shots/01-the-spec-change.png";
-import shot65 from "../../ail/home/review/sample-pull-request/shots/01-the-parts-to-review-are-open.png";
-import shot66 from "../../ail/home/review/sample-pull-request/shots/02-what-the-build-wrote-is-collapsed.png";
-import shot67 from "../../ail/home/review/shots/01-what-a-reviewer-reads.png";
-import shot68 from "../../ail/home/sections/footer/shots/01-the-links.png";
-import shot69 from "../../ail/home/sections/gap-strip/shots/01-three-cards.png";
-import shot70 from "../../ail/home/sections/get-started/agent-cards/shots/01-in-cursor.png";
-import shot71 from "../../ail/home/sections/get-started/agent-cards/shots/02-in-github-copilot.png";
-import shot72 from "../../ail/home/sections/get-started/review-note/shots/01-generated-code-stays-out-of-review.png";
-import shot73 from "../../ail/home/sections/get-started/shots/01-in-claude-code.png";
-import shot74 from "../../ail/home/sections/get-started/shots/02-in-a-terminal.png";
-import shot75 from "../../ail/home/sections/get-started/shots/03-what-to-do-next.png";
-import shot76 from "../../ail/home/sections/spec-browser/shots/01-the-demo-s-spec-is-shown-first.png";
-import shot77 from "../../ail/home/sections/spec-browser/shots/02-picking-another-file.png";
-import shot78 from "../../ail/home/sections/spec-browser/shots/03-showing-this-website-s-spec.png";
-import shot79 from "../../ail/home/sections/spec-browser/shots/04-a-screenshot-beside-its-spec.png";
-import shot80 from "../../ail/home/sections/spec-browser/shots/05-opened-from-a-link.png";
-import shot81 from "../../ail/home/sections/spec-browser/shots/06-the-language-is-defined.png";
-import shot82 from "../../ail/home/sections/spec-browser/shots/07-following-the-same-link-twice.png";
-import shot83 from "../../ail/home/sections/spec-browser/spec-tree/shots/01-screenshots-beside-their-spec.png";
-import shot84 from "../../ail/home/sections/top-bar/shots/01-the-links-lead-to-the-right-places.png";
-import shot85 from "../../ail/home/shots/01-one-story-in-order.png";
-import shot86 from "../../ail/home/shots/02-every-top-bar-link-has-a-place-to-land.png";
-import shot87 from "../../ail/home/tree/shots/01-the-tree-is-explained.png";
-import shot88 from "../../ail/home/tree/tree-figure/shots/01-the-picture.png";
-import shot89 from "../../ail/home/watch/shots/01-the-section.png";
-import shot90 from "../../ail/home/watch/walkthrough-player/shots/01-it-opens-paused.png";
-import shot91 from "../../ail/home/watch/walkthrough-player/shots/02-the-other-walkthrough.png";
-import shot92 from "../../ail/home/watch/walkthrough-player/shots/03-picking-a-chapter.png";
-import shot93 from "../../ail/home/watch/walkthrough-player/shots/04-next-and-previous.png";
-import shot94 from "../../ail/home/watch/walkthrough-player/shots/05-arrow-keys.png";
-import shot95 from "../../ail/home/watch/walkthrough-player/shots/06-playing.png";
-import shot96 from "../../ail/home/watch/walkthrough-player/walk-caption/shots/01-a-branch-chapter.png";
-import shot97 from "../../ail/home/watch/walkthrough-player/walk-controls/shots/01-on-the-first-chapter.png";
-import shot98 from "../../ail/home/watch/walkthrough-player/walk-controls/shots/02-moving-on.png";
-import shot99 from "../../ail/home/watch/walkthrough-player/walk-picture/shots/01-a-stale-chapter.png";
-import shot100 from "../../ail/home/watch/walkthrough-player/walk-picture/shots/02-nodes-with-no-spec-yet.png";
-import shot101 from "../../ail/home/watch/walkthrough-player/walk-picture/walk-inset/shots/01-a-card.png";
-import shot102 from "../../ail/home/watch/walkthrough-player/walk-picture/walk-inset/shots/02-a-screenshot.png";
-import shot103 from "../../ail/home/watch/walkthrough-player/walk-terminal/shots/01-lines-kept-exactly.png";
-import shot104 from "../../ail/home/watch/walkthrough-player/walk-terminal/shots/02-the-caret.png";
-import shot105 from "../../ail/home/watch/walkthrough-player/walk-terminal/shots/03-nothing-printed.png";
-import shot106 from "../../ail/home/watch/walkthrough-player/walk-timeline/shots/01-the-chapters.png";
-import shot107 from "../../ail/home/watch/walkthrough-player/walk-timeline/shots/02-picking-a-chapter.png";
-import shot108 from "../../ail/home/watch/walkthrough-player/walk-title-bar/shots/01-the-tabs.png";
-import shot109 from "../../ail/home/watch/walkthrough-player/walk-title-bar/shots/02-arrow-keys.png";
-import shot110 from "../../ail/parts/code-block/shots/01-shown-exactly.png";
-import shot111 from "../../ail/parts/code-block/shots/02-the-thread-is-marked.png";
-import shot112 from "../../ail/parts/code-block/shots/03-a-caption.png";
-import shot113 from "../../ail/parts/code-block/shots/04-a-long-line-wraps-under-itself.png";
-import shot114 from "../../ail/parts/copy-command/shots/01-copying.png";
-import shot115 from "../../ail/parts/mini-board/shots/01-marks.png";
-import shot116 from "../../ail/parts/mini-board/shots/02-numbers-in-empty-squares.png";
-import shot117 from "../../ail/parts/section-heading/shots/01-a-full-heading.png";
-import shot118 from "../../ail/parts/section-heading/shots/02-just-a-heading.png";
-import shot119 from "../../ail/parts/section/shots/01-an-anchored-band.png";
-import shot120 from "../../ail/parts/spec-editor/shots/01-readable-before-the-editor-loads.png";
-import shot121 from "../../ail/parts/spec-shot/shots/01-a-screenshot-is-shown.png";
-import shot122 from "../../ail/parts/stack/shots/01-children-keep-their-order.png";
+import shot25 from "../../ail/home/adopt/adopt-figure/shots/01-the-picture.png";
+import shot26 from "../../ail/home/adopt/shots/01-adopting-is-explained.png";
+import shot27 from "../../ail/home/build-loop/shots/01-four-steps.png";
+import shot28 from "../../ail/home/hero/hero-figure/shots/01-the-picture-is-described.png";
+import shot29 from "../../ail/home/hero/shots/01-the-links-go-to-the-right-places.png";
+import shot30 from "../../ail/home/journey/journey-stop/shots/01-a-stop.png";
+import shot31 from "../../ail/home/journey/journey-stop/shots/02-a-stop-with-a-file-to-browse.png";
+import shot32 from "../../ail/home/journey/jump-gauge/shots/01-every-pill-leads-to-its-stop.png";
+import shot33 from "../../ail/home/journey/jump-gauge/shots/02-the-gauge-shows-which-stops-are-the-spec.png";
+import shot34 from "../../ail/home/journey/shots/01-eight-stops-in-order.png";
+import shot35 from "../../ail/home/journey/shots/02-the-thread-is-explained.png";
+import shot36 from "../../ail/home/journey/stops/stop-build/build-figure/shots/01-the-picture.png";
+import shot37 from "../../ail/home/journey/stops/stop-build/shots/01-the-build.png";
+import shot38 from "../../ail/home/journey/stops/stop-experience/experience-figure/shots/01-the-picture.png";
+import shot39 from "../../ail/home/journey/stops/stop-experience/shots/01-the-experience-level.png";
+import shot40 from "../../ail/home/journey/stops/stop-idea/idea-figure/shots/01-the-picture.png";
+import shot41 from "../../ail/home/journey/stops/stop-idea/shots/01-the-idea.png";
+import shot42 from "../../ail/home/journey/stops/stop-product/product-figure/shots/01-the-picture.png";
+import shot43 from "../../ail/home/journey/stops/stop-product/shots/01-the-product-level.png";
+import shot44 from "../../ail/home/journey/stops/stop-proof/proof-screens/shots/01-the-screens.png";
+import shot45 from "../../ail/home/journey/stops/stop-proof/shots/01-the-proof.png";
+import shot46 from "../../ail/home/journey/stops/stop-result/result-frame/shots/01-the-game-is-embedded.png";
+import shot47 from "../../ail/home/journey/stops/stop-result/result-frame/shots/02-the-game-fits-a-phone.png";
+import shot48 from "../../ail/home/journey/stops/stop-result/shots/01-the-result.png";
+import shot49 from "../../ail/home/journey/stops/stop-specialist/shots/01-the-specialist-level.png";
+import shot50 from "../../ail/home/journey/stops/stop-specialist/specialist-figure/shots/01-the-picture.png";
+import shot51 from "../../ail/home/journey/stops/stop-system/shots/01-the-system-level.png";
+import shot52 from "../../ail/home/journey/stops/stop-system/system-figure/shots/01-the-picture.png";
+import shot53 from "../../ail/home/readers/readers-tree/shots/01-the-stakeholder-s-level.png";
+import shot54 from "../../ail/home/readers/shots/01-the-first-reader.png";
+import shot55 from "../../ail/home/readers/shots/02-picking-another-reader.png";
+import shot56 from "../../ail/home/readers/shots/03-arrow-keys.png";
+import shot57 from "../../ail/home/review/sample-pull-request/pull-request-diff/shots/01-the-spec-change.png";
+import shot58 from "../../ail/home/review/sample-pull-request/shots/01-the-parts-to-review-are-open.png";
+import shot59 from "../../ail/home/review/sample-pull-request/shots/02-what-the-build-wrote-is-collapsed.png";
+import shot60 from "../../ail/home/review/shots/01-what-a-reviewer-reads.png";
+import shot61 from "../../ail/home/sections/footer/shots/01-the-links.png";
+import shot62 from "../../ail/home/sections/gap-strip/shots/01-three-cards.png";
+import shot63 from "../../ail/home/sections/get-started/agent-cards/shots/01-in-cursor.png";
+import shot64 from "../../ail/home/sections/get-started/agent-cards/shots/02-in-github-copilot.png";
+import shot65 from "../../ail/home/sections/get-started/review-note/shots/01-generated-code-stays-out-of-review.png";
+import shot66 from "../../ail/home/sections/get-started/shots/01-in-claude-code.png";
+import shot67 from "../../ail/home/sections/get-started/shots/02-in-a-terminal.png";
+import shot68 from "../../ail/home/sections/get-started/shots/03-what-to-do-next.png";
+import shot69 from "../../ail/home/sections/spec-browser/shots/01-the-demo-s-spec-is-shown-first.png";
+import shot70 from "../../ail/home/sections/spec-browser/shots/02-picking-another-file.png";
+import shot71 from "../../ail/home/sections/spec-browser/shots/03-showing-this-website-s-spec.png";
+import shot72 from "../../ail/home/sections/spec-browser/shots/04-a-screenshot-beside-its-spec.png";
+import shot73 from "../../ail/home/sections/spec-browser/shots/05-opened-from-a-link.png";
+import shot74 from "../../ail/home/sections/spec-browser/shots/06-the-language-is-defined.png";
+import shot75 from "../../ail/home/sections/spec-browser/shots/07-following-the-same-link-twice.png";
+import shot76 from "../../ail/home/sections/spec-browser/spec-tree/shots/01-screenshots-beside-their-spec.png";
+import shot77 from "../../ail/home/sections/top-bar/shots/01-the-links-lead-to-the-right-places.png";
+import shot78 from "../../ail/home/shots/01-one-story-in-order.png";
+import shot79 from "../../ail/home/shots/02-every-top-bar-link-has-a-place-to-land.png";
+import shot80 from "../../ail/home/tree/shots/01-the-tree-is-explained.png";
+import shot81 from "../../ail/home/tree/tree-figure/shots/01-the-picture.png";
+import shot82 from "../../ail/home/watch/shots/01-the-section.png";
+import shot83 from "../../ail/home/watch/walkthrough-player/shots/01-it-opens-paused.png";
+import shot84 from "../../ail/home/watch/walkthrough-player/shots/02-the-other-walkthrough.png";
+import shot85 from "../../ail/home/watch/walkthrough-player/shots/03-picking-a-chapter.png";
+import shot86 from "../../ail/home/watch/walkthrough-player/shots/04-next-and-previous.png";
+import shot87 from "../../ail/home/watch/walkthrough-player/shots/05-arrow-keys.png";
+import shot88 from "../../ail/home/watch/walkthrough-player/shots/06-playing.png";
+import shot89 from "../../ail/home/watch/walkthrough-player/walk-caption/shots/01-a-branch-chapter.png";
+import shot90 from "../../ail/home/watch/walkthrough-player/walk-controls/shots/01-on-the-first-chapter.png";
+import shot91 from "../../ail/home/watch/walkthrough-player/walk-controls/shots/02-moving-on.png";
+import shot92 from "../../ail/home/watch/walkthrough-player/walk-picture/shots/01-a-stale-chapter.png";
+import shot93 from "../../ail/home/watch/walkthrough-player/walk-picture/shots/02-nodes-with-no-spec-yet.png";
+import shot94 from "../../ail/home/watch/walkthrough-player/walk-picture/walk-inset/shots/01-a-card.png";
+import shot95 from "../../ail/home/watch/walkthrough-player/walk-picture/walk-inset/shots/02-a-screenshot.png";
+import shot96 from "../../ail/home/watch/walkthrough-player/walk-terminal/shots/01-lines-kept-exactly.png";
+import shot97 from "../../ail/home/watch/walkthrough-player/walk-terminal/shots/02-the-caret.png";
+import shot98 from "../../ail/home/watch/walkthrough-player/walk-terminal/shots/03-nothing-printed.png";
+import shot99 from "../../ail/home/watch/walkthrough-player/walk-timeline/shots/01-the-chapters.png";
+import shot100 from "../../ail/home/watch/walkthrough-player/walk-timeline/shots/02-picking-a-chapter.png";
+import shot101 from "../../ail/home/watch/walkthrough-player/walk-title-bar/shots/01-the-tabs.png";
+import shot102 from "../../ail/home/watch/walkthrough-player/walk-title-bar/shots/02-arrow-keys.png";
+import shot103 from "../../ail/parts/code-block/shots/01-shown-exactly.png";
+import shot104 from "../../ail/parts/code-block/shots/02-the-thread-is-marked.png";
+import shot105 from "../../ail/parts/code-block/shots/03-a-caption.png";
+import shot106 from "../../ail/parts/code-block/shots/04-a-long-line-wraps-under-itself.png";
+import shot107 from "../../ail/parts/copy-command/shots/01-copying.png";
+import shot108 from "../../ail/parts/mini-board/shots/01-marks.png";
+import shot109 from "../../ail/parts/mini-board/shots/02-numbers-in-empty-squares.png";
+import shot110 from "../../ail/parts/section-heading/shots/01-a-full-heading.png";
+import shot111 from "../../ail/parts/section-heading/shots/02-just-a-heading.png";
+import shot112 from "../../ail/parts/section/shots/01-an-anchored-band.png";
+import shot113 from "../../ail/parts/spec-editor/shots/01-readable-before-the-editor-loads.png";
+import shot114 from "../../ail/parts/spec-shot/shots/01-a-screenshot-is-shown.png";
+import shot115 from "../../ail/parts/stack/shots/01-children-keep-their-order.png";
 export type SpecFile = { path: string; text: string };
 export type SpecShot = { node: string; test: string; path: string; src: string };
 export type SpecProject = { key: string; name: string; nodeCount: number; files: SpecFile[]; shots: SpecShot[] };
@@ -358,48 +351,6 @@ export const specProjects: SpecProject[] = [
         "test": "content is shown",
         "path": "ui/text/shots/01-content-is-shown.png",
         "src": shot24
-      },
-      {
-        "node": "PlayAGame",
-        "test": "X always starts",
-        "path": "app/play/shots/e2e/x-always-starts.png",
-        "src": shot25
-      },
-      {
-        "node": "PlayAGame",
-        "test": "taking turns",
-        "path": "app/play/shots/e2e/taking-turns.png",
-        "src": shot26
-      },
-      {
-        "node": "PlayAGame",
-        "test": "a taken square can't be picked",
-        "path": "app/play/shots/e2e/a-taken-square-can-t-be-picked.png",
-        "src": shot27
-      },
-      {
-        "node": "PlayAGame",
-        "test": "winning",
-        "path": "app/play/shots/e2e/winning.png",
-        "src": shot28
-      },
-      {
-        "node": "PlayAGame",
-        "test": "draw",
-        "path": "app/play/shots/e2e/draw.png",
-        "src": shot29
-      },
-      {
-        "node": "PlayAGame",
-        "test": "new game",
-        "path": "app/play/shots/e2e/new-game.png",
-        "src": shot30
-      },
-      {
-        "node": "PlayAGame",
-        "test": "the computer answers",
-        "path": "app/play/shots/e2e/the-computer-answers.png",
-        "src": shot31
       }
     ]
   },
@@ -418,7 +369,7 @@ export const specProjects: SpecProject[] = [
       },
       {
         "path": "home/adopt/adopt.ail.md",
-        "text": "# Adopt an existing app\n\nAIL in reverse: for an app that already exists, write its spec from what is\nthere, prove the spec describes it, and from then on build from the spec,\non the same stack or a new one.\n\nMore nodes, each in a folder of its own: [`AdoptFigure`](adopt-figure/adopt-figure.ail.md).\n\n```ail\nnode AdoptSection : view   level: experience\n  why   Most software already exists: show that AIL can take over an existing app, and carry it to a new technology without changing what it does.   <- HomePage\n  what\n    the section has the id \"adopt\", so the page can link to it\n    a heading, a picture of an old app and a new app checked against the same spec, four steps that write and prove the spec, and the two commands that do it\n    the picture comes before the steps\n    Scenario: adopting is explained\n      Given the page is open\n      Then the section with the id \"adopt\" has the level 2 heading \"Already have an app? Adopt it.\"\n      And it has the level 3 headings \"Why, from people and tickets\", \"What, from the running app\", \"How, from the code\" and \"Proof, on the old app\", in that order\n      And it shows the commands \"/ail:adopt\" and \"ail adopt\"\n  look\n    band      Section with id \"adopt\", tone plain\n    layout    stack(v, gap: space.6, align: stretch) [ head, figure, steps, commands, note ]\n    head      SectionHeading with eyebrow from adopt.eyebrow, text from adopt.heading, lead from adopt.lead\n    figure    a div: background color.surface.raised, radius.lg, pad clamp(16px, 4vw, 24px), overflow hidden; holding AdoptFigure\n    steps     an ol styled directly (not a Stack): list-style none, margin 0, pad 0, display grid, grid-template-columns repeat(auto-fit, minmax(min(240px, 100%), 1fr)), gap space.4\n    step      an li styled directly: background color.surface, a 1px solid color.border border, radius.lg, pad clamp(16px, 4vw, 24px), display flex, flex-direction column, gap space.2; holding [ number, title, text ]\n    number    a span showing the step's number from copy (adopt.n1 to adopt.n4): display block, font.display at clamp(26px, 7vw, 32px), weight 800, line-height 1; why color.level.product, what color.level.experience, how color.level.system, proof color.pass\n    title     an h3: font.lead, weight 700, color.text, margin 0\n    text      a p: font.body, line-height 1.6, color.text.muted, margin 0\n    commands  a div: display grid, grid-template-columns repeat(auto-fit, minmax(min(320px, 100%), 1fr)), gap space.4; holding two cards\n    card      background color.surface, a 1px solid color.border border, radius.lg, pad clamp(16px, 4vw, 24px), min-width 0; stack(v, gap: space.3, align: stretch) [ card.title, CopyCommand, card.text ]\n    card.title  an h3: font.lead, weight 700, color.text, margin 0\n    card.text   a p: font.small, line-height 1.6, color.text.muted, margin 0\n    note      a p: font.small, line-height 1.6, color.text.muted, max-width width.prose, margin 0\n  copy\n    adopt.eyebrow     \"AIL IN REVERSE\"\n    adopt.heading     \"Already have an app? Adopt it.\"\n    adopt.lead        \"Most software already exists. AIL can write the spec of an app you already have, prove that the spec describes it, and from then on build it from that spec, on the same technology or a new one.\"\n    adopt.n1          \"1\"\n    adopt.n2          \"2\"\n    adopt.n3          \"3\"\n    adopt.n4          \"4\"\n    adopt.1.title     \"Why, from people and tickets\"\n    adopt.1.text      \"The reasons come from the task tracker (Asana, Jira, Linear) and from interviewing the people who own the app. A reason nobody can confirm is written down as unknown, and every build lists it until someone answers.\"\n    adopt.2.title     \"What, from the running app\"\n    adopt.2.text      \"An agent finds out how to start the app, whatever it is (a website, a mobile app on a simulator, a command-line tool), along with the backend or database it needs. Each scenario's test data is created through the app's own API, never straight into its database. Then it drives every screen and error path, and writes down what it sees, quirks included.\"\n    adopt.3.title     \"How, from the code\"\n    adopt.3.text      \"The code tells what the screen can't: data shapes, rules, edge cases and timing. Real inputs and outputs become examples, and every claim records where it came from.\"\n    adopt.4.title     \"Proof, on the old app\"\n    adopt.4.text      \"Every flow gets an end-to-end check that plays its scenarios and screenshots the screen each one ends on, on any platform. ail adopt starts the old app, runs them, commits the screenshots, and records the app as built, so the first build only builds what changes.\"\n    adopt.claude.title  \"In Claude Code, Cursor or Copilot\"\n    adopt.claude.cmd    \"/ail:adopt\"\n    adopt.claude.text   \"The agent writes the spec one slice at a time: a screen, a flow or a rule. It asks you what only the owners know. In Cursor and Copilot, pick adopt from the / menu.\"\n    adopt.cli.title     \"In a terminal\"\n    adopt.cli.cmd       \"ail adopt\"\n    adopt.cli.text      \"Starts the app as ail.config.json says, runs every end-to-end check against it, and stops it.\"\n    adopt.note        \"To move to another technology, change the spec's target and build. Every build then runs the same end-to-end checks against the new app, so it is proven to behave like the old one.\"\n  binds\n    claude   a card with an h3 from adopt.claude.title, CopyCommand with adopt.claude.cmd, then a p from adopt.claude.text\n    cli      a card with an h3 from adopt.cli.title, CopyCommand with adopt.cli.cmd, then a p from adopt.cli.text\n    cards    each card is a region named by its h3\n  uses      Section, SectionHeading, Stack, CopyCommand, AdoptFigure\n  children  AdoptFigure\n```\n"
+        "text": "# Adopt an existing app\n\nAIL in reverse: for an app that already exists, write its spec from what is\nthere, prove the spec describes it, and from then on build from the spec,\non the same stack or a new one.\n\nMore nodes, each in a folder of its own: [`AdoptFigure`](adopt-figure/adopt-figure.ail.md).\n\n```ail\nnode AdoptSection : view   level: experience\n  why   Most software already exists: show that AIL can take over an existing app, and carry it to a new technology without changing what it does.   <- HomePage\n  what\n    the section has the id \"adopt\", so the page can link to it\n    a heading, a picture of an old app and a new app checked against the same spec, four steps that write and prove the spec, and the two commands that do it\n    the picture comes before the steps\n    Scenario: adopting is explained\n      Given the page is open\n      Then the section with the id \"adopt\" has the level 2 heading \"Already have an app? Adopt it.\"\n      And it has the level 3 headings \"Why, from people and tickets\", \"What, from the running app\", \"How, from the code\" and \"Proof, on the old app\", in that order\n      And it shows the commands \"/ail:adopt\" and \"ail adopt\"\n  look\n    band      Section with id \"adopt\", tone plain\n    layout    stack(v, gap: space.6, align: stretch) [ head, figure, steps, commands, note ]\n    head      SectionHeading with eyebrow from adopt.eyebrow, text from adopt.heading, lead from adopt.lead\n    figure    a div: background color.surface.raised, radius.lg, pad clamp(16px, 4vw, 24px), overflow hidden; holding AdoptFigure\n    steps     an ol styled directly (not a Stack): list-style none, margin 0, pad 0, display grid, grid-template-columns repeat(auto-fit, minmax(min(240px, 100%), 1fr)), gap space.4\n    step      an li styled directly: background color.surface, a 1px solid color.border border, radius.lg, pad clamp(16px, 4vw, 24px), display flex, flex-direction column, gap space.2; holding [ number, title, text ]\n    number    a span showing the step's number from copy (adopt.n1 to adopt.n4): display block, font.display at clamp(26px, 7vw, 32px), weight 800, line-height 1; why color.level.product, what color.level.experience, how color.level.system, proof color.pass\n    title     an h3: font.lead, weight 700, color.text, margin 0\n    text      a p: font.body, line-height 1.6, color.text.muted, margin 0\n    commands  a div: display grid, grid-template-columns repeat(auto-fit, minmax(min(320px, 100%), 1fr)), gap space.4; holding two cards\n    card      background color.surface, a 1px solid color.border border, radius.lg, pad clamp(16px, 4vw, 24px), min-width 0; stack(v, gap: space.3, align: stretch) [ card.title, CopyCommand, card.text ]\n    card.title  an h3: font.lead, weight 700, color.text, margin 0\n    card.text   a p: font.small, line-height 1.6, color.text.muted, margin 0\n    note      a p: font.small, line-height 1.6, color.text.muted, max-width width.prose, margin 0\n  copy\n    adopt.eyebrow     \"AIL IN REVERSE\"\n    adopt.heading     \"Already have an app? Adopt it.\"\n    adopt.lead        \"Most software already exists. AIL can write the spec of an app you already have, prove that the spec describes it, and from then on build it from that spec, on the same technology or a new one.\"\n    adopt.n1          \"1\"\n    adopt.n2          \"2\"\n    adopt.n3          \"3\"\n    adopt.n4          \"4\"\n    adopt.1.title     \"Why, from people and tickets\"\n    adopt.1.text      \"The reasons come from the task tracker (Asana, Jira, Linear) and from interviewing the people who own the app. A reason nobody can confirm is written down as unknown, and every build lists it until someone answers.\"\n    adopt.2.title     \"What, from the running app\"\n    adopt.2.text      \"An agent finds out how to start the app, whatever it is (a website, a mobile app on a simulator, a command-line tool), along with the backend or database it needs. Each scenario's test data is created through the app's own API, never straight into its database. Then it drives every screen and error path, and writes down what it sees, quirks included.\"\n    adopt.3.title     \"How, from the code\"\n    adopt.3.text      \"The code tells what the screen can't: data shapes, rules, edge cases and timing. Real inputs and outputs become examples, and every claim records where it came from.\"\n    adopt.4.title     \"Proof, on the old app\"\n    adopt.4.text      \"Every flow gets an end-to-end check that plays its scenarios on any platform. ail adopt starts the old app, runs them, and records the app as built, so the first build only builds what changes. Then each node with a look gets a derived check that renders the old app's own code and screenshots the screen each scenario ends on.\"\n    adopt.claude.title  \"In Claude Code, Cursor or Copilot\"\n    adopt.claude.cmd    \"/ail:adopt\"\n    adopt.claude.text   \"The agent writes the spec one slice at a time: a screen, a flow or a rule. It asks you what only the owners know. In Cursor and Copilot, pick adopt from the / menu.\"\n    adopt.cli.title     \"In a terminal\"\n    adopt.cli.cmd       \"ail adopt\"\n    adopt.cli.text      \"Starts the app as ail.config.json says, runs every end-to-end check against it, and stops it.\"\n    adopt.note        \"To move to another technology, change the spec's target and build. Every build then runs the same end-to-end checks against the new app, so it is proven to behave like the old one.\"\n  binds\n    claude   a card with an h3 from adopt.claude.title, CopyCommand with adopt.claude.cmd, then a p from adopt.claude.text\n    cli      a card with an h3 from adopt.cli.title, CopyCommand with adopt.cli.cmd, then a p from adopt.cli.text\n    cards    each card is a region named by its h3\n  uses      Section, SectionHeading, Stack, CopyCommand, AdoptFigure\n  children  AdoptFigure\n```\n"
       },
       {
         "path": "home/adopt/adopt-figure/adopt-figure.ail.md",
@@ -594,7 +545,7 @@ export const specProjects: SpecProject[] = [
       },
       {
         "path": "home/watch/walkthrough-player/walk-picture/walk-inset/walk-inset.ail.md",
-        "text": "# Walk inset\n\n```ail\nnode WalkInset : view   level: experience\n  why   Each chapter has one detail worth a closer look: a card of what the tool reads or writes, or a screenshot of the app it checks.   <- WalkPicture\n  what\n    a card shows its label and then its lines in a small code font, each on its own line, keeping their spaces\n    a screenshot shows its label, the verdict when there is one, and the committed screenshot of that node at the end of that check\n    a screenshot that is not among the committed ones shows nothing, and neither does an inset of kind none\n    Scenario: a card\n      Given a card labelled \"Compile context: WatchADemo\" with the lines \"Target, design tokens, glossary\" and \"Why chain: TicTacToe → App\"\n      Then \"Compile context: WatchADemo\" is shown, then those two lines, each on its own line\n    Scenario: a screenshot\n      Given a screenshot of the node \"PlayAGame\" at the end of the check \"winning\", labelled \"Your app today · localhost:3000\", with the verdict \"MATCHES\"\n      Then the image named \"Screenshot of the app at the end of the check “winning”\" is shown\n      And \"Your app today · localhost:3000\" and \"MATCHES\" are shown above it\n    Scenario: nothing\n      Given an inset of kind none\n      Then nothing is shown\n  look\n    card     a div: display flex, flex-direction column, gap space.2, min-width 0, pad space.3, background color.code, a 1px solid color.code.border border, radius.md\n    label    a p: margin 0, font.mono at font.tiny, color color.code.muted, overflow-wrap anywhere, line-height 1.4\n    lines    a div: display flex, flex-direction column, gap 0; each line a p: margin 0, font.mono at font.tiny, line-height 1.5, color color.code.text, white-space pre-wrap, overflow-wrap anywhere\n    shot     a figure: margin 0, display flex, flex-direction column, gap space.2, min-width 0; holding [ caption, image ]\n    caption  a figcaption: display flex, flex-wrap wrap, align-items center, gap space.2; the label in font.sans at font.tiny, weight 700, color color.code.muted; then, when given, the verdict pill\n    pill     a span: pad 2px space.2, radius.pill, background color.pass, color color.on.accent, font.micro, weight 700, letter-spacing 0.08em\n    image    an img: display block, width auto, height auto, max-width 100%, max-height 240px, align-self flex-start, object-fit contain, box-sizing border-box, background color.surface, a 1px solid color.code.border border, radius.md (at most 240px tall, so a screenshot never makes the player taller)\n  copy\n    walk.shot.alt  \"Screenshot of the app at the end of the check “{test}”\"\n  binds\n    props    inset: Inset\n    data     specProjects from the spec module: of the project with key \"tictactoe\", the last shot whose node and test are the inset's (the end-to-end one when there is one)\n    img      src the shot's src; alt from walk.shot.alt with {test} filled in\n  uses      Walkthrough\n```\n"
+        "text": "# Walk inset\n\n```ail\nnode WalkInset : view   level: experience\n  why   Each chapter has one detail worth a closer look: a card of what the tool reads or writes, or a screenshot of the app it checks.   <- WalkPicture\n  what\n    a card shows its label and then its lines in a small code font, each on its own line, keeping their spaces\n    a screenshot shows its label, the verdict when there is one, and the committed screenshot of that node at the end of that check\n    a screenshot that is not among the committed ones shows nothing, and neither does an inset of kind none\n    Scenario: a card\n      Given a card labelled \"Compile context: WatchADemo\" with the lines \"Target, design tokens, glossary\" and \"Why chain: TicTacToe → App\"\n      Then \"Compile context: WatchADemo\" is shown, then those two lines, each on its own line\n    Scenario: a screenshot\n      Given a screenshot of the node \"PlayAGame\" at the end of the check \"winning\", labelled \"Your app today · localhost:3000\", with the verdict \"MATCHES\"\n      Then the image named \"Screenshot of the app at the end of the check “winning”\" is shown\n      And \"Your app today · localhost:3000\" and \"MATCHES\" are shown above it\n    Scenario: nothing\n      Given an inset of kind none\n      Then nothing is shown\n  look\n    card     a div: display flex, flex-direction column, gap space.2, min-width 0, pad space.3, background color.code, a 1px solid color.code.border border, radius.md\n    label    a p: margin 0, font.mono at font.tiny, color color.code.muted, overflow-wrap anywhere, line-height 1.4\n    lines    a div: display flex, flex-direction column, gap 0; each line a p: margin 0, font.mono at font.tiny, line-height 1.5, color color.code.text, white-space pre-wrap, overflow-wrap anywhere\n    shot     a figure: margin 0, display flex, flex-direction column, gap space.2, min-width 0; holding [ caption, image ]\n    caption  a figcaption: display flex, flex-wrap wrap, align-items center, gap space.2; the label in font.sans at font.tiny, weight 700, color color.code.muted; then, when given, the verdict pill\n    pill     a span: pad 2px space.2, radius.pill, background color.pass, color color.on.accent, font.micro, weight 700, letter-spacing 0.08em\n    image    an img: display block, width auto, height auto, max-width 100%, max-height 240px, align-self flex-start, object-fit contain, box-sizing border-box, background color.surface, a 1px solid color.code.border border, radius.md (at most 240px tall, so a screenshot never makes the player taller)\n  copy\n    walk.shot.alt  \"Screenshot of the app at the end of the check “{test}”\"\n  binds\n    props    inset: Inset\n    data     specProjects from the spec module: of the project with key \"tictactoe\", the last shot whose node and test are the inset's\n    img      src the shot's src; alt from walk.shot.alt with {test} filled in\n  uses      Walkthrough\n```\n"
       },
       {
         "path": "home/watch/walkthrough-player/walk-terminal/walk-terminal.ail.md",
@@ -622,7 +573,7 @@ export const specProjects: SpecProject[] = [
       },
       {
         "path": "home/watch/walkthrough-player/walkthrough/adopt-walkthrough/adopt-second-half/adopt-second-half.ail.md",
-        "text": "# Adopt second half\n\n```ail\nnode AdoptSecondHalf : data   level: system\n  why   The last five chapters of the adopt walkthrough: from the end-to-end check to the new stack.   <- AdoptWalkthrough\n  what\n    ADOPT_SECOND_HALF: list of Beat = [\n        { id: \"checks\", seconds: 8, branch: false, title: \"A check for every scenario\",\n          caption: \"Each flow gets an end-to-end check: one test per scenario, only what a user can see and do, so it works on the rebuilt app. Tests end with screenshots.\",\n          lines: [\n            \"checks/e2e/app/play/play-a-game.e2e.ts\",\n            \"test(\\\"X always starts\\\", async () => {\",\n            \"  await expect(status(\\\"X's turn\\\").isVisible()).resolves.toBe(true);\",\n            \"  await proof(\\\"X always starts\\\");\",\n            \"});\",\n            \"→ x-always-starts.png\"],\n          states: { \"PlayAGame\": \"writing\", \"App\": \"written\", \"NewGameButton\": \"written\", \"StatusLine\": \"written\", \"BoardView\": \"written\", \"ChooseOpponent\": \"written\", \"GameReducer\": \"written\", \"Rules\": \"written\", \"GameState\": \"written\" },\n          inset: { kind: \"card\", label: \"One screenshot per test\", lines: [\"→ x-always-starts.png\", \"→ taking-turns.png\", \"→ a-taken-square-can-t-be-picked.png\", \"→ winning.png\", \"→ draw.png\", \"→ new-game.png\", \"→ the-computer-answers.png\"] } },\n        { id: \"prove\", seconds: 11, branch: false, title: \"Prove it on the old app\",\n          caption: \"ail_adopt starts and seeds the old app and its API, runs each check, then stops everything. A failing check means the spec or the check is wrong, never the app.\",\n          lines: [\"· starting the service api: npm run api\", \"· starting the app: npm start\", \"· seeding through the app: bun ../tictactoe-ail/checks/e2e/data.ts seed\"],\n          states: { \"PlayAGame\": \"checking\", \"App\": \"written\", \"NewGameButton\": \"written\", \"StatusLine\": \"written\", \"BoardView\": \"written\", \"ChooseOpponent\": \"written\", \"GameReducer\": \"written\", \"Rules\": \"written\", \"GameState\": \"written\" },\n          inset: { kind: \"card\", label: \"Run from outside the project\", lines: [\"// ail-derived-from: PlayAGame@5445e0669a18e44c\", \"a temp folder gets only AIL_APP_URL, AIL_API_URL and AIL_SHOTS_DIR\", \"✓ 7 tests, 7 screenshots in ail/app/play/shots/e2e/\", \"everything stops, the app first\"] } },\n        { id: \"judge\", seconds: 12, branch: false, title: \"A model checks the look\",\n          caption: \"One model call judges all the flow's screenshots together. Once everything has passed, every node ail hasn't built is recorded in the lock as built by the existing app.\",\n          lines: [\n            \"· PlayAGame: comparing its screenshots with its look\",\n            \"✓ app      1 of 1 flow(s) behave as their spec says (run.legacy)\",\n            \"    · 2 node(s) with scenarios have no end-to-end check yet: App, WatchADemo\",\n            \"    ✓ PlayAGame: 7 screenshot(s) match its look\",\n            \"    ✓ recorded 16 node(s) as built by the existing app in the lock file, so ail build only builds what changes from now on\",\n            \"    · to keep generated code out of pull request diffs (it stays committed, and GitHub collapses it), add to /…/tictactoe-ail/.gitattributes:\",\n            \"        src/gen/** linguist-generated=true\",\n            \"        ail.lock.json linguist-generated=true\"],\n          states: { \"TicTacToe\": \"adopted\", \"App\": \"adopted\", \"WatchADemo\": \"adopted\", \"GameState\": \"adopted\", \"Rules\": \"adopted\",\n            \"PlayAGame\": \"proven\", \"ChooseOpponent\": \"proven\", \"NewGameButton\": \"proven\", \"StatusLine\": \"proven\", \"BoardView\": \"proven\", \"GameReducer\": \"proven\", \"ComputerPlayer\": \"proven\", \"Stack\": \"proven\", \"Text\": \"proven\", \"Button\": \"proven\", \"Segmented\": \"proven\" },\n          inset: { kind: \"shot\", node: \"PlayAGame\", test: \"draw\", label: \"7 screenshots, one verdict\", verdict: \"MATCHES\" } },\n        { id: \"report\", seconds: 8, branch: false, title: \"Report, questions and review\",\n          caption: \"Claude reports the nodes it wrote, what ail_adopt said and each open question with who could answer it, and asks before adding .gitattributes. Every build lists the question until answered.\",\n          lines: [\"✓ spec     no errors, 1 warning(s)\"],\n          states: { \"TicTacToe\": \"adopted\", \"App\": \"adopted\", \"WatchADemo\": \"adopted\", \"GameState\": \"adopted\", \"Rules\": \"adopted\",\n            \"PlayAGame\": \"proven\", \"ChooseOpponent\": \"proven\", \"NewGameButton\": \"proven\", \"StatusLine\": \"proven\", \"BoardView\": \"proven\", \"GameReducer\": \"proven\", \"ComputerPlayer\": \"proven\", \"Stack\": \"proven\", \"Text\": \"proven\", \"Button\": \"proven\", \"Segmented\": \"proven\" },\n          inset: { kind: \"card\", label: \"The next ail build\", lines: [\"! open-question: PlayAGame has a reason nobody has confirmed yet\", \"ask: the product owner\", \"add the .gitattributes lines? yes\"] } },\n        { id: \"migrate\", seconds: 14, branch: false, title: \"Move to a new stack\",\n          caption: \"Change the target and run /ail:build. The build hash includes the target, the checks' pin does not: every node is rebuilt, and the same checks prove the new app.\",\n          lines: [\n            \"· PlayAGame: deriving checks from its scenarios\",\n            \"· PlayAGame: attempt 1 with claude-code\",\n            \"✓ PlayAGame          compiled\",\n            \"! app      end-to-end checks not run: ail.config.json has no run.app saying how to start the app this project builds\",\n            \"\\\"app\\\": { \\\"start\\\": \\\"bun --port=4173 ./index.html\\\", \\\"ready\\\": \\\"http://localhost:4173\\\", \\\"env\\\": { \\\"AIL_APP_URL\\\": \\\"http://localhost:4173\\\" } }\",\n            \"· starting the app: bun --port=4173 ./index.html\",\n            \"✓ app      1 of 1 flow(s) behave as their spec says (run.app)\",\n            \"    ✓ PlayAGame: 7 screenshot(s) match its look\"],\n          states: { \"TicTacToe\": \"fresh\", \"App\": \"fresh\", \"PlayAGame\": \"fresh\", \"WatchADemo\": \"fresh\", \"ChooseOpponent\": \"fresh\", \"NewGameButton\": \"fresh\", \"Stack\": \"fresh\", \"Text\": \"fresh\",\n            \"Button\": \"fresh\", \"Segmented\": \"fresh\", \"BoardView\": \"fresh\", \"StatusLine\": \"fresh\", \"GameState\": \"fresh\", \"Rules\": \"fresh\", \"GameReducer\": \"fresh\", \"ComputerPlayer\": \"fresh\" },\n          inset: { kind: \"shot\", node: \"PlayAGame\", test: \"new game\", label: \"Your app, rebuilt · localhost:4173\", verdict: \"MATCHES\" } }\n      ]\n    examples\n      ADOPT_SECOND_HALF.length => 5\n      ADOPT_SECOND_HALF[2].id => \"judge\"\n      ADOPT_SECOND_HALF[2].lines.length => 8\n  uses  Walkthrough\n```\n"
+        "text": "# Adopt second half\n\n```ail\nnode AdoptSecondHalf : data   level: system\n  why   The last five chapters of the adopt walkthrough: from the end-to-end check to the new stack.   <- AdoptWalkthrough\n  what\n    ADOPT_SECOND_HALF: list of Beat = [\n        { id: \"checks\", seconds: 8, branch: false, title: \"A check for every scenario\",\n          caption: \"Each flow gets an end-to-end check: one test per scenario, only what a user can see and do, so it works on the rebuilt app. It proves behaviour: it takes no screenshots.\",\n          lines: [\n            \"checks/e2e/app/play/play-a-game.e2e.ts\",\n            \"test(\\\"X always starts\\\", async () => {\",\n            \"  await expect(status(\\\"X's turn\\\").isVisible()).resolves.toBe(true);\",\n            \"});\"],\n          states: { \"PlayAGame\": \"writing\", \"App\": \"written\", \"NewGameButton\": \"written\", \"StatusLine\": \"written\", \"BoardView\": \"written\", \"ChooseOpponent\": \"written\", \"GameReducer\": \"written\", \"Rules\": \"written\", \"GameState\": \"written\" },\n          inset: { kind: \"card\", label: \"One test per scenario\", lines: [\"X always starts\", \"taking turns\", \"a taken square can't be picked\", \"winning\", \"draw\", \"new game\", \"the computer answers\"] } },\n        { id: \"prove\", seconds: 11, branch: false, title: \"Prove it on the old app\",\n          caption: \"ail_adopt starts and seeds the old app and its API, runs each check, then stops everything. A failing check means the spec or the check is wrong, never the app.\",\n          lines: [\"· starting the service api: npm run api\", \"· starting the app: npm start\", \"· seeding through the app: bun ../tictactoe-ail/checks/e2e/data.ts seed\"],\n          states: { \"PlayAGame\": \"checking\", \"App\": \"written\", \"NewGameButton\": \"written\", \"StatusLine\": \"written\", \"BoardView\": \"written\", \"ChooseOpponent\": \"written\", \"GameReducer\": \"written\", \"Rules\": \"written\", \"GameState\": \"written\" },\n          inset: { kind: \"card\", label: \"Run from outside the project\", lines: [\"// ail-derived-from: PlayAGame@5445e0669a18e44c\", \"a temp folder gets only AIL_APP_URL and AIL_API_URL\", \"✓ 7 tests pass against the old app\", \"everything stops, the app first\"] } },\n        { id: \"judge\", seconds: 12, branch: false, title: \"A model checks the look\",\n          caption: \"Once the checks pass, every node is recorded as built by the old app. Then /ail:build pictures each node with a look: its derived check renders the old app's own code, and one model call judges the screens together.\",\n          lines: [\n            \"✓ app      1 of 1 flow(s) behave as their spec says (run.legacy)\",\n            \"    ✓ recorded 16 node(s) as built by the existing app in the lock file, so ail build only builds what changes from now on\",\n            \"/ail:build\",\n            \"· PlayAGame: deriving the check that tests and pictures its hand-written code\",\n            \"· PlayAGame: proof screenshots taken\",\n            \"· PlayAGame: comparing its screens with its look\",\n            \"· PlayAGame: 7 screen(s) match its look\",\n            \"✓ behavior 7 test(s) passed\"],\n          states: { \"TicTacToe\": \"adopted\", \"App\": \"adopted\", \"WatchADemo\": \"adopted\", \"GameState\": \"adopted\", \"Rules\": \"adopted\",\n            \"PlayAGame\": \"proven\", \"ChooseOpponent\": \"proven\", \"NewGameButton\": \"proven\", \"StatusLine\": \"proven\", \"BoardView\": \"proven\", \"GameReducer\": \"proven\", \"ComputerPlayer\": \"proven\", \"Stack\": \"proven\", \"Text\": \"proven\", \"Button\": \"proven\", \"Segmented\": \"proven\" },\n          inset: { kind: \"shot\", node: \"PlayAGame\", test: \"draw\", label: \"7 screenshots, one verdict\", verdict: \"MATCHES\" } },\n        { id: \"report\", seconds: 8, branch: false, title: \"Report, questions and review\",\n          caption: \"Claude reports the nodes it wrote, what ail_adopt said and each open question with who could answer it, and asks before adding .gitattributes. Every build lists the question until answered.\",\n          lines: [\"✓ spec     no errors, 1 warning(s)\"],\n          states: { \"TicTacToe\": \"adopted\", \"App\": \"adopted\", \"WatchADemo\": \"adopted\", \"GameState\": \"adopted\", \"Rules\": \"adopted\",\n            \"PlayAGame\": \"proven\", \"ChooseOpponent\": \"proven\", \"NewGameButton\": \"proven\", \"StatusLine\": \"proven\", \"BoardView\": \"proven\", \"GameReducer\": \"proven\", \"ComputerPlayer\": \"proven\", \"Stack\": \"proven\", \"Text\": \"proven\", \"Button\": \"proven\", \"Segmented\": \"proven\" },\n          inset: { kind: \"card\", label: \"The next ail build\", lines: [\"! open-question: PlayAGame has a reason nobody has confirmed yet\", \"ask: the product owner\", \"add the .gitattributes lines? yes\"] } },\n        { id: \"migrate\", seconds: 14, branch: false, title: \"Move to a new stack\",\n          caption: \"Change the target and run /ail:build. The build hash includes the target, the checks' pin does not: every node is rebuilt, and the same checks prove the new app.\",\n          lines: [\n            \"· PlayAGame: deriving checks from its scenarios\",\n            \"· PlayAGame: attempt 1 with claude-code\",\n            \"· PlayAGame: 7 screen(s) match its look\",\n            \"✓ PlayAGame          compiled\",\n            \"! app      end-to-end checks not run: ail.config.json has no run.app saying how to start the app this project builds\",\n            \"\\\"app\\\": { \\\"start\\\": \\\"bun --port=4173 ./index.html\\\", \\\"ready\\\": \\\"http://localhost:4173\\\", \\\"env\\\": { \\\"AIL_APP_URL\\\": \\\"http://localhost:4173\\\" } }\",\n            \"· starting the app: bun --port=4173 ./index.html\",\n            \"✓ app      1 of 1 flow(s) behave as their spec says (run.app)\"],\n          states: { \"TicTacToe\": \"fresh\", \"App\": \"fresh\", \"PlayAGame\": \"fresh\", \"WatchADemo\": \"fresh\", \"ChooseOpponent\": \"fresh\", \"NewGameButton\": \"fresh\", \"Stack\": \"fresh\", \"Text\": \"fresh\",\n            \"Button\": \"fresh\", \"Segmented\": \"fresh\", \"BoardView\": \"fresh\", \"StatusLine\": \"fresh\", \"GameState\": \"fresh\", \"Rules\": \"fresh\", \"GameReducer\": \"fresh\", \"ComputerPlayer\": \"fresh\" },\n          inset: { kind: \"shot\", node: \"PlayAGame\", test: \"new game\", label: \"Your app, rebuilt · localhost:4173\", verdict: \"MATCHES\" } }\n      ]\n    examples\n      ADOPT_SECOND_HALF.length => 5\n      ADOPT_SECOND_HALF[2].id => \"judge\"\n      ADOPT_SECOND_HALF[2].lines.length => 8\n  uses  Walkthrough\n```\n"
       },
       {
         "path": "home/watch/walkthrough-player/walkthrough/build-walkthrough/build-walkthrough.ail.md",
@@ -634,7 +585,7 @@ export const specProjects: SpecProject[] = [
       },
       {
         "path": "home/watch/walkthrough-player/walkthrough/build-walkthrough/build-second-half/build-second-half.ail.md",
-        "text": "# Build second half\n\n```ail\nnode BuildSecondHalf : data   level: system\n  why   The last five chapters of the build walkthrough: from the screens judged to the final report.   <- BuildWalkthrough\n  what\n    BUILD_SECOND_HALF: list of Beat = [\n        { id: \"look\", seconds: 10, branch: false, title: \"Screens judged against the look\",\n          caption: \"Tests prove behaviour, not looks. Each test's final screen is screenshotted, and a model compares it with the node's look and copy. A mismatch sends it back, like a failing test.\",\n          lines: [\"· WatchADemo: 4 screen(s) match its look\", \"· App: attempt 1 with claude-code\", \"· App: 2 screen(s) match its look\"],\n          states: { \"WatchADemo\": \"proven\", \"App\": \"proven\" },\n          inset: { kind: \"shot\", node: \"WatchADemo\", test: \"perfect play ends in a draw\", label: \"WatchADemo: 4 screens judged against its look\", verdict: \"MATCHES\" } },\n        { id: \"stop\", seconds: 8, branch: true, title: \"Branch: the spec must decide\",\n          caption: \"Suppose only what said 500 ms. The compiler won't pick a pace: it replies STOP with a question, its dependants wait, and the answer goes into the spec.\",\n          lines: [\n            \"? WatchADemo         stopped: `what` says one move every 500 ms, but `how` decides one move every 600 ms and `binds` waits 600 ms. Which pace is it?\",\n            \"… App                skipped: waiting for WatchADemo\",\n            \"\",\n            \"✓ spec     no errors\",\n            \"✗ build    2 output(s) not built from the current spec — run `ail build`\",\n            \"✗ behavior 1 node(s) failed\",\n            \"\",\n            \"The spec doesn't decide the questions above. Answer them in the .ail.md files, then build again.\"],\n          states: { \"WatchADemo\": \"stopped\", \"App\": \"skipped\" },\n          inset: { kind: \"card\", label: \"Branch: a what-if\", lines: [\"STOP: which pace is it?\", \"what says 500 ms; how and binds say 600 ms\", \"the answer goes into ail/app/demo/demo.ail.md\", \"never into src/gen\", \"… App waits for WatchADemo\"] } },\n        { id: \"lock\", seconds: 7, branch: false, title: \"Recorded in the lock\",\n          caption: \"The lock records the new compile hash, a hash of the file, who built it, and its shots and look marks. An unchanged node with a matching look mark is a cache hit; a hand-edited file is rebuilt.\",\n          lines: [],\n          states: {},\n          inset: { kind: \"card\", label: \"ail.lock.json\", lines: [\"\\\"WatchADemo\\\": {\", \"  \\\"hash\\\": \\\"<new 64-hex>\\\",\", \"  \\\"files\\\": { \\\"src/gen/app/demo/watch-a-demo.tsx\\\": \\\"<sha256>\\\" },\", \"  \\\"by\\\": \\\"claude-code\\\",\", \"  \\\"shots\\\": \\\"<same as hash>\\\",\", \"  \\\"look\\\": \\\"<same as hash>\\\"\", \"}\"] } },\n        { id: \"e2e\", seconds: 9, branch: false, title: \"Checked, then run for real\",\n          caption: \"First, a check with no model: sound spec, current nodes, passing tests and typecheck. Then the app runs PlayAGame's scenarios in a browser, and a model judges the screenshots.\",\n          lines: [\"· starting the app: bun --port=4173 ./index.html\", \"· PlayAGame: comparing its screenshots with its look\"],\n          states: { \"PlayAGame\": \"checking\" },\n          inset: { kind: \"card\", label: \"Check with no model, then the real app\", lines: [\"✓ spec\", \"✓ build\", \"✓ behavior: all tests plus the typecheck\", \"localhost:4173: play-a-game.e2e.ts, 7 scenarios\", \"the app stops, then a model judges the 7 screenshots\"] } },\n        { id: \"summary\", seconds: 8, branch: false, title: \"Everything checks out\",\n          caption: \"The report prints last: what was built, then the model-free check, then the real app. The model-free part is the same check CI runs.\",\n          lines: [\n            \"✓ WatchADemo         compiled\",\n            \"✓ App                compiled\",\n            \"✓ spec     no errors\",\n            \"✓ build    16 node(s) up to date\",\n            \"✓ behavior 50 test(s) passed, typecheck ok\",\n            \"✓ app      1 of 1 flow(s) behave as their spec says (run.app)\",\n            \"    · 2 node(s) with scenarios have no end-to-end check yet: App, WatchADemo\",\n            \"    ✓ PlayAGame: 7 screenshot(s) match its look\"],\n          states: { \"PlayAGame\": \"proven\" },\n          inset: { kind: \"shot\", node: \"WatchADemo\", test: \"the computer plays both sides\", label: \"WatchADemo at the end of “the computer plays both sides”\" } }\n      ]\n    examples\n      BUILD_SECOND_HALF.length => 5\n      BUILD_SECOND_HALF[1].id => \"stop\"\n      BUILD_SECOND_HALF[1].lines.length => 8\n  uses  Walkthrough\n```\n"
+        "text": "# Build second half\n\n```ail\nnode BuildSecondHalf : data   level: system\n  why   The last five chapters of the build walkthrough: from the screens judged to the final report.   <- BuildWalkthrough\n  what\n    BUILD_SECOND_HALF: list of Beat = [\n        { id: \"look\", seconds: 10, branch: false, title: \"Screens judged against the look\",\n          caption: \"Tests prove behaviour, not looks. Each test's final screen is screenshotted, and a model compares it with the node's look and copy. A mismatch sends it back, like a failing test.\",\n          lines: [\"· WatchADemo: 4 screen(s) match its look\", \"· App: attempt 1 with claude-code\", \"· App: 2 screen(s) match its look\"],\n          states: { \"WatchADemo\": \"proven\", \"App\": \"proven\" },\n          inset: { kind: \"shot\", node: \"WatchADemo\", test: \"perfect play ends in a draw\", label: \"WatchADemo: 4 screens judged against its look\", verdict: \"MATCHES\" } },\n        { id: \"stop\", seconds: 8, branch: true, title: \"Branch: the spec must decide\",\n          caption: \"Suppose only what said 500 ms. The compiler won't pick a pace: it replies STOP with a question, its dependants wait, and the answer goes into the spec.\",\n          lines: [\n            \"? WatchADemo         stopped: `what` says one move every 500 ms, but `how` decides one move every 600 ms and `binds` waits 600 ms. Which pace is it?\",\n            \"… App                skipped: waiting for WatchADemo\",\n            \"\",\n            \"✓ spec     no errors\",\n            \"✗ build    2 output(s) not built from the current spec — run `ail build`\",\n            \"✗ behavior 1 node(s) failed\",\n            \"\",\n            \"The spec doesn't decide the questions above. Answer them in the .ail.md files, then build again.\"],\n          states: { \"WatchADemo\": \"stopped\", \"App\": \"skipped\" },\n          inset: { kind: \"card\", label: \"Branch: a what-if\", lines: [\"STOP: which pace is it?\", \"what says 500 ms; how and binds say 600 ms\", \"the answer goes into ail/app/demo/demo.ail.md\", \"never into src/gen\", \"… App waits for WatchADemo\"] } },\n        { id: \"lock\", seconds: 7, branch: false, title: \"Recorded in the lock\",\n          caption: \"The lock records the new compile hash, a hash of the file, who built it, and its shots and look marks. An unchanged node with a matching look mark is a cache hit; a hand-edited file is rebuilt.\",\n          lines: [],\n          states: {},\n          inset: { kind: \"card\", label: \"ail.lock.json\", lines: [\"\\\"WatchADemo\\\": {\", \"  \\\"hash\\\": \\\"<new 64-hex>\\\",\", \"  \\\"files\\\": { \\\"src/gen/app/demo/watch-a-demo.tsx\\\": \\\"<sha256>\\\" },\", \"  \\\"by\\\": \\\"claude-code\\\",\", \"  \\\"shots\\\": \\\"<same as hash>\\\",\", \"  \\\"look\\\": \\\"<same as hash>\\\"\", \"}\"] } },\n        { id: \"e2e\", seconds: 9, branch: false, title: \"Checked, then run for real\",\n          caption: \"First, a check with no model: sound spec, current nodes, passing tests and typecheck. Then the app runs PlayAGame's scenarios in a browser. That proves behaviour only: the screens come from the derived checks.\",\n          lines: [\"· starting the app: bun --port=4173 ./index.html\"],\n          states: { \"PlayAGame\": \"checking\" },\n          inset: { kind: \"card\", label: \"Check with no model, then the real app\", lines: [\"✓ spec\", \"✓ build\", \"✓ behavior: all tests plus the typecheck\", \"localhost:4173: play-a-game.e2e.ts, 7 scenarios\", \"the app stops; no screenshots, only behaviour\"] } },\n        { id: \"summary\", seconds: 8, branch: false, title: \"Everything checks out\",\n          caption: \"The report prints last: what was built, then the model-free check, then the real app. The model-free part is the same check CI runs.\",\n          lines: [\n            \"✓ WatchADemo         compiled\",\n            \"✓ App                compiled\",\n            \"✓ spec     no errors\",\n            \"✓ build    16 node(s) up to date\",\n            \"✓ behavior 50 test(s) passed, typecheck ok\",\n            \"✓ app      1 of 1 flow(s) behave as their spec says (run.app)\",\n            \"    · 2 node(s) with scenarios have no end-to-end check yet: App, WatchADemo\"],\n          states: { \"PlayAGame\": \"proven\" },\n          inset: { kind: \"shot\", node: \"WatchADemo\", test: \"the computer plays both sides\", label: \"WatchADemo at the end of “the computer plays both sides”\" } }\n      ]\n    examples\n      BUILD_SECOND_HALF.length => 5\n      BUILD_SECOND_HALF[1].id => \"stop\"\n      BUILD_SECOND_HALF[1].lines.length => 8\n  uses  Walkthrough\n```\n"
       },
       {
         "path": "parts/parts.ail.md",
@@ -678,547 +629,547 @@ export const specProjects: SpecProject[] = [
         "node": "AdoptFigure",
         "test": "the picture",
         "path": "home/adopt/adopt-figure/shots/01-the-picture.png",
-        "src": shot32
+        "src": shot25
       },
       {
         "node": "AdoptSection",
         "test": "adopting is explained",
         "path": "home/adopt/shots/01-adopting-is-explained.png",
-        "src": shot33
+        "src": shot26
       },
       {
         "node": "BuildLoop",
         "test": "four steps",
         "path": "home/build-loop/shots/01-four-steps.png",
-        "src": shot34
+        "src": shot27
       },
       {
         "node": "HeroFigure",
         "test": "the picture is described",
         "path": "home/hero/hero-figure/shots/01-the-picture-is-described.png",
-        "src": shot35
+        "src": shot28
       },
       {
         "node": "Hero",
         "test": "the links go to the right places",
         "path": "home/hero/shots/01-the-links-go-to-the-right-places.png",
-        "src": shot36
+        "src": shot29
       },
       {
         "node": "JourneyStop",
         "test": "a stop",
         "path": "home/journey/journey-stop/shots/01-a-stop.png",
-        "src": shot37
+        "src": shot30
       },
       {
         "node": "JourneyStop",
         "test": "a stop with a file to browse",
         "path": "home/journey/journey-stop/shots/02-a-stop-with-a-file-to-browse.png",
-        "src": shot38
+        "src": shot31
       },
       {
         "node": "JumpGauge",
         "test": "every pill leads to its stop",
         "path": "home/journey/jump-gauge/shots/01-every-pill-leads-to-its-stop.png",
-        "src": shot39
+        "src": shot32
       },
       {
         "node": "JumpGauge",
         "test": "the gauge shows which stops are the spec",
         "path": "home/journey/jump-gauge/shots/02-the-gauge-shows-which-stops-are-the-spec.png",
-        "src": shot40
+        "src": shot33
       },
       {
         "node": "Journey",
         "test": "eight stops in order",
         "path": "home/journey/shots/01-eight-stops-in-order.png",
-        "src": shot41
+        "src": shot34
       },
       {
         "node": "Journey",
         "test": "the thread is explained",
         "path": "home/journey/shots/02-the-thread-is-explained.png",
-        "src": shot42
+        "src": shot35
       },
       {
         "node": "BuildFigure",
         "test": "the picture",
         "path": "home/journey/stops/stop-build/build-figure/shots/01-the-picture.png",
-        "src": shot43
+        "src": shot36
       },
       {
         "node": "StopBuild",
         "test": "the build",
         "path": "home/journey/stops/stop-build/shots/01-the-build.png",
-        "src": shot44
+        "src": shot37
       },
       {
         "node": "ExperienceFigure",
         "test": "the picture",
         "path": "home/journey/stops/stop-experience/experience-figure/shots/01-the-picture.png",
-        "src": shot45
+        "src": shot38
       },
       {
         "node": "StopExperience",
         "test": "the experience level",
         "path": "home/journey/stops/stop-experience/shots/01-the-experience-level.png",
-        "src": shot46
+        "src": shot39
       },
       {
         "node": "IdeaFigure",
         "test": "the picture",
         "path": "home/journey/stops/stop-idea/idea-figure/shots/01-the-picture.png",
-        "src": shot47
+        "src": shot40
       },
       {
         "node": "StopIdea",
         "test": "the idea",
         "path": "home/journey/stops/stop-idea/shots/01-the-idea.png",
-        "src": shot48
+        "src": shot41
       },
       {
         "node": "ProductFigure",
         "test": "the picture",
         "path": "home/journey/stops/stop-product/product-figure/shots/01-the-picture.png",
-        "src": shot49
+        "src": shot42
       },
       {
         "node": "StopProduct",
         "test": "the product level",
         "path": "home/journey/stops/stop-product/shots/01-the-product-level.png",
-        "src": shot50
+        "src": shot43
       },
       {
         "node": "ProofScreens",
         "test": "the screens",
         "path": "home/journey/stops/stop-proof/proof-screens/shots/01-the-screens.png",
-        "src": shot51
+        "src": shot44
       },
       {
         "node": "StopProof",
         "test": "the proof",
         "path": "home/journey/stops/stop-proof/shots/01-the-proof.png",
-        "src": shot52
+        "src": shot45
       },
       {
         "node": "ResultFrame",
         "test": "the game is embedded",
         "path": "home/journey/stops/stop-result/result-frame/shots/01-the-game-is-embedded.png",
-        "src": shot53
+        "src": shot46
       },
       {
         "node": "ResultFrame",
         "test": "the game fits a phone",
         "path": "home/journey/stops/stop-result/result-frame/shots/02-the-game-fits-a-phone.png",
-        "src": shot54
+        "src": shot47
       },
       {
         "node": "StopResult",
         "test": "the result",
         "path": "home/journey/stops/stop-result/shots/01-the-result.png",
-        "src": shot55
+        "src": shot48
       },
       {
         "node": "StopSpecialist",
         "test": "the specialist level",
         "path": "home/journey/stops/stop-specialist/shots/01-the-specialist-level.png",
-        "src": shot56
+        "src": shot49
       },
       {
         "node": "SpecialistFigure",
         "test": "the picture",
         "path": "home/journey/stops/stop-specialist/specialist-figure/shots/01-the-picture.png",
-        "src": shot57
+        "src": shot50
       },
       {
         "node": "StopSystem",
         "test": "the system level",
         "path": "home/journey/stops/stop-system/shots/01-the-system-level.png",
-        "src": shot58
+        "src": shot51
       },
       {
         "node": "SystemFigure",
         "test": "the picture",
         "path": "home/journey/stops/stop-system/system-figure/shots/01-the-picture.png",
-        "src": shot59
+        "src": shot52
       },
       {
         "node": "ReadersTree",
         "test": "the stakeholder's level",
         "path": "home/readers/readers-tree/shots/01-the-stakeholder-s-level.png",
-        "src": shot60
+        "src": shot53
       },
       {
         "node": "Readers",
         "test": "the first reader",
         "path": "home/readers/shots/01-the-first-reader.png",
-        "src": shot61
+        "src": shot54
       },
       {
         "node": "Readers",
         "test": "picking another reader",
         "path": "home/readers/shots/02-picking-another-reader.png",
-        "src": shot62
+        "src": shot55
       },
       {
         "node": "Readers",
         "test": "arrow keys",
         "path": "home/readers/shots/03-arrow-keys.png",
-        "src": shot63
+        "src": shot56
       },
       {
         "node": "PullRequestDiff",
         "test": "the spec change",
         "path": "home/review/sample-pull-request/pull-request-diff/shots/01-the-spec-change.png",
-        "src": shot64
+        "src": shot57
       },
       {
         "node": "SamplePullRequest",
         "test": "the parts to review are open",
         "path": "home/review/sample-pull-request/shots/01-the-parts-to-review-are-open.png",
-        "src": shot65
+        "src": shot58
       },
       {
         "node": "SamplePullRequest",
         "test": "what the build wrote is collapsed",
         "path": "home/review/sample-pull-request/shots/02-what-the-build-wrote-is-collapsed.png",
-        "src": shot66
+        "src": shot59
       },
       {
         "node": "ReviewSection",
         "test": "what a reviewer reads",
         "path": "home/review/shots/01-what-a-reviewer-reads.png",
-        "src": shot67
+        "src": shot60
       },
       {
         "node": "Footer",
         "test": "the links",
         "path": "home/sections/footer/shots/01-the-links.png",
-        "src": shot68
+        "src": shot61
       },
       {
         "node": "GapStrip",
         "test": "three cards",
         "path": "home/sections/gap-strip/shots/01-three-cards.png",
-        "src": shot69
+        "src": shot62
       },
       {
         "node": "AgentCards",
         "test": "in Cursor",
         "path": "home/sections/get-started/agent-cards/shots/01-in-cursor.png",
-        "src": shot70
+        "src": shot63
       },
       {
         "node": "AgentCards",
         "test": "in GitHub Copilot",
         "path": "home/sections/get-started/agent-cards/shots/02-in-github-copilot.png",
-        "src": shot71
+        "src": shot64
       },
       {
         "node": "ReviewNote",
         "test": "generated code stays out of review",
         "path": "home/sections/get-started/review-note/shots/01-generated-code-stays-out-of-review.png",
-        "src": shot72
+        "src": shot65
       },
       {
         "node": "GetStarted",
         "test": "in Claude Code",
         "path": "home/sections/get-started/shots/01-in-claude-code.png",
-        "src": shot73
+        "src": shot66
       },
       {
         "node": "GetStarted",
         "test": "in a terminal",
         "path": "home/sections/get-started/shots/02-in-a-terminal.png",
-        "src": shot74
+        "src": shot67
       },
       {
         "node": "GetStarted",
         "test": "what to do next",
         "path": "home/sections/get-started/shots/03-what-to-do-next.png",
-        "src": shot75
+        "src": shot68
       },
       {
         "node": "SpecBrowser",
         "test": "the demo's spec is shown first",
         "path": "home/sections/spec-browser/shots/01-the-demo-s-spec-is-shown-first.png",
-        "src": shot76
+        "src": shot69
       },
       {
         "node": "SpecBrowser",
         "test": "picking another file",
         "path": "home/sections/spec-browser/shots/02-picking-another-file.png",
-        "src": shot77
+        "src": shot70
       },
       {
         "node": "SpecBrowser",
         "test": "showing this website's spec",
         "path": "home/sections/spec-browser/shots/03-showing-this-website-s-spec.png",
-        "src": shot78
+        "src": shot71
       },
       {
         "node": "SpecBrowser",
         "test": "a screenshot beside its spec",
         "path": "home/sections/spec-browser/shots/04-a-screenshot-beside-its-spec.png",
-        "src": shot79
+        "src": shot72
       },
       {
         "node": "SpecBrowser",
         "test": "opened from a link",
         "path": "home/sections/spec-browser/shots/05-opened-from-a-link.png",
-        "src": shot80
+        "src": shot73
       },
       {
         "node": "SpecBrowser",
         "test": "the language is defined",
         "path": "home/sections/spec-browser/shots/06-the-language-is-defined.png",
-        "src": shot81
+        "src": shot74
       },
       {
         "node": "SpecBrowser",
         "test": "following the same link twice",
         "path": "home/sections/spec-browser/shots/07-following-the-same-link-twice.png",
-        "src": shot82
+        "src": shot75
       },
       {
         "node": "SpecTree",
         "test": "screenshots beside their spec",
         "path": "home/sections/spec-browser/spec-tree/shots/01-screenshots-beside-their-spec.png",
-        "src": shot83
+        "src": shot76
       },
       {
         "node": "TopBar",
         "test": "the links lead to the right places",
         "path": "home/sections/top-bar/shots/01-the-links-lead-to-the-right-places.png",
-        "src": shot84
+        "src": shot77
       },
       {
         "node": "HomePage",
         "test": "one story, in order",
         "path": "home/shots/01-one-story-in-order.png",
-        "src": shot85
+        "src": shot78
       },
       {
         "node": "HomePage",
         "test": "every top bar link has a place to land",
         "path": "home/shots/02-every-top-bar-link-has-a-place-to-land.png",
-        "src": shot86
+        "src": shot79
       },
       {
         "node": "TreeSection",
         "test": "the tree is explained",
         "path": "home/tree/shots/01-the-tree-is-explained.png",
-        "src": shot87
+        "src": shot80
       },
       {
         "node": "TreeFigure",
         "test": "the picture",
         "path": "home/tree/tree-figure/shots/01-the-picture.png",
-        "src": shot88
+        "src": shot81
       },
       {
         "node": "WatchSection",
         "test": "the section",
         "path": "home/watch/shots/01-the-section.png",
-        "src": shot89
+        "src": shot82
       },
       {
         "node": "WalkthroughPlayer",
         "test": "it opens paused",
         "path": "home/watch/walkthrough-player/shots/01-it-opens-paused.png",
-        "src": shot90
+        "src": shot83
       },
       {
         "node": "WalkthroughPlayer",
         "test": "the other walkthrough",
         "path": "home/watch/walkthrough-player/shots/02-the-other-walkthrough.png",
-        "src": shot91
+        "src": shot84
       },
       {
         "node": "WalkthroughPlayer",
         "test": "picking a chapter",
         "path": "home/watch/walkthrough-player/shots/03-picking-a-chapter.png",
-        "src": shot92
+        "src": shot85
       },
       {
         "node": "WalkthroughPlayer",
         "test": "next and previous",
         "path": "home/watch/walkthrough-player/shots/04-next-and-previous.png",
-        "src": shot93
+        "src": shot86
       },
       {
         "node": "WalkthroughPlayer",
         "test": "arrow keys",
         "path": "home/watch/walkthrough-player/shots/05-arrow-keys.png",
-        "src": shot94
+        "src": shot87
       },
       {
         "node": "WalkthroughPlayer",
         "test": "playing",
         "path": "home/watch/walkthrough-player/shots/06-playing.png",
-        "src": shot95
+        "src": shot88
       },
       {
         "node": "WalkCaption",
         "test": "a branch chapter",
         "path": "home/watch/walkthrough-player/walk-caption/shots/01-a-branch-chapter.png",
-        "src": shot96
+        "src": shot89
       },
       {
         "node": "WalkControls",
         "test": "on the first chapter",
         "path": "home/watch/walkthrough-player/walk-controls/shots/01-on-the-first-chapter.png",
-        "src": shot97
+        "src": shot90
       },
       {
         "node": "WalkControls",
         "test": "moving on",
         "path": "home/watch/walkthrough-player/walk-controls/shots/02-moving-on.png",
-        "src": shot98
+        "src": shot91
       },
       {
         "node": "WalkPicture",
         "test": "a stale chapter",
         "path": "home/watch/walkthrough-player/walk-picture/shots/01-a-stale-chapter.png",
-        "src": shot99
+        "src": shot92
       },
       {
         "node": "WalkPicture",
         "test": "nodes with no spec yet",
         "path": "home/watch/walkthrough-player/walk-picture/shots/02-nodes-with-no-spec-yet.png",
-        "src": shot100
+        "src": shot93
       },
       {
         "node": "WalkInset",
         "test": "a card",
         "path": "home/watch/walkthrough-player/walk-picture/walk-inset/shots/01-a-card.png",
-        "src": shot101
+        "src": shot94
       },
       {
         "node": "WalkInset",
         "test": "a screenshot",
         "path": "home/watch/walkthrough-player/walk-picture/walk-inset/shots/02-a-screenshot.png",
-        "src": shot102
+        "src": shot95
       },
       {
         "node": "WalkTerminal",
         "test": "lines kept exactly",
         "path": "home/watch/walkthrough-player/walk-terminal/shots/01-lines-kept-exactly.png",
-        "src": shot103
+        "src": shot96
       },
       {
         "node": "WalkTerminal",
         "test": "the caret",
         "path": "home/watch/walkthrough-player/walk-terminal/shots/02-the-caret.png",
-        "src": shot104
+        "src": shot97
       },
       {
         "node": "WalkTerminal",
         "test": "nothing printed",
         "path": "home/watch/walkthrough-player/walk-terminal/shots/03-nothing-printed.png",
-        "src": shot105
+        "src": shot98
       },
       {
         "node": "WalkTimeline",
         "test": "the chapters",
         "path": "home/watch/walkthrough-player/walk-timeline/shots/01-the-chapters.png",
-        "src": shot106
+        "src": shot99
       },
       {
         "node": "WalkTimeline",
         "test": "picking a chapter",
         "path": "home/watch/walkthrough-player/walk-timeline/shots/02-picking-a-chapter.png",
-        "src": shot107
+        "src": shot100
       },
       {
         "node": "WalkTitleBar",
         "test": "the tabs",
         "path": "home/watch/walkthrough-player/walk-title-bar/shots/01-the-tabs.png",
-        "src": shot108
+        "src": shot101
       },
       {
         "node": "WalkTitleBar",
         "test": "arrow keys",
         "path": "home/watch/walkthrough-player/walk-title-bar/shots/02-arrow-keys.png",
-        "src": shot109
+        "src": shot102
       },
       {
         "node": "CodeBlock",
         "test": "shown exactly",
         "path": "parts/code-block/shots/01-shown-exactly.png",
-        "src": shot110
+        "src": shot103
       },
       {
         "node": "CodeBlock",
         "test": "the thread is marked",
         "path": "parts/code-block/shots/02-the-thread-is-marked.png",
-        "src": shot111
+        "src": shot104
       },
       {
         "node": "CodeBlock",
         "test": "a caption",
         "path": "parts/code-block/shots/03-a-caption.png",
-        "src": shot112
+        "src": shot105
       },
       {
         "node": "CodeBlock",
         "test": "a long line wraps under itself",
         "path": "parts/code-block/shots/04-a-long-line-wraps-under-itself.png",
-        "src": shot113
+        "src": shot106
       },
       {
         "node": "CopyCommand",
         "test": "copying",
         "path": "parts/copy-command/shots/01-copying.png",
-        "src": shot114
+        "src": shot107
       },
       {
         "node": "MiniBoard",
         "test": "marks",
         "path": "parts/mini-board/shots/01-marks.png",
-        "src": shot115
+        "src": shot108
       },
       {
         "node": "MiniBoard",
         "test": "numbers in empty squares",
         "path": "parts/mini-board/shots/02-numbers-in-empty-squares.png",
-        "src": shot116
+        "src": shot109
       },
       {
         "node": "SectionHeading",
         "test": "a full heading",
         "path": "parts/section-heading/shots/01-a-full-heading.png",
-        "src": shot117
+        "src": shot110
       },
       {
         "node": "SectionHeading",
         "test": "just a heading",
         "path": "parts/section-heading/shots/02-just-a-heading.png",
-        "src": shot118
+        "src": shot111
       },
       {
         "node": "Section",
         "test": "an anchored band",
         "path": "parts/section/shots/01-an-anchored-band.png",
-        "src": shot119
+        "src": shot112
       },
       {
         "node": "SpecEditor",
         "test": "readable before the editor loads",
         "path": "parts/spec-editor/shots/01-readable-before-the-editor-loads.png",
-        "src": shot120
+        "src": shot113
       },
       {
         "node": "SpecShot",
         "test": "a screenshot is shown",
         "path": "parts/spec-shot/shots/01-a-screenshot-is-shown.png",
-        "src": shot121
+        "src": shot114
       },
       {
         "node": "Stack",
         "test": "children keep their order",
         "path": "parts/stack/shots/01-children-keep-their-order.png",
-        "src": shot122
+        "src": shot115
       }
     ]
   }

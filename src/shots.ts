@@ -1,16 +1,22 @@
-// Screenshots of the proofs. For every node with a `look`, each test of its
-// derived check is run once more with a preload that records the final
-// screen; each screen is then rendered in Chromium (Playwright) with the
-// project's own page styles, so a reviewer sees what each scenario ends on.
+// Screenshots of the proofs. For every node with a `look`, its derived check
+// pictures each scenario's final screen. In TypeScript, each test is run once
+// more with a preload that records the final screen, which is then rendered in
+// Chromium (Playwright) with the project's own page styles. A check in another
+// language saves the screens itself: it is run with AIL_SHOTS_DIR set, and
+// saves each scenario's final screen there as <scenario slug>.png. End-to-end
+// checks take no screenshots: they prove the app behaves, the derived checks
+// show what it looks like.
 import { copyFileSync, existsSync, mkdirSync, mkdtempSync, readdirSync, readFileSync, renameSync, rmdirSync, rmSync, statSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { basename, dirname, join, relative, resolve, sep } from "node:path";
 import type { AilNode } from "./parse.ts";
 import { AIL_HOME, kebab, SHOTS, type Project } from "./project.ts";
 import { readLock, writeLock } from "./lock.ts";
-import { checksDir, derivedCheckFile, junitResults } from "./verify.ts";
+import { checksDir, derivedCheckFile, foreignChecks, junitResults, runForeignCheck } from "./verify.ts";
 export { junitResults, type TestResult } from "./verify.ts";
-import { e2eCheckPath, reportTests } from "./tests.ts";
+import { reportTests } from "./tests.ts";
+import { isCompilable } from "./project.ts";
+import { adoptedFresh } from "./plan.ts";
 
 export interface Shot { node: string; test: string; file: string }
 
@@ -26,6 +32,36 @@ export function collectShots(dir: string, node: string, tests: string[]): { shot
   }
   if (shots.length) writeFileSync(join(dir, "shots.json"), JSON.stringify({ node, shots: shots.map((s) => ({ test: s.test, file: relative(dir, s.file) })) }, null, 2) + "\n");
   return { shots, missing };
+}
+
+/**
+ * A node whose code is written by hand, not by ail: adopted (built by the existing app), `@existing`, or of a
+ * kind the target has no path for. With a look, its derived check tests that code, and pictures it.
+ */
+export function handBuilt(p: Project, n: AilNode): boolean {
+  return !isCompilable(p, n) || adoptedFresh(p, n, readLock(p).nodes[n.name]);
+}
+
+/** What a node's screenshots and look verdict are keyed to: its build (compile hash), or, built by hand, its derived check's pin. */
+export function shotKey(p: Project, n: AilNode): string | null {
+  return handBuilt(p, n) ? derivedCheckFile(p, n).pinned : readLock(p).nodes[n.name]?.hash ?? null;
+}
+
+/** The key the committed screenshots (`shots`) or the look verdict (`look`) were recorded for. */
+export function recordedFor(p: Project, n: AilNode, what: "shots" | "look"): string | undefined {
+  const lock = readLock(p);
+  return handBuilt(p, n) ? lock.hand?.[n.name]?.[what] : lock.nodes[n.name]?.[what];
+}
+
+/** Record that a node's screenshots, or its look verdict, are those of its current key. */
+export function recordFor(p: Project, n: AilNode, what: "shots" | "look"): void {
+  const key = shotKey(p, n);
+  if (!key) return;
+  const lock = readLock(p);
+  if (handBuilt(p, n)) (((lock.hand ??= {})[n.name] ??= {})[what] = key);
+  else if (lock.nodes[n.name]) lock.nodes[n.name]![what] = key;
+  else return;
+  writeLock(p, lock);
 }
 
 /** Nodes whose proofs can be pictured: they have a look, and a derived check. */
@@ -87,6 +123,32 @@ export function shotPage(styles: string, screen: { html: string; head: string })
   return `<!doctype html><html><head><meta charset="utf-8">${styles}\n${screen.head}</head><body><div id="ail-shot" style="padding:24px">${inlineImages(screen.html)}</div></body></html>`;
 }
 
+/**
+ * Run a node's derived check in the target's own language with AIL_SHOTS_DIR set, and collect the screens it
+ * saved there (<scenario slug>.png), numbered in the order of the node's scenarios, into `dir`.
+ */
+export function savedShots(p: Project, n: AilNode, dir: string): Shot[] {
+  const file = derivedCheckFile(p, n).file;
+  if (!file) return [];
+  const tmp = mkdtempSync(join(tmpdir(), "ail-saved-"));
+  try {
+    const r = runForeignCheck(p, n, [file], { AIL_SHOTS_DIR: tmp });
+    if (!r.ok) throw new Error(`${n.name}'s check failed, so its screens were not taken:\n${r.output.split("\n").slice(-15).join("\n")}`);
+    const shots: Shot[] = [];
+    n.scenarios.forEach((sc, i) => {
+      const from = join(tmp, shotFileName(sc.title));
+      if (!existsSync(from)) return;
+      const to = join(dir, `${String(i + 1).padStart(2, "0")}-${slug(sc.title)}.png`);
+      mkdirSync(dir, { recursive: true });
+      copyFileSync(from, to);
+      shots.push({ node: n.name, test: sc.title, file: to });
+    });
+    return shots;
+  } finally {
+    rmSync(tmp, { recursive: true, force: true });
+  }
+}
+
 /** A test name as a file name: lower case, each run of other characters one "-", at most 60 characters. */
 export const slugOf = (s: string) => s.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "").slice(0, 60) || "test";
 const slug = slugOf;
@@ -98,6 +160,15 @@ const slug = slugOf;
 export async function takeShots(p: Project, outDir: string, names?: string[], log: (s: string) => void = () => {}, opts: { scale?: number; manifest?: boolean; dirOf?: (n: AilNode) => string } = {}): Promise<Shot[]> {
   const nodes = visualNodes(p, names);
   if (!nodes.length) return [];
+  if (foreignChecks(p)) {
+    const shots = nodes.flatMap((n) => {
+      const taken = savedShots(p, n, opts.dirOf?.(n) ?? join(outDir, n.dir, kebab(n.name)));
+      log(`· ${n.name}: ${taken.length} screen(s)`);
+      return taken;
+    });
+    if (opts.manifest !== false) writeFileSync(join(outDir, "shots.json"), JSON.stringify(shots.map((s) => ({ ...s, file: relative(outDir, s.file) })), null, 2));
+    return shots;
+  }
   let chromium: typeof import("playwright").chromium;
   try {
     ({ chromium } = await import("playwright"));
@@ -133,8 +204,7 @@ export async function takeShots(p: Project, outDir: string, names?: string[], lo
 // Every node with a look keeps the screenshots of its proofs beside its spec
 // file, in its folder's shots/, with a shots.json index: a spec file holds one
 // node, and a folder one spec file, so there is always room for them.
-// A flow's end-to-end screenshots are in shots/e2e/. So a spec folder holds the spec and
-// the proof of how it looks, and a pull request shows both together. They are
+// So a spec folder holds the spec and the proof of how it looks, and a pull request shows both together. They are
 // part of what a build produces, like the generated code: reviewed in pull
 // requests, shown on pages through the spec module, and judged against the
 // look. A build retakes them when it builds the node; the lock records which
@@ -143,8 +213,6 @@ export async function takeShots(p: Project, outDir: string, names?: string[], lo
 
 export { SHOTS };
 export const nodeShotsDir = (p: Project, n: AilNode) => join(dirname(join(p.root, n.file)), SHOTS);
-/** Where a flow's end-to-end screenshots go, handed to its check as AIL_SHOTS_DIR. */
-export const e2eShotsDir = (p: Project, n: AilNode) => join(nodeShotsDir(p, n), "e2e");
 /** Where proof screenshots were kept before they moved beside the spec: moved by a build. */
 export const legacyShotsDir = (p: Project) => join(checksDir(p), "shots");
 
@@ -156,7 +224,7 @@ export function isShotFile(p: Project, rel: string): boolean {
   return inSpec !== null && !inSpec.endsWith(".ail.md") && new RegExp(`(^|/)${SHOTS}/`).test(inSpec);
 }
 
-/** Remove a folder's screenshots and index, keeping subfolders (a node's e2e/); empty folders up to the spec folder go too. */
+/** Remove a folder's screenshots and index, keeping subfolders; empty folders up to the spec folder go too. */
 export function clearShots(dir: string): void {
   if (!existsSync(dir)) return;
   for (const f of readdirSync(dir)) if (!statSync(join(dir, f)).isDirectory()) rmSync(join(dir, f), { force: true });
@@ -186,16 +254,13 @@ export async function refreshNodeShots(p: Project, n: AilNode, log: (s: string) 
     rmSync(tmp, { recursive: true, force: true });
   }
   if (shots.length) writeFileSync(join(dir, "shots.json"), JSON.stringify({ node: n.name, shots: shots.map((s) => ({ test: s.test, file: relative(dir, s.file) })) }, null, 2) + "\n");
-  const lock = readLock(p);
-  const entry = lock.nodes[n.name];
-  if (entry) { entry.shots = entry.hash; writeLock(p, lock); }
+  recordFor(p, n, "shots");
   return shots;
 }
 
-/** Built nodes with a look whose committed screenshots are missing or from an older build. */
+/** Nodes with a look whose committed screenshots are missing, or from an older build (or, built by hand, an older check). */
 export function staleShots(p: Project): AilNode[] {
-  const lock = readLock(p);
-  return visualNodes(p).filter((n) => { const e = lock.nodes[n.name]; return e && e.shots !== e.hash; });
+  return visualNodes(p).filter((n) => { const key = shotKey(p, n); return !!key && recordedFor(p, n, "shots") !== key; });
 }
 
 /** Every committed screenshot folder: the folders under the spec that hold a shots.json, in path order. */
@@ -210,9 +275,8 @@ export function shotFolders(p: Project): string[] {
 
 /** Screenshot folders of nodes that no longer exist, or no longer have a look: removed by a build. */
 export function orphanShots(p: Project): string[] {
+  // End-to-end checks take no screenshots: those they took once (in shots/e2e/) go too.
   const keep = new Set(visualNodes(p).map((n) => nodeShotsDir(p, n)));
-  // A flow's end-to-end screenshots stay while it has an end-to-end check.
-  for (const n of p.ordered) if (existsSync(e2eCheckPath(p, n))) keep.add(e2eShotsDir(p, n));
   return shotFolders(p).filter((d) => !keep.has(d));
 }
 
@@ -220,24 +284,25 @@ export function orphanShots(p: Project): string[] {
  * Move screenshots that are not where they belong (in checks/shots/, where
  * they used to be kept, or in an older layout beside the spec) to their
  * node's place, by the node each index names. Those of nodes that are gone
- * from checks/shots/ are dropped; screenshots already in their place are
- * newer and are kept. True when anything moved.
+ * from checks/shots/, and end-to-end ones (in an e2e/ folder), are dropped;
+ * screenshots already in their place are newer and are kept. True when
+ * anything moved.
  */
 export function relocateShots(p: Project): boolean {
   const old = legacyShotsDir(p);
   const moves: { from: string; to: string; legacy: boolean }[] = [];
   const target = (node: string, e2e: boolean) => {
     const n = p.nodes.get(node);
-    return n ? (e2e ? e2eShotsDir(p, n) : nodeShotsDir(p, n)) : null;
+    return n && !e2e ? nodeShotsDir(p, n) : null;
   };
   const nodeOf = (dir: string) => (JSON.parse(readFileSync(join(dir, "shots.json"), "utf8")) as { node: string }).node;
   for (const dir of shotFolders(p)) {
-    const to = target(nodeOf(dir), basename(dir) === "e2e");
+    const to = target(nodeOf(dir), basename(dir) === "e2e" || dir.includes(`${sep}e2e${sep}`));
     if (to && to !== dir) moves.push({ from: dir, to, legacy: false });
   }
   if (existsSync(old)) for (const f of new Bun.Glob("**/shots.json").scanSync({ cwd: old })) {
     const from = join(old, dirname(f));
-    const to = target(nodeOf(from), f.split("/")[0] === "e2e");
+    const to = target(nodeOf(from), f.split("/").includes("e2e"));
     if (to) moves.push({ from, to, legacy: true });
   }
   if (!moves.length) {

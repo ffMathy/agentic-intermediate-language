@@ -48,7 +48,7 @@ node AdoptSection : view   level: experience
     adopt.3.title     "How, from the code"
     adopt.3.text      "The code tells what the screen can't: data shapes, rules, edge cases and timing. Real inputs and outputs become examples, and every claim records where it came from."
     adopt.4.title     "Proof, on the old app"
-    adopt.4.text      "Every flow gets an end-to-end check that plays its scenarios and screenshots the screen each one ends on, on any platform. ail adopt starts the old app, runs them, commits the screenshots, and records the app as built, so the first build only builds what changes."
+    adopt.4.text      "Every flow gets an end-to-end check that plays its scenarios on any platform. ail adopt starts the old app, runs them, and records the app as built, so the first build only builds what changes. Then each node with a look gets a derived check that renders the old app's own code and screenshots the screen each scenario ends on."
     adopt.claude.title  "In Claude Code, Cursor or Copilot"
     adopt.claude.cmd    "/ail:adopt"
     adopt.claude.text   "The agent writes the spec one slice at a time: a screen, a flow or a rule. It asks you what only the owners know. In Cursor and Copilot, pick adopt from the / menu."

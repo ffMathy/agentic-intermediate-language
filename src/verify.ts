@@ -20,6 +20,7 @@ import { oracleHash } from "./hash.ts";
 
 import { fileHash, readLock } from "./lock.ts";
 import type { AilNode } from "./parse.ts";
+import { handBuilt } from "./shots.ts";
 import { AIL_HOME, expandPath, isCompilable, kebab, modulePath, specModulePath, topoByUses, type Project } from "./project.ts";
 
 export interface Check {
@@ -173,9 +174,19 @@ export const checksDir = (p: Project) => join(p.root, p.config.checksDir ?? "che
  * node's check goes, and `checks.run`, the command that runs it. Null for the
  * default, bun tests in TypeScript.
  */
-export function foreignChecks(p: Project): { path: string; run: string } | null {
+export function foreignChecks(p: Project, n?: AilNode): { path: string; run: string } | null {
   const s = p.target?.settings ?? {};
-  return s["checks.path"] && s["checks.run"] ? { path: s["checks.path"], run: s["checks.run"] } : null;
+  if (!s["checks.path"] || !s["checks.run"]) return null;
+  // A kind may have checks of its own (`checks.path.view`, `checks.run.view`): a view's, say, need the UI toolkit.
+  const kind = n && s[`checks.path.${n.kind}`] && s[`checks.run.${n.kind}`] ? n.kind : null;
+  return kind ? { path: s[`checks.path.${kind}`]!, run: s[`checks.run.${kind}`]! } : { path: s["checks.path"], run: s["checks.run"] };
+}
+
+/** Every place a foreign target's derived checks may live: its `checks.path`, and those of its kinds. */
+export function foreignCheckPaths(p: Project): string[] {
+  const s = p.target?.settings ?? {};
+  if (!foreignChecks(p)) return [];
+  return Object.keys(s).filter((k) => k === "checks.path" || (k.startsWith("checks.path.") && s[`checks.run.${k.slice("checks.path.".length)}`])).map((k) => s[k]!);
 }
 
 /** The comment that starts a line in a check file, by its extension. */
@@ -205,15 +216,43 @@ export function needsDerivedCheck(n: AilNode, p?: Project): boolean {
 }
 
 /** Run a target's own checks: `checks.run`, with {files}, {name}, {kebab} and {dir} filled in. Exit code 0 passes. */
-export function runForeignCheck(p: Project, n: AilNode, files: string[]): { ok: boolean; output: string } {
-  const cmd = foreignChecks(p)!.run
+export function runForeignCheck(p: Project, n: AilNode, files: string[], env: Record<string, string> = {}): { ok: boolean; output: string } {
+  const cmd = foreignChecks(p, n)!.run
     .replace(/\{files\}/g, files.map((f) => JSON.stringify(relative(p.root, f))).join(" "))
     .replace(/\{name\}/g, n.name).replace(/\{kebab\}/g, kebab(n.name)).replace(/\{dir\}/g, n.dir);
-  const r = Bun.spawnSync(["sh", "-c", cmd], { cwd: p.root, env: { ...process.env, NO_COLOR: "1", FORCE_COLOR: "0" }, stdout: "pipe", stderr: "pipe" });
+  const r = Bun.spawnSync(["sh", "-c", cmd], { cwd: p.root, env: { ...process.env, NO_COLOR: "1", FORCE_COLOR: "0", ...env }, stdout: "pipe", stderr: "pipe" });
   return { ok: r.exitCode === 0, output: (r.stdout.toString() + r.stderr.toString()).trim() };
 }
 
+/**
+ * A node with a look and scenarios whose code is written by hand (shots.ts, handBuilt): its derived check tests
+ * that code, and pictures it. ail derives it and runs it like any other, though it builds nothing for the node.
+ */
+export function needsHandCheck(p: Project, n: AilNode): boolean {
+  return n.sections.some((s) => s.key === "look") && needsDerivedCheck(n, p) && handBuilt(p, n);
+}
+
+/** Run the derived check of a node built by hand: it must exist, be derived from the current spec, and pass. */
+function verifyHandNode(p: Project, n: AilNode): VerifyResult {
+  const { file, pinned } = derivedCheckFile(p, n);
+  const want = oracleHash(p, n).slice(0, 16);
+  const rel = checkPath(p, n);
+  if (!file) return { node: n.name, ok: false, checks: [fail("derived", `${rel} does not exist: its code is written by hand, and its derived check pictures it; \`ail build\` derives it`)] };
+  if (pinned !== want) return { node: n.name, ok: false, checks: [fail("derived", `${rel} was derived from an older spec (${pinned} ≠ ${want}); re-derive and review`)] };
+  const checks: Check[] = [pass("exists", "written by hand; its derived check tests it")];
+  if (foreignChecks(p)) {
+    const r = runForeignCheck(p, n, [file]);
+    const tail = r.output.split("\n").slice(-40).join("\n");
+    checks.push(r.ok ? pass("tests", tail.split("\n").filter(Boolean).at(-1) ?? "passed") : fail("tests", tail));
+  } else {
+    const r = runBunTest(p.root, [file]);
+    checks.push(r.ok ? { ...pass("tests", `${r.passes} passed`), tests: r.tests } : { ...fail("tests", r.failures.length ? `${r.failures.map((f) => "✗ " + f).join("\n")}\n${errorExcerpt(r.output)}` : r.output.trim().split("\n").slice(-25).join("\n")), tests: r.tests });
+  }
+  return { node: n.name, ok: checks.every((c) => c.ok), checks };
+}
+
 export function verifyNode(p: Project, n: AilNode, opts: { checkDrift?: boolean } = {}): VerifyResult {
+  if (needsHandCheck(p, n)) return verifyHandNode(p, n);
   const checks: Check[] = [];
   const path = modulePath(p, n);
   if (!path) return { node: n.name, ok: true, checks: [pass("exists", "not compilable; nothing to verify")] };
@@ -270,7 +309,7 @@ export function typecheck(p: Project): Check | null {
 }
 
 export function verifyProject(p: Project, names?: string[]): { results: VerifyResult[]; typecheck: Check | null; ok: boolean } {
-  const targets = topoByUses(p, p.ordered.filter((n) => isCompilable(p, n) && (!names?.length || names.includes(n.name))));
+  const targets = topoByUses(p, p.ordered.filter((n) => (isCompilable(p, n) || needsHandCheck(p, n)) && (!names?.length || names.includes(n.name))));
   const results = targets.map((n) => verifyNode(p, n));
   const tc = typecheck(p);
   return { results, typecheck: tc, ok: results.every((r) => r.ok) && (tc?.ok ?? true) };
@@ -298,7 +337,7 @@ export function loadPrompt(name: string): string {
 /** Where a node's derived check lives: checks/<dir>/<kebab>.test.ts(x), or the target's `checks.path`. */
 export function checkPath(p: Project, n: AilNode): string {
   const foreign = foreignChecks(p);
-  if (foreign) return expandPath(foreign.path, n);
+  if (foreign) return expandPath(foreignChecks(p, n)!.path, n);
   const ext = n.kind === "view" || n.kind === "flow" ? "tsx" : "ts";
   return relative(p.root, join(checksDir(p), n.dir, `${kebab(n.name)}.test.${ext}`));
 }

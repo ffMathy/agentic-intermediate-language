@@ -30,9 +30,8 @@ results that arrive later. How the target spells things is said once, in the
   named after it: `open-picker/open-picker.ail.md` for `OpenPicker`.
 - Folders mirror the tree: a node's folder is in its parent's folder or below
   it `[misplaced-node]`, and generated code mirrors the folders.
-- A node's proof screenshots are kept in its folder's `shots/`, the
-  end-to-end ones in `shots/e2e/`. `ail build` writes them. So no spec folder
-  may be called `shots` `[reserved-folder]`.
+- A node's proof screenshots are kept in its folder's `shots/`. `ail build`
+  writes them. So no spec folder may be called `shots` `[reserved-folder]`.
 
 ## 2. Statements
 
@@ -55,6 +54,9 @@ in another language names its own `[checks-incomplete]`:
 - `checks.run`: the command that runs it, from the project folder; `{files}`,
   `{name}`, `{kebab}` and `{dir}` are filled in, and exit code 0 passes, e.g.
   `dotnet test --project tests/App.Tests -- --filter-class "*.{name}Tests"`
+- `checks.path.<kind>` and `checks.run.<kind>`, optionally: the same for the
+  nodes of one kind, e.g. `checks.path.view` in a test project that can
+  render the UI toolkit's views
 
 Its examples are then written into that check alongside the scenarios (see
 Checks), since they can't be translated mechanically into its language.
@@ -252,10 +254,17 @@ into the platform (`svg`, `hash`, `tablist`) and say what it does in words.
   test per example.
 - Each scenario and each `verify` item becomes a test in `checks/`, derived
   once and pinned to the spec's hash.
-- A view with a `look` gets screenshots of each test's final screen, judged
-  against the `look` and `copy`.
+- A node with a `look` gets screenshots of the final screen of each test of
+  its derived check, judged against the `look` and `copy`. In TypeScript, ail
+  records each screen. A check in another language saves them itself: run
+  with `AIL_SHOTS_DIR` set, it saves each scenario's final screen there, as
+  the scenario's title in lower case with each run of other characters one
+  `-`, plus `.png`.
+- A node with a `look` whose code is written by hand (adopted, `@existing`,
+  or of a kind the target has no path for) gets a derived check too. It tests
+  the app's own code, as the target's `test harness` says, and pictures it.
 - A flow may also have an end-to-end check in `checks/e2e/` that drives the
-  running app.
+  running app. End-to-end checks prove behaviour: they take no screenshots.
 - End-to-end checks are written in the target's language too. For TypeScript
   they are bun tests. For any other language, `tests` in `ail.config.json`
   gives where a flow's check lives (`e2e`, with `{dir}`, `{name}` and

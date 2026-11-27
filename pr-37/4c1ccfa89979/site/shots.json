@@ -1,0 +1,47 @@
+[
+  {
+    "node": "HomePage",
+    "test": "one story, in order",
+    "file": "home/home-page/01-one-story-in-order.png"
+  },
+  {
+    "node": "HomePage",
+    "test": "every top bar link has a place to land",
+    "file": "home/home-page/02-every-top-bar-link-has-a-place-to-land.png"
+  },
+  {
+    "node": "WalkthroughPlayer",
+    "test": "it opens paused",
+    "file": "home/watch/walkthrough-player/walkthrough-player/01-it-opens-paused.png"
+  },
+  {
+    "node": "WalkthroughPlayer",
+    "test": "the other walkthrough",
+    "file": "home/watch/walkthrough-player/walkthrough-player/02-the-other-walkthrough.png"
+  },
+  {
+    "node": "WalkthroughPlayer",
+    "test": "picking a chapter",
+    "file": "home/watch/walkthrough-player/walkthrough-player/03-picking-a-chapter.png"
+  },
+  {
+    "node": "WalkthroughPlayer",
+    "test": "next and previous",
+    "file": "home/watch/walkthrough-player/walkthrough-player/04-next-and-previous.png"
+  },
+  {
+    "node": "WalkthroughPlayer",
+    "test": "arrow keys",
+    "file": "home/watch/walkthrough-player/walkthrough-player/05-arrow-keys.png"
+  },
+  {
+    "node": "WalkthroughPlayer",
+    "test": "playing",
+    "file": "home/watch/walkthrough-player/walkthrough-player/06-playing.png"
+  },
+  {
+    "node": "AdoptSection",
+    "test": "adopting is explained",
+    "file": "home/adopt/adopt-section/01-adopting-is-explained.png"
+  }
+]

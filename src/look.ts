@@ -9,7 +9,7 @@ import { readLock, writeLock } from "./lock.ts";
 import { specText, type AilNode } from "./parse.ts";
 import { ancestors, type Project } from "./project.ts";
 import type { Provider } from "./providers/index.ts";
-import { refreshNodeShots, visualNodes, type Shot } from "./shots.ts";
+import { handBuilt, recordedFor, recordFor, refreshNodeShots, shotKey, visualNodes, type Shot } from "./shots.ts";
 import { loadPrompt } from "./verify.ts";
 
 export interface LookResult { node: string; ok: boolean; problems: string[]; shots: Shot[]; skipped?: string }
@@ -31,7 +31,7 @@ export function lookTask(p: Project, n: AilNode, shots: Shot[], wholeApp = false
     "",
     "## Screenshots",
     `${shots.length} screenshot(s) are attached above, in this order: ${shots.map((s) => `"${s.test}"`).join(", ")}.`,
-    ...(wholeApp ? ["They show the whole running app, taken by an end-to-end check, on whatever platform the app runs (a browser, a simulator, a desktop). This node is only part of each screen: judge that part, and ignore everything around it that belongs to its parents or to other nodes (navigation, frames, system bars)."] : []),
+    ...(wholeApp ? ["They show the app's own windows, rendered by its derived check on whatever platform the app runs (a browser, a simulator, a desktop). This node may be only part of each screen: judge that part, and ignore everything around it that belongs to its parents or to other nodes (navigation, frames, system bars)."] : []),
     "Do they match the spec?",
   ].join("\n");
 }
@@ -61,7 +61,7 @@ export async function lookCheck(p: Project, n: AilNode, provider: Provider, log:
     return { node: n.name, ok: true, problems: [], shots: [], skipped: (e as Error).message };
   }
   if (!shots.length) return { node: n.name, ok: true, problems: [], shots, skipped: "its tests left nothing on screen" };
-  return judgeShots(p, n, shots, provider, log);
+  return judgeShots(p, n, shots, provider, log, handBuilt(p, n));
 }
 
 /** Ask the model whether screenshots (from any platform) match a node's look. */
@@ -77,19 +77,15 @@ export async function judgeShots(p: Project, n: AilNode, shots: Shot[], provider
   return { node: n.name, ...parseVerdict(reply), shots };
 }
 
-/** Record that a node's screens matched its look, for the build in the lock. */
+/** Record that a node's screens matched its look, for its build (or, built by hand, its derived check) in the lock. */
 export function recordLook(p: Project, node: string) {
-  const lock = readLock(p);
-  const entry = lock.nodes[node];
-  if (!entry) return;
-  entry.look = entry.hash;
-  writeLock(p, lock);
+  const n = p.nodes.get(node);
+  if (n) recordFor(p, n, "look");
 }
 
-/** Built nodes with a look whose screens were not compared for their current build. */
+/** Nodes with a look whose screens were not compared for their current build (or, built by hand, derived check). */
 export function unjudged(p: Project): string[] {
-  const lock = readLock(p);
-  return visualNodes(p).filter((n) => { const e = lock.nodes[n.name]; return e && e.look !== e.hash; }).map((n) => n.name);
+  return visualNodes(p).filter((n) => { const key = shotKey(p, n); return !!key && recordedFor(p, n, "look") !== key; }).map((n) => n.name);
 }
 
 export const formatLook = (r: LookResult) =>

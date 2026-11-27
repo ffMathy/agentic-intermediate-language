@@ -81,7 +81,7 @@ test("a spec with errors says nothing was checked, and why", () => {
 test("end-to-end checks are sections too, with their screens", () => {
   const md = renderChecks(loadProject(KATA), report({
     e2e: { ok: true, app: "run.app", results: [
-      { node: "PlayAGame", file: "checks/e2e/app/play/play-a-game.e2e.ts", status: "pass", detail: "", tests: [{ name: "X always starts", ok: true }], shots: [] },
+      { node: "PlayAGame", file: "checks/e2e/app/play/play-a-game.e2e.ts", status: "pass", detail: "", tests: [{ name: "X always starts", ok: true }] },
       { node: "App", file: null, status: "missing", detail: "" },
     ] },
   }));
@@ -143,7 +143,7 @@ test("a build that ran only what a change affects says so", () => {
 
 test("screens link to the commit that holds the build's own screenshots, and only that one", async () => {
   const { screensCommit, buildHead } = await import("../src/report.ts");
-  const { e2eShotsDir } = await import("../src/shots.ts");
+  const { nodeShotsDir } = await import("../src/shots.ts");
   const dir = tempProject("areas");
   const sh = (...a: string[]) => Bun.spawnSync(["git", ...a], { cwd: dir, stdout: "pipe" }).stdout.toString().trim();
   sh("init", "-q"); sh("-c", "user.email=a@b", "-c", "user.name=a", "commit", "-qam", "x", "--allow-empty");
@@ -152,7 +152,7 @@ test("screens link to the commit that holds the build's own screenshots, and onl
   const ran = buildHead(p);
   expect(ran.dirty).toBe(false);
   // the build writes its proof screenshots; that is not a change it ran on
-  const shots = e2eShotsDir(p, p.nodes.get("Price")!);
+  const shots = nodeShotsDir(p, p.nodes.get("Price")!);
   mkdirSync(shots, { recursive: true });
   writeFileSync(join(shots, "paying.png"), "png");
   expect(screensCommit(p, ran.head!)).toBe(ran.head!);

@@ -104,25 +104,20 @@ Follow the `ail` skill for how nodes are written. On top of it:
      `prepare` builds the checks once before they run. (The derived checks
      `ail build` writes follow the target's `checks.path` and `checks.run`.)
 
-   - at the end of every test it saves visual proof: a screenshot of the screen
-     the scenario ends on, as a PNG in the folder `process.env.AIL_SHOTS_DIR`,
-     named after the test: the test's name in lower case, each run of other
-     characters turned into one `-`, trimmed of `-`, at most 60 characters, plus
-     `.png` ("X always starts" → `x-always-starts.png`). A shared helper that
-     wraps each test does this best. Work out how to take it
-     on this platform and make it work: `page.screenshot()` for the web, the X
-     display (`import -window root`, `xwd`) or the OS's screenshot tool for a
-     desktop app, `xcrun simctl io booted screenshot` or `adb exec-out
-     screencap -p` for mobile. For an app with no screen (a CLI, an API), save
-     an image of what the scenario ends with, such as its rendered output.
+   - it takes no screenshots: it proves behaviour only. What the app looks
+     like is pictured by the derived checks (below).
 
    Add any driver it needs to the checks' own dependencies. Call `ail_adopt`:
    it starts the app's services and the app as `run.legacy` says, runs its
-   baseline seed, runs the checks, collects their
-   screenshots beside each node's spec file, in the `e2e/` folder of its `shots/` (committed, like the other proof), has
-   a model compare them with each node's `look`, and stops the app. A failing
-   check, or a screenshot that doesn't match its `look`, means the spec or the
-   check is wrong about the app: fix that, never the app. When everything
+   baseline seed, runs the checks, and stops the app. A failing check means
+   the spec or the check is wrong about the app: fix that, never the app.
+   Then `/ail:build` pictures every node with a `look`: its code is the
+   app's own, so ail builds nothing for it, but derives a check that renders
+   that code and saves each scenario's final screen beside the node's spec,
+   in `shots/`, and a model compares them with the `look`. Say in the
+   target's `test harness` how a check renders a view without a display and
+   saves a PNG (a headless browser for the web, the UI toolkit's headless
+   mode for a desktop app). When everything
    passes, the spec describes the app, and `ail_adopt` records every node in
    the lock file as built by the existing app, and records `run.app` as a copy
    of `run.legacy`: the existing app is what `ail build` makes until the target

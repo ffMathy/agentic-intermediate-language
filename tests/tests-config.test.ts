@@ -3,7 +3,7 @@
 import { expect, test } from "bun:test";
 import { existsSync, mkdirSync, readFileSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
-import { adopt, e2eCheckPath, e2eShotsDir } from "../src/adopt.ts";
+import { adopt, e2eCheckPath } from "../src/adopt.ts";
 import { pinOf, reportTests, withPin } from "../src/tests.ts";
 import { load, tempProject, specFile } from "./helpers.ts";
 
@@ -33,10 +33,9 @@ function project(check: string, extra: Record<string, unknown> = {}) {
   return { dir, p, file };
 }
 
-test("an end-to-end check in another language is run by the project's command, pinned in its comment syntax, with its screenshots", async () => {
-  const { dir, p, file } = project(`# each scenario saves its screen and reports itself
-printf png > "$AIL_SHOTS_DIR/paying.png"
-printf png > "$AIL_SHOTS_DIR/paying-twice.png"
+test("an end-to-end check in another language is run by the project's command, pinned in its comment syntax, and takes no screenshots", async () => {
+  const { dir, p, file } = project(`# each scenario reports itself; there is nowhere to save a screen
+[ -z "$AIL_SHOTS_DIR" ] || exit 2
 [ "$AIL_APP" = receipt ] && [ "$AIL_CHECK_NODE" = Checkout ] || exit 1
 echo '<testcase name="paying"/><testcase name="paying twice"/>'
 `);
@@ -46,8 +45,7 @@ echo '<testcase name="paying"/><testcase name="paying twice"/>'
   const res = r.results.find((x) => x.node === "Checkout")!;
   expect(res.status).toBe("pass");
   expect(res.detail).toContain("2 scenario(s)");
-  expect(res.shots!.map((s) => s.test)).toEqual(["paying", "paying twice"]);
-  expect(existsSync(join(e2eShotsDir(p, p.nodes.get("Checkout")!), "shots.json"))).toBe(true);
+  expect(existsSync(join(dir, "a", "checkout", "shots"))).toBe(false);
   expect(readFileSync(file, "utf8")).toStartWith("# ail-derived-from: Checkout@");
   // pinned now: a second run is not stale
   expect((await adopt(load(dir))).results.find((x) => x.node === "Checkout")!.status).toBe("pass");

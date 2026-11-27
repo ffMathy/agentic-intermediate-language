@@ -89,7 +89,7 @@ export function renderChecks(p: Project, r: BuildReport, opts: { shots?: Shot[];
     if (e.status === "missing") continue;
     const failed = e.status !== "pass";
     sections.push({
-      title: `${e.node} · end to end`, ok: !failed, tests: e.tests ?? [], shots: e.shots ?? [],
+      title: `${e.node} · end to end`, ok: !failed, tests: e.tests ?? [], shots: [],
       problems: failed ? [`${e.status === "stale" ? WARN : FAIL} ${e.status}: ${e.detail}`] : [],
       note: e.file ?? undefined,
     });

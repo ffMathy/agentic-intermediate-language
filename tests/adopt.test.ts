@@ -99,10 +99,9 @@ test("adopting suggests the .gitattributes lines that keep generated code out of
   expect(r.review?.missing).toEqual([]);
 });
 
-test("adopting takes the checks' screenshots as proof and records the existing app as the build", async () => {
+test("adopting runs the checks, takes no screenshots, and records the existing app as the build", async () => {
   const { plan } = await import("../src/plan.ts");
   const { verifyProject } = await import("../src/verify.ts");
-  const { e2eShotsDir } = await import("../src/adopt.ts");
   const dir = tempProject("areas");
   // Checkout is AreaA's child, so the project lints and builds.
   const area = join(dir, "a", "a.ail.md");
@@ -114,21 +113,20 @@ test("adopting takes the checks' screenshots as proof and records the existing a
   let p = load(dir);
   const file = e2eCheckPath(p, p.nodes.get("Checkout")!);
   mkdirSync(join(file, ".."), { recursive: true });
-  // Any platform: this "app" has no browser, so the check saves its own picture of what it saw.
+  // End-to-end checks prove behaviour: they are given nowhere to save a screen.
   writeFileSync(file, `import { expect, test } from "bun:test";
-import { join } from "node:path";
 test("paying", async () => {
   const body = await (await fetch(process.env.AIL_APP_URL!)).text();
   expect(body).toBe("receipt");
-  await Bun.write(join(process.env.AIL_SHOTS_DIR!, "paying.png"), body);
+  expect(process.env.AIL_SHOTS_DIR).toBeUndefined();
 });
 `);
   expect(plan(p).some((e) => e.status !== "fresh")).toBe(true); // nothing built yet
   const r = await adopt(p, { record: true });
   expect(r.ok).toBe(true);
-  expect(r.results.find((x) => x.node === "Checkout")!.shots!.map((s) => s.test)).toEqual(["paying"]);
+  expect(r.results.find((x) => x.node === "Checkout")!.status).toBe("pass");
   p = load(dir);
-  expect(JSON.parse(readFileSync(join(e2eShotsDir(p, p.nodes.get("Checkout")!), "shots.json"), "utf8")).shots).toEqual([{ test: "paying", file: "paying.png" }]);
+  expect(existsSync(join(dir, "a", "checkout", "shots"))).toBe(false);
   expect(r.recorded!.length).toBeGreaterThan(0);
   // the existing app is the build: nothing to rebuild, and nothing fails for lack of generated code
   expect(plan(p).filter((e) => e.status !== "fresh")).toEqual([]);

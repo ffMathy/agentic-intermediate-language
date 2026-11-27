@@ -51,7 +51,7 @@ Every node has a folder of its own, with its screens in `shots/`. Folders mirror
 ```
 ail/app/play/
 ├── play.ail.md                    PlayAGame
-├── shots/                         its screens: 01-x-always-starts.png …, e2e/
+├── shots/                         its screens: 01-x-always-starts.png …
 ├── new-game-button/
 │   ├── new-game-button.ail.md     NewGameButton
 │   └── shots/
@@ -106,7 +106,8 @@ Then ask for features in plain words. The agent changes the spec, never the code
 | **why** | tickets (Asana, Jira, Linear) and the people who own the app |
 | **what** | driving the running app: every screen and error path |
 | **how** | its code: data shapes, rules, real values as examples |
-| **proof** | an end-to-end check per flow, run against the old app, with a screenshot per scenario |
+| **proof** | an end-to-end check per flow, run against the old app |
+| **screens** | a derived check per node with a `look`, rendering the app's own code |
 
 Then change the `target` and run `ail build`. The same checks prove the new app behaves like the old one. Example: [`examples/tictactoe/checks/e2e/`](examples/tictactoe/checks/e2e).
 

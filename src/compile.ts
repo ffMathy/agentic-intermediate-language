@@ -14,7 +14,8 @@ import { adoptedFresh, plan } from "./plan.ts";
 import { AIL_HOME, isCompilable, kebab, modulePath, SHOTS, specModulePath, topoByUses, type Project } from "./project.ts";
 import type { Provider } from "./providers/index.ts";
 import { e2eCheckPath } from "./tests.ts";
-import { checkHeader, checkPath, checksDir, DERIVED_HEADER, derivedCheckFile, foreignChecks, loadPrompt, needsDerivedCheck, stampCheck, verifyNode, type VerifyResult } from "./verify.ts";
+import { checkHeader, checkPath, checksDir, DERIVED_HEADER, derivedCheckFile, foreignCheckPaths, foreignChecks, loadPrompt, needsDerivedCheck, needsHandCheck, stampCheck, verifyNode, type VerifyResult } from "./verify.ts";
+import { handBuilt, shotFileName } from "./shots.ts";
 export { checkPath, loadPrompt } from "./verify.ts";
 
 export interface ParsedReply { stop: string | null; files: Record<string, string> }
@@ -68,18 +69,17 @@ export function specModuleProjects(p: Project): { key: string; name: string; dir
     : [{ key: "this", name: "This project", dir: p.specRoot, configDir: relative(p.root, p.specRoot) || ".", shots: false }];
 }
 
-/** The committed proof screenshots of the AIL project whose spec folder is `specDir`, in path order, end-to-end ones last. */
+/** The committed proof screenshots of the AIL project whose spec folder is `specDir`, in path order. */
 export function projectShots(specDir: string): { node: string; test: string; file: string }[] {
   let root = specDir;
   while (!existsSync(join(root, "ail.config.json")) && dirname(root) !== root) root = dirname(root);
   if (!existsSync(join(root, "ail.config.json"))) return [];
   const config = JSON.parse(readFileSync(join(root, "ail.config.json"), "utf8")) as { specRoot?: string };
-  // Beside the spec: each spec folder's shots/<node>/ (and its e2e/), as nodeShotsDir in shots.ts puts them.
+  // Beside the spec: each node folder's shots/, as nodeShotsDir in shots.ts puts them.
   const dir = resolve(root, config.specRoot ?? ".");
   if (!existsSync(dir)) return [];
-  return [...new Bun.Glob(`**/${SHOTS}/**/shots.json`).scanSync({ cwd: dir })].filter((f) => !/(^|\/)(node_modules|\.[^/]+)\//.test(f))
-    // A node's own screens first, its end-to-end ones after all of them.
-    .sort((a, b) => Number(/(^|\/)e2e\/shots\.json$/.test(a)) - Number(/(^|\/)e2e\/shots\.json$/.test(b)) || (a < b ? -1 : a > b ? 1 : 0)).flatMap((f) => {
+  return [...new Bun.Glob(`**/${SHOTS}/shots.json`).scanSync({ cwd: dir })].filter((f) => !/(^|\/)(node_modules|\.[^/]+)\//.test(f))
+    .sort().flatMap((f) => {
     const idx = JSON.parse(readFileSync(join(dir, f), "utf8")) as { node: string; shots: { test: string; file: string }[] };
     return idx.shots.map((s) => ({ node: idx.node, test: s.test, file: join(dir, dirname(f), s.file) }));
   });
@@ -239,13 +239,14 @@ export function prune(p: Project): { removed: string[]; kept: string[] } {
 
 /** Every file that may be a derived check: bun tests under checks/, or, for a foreign target, files under the fixed start of its `checks.path`. */
 function derivedCheckFiles(p: Project): string[] {
-  const foreign = foreignChecks(p);
-  // The folder before the first placeholder, e.g. tests/Gen.Tests/ for tests/Gen.Tests/{dir}/{name}Tests.cs.
-  const fixed = foreign ? foreign.path.split("{")[0]!.replace(/[^/]*$/, "") : "";
-  const dir = foreign ? join(p.root, fixed) : checksDir(p);
-  if (!existsSync(dir)) return [];
-  const glob = foreign ? `**/*${foreign.path.slice(foreign.path.lastIndexOf("."))}` : "**/*.test.{ts,tsx}";
-  return [...new Bun.Glob(glob).scanSync({ cwd: dir })].filter((f) => !/(^|\/)(node_modules|bin|obj|\.[^/]+)\//.test(f)).map((f) => join(dir, f));
+  const paths = foreignChecks(p) ? foreignCheckPaths(p) : [null];
+  return [...new Set(paths.flatMap((path) => {
+    // The folder before the first placeholder, e.g. tests/Gen.Tests/ for tests/Gen.Tests/{dir}/{name}Tests.cs.
+    const dir = path ? join(p.root, path.split("{")[0]!.replace(/[^/]*$/, "")) : checksDir(p);
+    if (!existsSync(dir)) return [];
+    const glob = path ? `**/*${path.slice(path.lastIndexOf("."))}` : "**/*.test.{ts,tsx}";
+    return [...new Bun.Glob(glob).scanSync({ cwd: dir })].filter((f) => !/(^|\/)(node_modules|bin|obj|\.[^/]+)\//.test(f)).map((f) => join(dir, f));
+  }))];
 }
 
 // --- compile -----------------------------------------------------------------
@@ -332,7 +333,8 @@ export async function compile(p: Project, names: string[], opts: CompileOptions)
   if (pruned.removed.length) log(`pruned: ${pruned.removed.join(", ")}`);
   if (pruned.kept.length) log(`left hand-edited files of removed nodes in place: ${pruned.kept.join(", ")}`);
   const statuses = new Map(plan(p).map((e) => [e.node, e.status]));
-  const targets = topoByUses(p, p.ordered.filter((n) => isCompilable(p, n) && (!names.length || names.includes(n.name))));
+  // A node built by hand with a look is never compiled here: its screens not matching its look is reported, not rebuilt.
+  const targets = topoByUses(p, p.ordered.filter((n) => isCompilable(p, n) && !needsHandCheck(p, n) && (!names.length || names.includes(n.name))));
   const limit = semaphore(opts.jobs ?? 4);
   const results = new Map<string, Promise<CompileOutcome>>();
   const built = (o: { status: string }) => o.status === "fresh" || o.status === "compiled";
@@ -442,7 +444,10 @@ export async function derive(p: Project, n: AilNode, provider: Provider, retry?:
       buildContext(p, n),
       "## Task",
       `Write the derived check file ${rel} for ${n.name}: one test per scenario (named exactly as the scenario) and one per verify item${foreignChecks(p) ? ", and one per example (named \"example <n>: <the example>\")" : ""}.`,
-      `The module under test is ${modulePath(p, n)}. ${checkImports(p, n, rel)} The first line must be:`,
+      handBuilt(p, n)
+        ? `${n.name} is not generated by ail: its code is written by hand (${modulePath(p, n) ? "the existing app still builds it" : "the target has no path for it"}). Test that code, the app's own, as the target's \`tests\` and \`test harness\` settings say. ${checkImports(p, n, rel)} The first line must be:`
+        : `The module under test is ${modulePath(p, n)}. ${checkImports(p, n, rel)} The first line must be:`,
+      ...shotInstructions(p, n),
       header,
       "Reply with exactly one block:",
       `=== FILE: ${rel} ===`, "<complete file contents>", "=== END ===",
@@ -462,14 +467,30 @@ export async function derive(p: Project, n: AilNode, provider: Provider, retry?:
   return { file: rel };
 }
 
+/**
+ * What a derived check in another language must do to picture a node with a look: save each scenario's final
+ * screen where AIL_SHOTS_DIR says, under a name ail gives. (In TypeScript, ail records the screens itself.)
+ */
+export function shotInstructions(p: Project, n: AilNode): string[] {
+  if (!foreignChecks(p) || !hasLook(n) || !n.scenarios.length) return [];
+  return [
+    "",
+    "## Screenshots",
+    `${n.name} has a look, so its check also pictures it. When the environment variable AIL_SHOTS_DIR is set, each scenario's test ends by saving the screen the scenario ends on, as a PNG in that folder, named exactly:`,
+    ...n.scenarios.map((sc) => `- "${sc.title}" → ${shotFileName(sc.title)}`),
+    `Picture ${n.name} as a user sees it, rendered by the app's own code (its window, or the view in a window of its own), sized to fit it, as the target's \`test harness\` says. When AIL_SHOTS_DIR is not set, save nothing. A failed save fails the test.`,
+  ];
+}
+
 /** Nodes whose derived check is missing or was derived from an older spec. */
 export function checksToDerive(p: Project, nodes: AilNode[]): AilNode[] {
   const lock = readLock(p);
   return nodes.filter((n) => {
     if (!needsDerivedCheck(n, p)) return false;
-    // An adopted node has no generated module to test: its end-to-end checks prove it.
+    // An adopted node has no generated module to test: its end-to-end checks prove it. With a look, its derived
+    // check tests the existing code instead, and pictures it.
     const e = lock.nodes[n.name];
-    if (adoptedFresh(p, n, e)) return false;
+    if (adoptedFresh(p, n, e) && !needsHandCheck(p, n)) return false;
     const { file, pinned } = derivedCheckFile(p, n);
     return !file || pinned !== oracleHash(p, n).slice(0, 16);
   });

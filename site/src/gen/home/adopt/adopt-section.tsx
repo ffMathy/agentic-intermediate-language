@@ -1,9 +1,37 @@
+import { useId } from "react";
 import type { CSSProperties } from "react";
 import { Section } from "../../parts/section/section";
 import { SectionHeading } from "../../parts/section-heading/section-heading";
 import { Stack } from "../../parts/stack/stack";
 import { CopyCommand } from "../../parts/copy-command/copy-command";
 import { AdoptFigure } from "./adopt-figure/adopt-figure";
+
+const steps = [
+  {
+    n: "1",
+    color: "var(--color-level-product)",
+    title: "Why, from people and tickets",
+    text: "The reasons come from the task tracker (Asana, Jira, Linear) and from interviewing the people who own the app. A reason nobody can confirm is written down as unknown, and every build lists it until someone answers.",
+  },
+  {
+    n: "2",
+    color: "var(--color-level-experience)",
+    title: "What, from the running app",
+    text: "An agent finds out how to start the app, whatever it is (a website, a mobile app on a simulator, a command-line tool), along with the backend or database it needs. Each scenario's test data is created through the app's own API, never straight into its database. Then it drives every screen and error path, and writes down what it sees, quirks included.",
+  },
+  {
+    n: "3",
+    color: "var(--color-level-system)",
+    title: "How, from the code",
+    text: "The code tells what the screen can't: data shapes, rules, edge cases and timing. Real inputs and outputs become examples, and every claim records where it came from.",
+  },
+  {
+    n: "4",
+    color: "var(--color-pass)",
+    title: "Proof, on the old app",
+    text: "Every flow gets an end-to-end check that plays its scenarios on any platform. ail adopt starts the old app, runs them, and records the app as built, so the first build only builds what changes. Then each node with a look gets a derived check that renders the old app's own code and screenshots the screen each scenario ends on.",
+  },
+];
 
 const figureStyle: CSSProperties = {
   background: "var(--color-surface-raised)",
@@ -89,49 +117,22 @@ const noteStyle: CSSProperties = {
   margin: 0,
 };
 
-const steps = [
-  {
-    n: "1",
-    color: "var(--color-level-product)",
-    title: "Why, from people and tickets",
-    text: "The reasons come from the task tracker (Asana, Jira, Linear) and from interviewing the people who own the app. A reason nobody can confirm is written down as unknown, and every build lists it until someone answers.",
-  },
-  {
-    n: "2",
-    color: "var(--color-level-experience)",
-    title: "What, from the running app",
-    text: "An agent finds out how to start the app, whatever it is (a website, a mobile app on a simulator, a command-line tool), along with the backend or database it needs. Each scenario's test data is created through the app's own API, never straight into its database. Then it drives every screen and error path, and writes down what it sees, quirks included.",
-  },
-  {
-    n: "3",
-    color: "var(--color-level-system)",
-    title: "How, from the code",
-    text: "The code tells what the screen can't: data shapes, rules, edge cases and timing. Real inputs and outputs become examples, and every claim records where it came from.",
-  },
-  {
-    n: "4",
-    color: "var(--color-pass)",
-    title: "Proof, on the old app",
-    text: "Every flow gets an end-to-end check that plays its scenarios and screenshots the screen each one ends on, on any platform. ail adopt starts the old app, runs them, commits the screenshots, and records the app as built, so the first build only builds what changes.",
-  },
-];
+function CommandCard(props: { title: string; command: string; text: string }) {
+  const titleId = useId();
+  return (
+    <section aria-labelledby={titleId} style={cardStyle}>
+      <Stack dir="v" gap="space.3" align="stretch">
+        <h3 id={titleId} style={cardTitleStyle}>
+          {props.title}
+        </h3>
+        <CopyCommand command={props.command} />
+        <p style={cardTextStyle}>{props.text}</p>
+      </Stack>
+    </section>
+  );
+}
 
-const cards = [
-  {
-    id: "adopt-claude-title",
-    title: "In Claude Code, Cursor or Copilot",
-    cmd: "/ail:adopt",
-    text: "The agent writes the spec one slice at a time: a screen, a flow or a rule. It asks you what only the owners know. In Cursor and Copilot, pick adopt from the / menu.",
-  },
-  {
-    id: "adopt-cli-title",
-    title: "In a terminal",
-    cmd: "ail adopt",
-    text: "Starts the app as ail.config.json says, runs every end-to-end check against it, and stops it.",
-  },
-];
-
-/** "Most software already exists: show that AIL can take over an existing app, and carry it to a new technology without changing what it does." */
+/** "a heading, a picture of an old app and a new app checked against the same spec, four steps that write and prove the spec, and the two commands that do it" */
 export function AdoptSection() {
   return (
     <Section id="adopt" tone="plain">
@@ -154,22 +155,16 @@ export function AdoptSection() {
           ))}
         </ol>
         <div style={commandsStyle}>
-          {cards.map((card) => (
-            <div
-              key={card.id}
-              role="region"
-              aria-labelledby={card.id}
-              style={cardStyle}
-            >
-              <Stack dir="v" gap="space.3" align="stretch">
-                <h3 id={card.id} style={cardTitleStyle}>
-                  {card.title}
-                </h3>
-                <CopyCommand command={card.cmd} />
-                <p style={cardTextStyle}>{card.text}</p>
-              </Stack>
-            </div>
-          ))}
+          <CommandCard
+            title="In Claude Code, Cursor or Copilot"
+            command="/ail:adopt"
+            text="The agent writes the spec one slice at a time: a screen, a flow or a rule. It asks you what only the owners know. In Cursor and Copilot, pick adopt from the / menu."
+          />
+          <CommandCard
+            title="In a terminal"
+            command="ail adopt"
+            text="Starts the app as ail.config.json says, runs every end-to-end check against it, and stops it."
+          />
         </div>
         <p style={noteStyle}>
           To move to another technology, change the spec's target and build. Every build then runs the same end-to-end checks against the new app, so it is proven to behave like the old one.

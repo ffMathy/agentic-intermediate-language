@@ -18,7 +18,17 @@ export interface LockEntry {
   /** For an adopted node: the hash of its spec alone, without the target (hash.ts, specHash). */
   spec?: string;
 }
-export interface Lock { version: 1; nodes: Record<string, LockEntry>; glue: Record<string, string> }
+/**
+ * A node with a look whose code is written by hand (adopted, `@existing`, or of a kind the target doesn't build):
+ * its derived check pictures it, so its screenshots and look verdict are keyed to that check's pin.
+ */
+export interface HandEntry {
+  /** The pin of the derived check whose screenshots are committed beside the spec, in shots/. */
+  shots?: string;
+  /** The pin of the derived check whose screens a model found to match the node's look. */
+  look?: string;
+}
+export interface Lock { version: 1; nodes: Record<string, LockEntry>; glue: Record<string, string>; hand?: Record<string, HandEntry> }
 
 export const lockPath = (p: Project) => join(p.root, p.config.lockFile ?? "ail.lock.json");
 
@@ -33,6 +43,7 @@ export function writeLock(p: Project, lock: Lock) {
     version: 1,
     nodes: Object.fromEntries(Object.entries(lock.nodes).sort(([a], [b]) => a.localeCompare(b))),
     glue: Object.fromEntries(Object.entries(lock.glue).sort(([a], [b]) => a.localeCompare(b))),
+    ...(lock.hand && Object.keys(lock.hand).length ? { hand: Object.fromEntries(Object.entries(lock.hand).sort(([a], [b]) => a.localeCompare(b))) } : {}),
   };
   writeFileSync(lockPath(p), JSON.stringify(sorted, null, 2) + "\n");
 }

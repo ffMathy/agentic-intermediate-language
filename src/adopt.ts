@@ -13,9 +13,7 @@ import { tmpdir } from "node:os";
 import { join, relative, resolve } from "node:path";
 import { compileHash, oracleHash, specHash } from "./hash.ts";
 import { adoptedFresh } from "./plan.ts";
-import { hasLook, judgeShots, type LookResult } from "./look.ts";
 import type { Provider } from "./providers/index.ts";
-import { collectShots, e2eShotsDir, type Shot } from "./shots.ts";
 import { e2eCheckPath, failureText, ownRunner, pinOf, prepareChecks, runCheckFile, withPin } from "./tests.ts";
 import type { AilNode } from "./parse.ts";
 import { isCompilable, kebab, type Project, type RunSpec } from "./project.ts";
@@ -27,9 +25,8 @@ export { e2eCheckPath } from "./tests.ts";
 /** Nodes whose scenarios a person could play through in the app: its flows and the root. */
 export const observable = (n: AilNode) => n.scenarios.length > 0 && (n.kind === "flow" || n.kind === "system");
 
-export interface AdoptResult { node: string; file: string | null; status: "pass" | "fail" | "stale" | "missing"; detail: string; shots?: Shot[]; tests?: TestResult[] }
+export interface AdoptResult { node: string; file: string | null; status: "pass" | "fail" | "stale" | "missing"; detail: string; tests?: TestResult[] }
 
-export { collectShots, e2eShotsDir, shotFileName } from "./shots.ts";
 
 /** Which app to run: the given name, else "legacy" while adopting, else "app". */
 export function runSpecName(p: Project, name?: string): string | null {
@@ -102,7 +99,7 @@ export async function startApp(p: Project, spec: RunSpec, log: (s: string) => vo
 export const runEnv = (spec: RunSpec): Record<string, string> =>
   ({ ...Object.assign({}, ...Object.values(spec.services ?? {}).map((s) => s.env ?? {})), ...(spec.env ?? {}) });
 
-export interface AdoptReport { ok: boolean; app: string; results: AdoptResult[]; error?: string; review?: { file: string; missing: string[] }; looks?: LookResult[]; recorded?: string[]; runApp?: boolean }
+export interface AdoptReport { ok: boolean; app: string; results: AdoptResult[]; error?: string; review?: { file: string; missing: string[] }; recorded?: string[]; runApp?: boolean }
 
 /**
  * Once the existing app is proven to be the build, it is also the app `ail build` makes: record run.app as a copy of
@@ -150,8 +147,6 @@ export function recordAdopted(p: Project): string[] {
  */
 export async function adopt(p: Project, opts: {
   app?: string; names?: string[]; log?: (s: string) => void; suggestReview?: boolean;
-  /** A model that compares each flow's screenshots with its look (skipped without one). */
-  judge?: Provider;
   /** Record every node as built by this (legacy) app once its spec is proven: `ail adopt` does. */
   record?: boolean;
 } = {}): Promise<AdoptReport> {
@@ -188,35 +183,20 @@ export async function adopt(p: Project, opts: {
     // The checks' own build (in the target's language), once, before any of them runs.
     const unprepared = prepareChecks(p, runEnv(spec));
     if (unprepared) return { ok: false, app: label, results, review, error: unprepared };
+    // End-to-end checks prove behaviour only: they take no screenshots (a node's derived check pictures it).
     for (const { n, abs, file } of toRun) {
-      // A fresh folder for the screenshots the check takes as proof, however its platform takes them.
-      const shotsAt = e2eShotsDir(p, n);
-      rmSync(shotsAt, { recursive: true, force: true });
-      mkdirSync(shotsAt, { recursive: true });
       // As bun tests, run from outside the project, so its test setup (a simulated DOM) stays out of a real app's way.
-      const r = runCheckFile(p, n, abs, { ...runEnv(spec), AIL_SHOTS_DIR: shotsAt }, tmpdir());
-      const tests = r.tests.map((t) => t.name);
-      const { shots, missing: unpictured } = collectShots(shotsAt, n.name, tests);
-      if (!shots.length) rmSync(shotsAt, { recursive: true, force: true });
-      const pictured = !tests.length ? "" : !shots.length ? "; no screenshots saved (the check should save one per scenario into AIL_SHOTS_DIR)" : unpictured.length ? `; no screenshot for: ${unpictured.join(", ")}` : `, each with a screenshot`;
+      const r = runCheckFile(p, n, abs, runEnv(spec), tmpdir());
       results.push(r.ok
-        ? { node: n.name, file, status: "pass", detail: `${r.passes} scenario(s) behave as specified${pictured}`, shots, tests: r.tests }
-        : { node: n.name, file, status: "fail", detail: `${r.failures.length ? r.failures.join("; ") : "the check did not run"}\n${ownRunner(p) ? failureText(r) : errorExcerpt(r.output, 20)}`, shots, tests: r.tests });
+        ? { node: n.name, file, status: "pass", detail: `${r.passes} scenario(s) behave as specified`, tests: r.tests }
+        : { node: n.name, file, status: "fail", detail: `${r.failures.length ? r.failures.join("; ") : "the check did not run"}\n${ownRunner(p) ? failureText(r) : errorExcerpt(r.output, 20)}`, tests: r.tests });
     }
   } finally { app.stop(); }
-  // The screenshots are proof of the look too: a model compares them with it.
-  const looks: LookResult[] = [];
-  if (opts.judge) for (const r of results) {
-    const n = p.nodes.get(r.node)!;
-    if (r.status !== "pass" || !r.shots?.length || !hasLook(n)) continue;
-    opts.log?.(`${n.name}: comparing its screenshots with its look`);
-    looks.push(await judgeShots(p, n, r.shots, opts.judge, () => {}, true).catch((e) => ({ node: n.name, ok: true, problems: [], shots: [], skipped: (e as Error).message })));
-  }
-  const ok = results.every((r) => r.status === "pass" || r.status === "missing") && looks.every((l) => l.ok);
+  const ok = results.every((r) => r.status === "pass" || r.status === "missing");
   // Proven on the existing app: record every node as built by it, so the first ail build has nothing to redo.
   const recorded = ok && opts.record ? recordAdopted(p) : [];
   const runApp = ok && !!opts.record && recordRunApp(p);
-  return { ok, app: label, results, review, looks, recorded, runApp };
+  return { ok, app: label, results, review, recorded, runApp };
 }
 
 /**
@@ -257,7 +237,6 @@ export function formatAdopt(r: AdoptReport): string {
     : [`${r.ok ? "✓" : "✗"} app      ${ran.filter((x) => x.status === "pass").length} of ${ran.length} flow(s) behave as their spec says (${app})`];
   for (const x of ran.filter((y) => y.status !== "pass")) lines.push(`    ${icon[x.status]} ${x.node} ${x.status}: ${x.detail.split("\n").join("\n      ")}`);
   if (missing.length) lines.push(`    · ${missing.length} node(s) with scenarios have no end-to-end check yet: ${missing.map((x) => x.node).join(", ")}`);
-  for (const l of r.looks ?? []) lines.push(l.skipped ? `    · ${l.node}: screenshots not compared with its look (${l.skipped})` : l.ok ? `    ✓ ${l.node}: ${l.shots.length} screenshot(s) match its look` : `    ✗ ${l.node}: its screenshots don't match its look\n${l.problems.map((x) => `        - ${x}`).join("\n")}`);
   if (r.runApp) lines.push("    ✓ recorded run.app in ail.config.json as a copy of run.legacy: the existing app is what ail build makes, so every build runs these checks against it");
   if (r.recorded?.length) lines.push(`    ✓ recorded ${r.recorded.length} node(s) as built by the existing app in the lock file, so ail build only builds what changes from now on`);
   if (r.review) { const tip = formatReview(r.review); if (tip) lines.push(tip); }

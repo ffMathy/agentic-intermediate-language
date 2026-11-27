@@ -1,0 +1,37 @@
+[
+  {
+    "node": "HomePage",
+    "test": "one story, in order",
+    "file": "home/home-page/01-one-story-in-order.png"
+  },
+  {
+    "node": "HomePage",
+    "test": "every top bar link has a place to land",
+    "file": "home/home-page/02-every-top-bar-link-has-a-place-to-land.png"
+  },
+  {
+    "node": "WalkPicture",
+    "test": "a stale chapter",
+    "file": "home/watch/walkthrough-player/walk-picture/walk-picture/01-a-stale-chapter.png"
+  },
+  {
+    "node": "WalkPicture",
+    "test": "nodes with no spec yet",
+    "file": "home/watch/walkthrough-player/walk-picture/walk-picture/02-nodes-with-no-spec-yet.png"
+  },
+  {
+    "node": "WalkInset",
+    "test": "a card",
+    "file": "home/watch/walkthrough-player/walk-picture/walk-inset/walk-inset/01-a-card.png"
+  },
+  {
+    "node": "WalkInset",
+    "test": "a screenshot",
+    "file": "home/watch/walkthrough-player/walk-picture/walk-inset/walk-inset/02-a-screenshot.png"
+  },
+  {
+    "node": "AdoptSection",
+    "test": "adopting is explained",
+    "file": "home/adopt/adopt-section/01-adopting-is-explained.png"
+  }
+]
